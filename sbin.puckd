@@ -1,0 +1,87 @@
+#!/bin/bash -x
+
+#
+# Starts up the PUCK programs... openvpn, yate, and the node app
+#
+# Will create a default PUCK if none are present
+#
+
+echo starting PUCK server...
+
+PUCK_HOME="/etc/puck"
+hell="/etc/puck/f-u-openssl"
+
+cd $PUCK_HOME
+
+NODE="node"
+
+KEY_SIZE=2048
+KEY_SIZE=512
+KEY_SIZE=64
+
+# if no dir or symlink
+if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
+    cd $hell
+    ./rot-in-hell.sh
+
+    cd ..
+
+    mkdir $PUCK_HOME/pucks/PUCK
+    mkdir $PUCK_HOME/pucks/vpn_client
+
+    cp $hell/ca* $hell/puck* $PUCK_HOME/pucks/PUCK
+
+    ln -s $PUCK_HOME/pucks/PUCK/ca.crt $PUCK_HOME/pucks/PUCK/puckroot.crt
+
+    cp $hell/vpn* $PUCK_HOME/pucks/vpn_client
+
+    # print SHA1 fingerprint
+    openssl x509 -noout -fingerprint -in $PUCK_HOME/pucks/PUCK/puck.crt | awk -F= '{print $2}' | sed 's/://g' | tee -a $PUCK_HOME/pucks/PUCK/puck.pid
+
+    pid=`cat $PUCK_HOME/pucks/PUCK/puck.pid`
+
+    # DHM key
+    ./create_tlsauth.sh $pid
+    # xxx - give all clients the same TA key?
+
+    ./create_dhm.sh $KEY_SIZE
+
+    mv pucks/PUCK/* pucks/$pid
+    rmdir pucks/PUCK
+    ln -s /etc/puck/pucks/$pid /etc/puck/pucks/PUCK
+
+    # current eth0 ip addr
+    ip=$(ifconfig eth0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
+
+    # need to start this before we try a REST call to it....
+    $NODE main.js &
+
+    # XXX - make REST pings or something every sec until an answer, but for now...
+    sleep 10
+
+    ./exe/create_puck.sh $pid img/puck.png $ip "?" puck@example.com
+
+else
+    # if not started above, do so now
+    $NODE main.js &
+fi
+
+# for testing only... get something in the 10.x.y/24 zone
+x=$((RANDOM%254+1))
+y=$((RANDOM%254+1))
+
+base10="10.$x.$y"
+
+#
+# why in the name of holy fuck does openvpn require a /29 or bigger?
+# Did /31 kill their dog or something?  There must be a reason... somewhere...
+#
+mask10="255.255.255.248"
+
+cd /etc/puck
+
+openvpn --server $base10.0 $mask10 --config S.conf &
+
+yate -c /etc/puck/yate/ -vvvvv -d -l /etc/puck/log/yate.log -Dt
+
+exit 0

@@ -1,0 +1,34 @@
+curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '@a-puck.json' http://localhost:8080/puck
+
+{
+
+"image":"img/puck.png",
+    "PUCK":{"name":"?","PUCK-ID":"E47F1CDFD3FE16562C3F5D61012FEE94599D8949","ip_addr":"192.168.0.138","ip_addr_vpn":"192.168.0.138","owner":{"name":"?","email":"puck@example.com"}
+    "vpn" : {
+        "port"     : "80",
+        "protocol" : "tcp",
+        "ca"       : [
+            "-----BEGIN CERTIFICATE-----",
+            "MIIB9zCCAaGgAwIBAgIJANJua3/ADT/vMA0GCSqGSIb3DQEBBQUAMFcxCzAJBgNV",
+            "BAYTAkFRMQ4wDAYDVQQIDAVXaGl0ZTERMA8GA1UEBwwIUHVja3Rvd24xETAPBgNV",
+            "BAoMCFB1Y2t0b3duMRIwEAYDVQQDDAlsb2NhbGhvc3QwHhcNMTQwMjI3MDQ0MTM2",
+            "WhcNMjQwMjI1MDQ0MTM2WjBXMQswCQYDVQQGEwJBUTEOMAwGA1UECAwFV2hpdGUx",
+            "ETAPBgNVBAcMCFB1Y2t0b3duMREwDwYDVQQKDAhQdWNrdG93bjESMBAGA1UEAwwJ",
+            "bG9jYWxob3N0MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAM6NXTAjyXoXi93XHlh1",
+            "98HUYrlh5dVFZK87BZUgWOpw28NAKv295J4ak/Tzy2oAqvInL2WJeCLLGRT/epEG",
+            "SSUCAwEAAaNQME4wHQYDVR0OBBYEFNA9j69LTsX7NH8xNyTqBC4Ik+0hMB8GA1Ud",
+            "IwQYMBaAFNA9j69LTsX7NH8xNyTqBC4Ik+0hMAwGA1UdEwQFMAMBAf8wDQYJKoZI",
+            "hvcNAQEFBQADQQCMrosqSw06/SGHyM08+522zTW6aa7dNblb1PWCxDdwQ2IouxaH",
+            "UR6zwQsDOr155AvbkBJSCL2mJK9BqUPZvh2Q",
+            "-----END CERTIFICATE-----"
+            ],
+        "key"      : $vpn_key,
+        "cert"     : $cert,
+        "dh"       : $dh
+        }
+    }
+
+
+}
+
+

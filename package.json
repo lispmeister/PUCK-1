@@ -1,0 +1,29 @@
+{
+    "name": "PuckApp",
+    "version": "0.0.1",
+    "description": "REST prototype of Puck backend",
+    "main": "main.js",
+    "dependencies": {
+        "assert-plus": "0.1.2",
+        "bunyan": "0.21.1",
+        "node-static": "0.6.9",
+        "hiredis": "0.1.15",
+        "httpsync": "0.0.8",
+        "posix-getopt": "1.0.0",
+        "q": "1.0.0",
+        "rest": "latest",
+        "when": "latest",
+        "restify": "git://github.com/mcavage/node-restify.git#master",
+        "redis": "0.8.3"
+    },
+    "devDependencies": {
+        "nodeunit": "0.8.0"
+    },
+    "scripts": {
+        "start": "node main.js 2>&1 | bunyan",
+        "test": "nodeunit test"
+    },
+    "author": "Markus Fix",
+    "license": "MIT"
+}
+

@@ -1,0 +1,125 @@
+{"key": "xxx1", 
+ "value":{
+ "image" : "/img/TheScarecrowDidIt.jpg",
+   "PUCK" : {
+
+      "PUCK-ID" : "xxx1",
+      "ip_addr" : "192.168.0.14:8080",
+
+      "owner" : {
+         "name"            : "rex foo",
+         "email"           : "zen@fish2.com",
+         "pgp_fingerprint" : "abcdef"
+      },
+
+      "OpenVPN": {
+         "client" : {
+            "type"       : "slingshot",
+
+            "conf_file"  : "OpenVPN_client.conf",
+
+            "int-internal" : {
+               "type"    : "static",
+               "IP"      : "192.168.0.14",
+               "netmask" : "255.255.255.0"
+            },
+
+            "int-vpn" : {
+               "IP"      : "10.6.6.66",
+               "netmask" : "255.255.255.0"
+            },
+
+            "int-external" : {   
+               "IP"      : "63.225.191.45",
+               "netmask" : "255.255.255.0"
+            },
+
+
+            "config" : {
+               "port"            : "80",
+               "proto"           : "tcp-client",
+               "dev"             : "tun",
+               "script-security" : "2",
+               "verb"            : "6",
+
+               "resolv-retry"    : "infinite",
+               "nobind"          : "",
+               "persist-key"     : "",
+               "persist-tun"     : "",
+               "auth-user-pass"  : "creds.txt",
+               "pull"            : "",
+               "tls-client"      : "",
+               "tls-auth"        : "puck_open_vpn.static 1",
+               "key-direction"   : "1",
+               "remote-cert-tls" : "server",
+               "ca"              : "ca.crt",
+               "cert"            : "puck001.crt",
+               "key"             : "puck001.key",
+               "script-security" : "4",
+               "comp-lzo"        : "",
+               "auth-nocache"    : "",
+
+               "remote"          : "50.19.17.36 80"
+            }
+         },
+
+         "server" : {
+            "type" : "slingshot",
+
+            "int-internal" : {
+               "IP"      : "10.195.14.33",
+               "netmask" : "255.255.255.0",
+               "port"    : "1337",
+               "proto"   : "tcp"
+            },
+
+            "int-vpn" : {
+               "IP"      : "10.6.6.0",
+               "netmask" : "255.255.255.0",
+               "port"    : "80",
+               "proto"   : "tcp"
+            },
+
+            "int-external" : {   
+               "IP"      : "",
+               "netmask" : "255.255.255.0",
+               "port"    : "80",
+               "proto"   : "tcp"
+            },
+
+            "conf_file"  : "OpenVPN_server.conf",
+
+            "config" : {
+               "local"                    : "10.195.14.33",
+               "server"                   : "10.6.6.0 255.255.255.0",
+
+               "port"                     : "80",
+               "proto"                    : "tcp",
+               "dev"                      : "tun",
+
+               "client-config-dir"        : "CCD",
+               "ca"                       : "keys/ca.crt",
+               "cert"                     : "keys/server.crt",
+               "key"                      : "keys/server.key",
+               "dh"                       : "keys/dh2048.pem",
+               "key-direction"            : "0",
+               "script-security"          : "2",
+               "max-clients"              : "10",
+   
+               "tls-server"               : "",
+               "comp-lzo"                 : "",
+               "username-as-common-name"  : "",
+               "client-to-client"         : "",
+               "persist-key"              : "",
+               "persist-tun"              : "",
+
+               "tls-auth"                 : "puck_open_vpn.static  0",
+               "plugin"                   : "/usr/lib64/openvpn/plugin/lib/openvpn-auth-pam.so /etc/pam.d/login",
+               "push"                     : "\"redirect-gateway def1\"",
+
+               "verb" : "6"
+            }
+         }
+      }
+   }
+ }}

@@ -1,0 +1,43 @@
+
+# 
+# stuff you need to run a PUCK
+#
+# - zen
+#
+# Wed Mar  5 11:57:40 PST 2014
+#
+
+apt-get install -y aptitude
+
+# install node... better way?
+add-apt-repository ppa:chris-lea/node.js
+
+aptitude update
+
+apt-get install -y openssh-server
+apt-get install -y openvpn
+apt-get install -y yate
+apt-get install -y openssl
+apt-get install -y git
+apt-get install -y npm
+apt-get install -y redis-server
+apt-get install -y curl
+apt-get install -y python-software-properties
+apt-get install -y nodejs
+
+git clone https://github.com/the-puck/prototype
+
+cd prototype
+
+npm install
+
+
+# creates various bits
+./linkage
+
+
+# and finally....
+
+# start, stop, restart... sort of work ;)
+service puck start
+

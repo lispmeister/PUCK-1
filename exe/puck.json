@@ -1,0 +1,121 @@
+{
+   "PUCK" : {
+
+      "PUCK-ID" : "5C6B A08E 8D9B 8419 EB71  201B D89D 04AB E35D 5B36",
+
+      "owner" : {
+         "name"            : "dan farmer",
+         "email"           : "zen@fish2.com",
+         "pgp-fingerprint" : "abcdef"
+      },
+
+      "OpenVPN": {
+         "client" : {
+            "type"       : "slingshot",
+
+            "conf_file"  : "OpenVPN_client.conf",
+
+            "int-internal" : {
+               "type"    : "static",
+               "IP"      : "192.168.0.141",
+               "netmask" : "255.255.255.0"
+            },
+
+            "int-vpn" : {
+               "IP"      : "10.6.6.66",
+               "netmask" : "255.255.255.0"
+            },
+
+            "int-external" : {   
+               "IP"      : "63.225.191.45",
+               "netmask" : "255.255.255.0"
+            },
+
+
+            "config" : {
+               "port"            : "80",
+               "proto"           : "tcp-client",
+               "dev"             : "tun",
+               "script-security" : "2",
+               "verb"            : "6",
+               "resolv-retry"    : "infinite",
+               "nobind"          : "",
+               "persist-key"     : "",
+               "persist-tun"     : "",
+               "pull"            : "",
+               "tls-client"      : "",
+               "tls-auth"        : "keys/puck_open_vpn.static 1",
+               "key-direction"   : "1",
+               "remote-cert-tls" : "server",
+               "ca"              : "keys/ca.crt",
+               "cert"            : "keys/puck001.crt",
+               "key"             : "keys/puck001.key",
+               "script-security" : "4",
+               "comp-lzo"        : "",
+               "auth-nocache"    : "",
+
+               "remote"          : "192.168.0.55 80"
+            }
+         },
+
+         "server" : {
+            "type" : "slingshot",
+
+            "int-internal" : {
+               "IP"      : "10.195.14.33",
+               "netmask" : "255.255.255.0",
+               "port"    : "1337",
+               "proto"   : "tcp"
+            },
+
+            "int-vpn" : {
+               "IP"      : "10.6.6.0",
+               "netmask" : "255.255.255.0",
+               "port"    : "80",
+               "proto"   : "tcp"
+            },
+
+            "int-external" : {   
+               "IP"      : "",
+               "netmask" : "255.255.255.0",
+               "port"    : "80",
+               "proto"   : "tcp"
+            },
+
+            "conf_file"  : "OpenVPN_server.conf",
+
+            "config" : {
+               "local"                    : "10.195.14.33",
+               "server"                   : "10.6.6.0 255.255.255.0",
+
+               "port"                     : "80",
+               "proto"                    : "tcp",
+               "dev"                      : "tun",
+
+               "client-config-dir"        : "CCD",
+               "ca"                       : "keys/ca.crt",
+               "cert"                     : "keys/server.crt",
+               "key"                      : "keys/server.key",
+               "dh"                       : "keys/dh2048.pem",
+               "key-direction"            : "0",
+               "script-security"          : "2",
+               "max-clients"              : "10",
+   
+               "tls-server"               : "",
+               "comp-lzo"                 : "",
+               "username-as-common-name"  : "",
+               "client-to-client"         : "",
+               "persist-key"              : "",
+               "persist-tun"              : "",
+
+               "tls-auth"                 : "puck_open_vpn.static  0",
+               "plugin"                   : "/usr/lib64/openvpn/plugin/lib/openvpn-auth-pam.so /etc/pam.d/login",
+               "push"                     : "\"redirect-gateway def1\"",
+
+               "verb" : "6"
+            }
+         }
+      }
+   }
+}
+

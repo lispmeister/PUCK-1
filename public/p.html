@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>PUCKasaurus Rex!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="rawr!">
+    <meta name="author" content="zen + markus">
+
+    <!-- Le styles -->
+    <!-- <link href="/css/bootstrap.css" rel="stylesheet"> -->
+
+   <!-- for pucks -->
+   <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
+   <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/>
+
+
+  </head>
+
+  <body>
+
+      <div class="hero-unit">
+      <a href="#modalPuck" role="button" class="btn btn-primary btn-medium" data-toggle="modal">Create PUCK</a>
+
+      <form id="modalPuck" class="modal hide fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
+      <div class="modal-header">
+         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+         <h3 id="modalPuckLabel">Create your Own PUCK!</h3>
+      </div>
+
+      <fieldset>
+         <div class="control-group">
+            <p> </p>
+            <label class="control-label"  for="puckname">PUCK name</label>
+            <div class="controls">
+            <input type="text" id="puckname" name="puckname" placeholder="" class="input-xlarge">
+            <p class="help-block">Must be at least 1 character, less than 1000</p>
+            </div>
+         </div>
+       
+         <div class="control-group">
+            <label class="control-label" for="ip_addr">IP Address</label>
+            <div class="controls">
+            <input type="text" id="ip_addr" name="ip_addr" placeholder="" class="input-xlarge">
+            <p class="help-block"><em>This should be figured out in the future</em></p>
+            </div>
+         </div>
+ 
+         <div class="control-group">
+            <label class="control-label" for="owner">PUCK's owner</label>
+            <div class="controls">
+            <input type="text" id="owner" name="owner" placeholder="" class="input-xlarge">
+            <p class="help-block"><em>Optional</em></p>
+            </div>
+         </div>
+ 
+         <div class="control-group">
+            <label class="control-label" for="email">E-mail</label>
+            <div class="controls">
+            <input type="text" id="email" name="email" placeholder="" class="input-xlarge">
+            <p class="help-block"><em>Optional</em></p>
+            </div>
+         </div>
+ 
+         <div class="control-group">
+            <label class="control-label" for="image">image</label>
+            <div class="controls">
+            <input type="text" id="image" name="image" placeholder="" class="input-xlarge">
+            <p class="help-block"><em>Optional</em></p>
+            </div>
+         </div>
+ 
+         <!-- make it so -->
+         <div class="control-group">
+            <div class="controls">
+            <!-- this does some javascript fu below to post the data and redirect back to this page -->
+            <button class="btn btn-success" onclick="puck_create()">Create</button>
+            </div>
+         </div>
+      </fieldset>
+      </form>
+
+      </div>
+
+      <hr>
+
+      <!-- puck pals show up here -->
+      <div class="row-fluid marketing">
+      <ul class="thumbnails" id="puck_friends">
+      </ul>
+      </div>
+
+      <hr>
+
+    </div>
+
+    <!-- le javascript -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.adipoli.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+    <script type='text/javascript'>
+
+       //
+       // if they hit create puck... post data to server,
+       // which calls a program to do the work
+       // 
+       function puck_create() {
+
+           var puckname = document.getElementById('puckname').value
+           var ip_addr  = document.getElementById('ip_addr').value
+           var puckname = document.getElementById('owner').value
+           var email    = document.getElementById('email').value
+           var image    = document.getElementById('image').value
+
+           // validation will prevent puck's getting here w/o a valid name
+           if (puckname == "") { puckname = "WhaleSong666" }
+           if (ip_addr  == "") { ip_addr  = "10.0.0.1" }
+           if (owner    == "") { owner    = "anonymous" }
+           if (email    == "") { email    = "anon@example.org" }
+           if (image    == "") { image    = "/img/question_mark_128x128.jpg" }
+
+          alert('one')
+          var blank_puck = []
+          console.log('1\n\n')
+          blank_puck['value']                           = puckname
+          console.log('2\n\n')
+          blank_puck.task                               = []
+          console.log('3\n\n')
+          blank_puck.task.PUCK['PUCK-ID']               = puckname
+          console.log('4\n\n')
+          blank_puck.task.PUCK['ip_addr']               = ip_addr
+          console.log('5\n\n')
+          blank_puck.task.PUCK.owner                    = []
+          console.log('6\n\n')
+          blank_puck.task.PUCK.owner['name']            = owner
+          console.log('7\n\n')
+          blank_puck.task.PUCK.owner['email']           = email
+          console.log('8\n\n')
+          blank_puck.task.PUCK.owner['image']           = image
+          console.log('9\n\n')
+          alert('two')
+
+          console.log(blank_puck)
+          alert('three')
+
+          var json_puck = JSON.stringify(blank_puck);
+
+//        var postify = $.ajax({
+//             type: "POST",
+//             url: "http://localhost:8080/puck",
+//             data: json_puck
+//        })
+//            .done(function()   { console.log("success"); })
+//            .fail(function()   { console.log("error"); })
+//            .always(function() { console.log("finished"); });
+//     }
+
+    </script>
+
+  </body>
+</html>
+
