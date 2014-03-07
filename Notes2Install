@@ -33,7 +33,7 @@ npm install
 
 
 # creates various bits
-./linkage
+./linkage.sh
 
 
 # and finally....
