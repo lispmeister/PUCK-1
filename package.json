@@ -11,7 +11,6 @@
         "httpsync": "0.0.8",
         "posix-getopt": "1.0.0",
         "q": "1.0.0",
-        "rest": "latest",
         "when": "latest",
         "restify": "git://github.com/mcavage/node-restify.git#master",
         "redis": "0.8.3"
@@ -23,7 +22,7 @@
         "start": "node main.js 2>&1 | bunyan",
         "test": "nodeunit test"
     },
-    "author": "Markus Fix",
+    "author": "dan f & Markus Fix",
     "license": "MIT"
 }
 

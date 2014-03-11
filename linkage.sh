@@ -21,7 +21,9 @@ mkdir /etc/puck/redis
 mkdir /etc/puck/pucks
 chown redis.redis /etc/puck/redis
 
+sudo chown -R pi /etc/puck
 sudo chown -R redis /etc/puck/redis
+sudo chmod 755 /etc/puck
 sudo chmod 777 /etc/puck/tmp
 sudo chmod 777 /etc/puck/logs
 
