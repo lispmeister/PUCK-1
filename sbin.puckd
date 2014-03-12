@@ -13,7 +13,7 @@ hell="/etc/puck/f-u-openssl"
 
 cd $PUCK_HOME
 
-NODE="node"
+NODE="/usr/local/bin/node"
 
 KEY_SIZE=2048
 KEY_SIZE=512
