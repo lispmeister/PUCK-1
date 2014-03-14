@@ -12,9 +12,9 @@ keystore="/etc/puck/pucks"
 puckland="$keystore/PUCK"
 vpn="$keystore/vpn_client"
 
-ca=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $puckland/puckroot.crt)
-key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $vpn/vpn_client.key)
-cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $vpn/vpn_client.crt)
+ca=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $puckland/puckroot.crt)
+key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $vpn/vpn_client.key)
+cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $vpn/vpn_client.crt)
 
 # tls=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $puckland/ta.key)
 # dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $puckland/dh.params)
