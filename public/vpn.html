@@ -54,7 +54,7 @@
 
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
-          <li> <h4> <a href="/vpn.html" class="label label-danger">Video</a></h4> </li>
+          <li> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></a></button>
           <li class="muted"><a href="https://github.com/the-puck">Github</a></li>
           <li class="muted"><a href="/logs.html">Logs</a></li>
           <li class="muted"><a href="#">Help</a></li>
@@ -110,6 +110,9 @@ webrtc.on('readyToCall', function () {
     // you can name it anything
     webrtc.joinRoom('roomy');
 });
+
+
+poll_status('client_vpn.json', 1000)
 
 </script>
 

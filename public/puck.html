@@ -11,26 +11,12 @@
     <!-- <link href="/css/bootstrap.css" rel="stylesheet"> -->
 
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <style type="text/css">
-      body {
-        padding-top: 20px;
-        padding-bottom: 40px;
-      }
 
-      .ip_address {
-         /* border-style: solid ; 
-         border-color: black; 
-         border-width: 2px; */
-         color: gray:
-      }
+    <link href="/css/puck.css" rel="stylesheet">
 
+    <!-- for incoming calls -->
+    <link href="/css/avgrund.css" rel="stylesheet">
 
-   div.growlUI { background: url(check48.png) no-repeat 10px 10px }
-   div.growlUI h1, div.growlUI h2 {
-      color: white; padding: 5px 5px 5px 75px; text-align: left
-   }
-
-    </style>
     <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -45,73 +31,84 @@
 
   </head>
 
-  <body>
+<body>
 
     <div class="container">
 
-      <div class="masthead">
-        <ul class="nav nav-pills pull-right">
-          <li> <h4> <a href="/vpn.html" class="label label-danger">Video</a></h4> </li>
-          <li class="muted"><a href="https://github.com/the-puck">Github</a></li>
-          <li class="muted"><a href="/logs.html">Logs</a></li>
-          <li class="muted"><a href="#">Help</a></li>
-        </ul>
-        <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
-      </div>
+        <div class="masthead">
+            <ul class="nav nav-pills pull-right">
+                <li> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></a></button>
+                <li class="muted"><a href="https://github.com/the-puck">Github</a></li>
+                <li class="muted"><a href="/logs.html">Logs</a></li>
+                <li class="muted"><a href="#">Help</a></li>
+            </ul>
+            <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
+        </div>
 
-      <hr>
+        <hr>
 
-      <div class="hero-unit">
-         <p>... create, delete, view, etc.</p>
+        <div class="hero-unit">
 
+            <!-- <div id="incoming"></div> -->
+            <a href="#" id="incoming" class="button left">Show it</a>
         
-         <a href="#modalPuck" role="button" class="btn btn-primary btn-medium" data-toggle="modal">Add PUCK</a>
+            <a href="#modalPuck" role="button" class="btn btn-primary btn-medium" data-toggle="modal">Add PUCK</a>
 
 <!-- based on http://bootsnipp.com/snipps/simple-registration-form -->
 
-         <form id="modalPuck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
-            <div class="modal-dialog">
-               <div class="modal-content">
-                  <div class="modal-header">
-                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                     <h3 id="modalPuckLabel">Get PUCK</h3>
-                  </div>
-               <div class="modal-body">
-                  <fieldset>
+            <form id="modalPuck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h3 id="modalPuckLabel">Get PUCK</h3>
+                        </div>
+                        <div class="modal-body">
+                            <fieldset>
        
-                     <div class="control-group">
-                        <label class="control-label" for="ip_addr">IP Address</label>
-                        <div class="controls">
-                           <input type="text" id="ip_addr" name="ip_addr" placeholder="" maxlength="21" class="input-xlarge">
-                           <p class="help-block"></p>
-                        </div>
-                     </div>
+                            <div class="control-group">
+                                <label class="control-label" for="ip_addr">IP Address</label>
+                                <div class="controls">
+                                    <input type="text" id="ip_addr" name="ip_addr" placeholder="" maxlength="21" class="input-xlarge">
+                                    <p class="help-block"></p>
+                                </div>
+                            </div>
  
-                     <span> 
-                        <input style="display:none" id="puck_action" name="puck_action" value="CREATE" />
-                     </span>
-                     <!-- make it so -->
-                     <div class="control-group">
-                        <div class="controls">
-                        <!-- this does some javascript fu below to post the data and redirect back to this page -->
-                        <button id="puck_button_create" class="btn btn-success" onclick="puck_create()">Create</button>
-                        </div>
-                     </div>
-                  </fieldset>
-               </div>
-            </div>
-         </form>
-      </div>
+                            <span> 
+                                <input style="display:none" id="puck_action" name="puck_action" value="CREATE" />
+                            </span>
 
-      <hr>
+                            <div class="control-group">
+                                <div class="controls">
+                                <!-- this does some javascript fu below to post the data and redirect back to this page -->
+                                <button id="puck_button_create" class="btn btn-success" onclick="puck_create()">Create</button>
+                                </div>
+                            </div>
 
-      <!-- puck pals show up here -->
-      <div class="row-fluid marketing" id="puck_friends">
-      </div>
+                        </fieldset>
 
-      <hr>
+                    </div>
+                </div>
+            </form>
 
-    </div>
+        </div> 
+        </div> <!-- end of form/top stuff -->
+        <div class="btn-toolbar spacer20"></div>
+
+        <!-- puck pals show up here -->
+        <div class="row-fluid marketing" id="puck_friends"> </div>
+
+        <div class="btn-toolbar"> <span></span></div>
+        <div class="btn-toolbar"> <span class="spacer100"></span></div>
+
+        <div class="footer" id="puck_footy">
+            <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
+        </div>
+
+   </div>
+
+
+    </body>
 
     <!-- le javascript -->
     <!-- <script type="text/javascript" src="/js/jquery.1.10.0.min.js"></script> -->
@@ -125,10 +122,88 @@
     <script type="text/javascript" src="/js/jquery.inputmask.js"></script>
     <script type="text/javascript" src="/js/spin.js"></script>
     <script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="/js/jquery.avgrund.js"></script>
 
     <!-- some stuff by zen in here - all the actions on this page concerning pucks... -->
-    <script type="text/javascript" src="/js/puck_server_misc.js"></script>
+   <script type="text/javascript" src="/js/puck_server_misc.js"></script>
 
-  </body>
+   <script>
+
+    $(document).ready(function () {
+
+
+        var url = "/getip"
+        var jqXHR_getIP = $.ajax({
+            url: url,
+            dataType: 'json',
+        }) 
+
+        jqXHR_getIP.done(function (data, textStatus, jqXHR) {
+            console.log('jxq getIP wootz')
+            console.log(data)
+            var ip = data.ip
+            $('#ip_diddy').prepend("Your IP address is: " + ip + " ... ");
+        }).fail(function(err) {
+            console.log('errz on getIP' + err)
+        })
+
+        poll_status('client_vpn.json', 10000)
+
+//      $('#puck_disconnect').click(function() {
+
+        $('body').on('click', '#puck_disconnect', function() {
+            console.log( "disconnecting VPN...." );
+            var url = "/vpn/stop"
+
+            $(this).button('loading')
+
+            var jqXHR_getIP = $.ajax({
+                url: url,
+                dataType: 'json',
+            }) 
+
+            jqXHR_getIP.done(function (data, textStatus, jqXHR) {
+                console.log('jxq hangup wootz')
+                console.log(data)
+                window.location = '/puck.html'
+            }).fail(function(err) {
+                console.log('errz on hangup' + err)
+                alert('error on hangup!')
+                window.location = '/puck.html'
+            })
+
+        })
+
+        // from http://soundbible.com/1411-Telephone-Ring.html
+        var ring = new Audio("media/ringring.mp3") // load it up
+
+        // when clicked....
+        $('#incoming').avgrund({
+            onLoad: function (element) {
+                console.log('This function will be called before dialog is initialized');
+                ring.play()
+            },
+            height: 120,
+            width: 600,
+            holderClass: 'custom',
+            showClose: true,
+            showCloseText: 'Close',
+            enableStackAnimation: true,
+            onBlurContainer: '.container',
+            template: '<div class="row">' +
+                      '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
+                      '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Answer</span></a></button></div>'  +
+                      '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
+                      '</div>'
+            })
+
+        // if click above, disconnect
+
+    })
+
+
+    </script>
+
+
 </html>
 

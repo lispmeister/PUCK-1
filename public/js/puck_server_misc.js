@@ -64,13 +64,13 @@ function puck_vpn(pid, ip) {
 
    vpn_puck['pid']    = pid
    vpn_puck['ip']     = ip
-   vpn_puck['action'] = '/VPN'
+   vpn_puck['action'] = '/vpn/start'
 
    var json_puck = JSON.stringify(vpn_puck);
 
    console.log('posting' + json_puck)
 
-   post ("/VPN", vpn_puck)
+   post ("/vpn/start", vpn_puck)
 
    window.location = '/puck.html'
 
@@ -174,11 +174,57 @@ function truncate(string){
      return string;
 };
 
+
+function poll_status(status_file, frequency){
+    window.setInterval(function () {
+        $.ajax({ 
+            url: status_file, 
+            dataType: "json",
+            success: function(data){
+                console.log('got status file... ' + status_file)
+                console.log(data)
+
+                if (typeof data.vpn_status != "undefined") {
+                    if (data.vpn_status == "up") {
+                        $('#puck_video').removeClass('disabled')
+                        
+                        var page = window.location.pathname.split('/')[1]
+
+                        console.log("we're on... " + page)
+
+                        // if we're not on the vpn page, ring
+                        if (page != "vpn.html") {
+                            console.log('trying .... to... ring!')
+                            $('#incoming')[0].click()
+                        }
+                        // else {
+                        //     console.log('no ring, on vpn page')
+                        // }
+                    }
+
+                    else {
+                        $('#puck_video').addClass('disabled')
+                    }
+
+                }
+                else {
+                    $('#puck_video').addClass('disabled')
+                }
+            }})
+    }, frequency); // repeat every X seconds
+}
+
 //
 // after all the HTML... let the JS fur fly
 //
 $(document).ready(function () {
   var image = ""
+
+    // disable a/href pushing if disabled
+    $('body').on('click', 'a.disabled', function(event) {
+        event.preventDefault();
+    });
+
 
   // get the pucks we know about from local REST
   $.getJSON('/puck', function(pucks) {
@@ -249,7 +295,7 @@ $(document).ready(function () {
                // '<li class="span3" id="{{puckid}}">'                                                        +
                // '<div class="thumbnail">'                                                                +
            var template = 
-                '<div class="col-sm-6 col-md-4">' + 
+                '<div class="col-md-3">' + 
                  '<div class="thumbnail" id="{{puckid}}">'                                                +               
                     '<a href="/puck_details.html?puckid={{puckid}}">'                                     +
                     '<img id="{{puckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
@@ -259,7 +305,7 @@ $(document).ready(function () {
                        '<span id="{{ipaddr}}">Server: <strong>{{ipaddr}}</strong> </span> <br />'         +
                        '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                        '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
-                       '<form id="{{vpn_form}}" action="/VPN" method="POST">'                             +
+                       '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                             +
                        '<input style="display:none" name="puckid"  value={{puckid}}>'    +
                        '<input style="display:none" name="ipaddr"  value={{ipaddr}}>'           +
                        '<input style="display:none" name="vpn_action" value="VPN" />'     +

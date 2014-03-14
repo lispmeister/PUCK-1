@@ -4,16 +4,20 @@
     "description": "REST prototype of Puck backend",
     "main": "main.js",
     "dependencies": {
+        "asn1": "latest",
         "assert-plus": "0.1.2",
         "bunyan": "0.21.1",
-        "node-static": "0.6.9",
-        "hiredis": "0.1.15",
         "httpsync": "0.0.8",
+        "moment": "latest",
+        "nodemon": "latest",
+        "node-static": "0.6.9",
         "posix-getopt": "1.0.0",
         "q": "1.0.0",
-        "when": "latest",
-        "restify": "git://github.com/mcavage/node-restify.git#master",
-        "redis": "0.8.3"
+        "rest": "latest",
+        "restify": "latest",
+        "redis": "0.8.3",
+        "tail": "latest",
+        "when": "latest"
     },
     "devDependencies": {
         "nodeunit": "0.8.0"

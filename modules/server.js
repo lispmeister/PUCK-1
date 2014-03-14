@@ -1,8 +1,10 @@
 
 // general includes
-var assert  = require('assert-plus'),
+var Tail    = require('tail').Tail;
+    assert  = require('assert-plus'),
     bunyan  = require('bunyan'),
     fs      = require('fs'),
+    moment  = require('moment'),
     restify = require('restify'),
     path    = require('path'),
     rest    = require('rest'),
@@ -30,6 +32,115 @@ rclient.on("error", function (err) {
 // file reads to string nodey stuff
 var StringDecoder = require('string_decoder').StringDecoder;
 var decoder       = new StringDecoder('utf8');
+
+
+// log file watcher
+function watch_logs(logfile) {
+
+    // create if doesn't exist...?
+    if (!fs.existsSync(logfile)) {
+        console.log('creating ' + logfile)
+        fs.writeFileSync(logfile, "")
+    }
+    else {
+        console.log('watching ' + logfile)
+    }
+
+    // status in public, logs in logs
+    var logfile_status = "/etc/puck/public/" + logfile + ".json",
+        status_data    = ""
+
+    logfile = "/etc/puck/logs/" + logfile + ".log"
+
+    var tail = new Tail(logfile)
+
+    tail.on("line", function(line) {
+        // console.log("got line from " + logfile + ":" + line)
+    
+        // xxx - for client openvpn - config
+        var magic_client_up   = "/sbin/route add"
+        var magic_client_down = "VPN is down"
+//      var vpn_status_file  = "/etc/puck/logs/open_vpn_status.log"
+        if (line.indexOf(magic_client_up) > -1 || line.indexOf(magic_client_down) > -1) {
+            console.log('\n\n\n++++++++++++\n\n Openvpn changed status!\n\n')
+
+            
+            // yeah, yeah, sync, cry me a river
+            if (fs.existsSync(logfile_status)) {
+                console.log('status file exists...!')
+                fs.readFileSync(logfile_status, {encoding: 'utf8'}, function (err, data) {
+                    if (err) { 
+                        console.log('no status file, will create')
+                    }
+                    else {
+                        console.log(data);
+                        status_data = JSON.parse(data)
+                    }
+                })
+            }
+            else { console.log('will create status file') }
+
+            var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
+                moment_in_secs =  (new Date).getTime();
+
+            console.log('moment: ' + moment_in_time)
+
+            var magic      = {}
+
+            if (line.indexOf(magic_client_up) > -1) {
+                // if starting simply take the current stuff
+                magic = {
+                    vpn_status : "up",
+                    start      : moment_in_time,
+                    start_s    : moment_in_secs,
+                    duration   : "n/a",
+                    stop       : "n/a"
+                    }
+            }
+            else {
+                var v_duration = 0
+
+                // if stopping read the status for when we started
+                if (status_data != "" && status_data.vpn_status == "up") {
+                    v_duration = moment_in_secs - status_data.start_s
+                }
+
+                magic = {
+                    vpn_status : "down",
+                    start      : moment_in_time,
+                    start_s    : moment_in_secs,
+                    duration   : v_duration,
+                    stop       : "n/a"
+                    }
+            }
+
+            magic = JSON.stringify(magic)
+
+            console.log("vpn-client-status" + magic)
+            console.log("write to: " + logfile_status)
+
+            // fs.writeFileSync(vpn_status_file, magic, function (err) {
+            fs.writeFile(logfile_status, magic, function (err) {
+                // xxx need flag error
+                if (err) { console.log('errz ' + err)  }
+                else     { console.log('wrote status') }
+            })
+        }
+
+   })
+
+   tail.on('error', function(err) {
+      console.log("\n\n\n*** error tailing *** :", err)
+      console.log("stopping the watch of " + logfile)
+      tail.unwatch()
+   })
+
+   console.log('trigger set')
+   // Quis custodiet ipsos custodes?
+   tail.watch()
+
+}
+
 
 // global PUCK ID for this server's PUCK
 try {
@@ -150,6 +261,17 @@ function NotImplementedError() {
     this.name = 'NotImplementedError';
 }
 util.inherits(NotImplementedError, restify.RestError);
+
+
+// quick bit to get the user's ip addr
+
+function getIP(req, res, next) {
+
+   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+
+    res.send(200, '{"ip" : "' + ip + '"}');
+    next(); 
+}
 
 
 /**
@@ -353,38 +475,37 @@ function echoStatus(req, res, next) {
 }
 
  /**
- * Start the local OpenVPN server. We execute an external bash script.
- * Returns OK if we succeed.
- * TODO: We might want to use https://github.com/arturadib/shelljs#readme
- *
- * Note: We can also use child_process.execFile(file, args, options, callback)
- *       if that is more convenient.
+ * Stop the local OpenVPN server via an external bash script.
  */
-function startVPN(req, res, next) {
-    var exec = require('child_process').exec;
-    var child;
-    var command = 'date';
-    child = exec(command,
-                 function (error, stdout, stderr) {
-                     req.log.debug('startVPN stdout: ' + stdout);
-                     req.log.debug('startVPN stderr: ' + stderr);
-                     if (error !== null) {
-                         req.log.error('exec error: ' + error);
-                         res.send(500, "{\"status\": \"Failed\"}");
-                         next();
-                     } else {
-                         res.send(200, "{\"status\": \"OK\"}");
-                         next();
-                     }
-                 });
+function stopVPN(req, res, next) {
+    var exec    = require('child_process').exec;
+    var command = '/etc/puck/exe/stop_vpn.sh';
+
+    var child = exec(command,
+        function (error, stdout, stderr) {
+            req.log.debug('stop VPN stdout: ' + stdout);
+            req.log.debug('stop VPN stderr: ' + stderr);
+            if (error !== null) {
+                req.log.error('exec error: ' + error);
+                res.send(500, "{\"status\": \"Failed\"}");
+                next();
+            } else {
+                res.send(200, "{\"status\": \"OK\"}");
+                next();
+            }
+        });
 }
 
-function startVPN2(req, res, next) {
+ /**
+ * Start the local OpenVPN server via an external bash script.
+ */
+function startVPN(req, res, next) {
 
     console.log('start vpn2')
     console.log(req.params)
 
     var puck_web_home = "/puck.html"
+    var vpn_log       = "client_vpn"
 
     // bail if we don't get ID
     if (typeof req.params.puckid === 'undefined' || req.params.puckid == "") {
@@ -396,6 +517,9 @@ function startVPN2(req, res, next) {
       return next(false);
     }
    
+    // xxxx - wonder if this shouldn't be done via REST
+    watch_logs(vpn_log)
+
     console.log('onto the execution...')
 
     puckid = req.params.puckid
@@ -408,13 +532,9 @@ function startVPN2(req, res, next) {
     args = [puckid, ipaddr]
     cmd = vpn
 
-    var fs = require('fs'),
-
-    spawn = require('child_process').spawn,
-
-    out = fs.openSync('/etc/puck/tmp/std.log', 'a'),
-
-    err = fs.openSync('/etc/puck/tmp/err.log', 'a');
+    var spawn = require('child_process').spawn,
+          out = fs.openSync('/etc/puck/tmp/std.log', 'a'),
+          err = fs.openSync('/etc/puck/tmp/err.log', 'a');
 
     var child = spawn(cmd, args, {
         detached: true,
@@ -424,24 +544,6 @@ function startVPN2(req, res, next) {
     child.unref();
 
     console.log('post execution')
-
-    // now slice and dice output, errors, etc.
-
-// xxx... 
-//  vpn.stdout.on('data', function (data) {
-//    console.log('start_vpn.sh stdout: ' + data);
-//  });
-
-//  vpn.stderr.on('data', function (data) {
-//    console.log('start_vpn.sh stderr: ' + data);
-//    vpn_error = "data"
-//  });
-
-//  vpn.on('close', function (code) {
-//    console.log('start_vpn.sh process exited with code ' + code);
-//  });
-
-    // redirect to the home-o-the-puck
 
     var vpn_home = "/vpn.html"
     res.header('Location', vpn_home);
@@ -833,8 +935,8 @@ function createServer(options) {
     });
 
 
-    // Start the OpenVPN server locally. Return OK if we succeed.
-    server.get('/startVPN', startVPN);
+    // get your ip addr(s)
+    server.get('/getip', getIP);
 
     // Return a Puck by key
 
@@ -875,7 +977,8 @@ function createServer(options) {
             'GET     /ping',
             'GET     /ping/:key',
             'GET     /sping/:key',
-            'GET     /startVPN',
+            'POST    /vpn/start',
+            'GET     /vpn/stop'
         ];
         res.send(200, routes);
         next();
@@ -883,11 +986,12 @@ function createServer(options) {
 
     server.del('/puck/:key', deletePuck);
 
-
     /// zen....
     server.post('/form', handleForm);
 
-    server.post('/VPN', startVPN2);
+    server.post('/vpn/start', startVPN);
+    // stop
+    server.get('/vpn/stop', stopVPN);
 
     server.get(".*", restify.serveStatic({ 
       directory: './public', 
