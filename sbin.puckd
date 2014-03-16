@@ -11,11 +11,10 @@ echo starting PUCK server...
 PUCK_HOME="/etc/puck"
 hell="/etc/puck/f-u-openssl"
 
-cd $PUCK_HOME
-
-NODE="/usr/local/bin/node"
-
+PATH=$PATH:/usr/local/nodey/bin
 echo $PATH
+
+cd $PUCK_HOME
 
 KEY_SIZE=2048
 KEY_SIZE=512
@@ -57,7 +56,7 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     ip=$(ifconfig eth0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
 
     # need to start this before we try a REST call to it....
-    $NODE main.js &
+    node main.js &
 
     # XXX - make REST pings or something every sec until an answer, but for now...
     sleep 10
@@ -68,7 +67,7 @@ else
     cp $PUCK_HOME/pucks/PUCK/puck.pid $PUCK_HOME/public/puck.pid
 
     # if not started above, do so now
-    $NODE main.js &
+    node main.js &
 
 fi
 

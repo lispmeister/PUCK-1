@@ -875,7 +875,6 @@ function formCreate(req, res, next) {
                         var spawn = require('child_process').spawn
 
                         // this simply takes the pwd and finds the exe area...
-                              console.log(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
                         var pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
 
                         // now slice and dice output, errors, etc.
@@ -884,29 +883,13 @@ function formCreate(req, res, next) {
                         pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
 
                         if (!isEmpty(bwana_puck)) {
-                            console.log("THE TIME HAS COME!")
-                            console.log("THE TIME HAS COME!")
-                            console.log("THE TIME HAS COME!")
-                            console.log("THE TIME HAS COME!")
-                            console.log("THE TIME HAS COME!")
-                            console.log("THE TIME HAS COME!")
-                            console.log("THE TIME HAS COME!")
-                                         console.log(puck_fs_home + '/../exe/create_puck.sh', puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr)
+                            console.log("posting our puck to the puck who asked for ours....")
                             var remote_pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
 
+                            // output, errors, etc.
                             remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
                             remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
-                            remote_pucky.on('exit', function (code) { console.log('remote create_puck.sh process exited with code ' + code); });
-                        }
-                        else {
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
-                            console.log("THE TIME ... wait, not yet")
+                            remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
                         }
                     })
                 }
