@@ -466,7 +466,7 @@ $(document).ready(function () {
                        '<input style="display:none" name="puckid"  value={{puckid}}>'    +
                        '<input style="display:none" name="ipaddr"  value={{ipaddr}}>'           +
                        '<input style="display:none" name="vpn_action" value="VPN" />'     +
-                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="btn disabled">VPN</button>' +
+                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="btn disabled">Call</button>' +
                        '</form>'                                                                          +
                     '</div>'                                                                              +
                  '</div>'                                                                                 +
