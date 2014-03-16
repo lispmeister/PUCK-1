@@ -123,32 +123,33 @@ function puck_vpn(pid, ip) {
 }
 
 //
-// if they hit create puck... post data to server,
+// if they hit create puck... post data to target server,
 // 
-function puck_create() {
-
-    console.log('js puck_create')
-
-    var delay = 10000
-
-    $('#puck_button_create').text("... creating ...")
-
-    var json_puck = JSON.stringify(puck_data);
-
-    $.ajax({
-        url : "/puck/swap",
-        type: "post",
-        data : json_puck,
-        success: function(data, textStatus, jqXHR) {
-            console.log('successfully posted request')
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.log('down, down, down she goes... post failed')
-            console.log('"' + errorThrown + '"')
-        }
-    });
-
-}
+// function puck_create(ip_addr) {
+// 
+//     console.log('js puck_create')
+// 
+//     var delay = 10000
+// 
+//     $('#puck_button_create').text("... creating ...")
+// 
+//     var json_puck = JSON.stringify(puck_data);
+// 
+//     $.ajax({
+//         url : 'https://' + ip_addr + ':8080/puck/swap',
+//         type: "post",
+//         data : json_puck,
+//         success: function(data, textStatus, jqXHR) {
+//             console.log('successfully posted request')
+//             console.log(data)
+//         },
+//         error: function (jqXHR, textStatus, errorThrown) {
+//             console.log('down, down, down she goes... post failed')
+//             console.log('"' + errorThrown + '"')
+//         }
+//     });
+// 
+// }
 
 //
 // well...  sort of... pingish... send ping request to PUCK server
@@ -314,7 +315,11 @@ $(document).ready(function () {
     poll_status('server_vpn.json', main_page_poll_time)
 
     // ... and on the 6th day...
-    $('body').on('click', '#puck_button_create', function() { puck_create() })
+    // xxxx
+//    $('body').on('click', '#puck_button_create', function() { 
+//        console.log('trying to create puck...')
+//        puck_create($('input[name=ip_addr]').val()) 
+//    })
 
     // ... bye bye
     $('body').on('click', '#puck_disconnect', function() { hang_up() })

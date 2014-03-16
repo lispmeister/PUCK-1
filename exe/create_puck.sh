@@ -2,14 +2,13 @@
 #
 # create a new puck via curl
 #
-# Usage: $0 puck-id picture IP-addr owner email
+# Usage: $0 puck-id picture IP-addr owner email [puck-ip]
 #
 puck_host="https://localhost"
 puck_port="8080"
 puck_home="/etc/puck"
 keystores="/etc/puck/pucks"
 client_keys="/etc/puck/vpn_client"
-puck_url="$puck_host:$puck_port/puck"
 tmp="$puck_home/tmp"
 results="$tmp/_puck_create_results.$$"
 new_puck="$tmp/_new_puck.$$"
@@ -21,11 +20,21 @@ duplicate="already exists"
 noserver="couldn't connect to host"
 success="upload completely sent off"
 method="Method Not Allowed"
+serverborkage="InternalError"
 
-if [ $# -ne 5 ] ; then
+echo ARGZ: $*
+
+if [ $# -lt 5 ] ; then
    echo "Usage: $0 key picture puck-ID  IP-addr owner email"
    exit 1
 fi
+
+if [ $# -eq 6 ] ; then
+    echo creating puck on remote host
+    puck_host="https://$6"
+fi
+
+puck_url="$puck_host:$puck_port/puck"
 
 # kill off the evidence
 # trap "rm -f $tmp_files" EXIT
@@ -127,27 +136,16 @@ elif `grep -q "$invalid" $results` ; then
 elif `grep -q "$noserver" $results` ; then
    echo couldn\'t connect to $url
    exit 6
+elif `grep -q "$serverborkage" $results` ; then
+   echo internal server error $url
+   exit 7
 # elif `grep -q "$error" $results` ; then
 #    echo Invalid method
 #    exit 4
 
 # elif `grep -q "$success" $results` ; then
 else
-
-   # ... unsure about how to deal with this, but for now...!
-#  $puck_home/create_cert.sh $puck_id
-
-   # if the above worked....
-#  if [ $? != 0 ] ; then
-#      echo "certificate/key creation failed"
-#      exit 7
-#  fi
-
-   # XXX - should create it here to begin with...?
-#  mv $puck_id.* $keystores/$puck_id
-
    echo success\!
-
    exit 0
 fi
 

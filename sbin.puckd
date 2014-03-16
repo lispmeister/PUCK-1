@@ -13,7 +13,7 @@ hell="/etc/puck/f-u-openssl"
 
 cd $PUCK_HOME
 
-PATH=$PATH:/usr/local/nodey/bin/
+NODE="/usr/local/bin/node"
 
 echo $PATH
 
@@ -57,18 +57,18 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     ip=$(ifconfig eth0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
 
     # need to start this before we try a REST call to it....
-    node main.js &
+    $NODE main.js &
 
     # XXX - make REST pings or something every sec until an answer, but for now...
     sleep 10
 
-    ./exe/create_puck.sh $pid img/puck.png $ip "?" puck@example.com
+    ./exe/create_puck.sh $pid img/puck.png $ip "Ms. PUCK" puck@example.com
 
 else
     cp $PUCK_HOME/pucks/PUCK/puck.pid $PUCK_HOME/public/puck.pid
 
     # if not started above, do so now
-    node main.js &
+    $NODE main.js &
 
 fi
 

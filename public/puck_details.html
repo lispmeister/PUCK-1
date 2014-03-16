@@ -68,38 +68,28 @@
 
       <hr>
 
-      <div>
+        <div class="container">
 
         <!-- make it so -->
-        <div class="control-group">
-            <div class="controls">
-                <!-- this does some javascript fu below to ping this PUCK -->
-                <h4><em>this doesn't work yet....!</em></h4>
-                <!-- <button id="puck_vpn" class="btn btn-large btn-success" onclick="puck_create()">VPN </button> -->
-                <button id="puck_vpn" class="btn btn-large btn-primary">VPN </button>
+          <div id="puck_details">
+          </div>
+
+        <!-- make it so -->
+        <form action='/form' method="POST">
+        <fieldset>
+            <div class="control-group">
+                <span> <input style="display:none" id="puck_action" name="puck_action" value="DELETE" /> </span>
+                <span> <input style="display:none" id="puckid_form" name="puckid" value="" /> </span>
+                <div class="controls">
+                <!-- this does some javascript fu below to post the data and redirect back to this page -->
+                <button id="puck_button_delete" class="btn btn-large btn-danger" onclick="puck_delete()">DELETE w NO CONFIRM </button>
+                </div>
             </div>
+        </fieldset>
+        </form>
+
         </div>
 
-      </div>
-
-      <hr>
-
-      <div id="puck_details">
-      </div>
-
-      <!-- make it so -->
-      <form action='/form' method="POST">
-      <fieldset>
-         <div class="control-group">
-            <span> <input style="display:none" id="puck_action" name="puck_action" value="DELETE" /> </span>
-            <span> <input style="display:none" id="puckid_form" name="puckid" value="" /> </span>
-            <div class="controls">
-               <!-- this does some javascript fu below to post the data and redirect back to this page -->
-               <button id="puck_button_delete" class="btn btn-large btn-danger" onclick="puck_delete()">DELETE w NO CONFIRM </button>
-            </div>
-         </div>
-      </fieldset>
-      </form>
 
     <!-- le javascript -->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>

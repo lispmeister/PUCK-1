@@ -26,7 +26,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 ///--- Redis
 var redis = require("redis"),
-rclient = redis.createClient();    
+  rclient = redis.createClient();    
+
 rclient.on("error", function (err) {
    console.log("Redis client error: " + err);
    // req.log.error("Redis client error: " + err);
@@ -36,6 +37,70 @@ rclient.on("error", function (err) {
 var StringDecoder = require('string_decoder').StringDecoder;
 var decoder       = new StringDecoder('utf8');
 
+
+// global PUCK ID for this server's PUCK
+try {
+    puck_id = fs.readFileSync("/etc/puck/pucks/PUCK/puck.pid")
+    puck_id = decoder.write(puck_id);
+    puck_id = puck_id.replace(/\n/, '');
+} 
+catch (e) {
+    console.log("no PUCK ID for this potential PUCK... you won't get anywhere w/o it....\n")
+    console.log(e)
+    process.exit(2)
+}
+
+//
+// drag in PUCK data to the server
+//
+// the very first time it's a bit of a chicken and egg thing;
+// how do you get the PUCK data loaded into the server if 
+// the client hasn't posted it yet? Wait for the first time
+// something is posted, that should be the one that we can
+// trigger on.
+//
+
+console.log('pulling in puck data for the server itself')
+var bwana_puck = {}
+
+// wait for the first puck to be loaded in
+events    = require('events');
+emitter   = new events.EventEmitter();
+
+var uber_puck = function uber_puck() {
+
+    console.log("it's time...!")
+
+    someday_get_https('https://localhost:8080/puck/' + puck_id).then(onFulfilled, onRejected)
+
+    function onFulfilled(res) {
+        console.log('finally got server response...')
+
+        if (res.indexOf("was not found") != -1) {
+            console.log('no woman no puck: ' + res)
+            // trytryagain(options, callback);
+        }
+        else {
+            console.log('puckarrific!')
+            // console.log(res)
+            res = JSON.parse(res)
+            bwana_puck = res
+       }
+    }
+
+    function onRejected(err) {
+        console.log('Error: ', err);
+        console.log("well... try again?")
+        trytryagain(options, callback);
+    }
+}
+// set the mousetrap
+emitter.on('loaded', uber_puck);
+
+// try it once
+if (isEmpty(bwana_puck)) {
+    emitter.emit('loaded')
+}
 
 // log file watcher
 function watch_logs(logfile) {
@@ -163,72 +228,6 @@ function watch_logs(logfile) {
    tail.watch()
 
 }
-
-
-// global PUCK ID for this server's PUCK
-try {
-    puck_id = fs.readFileSync("/etc/puck/pucks/PUCK/puck.pid")
-    puck_id = decoder.write(puck_id);
-    puck_id = puck_id.replace(/\n/, '');
-} 
-catch (e) {
-    console.log("no PUCK ID for this potential PUCK... you won't get anywhere w/o it....\n")
-    console.log(e)
-    process.exit(2)
-}
-
-//
-// drag in PUCK data to the server
-//
-// the very first time it's a bit of a chicken and egg thing;
-// how do you get the PUCK data loaded into the server if 
-// the client hasn't posted it yet? Wait for the first time
-// something is posted, that should be the one that we can
-// trigger on.
-//
-
-console.log('pulling in puck data for the server itself')
-var bwana_puck = {}
-
-// wait for the first puck to be loaded in
-events    = require('events');
-emitter   = new events.EventEmitter();
-
-var uber_puck = function uber_puck() {
-
-    console.log("it's time...!")
-
-    someday_get_https('https://localhost:8080/puck/' + puck_id).then(onFulfilled, onRejected)
-
-    function onFulfilled(res) {
-        console.log('finally got server response...')
-
-        if (res.indexOf("was not found") != -1) {
-            console.log('no woman no puck: ' + res)
-            // trytryagain(options, callback);
-        }
-        else {
-            console.log('puckarrific!')
-            // console.log(res)
-            res = JSON.parse(res)
-            bwana_puck = res
-       }
-    }
-
-    function onRejected(err) {
-        console.log('Error: ', err);
-        console.log("well... try again?")
-        trytryagain(options, callback);
-    }
-}
-// set the mousetrap
-emitter.on('loaded', uber_puck);
-
-// try it once
-if (isEmpty(bwana_puck)) {
-    emitter.emit('loaded')
-}
-
 
 ///--- Errors
 function MissingValueError() {
@@ -725,6 +724,9 @@ function formDelete(req, res, next) {
 }
 
 
+//
+// https ping a remote puck
+//
 function httpsPing(ipaddr, res, next) {
 
    var https    = require('https')
@@ -873,23 +875,39 @@ function formCreate(req, res, next) {
                         var spawn = require('child_process').spawn
 
                         // this simply takes the pwd and finds the exe area...
-
-                            console  .log(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
+                              console.log(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
                         var pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
 
                         // now slice and dice output, errors, etc.
-                        pucky.stdout.on('data', function (data) {
-                            console.log('create_puck.sh stdout: ' + data);
-                        });
+                        pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
+                        pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
+                        pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
 
-                        pucky.stderr.on('data', function (data) {
-                            console.log('create_puck.sh stderr: ' + data);
-                        });
+                        if (!isEmpty(bwana_puck)) {
+                            console.log("THE TIME HAS COME!")
+                            console.log("THE TIME HAS COME!")
+                            console.log("THE TIME HAS COME!")
+                            console.log("THE TIME HAS COME!")
+                            console.log("THE TIME HAS COME!")
+                            console.log("THE TIME HAS COME!")
+                            console.log("THE TIME HAS COME!")
+                                         console.log(puck_fs_home + '/../exe/create_puck.sh', puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr)
+                            var remote_pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
 
-                        pucky.on('exit', function (code) {
-                            console.log('create_puck.sh process exited with code ' + code);
-                        });
-
+                            remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
+                            remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
+                            remote_pucky.on('exit', function (code) { console.log('remote create_puck.sh process exited with code ' + code); });
+                        }
+                        else {
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                            console.log("THE TIME ... wait, not yet")
+                        }
                     })
                 }
         })
