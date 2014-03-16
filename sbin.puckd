@@ -13,6 +13,8 @@ hell="/etc/puck/f-u-openssl"
 
 cd $PUCK_HOME
 
+PATH=$PATH:/usr/local/nodey/bin/
+
 echo $PATH
 
 KEY_SIZE=2048
