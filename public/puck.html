@@ -38,7 +38,7 @@
         <div class="masthead">
             <ul class="nav nav-pills pull-right">
                 <li> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></a></button>
-                <li class="muted"><a href="https://github.com/zenfish/PUCK">Github</a></li>
+                <li class="muted"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></li>
                 <li class="muted"><a href="/logs.html">Logs</a></li>
                 <li class="muted"><a href="#">Help</a></li>
             </ul>
@@ -50,7 +50,7 @@
         <div class="hero-unit">
 
             <!-- <div id="incoming"></div> -->
-            <a href="#" id="incoming" class="button left">Show it</a>
+            <a href="#" id="incoming" class="button left"></a>
         
             <a href="#modalPuck" role="button" class="btn btn-primary btn-medium" data-toggle="modal">Add PUCK</a>
 
@@ -65,7 +65,6 @@
                         </div>
                         <div class="modal-body">
                             <fieldset>
-       
                             <div class="control-group">
                                 <label class="control-label" for="ip_addr">IP Address</label>
                                 <div class="controls">
@@ -73,7 +72,6 @@
                                     <p class="help-block"></p>
                                 </div>
                             </div>
- 
                             <span> 
                                 <input style="display:none" id="puck_action" name="puck_action" value="CREATE" />
                             </span>
@@ -101,6 +99,15 @@
         <div class="btn-toolbar"> <span></span></div>
         <div class="btn-toolbar"> <span class="spacer100"></span></div>
 
+
+        <!--
+        <div class="row-fluid marketing"> 
+            <form action="/upload", method="post", enctype="multipart/form-data">
+                <input type="text" type="file" name="displayImage">
+            </form>
+        </div>
+        -->
+
         <div class="footer" id="puck_footy">
             <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
         </div>
@@ -127,83 +134,7 @@
     <!-- some stuff by zen in here - all the actions on this page concerning pucks... -->
    <script type="text/javascript" src="/js/puck_server_misc.js"></script>
 
-   <script>
-
-    $(document).ready(function () {
-
-
-        var url = "/getip"
-        var jqXHR_getIP = $.ajax({
-            url: url,
-            dataType: 'json',
-        }) 
-
-        jqXHR_getIP.done(function (data, textStatus, jqXHR) {
-            console.log('jxq getIP wootz')
-            console.log(data)
-            var ip = data.ip
-            $('#ip_diddy').prepend("Your IP address is: " + ip + " ... ");
-        }).fail(function(err) {
-            console.log('errz on getIP' + err)
-        })
-
-        poll_status('client_vpn.json', 10000)
-
-//      $('#puck_disconnect').click(function() {
-
-        $('body').on('click', '#puck_disconnect', function() {
-            console.log( "disconnecting VPN...." );
-            var url = "/vpn/stop"
-
-            $(this).button('loading')
-
-            var jqXHR_getIP = $.ajax({
-                url: url,
-                dataType: 'json',
-            }) 
-
-            jqXHR_getIP.done(function (data, textStatus, jqXHR) {
-                console.log('jxq hangup wootz')
-                console.log(data)
-                window.location = '/puck.html'
-            }).fail(function(err) {
-                console.log('errz on hangup' + err)
-                alert('error on hangup!')
-                window.location = '/puck.html'
-            })
-
-        })
-
-        // from http://soundbible.com/1411-Telephone-Ring.html
-        var ring = new Audio("media/ringring.mp3") // load it up
-
-        // when clicked....
-        $('#incoming').avgrund({
-            onLoad: function (element) {
-                console.log('This function will be called before dialog is initialized');
-                ring.play()
-            },
-            height: 120,
-            width: 600,
-            holderClass: 'custom',
-            showClose: true,
-            showCloseText: 'Close',
-            enableStackAnimation: true,
-            onBlurContainer: '.container',
-            template: '<div class="row">' +
-                      '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
-                      '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Answer</span></a></button></div>'  +
-                      '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
-                      '</div>'
-            })
-
-        // if click above, disconnect
-
-    })
-
-
-    </script>
-
+   <!-- js stuff is all stuffed in js/puck_server_misc.js -->
 
 </html>
 

@@ -12,18 +12,12 @@ keystore="/etc/puck/pucks"
 puckland="$keystore/PUCK"
 vpn="$keystore/vpn_client"
 
-ca=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $puckland/puckroot.crt)
-key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $vpn/vpn_client.key)
-cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $vpn/vpn_client.crt)
-
-# tls=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $puckland/ta.key)
-# dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-1) }' $puckland/dh.params)
-
-# ca=$(awk   '{json = sprintf("%s\"%s\",\n", json, $0)}END{print substr(json,0,length(json)-1) }' $puckland/puckroot.crt)
-# tls=$(awk  '{json = sprintf("%s\"%s\",\n", json, $0)}END{print substr(json,0,length(json)-1) }' $puckland/ta.key)
-# dh=$(awk   '{json = sprintf("%s\"%s\",\n", json, $0)}END{print substr(json,0,length(json)-1) }' $puckland/dh.params)
-# key=$(awk  '{json = sprintf("%s\"%s\",\n", json, $0)}END{print substr(json,0,length(json)-1) }' $keystore/vpn_client/puck.key)
-# cert=$(awk '{json = sprintf("%s\"%s\",\n", json, $0)}END{print substr(json,0,length(json)-1) }' $keystore/vpn_client/puck.crt)
+# not all awks are equal... sigh... substring broken on raspbian
+# don't even say that mawk does things "differently"... then don't
+# call it awk, you fuckers.  Pissed at time lost.
+ca=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $puckland/puckroot.crt)
+key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $vpn/vpn_client.key)
+cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $vpn/vpn_client.crt)
 
 # XXX hardcoding port/proto for a bit
 vpn='"vpn_client" : {

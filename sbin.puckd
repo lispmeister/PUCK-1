@@ -15,6 +15,8 @@ cd $PUCK_HOME
 
 NODE="/usr/local/bin/node"
 
+echo $PATH
+
 KEY_SIZE=2048
 KEY_SIZE=512
 KEY_SIZE=64
@@ -39,6 +41,7 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     openssl x509 -noout -fingerprint -in $PUCK_HOME/pucks/PUCK/puck.crt | awk -F= '{print $2}' | sed 's/://g' | tee -a $PUCK_HOME/pucks/PUCK/puck.pid
 
     pid=`cat $PUCK_HOME/pucks/PUCK/puck.pid`
+    cp $PUCK_HOME/pucks/PUCK/puck.pid $PUCK_HOME/public/puck.pid
 
     # DHM key
     ./create_tlsauth.sh $pid
@@ -62,9 +65,13 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     ./exe/create_puck.sh $pid img/puck.png $ip "?" puck@example.com
 
 else
+    cp $PUCK_HOME/pucks/PUCK/puck.pid $PUCK_HOME/public/puck.pid
+
     # if not started above, do so now
     $NODE main.js &
+
 fi
+
 
 # for testing only... get something in the 10.x.y/24 zone
 x=$((RANDOM%254+1))

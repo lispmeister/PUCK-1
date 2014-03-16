@@ -1,8 +1,0 @@
-{
-"PUCK" : {
-    "home"     : "/etc/puck",
-    "keystore" : "/etc/puck/pucks",
-    "bin"      : "/etc/puck/exe"
-    }
-}
-

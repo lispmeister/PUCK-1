@@ -6,7 +6,7 @@ var fs      = require('fs'),
     assert  = require('assert-plus'),
     bunyan  = require('bunyan'),
     getopt  = require('posix-getopt'),
-    restify = require('restify')
+    restify = require('restify');
 
 var puck = require('./modules');
 
@@ -54,9 +54,9 @@ var LOG = bunyan.createLogger({
  * And the log level will be set to TRACE.
  */
 function parseOptions() {
-        var option;
-        var opts = {}
-        var parser = new getopt.BasicParser('hvd:p:u:z:', process.argv);
+        var option,
+            opts = {},
+            parser = new getopt.BasicParser('hvd:p:u:z:', process.argv);
 
         while ((option = parser.getopt()) !== undefined) {
                 switch (option.option) {
@@ -120,7 +120,7 @@ function usage(msg) {
 
 
         // At last, let's rock and roll
-        var port = options.port || 8080
+        var port = options.port || 8080;
 	// hostname = '192.168.0.141'
         // server.listen(port, hostname, function onListening() {
         server.listen(port, function onListening() {

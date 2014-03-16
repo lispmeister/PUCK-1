@@ -51,12 +51,16 @@ email=$5
 # XXXXX - this needs to come from server...
 $puck_home/create_tlsauth.sh $puck_id
 
+# not all awks are equal... sigh... substring broken on raspbian
+# don't even say that mawk does things "differently"... then don't
+# call it awk, you fuckers.  Pissed at time lost.
+
 # clumsy way to get the content into json form
-v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $keystores/$puck_id/puckroot.crt)
-v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $keystores/$puck_id/puck.key)
-v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $keystores/$puck_id/puck.crt)
-v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $keystores/$puck_id/dh.params)
-v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,0,length(json)-2) }' $keystores/$puck_id/ta.key)
+v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puckroot.crt)
+v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.key)
+v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.crt)
+v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/dh.params)
+v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/ta.key)
 
 # XXX hardcoding port/proto for a bit
 vpn='"vpn" : {
@@ -103,7 +107,7 @@ E_O_C
 echo "using curl to create PUCK..."
 
 echo curl -k -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_puck" $puck_url
-     curl -v -k -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_puck" $puck_url 2> $results
+     curl -k -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_puck" $puck_url &> $results
 
 if [ $? != 0 ] ; then
    echo "curl REST to PUCK server failed to create PUCK"

@@ -51,6 +51,52 @@ function post(url, parameters) {
 }
 
 //
+// hang up the phone, return to home
+//
+function hang_up() {
+    console.log( "disconnecting ...." );
+    var url = "/vpn/stop"
+
+    $(this).button('loading')
+
+    var jqXHR_getIP = $.ajax({
+        url: url,
+        dataType: 'json',
+    }) 
+
+    jqXHR_getIP.done(function (data, textStatus, jqXHR) {
+        console.log('jxq hangup wootz')
+        console.log(data)
+        window.location = '/puck.html'
+    }).fail(function(err) {
+        console.log('errz on hangup' + err)
+        alert('error on hangup!')
+        window.location = '/puck.html'
+    })
+}
+
+//
+// get the current user's IP addr, put it where the element is
+//
+
+function get_ip(element) {
+    var url = "/getip"
+    var jqXHR_getIP = $.ajax({
+        url: url,
+        dataType: 'json',
+    }) 
+
+    jqXHR_getIP.done(function (data, textStatus, jqXHR) {
+        console.log('jxq getIP wootz')
+        console.log(data)
+        var ip = data.ip
+        $('#ip_diddy').prepend("Your IP address is: " + ip + " ... ");
+    }).fail(function(err) {
+        console.log('errz on getIP' + err)
+    })
+}
+
+//
 // fire up the VPN
 //
 function puck_vpn(pid, ip) {
@@ -76,47 +122,31 @@ function puck_vpn(pid, ip) {
 
 }
 
-function puck_create() {
-
-   var ip_addr  = document.getElementById('ip_addr').value
-
-   $('#puck_button_create').text("... checking")
-
-// var result = puck_ping('', 'https://' + ip_addr + '8080')
-
-// console.log('ping result...\n\n')
-
-// console.log(result)
-
-}
-
 //
 // if they hit create puck... post data to server,
-// which calls a program to do the work
 // 
-function _old_puck_create() {
+function puck_create() {
 
-   $('#puck_button_create').text("... creating ...")
+    console.log('js puck_create')
 
-   var puckname = document.getElementById('puckname').value
-   var ip_addr  = document.getElementById('ip_addr').value
-   var owner    = document.getElementById('owner').value
-   var email    = document.getElementById('email').value
-   var image    = document.getElementById('image').value
+    var delay = 10000
 
-   // some actual input validation will prevent puck's getting here w/o a valid name
-   var blank_puck                = {}
-   blank_puck['value']           = ' ... '
-   blank_puck['key']             = puckname
-   blank_puck['image']           = image
-   blank_puck['ip_addr']         = ip_addr
-   blank_puck['owner']           = owner
-   blank_puck['email']           = email
-   blank_puck['puck_action']     = 'CREATE'
+    $('#puck_button_create').text("... creating ...")
 
-   var json_puck = JSON.stringify(blank_puck);
+    var json_puck = JSON.stringify(puck_data);
 
-   post ("/puck", json_puck)
+    $.ajax({
+        url : "/puck/swap",
+        type: "post",
+        data : json_puck,
+        success: function(data, textStatus, jqXHR) {
+            console.log('successfully posted request')
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+            console.log('down, down, down she goes... post failed')
+            console.log('"' + errorThrown + '"')
+        }
+    });
 
 }
 
@@ -175,6 +205,21 @@ function truncate(string){
 };
 
 
+//
+// xxx... don't want to harass the user by ringing all the time...
+// may or may not be needed
+//
+function check_ring() {
+    console.log("have I rang?");
+}
+
+//
+// every X seconds look at a file for status... if we 
+// see an incoming/outgoing call, squawk!
+//
+// should use events or a better method, this will work for now
+//
+
 function poll_status(status_file, frequency){
     window.setInterval(function () {
         $.ajax({ 
@@ -186,28 +231,45 @@ function poll_status(status_file, frequency){
 
                 if (typeof data.vpn_status != "undefined") {
                     if (data.vpn_status == "up") {
+
+                        // this will enable the video button
                         $('#puck_video').removeClass('disabled')
                         
+                        // where are we?
                         var page = window.location.pathname.split('/')[1]
 
                         console.log("we're on... " + page)
 
-                        // if we're not on the vpn page, ring
-                        if (page != "vpn.html") {
-                            console.log('trying .... to... ring!')
+                        // xxxx... need to consider workflow... what if talking to
+                        // someone and another tries to call?
+                        if (status_file.indexOf("server") > -1) {
+                            console.log('incoming ring!')
                             $('#incoming')[0].click()
                         }
-                        // else {
-                        //     console.log('no ring, on vpn page')
-                        // }
+                        else if (status_file.indexOf("client") > -1) {
+                            console.log('outgoing call...')
+                            // if we're not on the vpn page, ring
+                            if (page != "vpn.html") {
+                                console.log('one ringy dingy... two ringy dingy...')
+                                $('#outgoing')[0].click()
+                                // write... rang once
+                            }
+                            //...?
+                            // else 
+                            //     console.log('no ring, on vpn page')
+                        }
+                        else {
+                            console.log("dan... you're still an idiot")
+                            throw('errorz in polling adventures')
+                        }
                     }
-
-                    else {
+                    else {  // down
+                        // disable the video button
                         $('#puck_video').addClass('disabled')
                     }
-
                 }
-                else {
+                else {      // undefined
+                    // disable the video button
                     $('#puck_video').addClass('disabled')
                 }
             }})
@@ -218,12 +280,94 @@ function poll_status(status_file, frequency){
 // after all the HTML... let the JS fur fly
 //
 $(document).ready(function () {
-  var image = ""
+    var image     = ""
+    var puck_id   = ""
+    puck_data = ""
 
     // disable a/href pushing if disabled
     $('body').on('click', 'a.disabled', function(event) {
         event.preventDefault();
     });
+
+    // who are we?  Read from file
+    var secret_identity = "puck.pid"
+    $.ajax({
+        url: secret_identity,
+        success: function(pid){
+            pid = pid.replace('\n', '')
+            console.log('got PID... ' + pid)
+            puck_id = pid
+        },
+        error: function(req, text, err) {
+            alert('who am I?  ' + err);
+        }
+    })
+
+
+    // toss your ip in the footer
+    get_ip('#ip_diddy')
+
+    // every X seconds look at this file for status changes....
+    // xxx - config
+    var main_page_poll_time = 5000
+    poll_status('client_vpn.json', main_page_poll_time)
+    poll_status('server_vpn.json', main_page_poll_time)
+
+    // ... and on the 6th day...
+    $('body').on('click', '#puck_button_create', function() { puck_create() })
+
+    // ... bye bye
+    $('body').on('click', '#puck_disconnect', function() { hang_up() })
+
+    // xxx - from http://soundbible.com/1411-Telephone-Ring.html
+    var ring = new Audio("media/ringring.mp3") // load it up
+
+    // var in_or_out = "Calling..."
+
+    var message = ""
+    $('#outgoing').avgrund({
+        onLoad: function (element) {
+            // console.log('This function will be called before dialog is initialized');
+            // ring ring - play sound
+            message = "Calling"
+            ring.play()
+        },
+        height: 120,
+        width: 600,
+        holderClass: 'custom',
+        showClose: true,
+        showCloseText: 'Close',
+        enableStackAnimation: true,
+        onBlurContainer: '.container',
+        template: '<div class="row">' +
+                  '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
+                  '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">' + message + '</span></a></button></div>'  +
+                  '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
+                  '</div>'
+        })
+
+    $('#incoming').avgrund({
+        onLoad: function (element) {
+            // console.log('This function will be called before dialog is initialized');
+            // ring ring - play sound
+            message = "Incoming"
+            ring.play()
+        },
+        height: 120,
+        width: 600,
+        holderClass: 'custom',
+        showClose: true,
+        showCloseText: 'Close',
+        enableStackAnimation: true,
+        onBlurContainer: '.container',
+        template: '<div class="row">' +
+                  '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
+                  '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">' + message + '</span></a></button></div>'  +
+                  '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
+                  '</div>'
+        })
+
+    // if click above, disconnect
 
 
   // get the pucks we know about from local REST
@@ -232,6 +376,14 @@ $(document).ready(function () {
      $.each(pucks, function(key, val) {
         // for each puck get more detailed data
         $.getJSON('/puck/' + val, function(puckinfo) {
+
+            console.log('v/p')
+            console.log(val)
+            console.log(puck_id)
+
+            if (puck_id == val) {
+                puck_data = puckinfo
+            }
 
            var name        = truncate(puckinfo.PUCK.name)
            var owner       = truncate(puckinfo.PUCK.owner.name)

@@ -1,12 +1,12 @@
 
 cd /etc/puck
 
-sudo /etc/init.d/redis-server stop
+killall redis-server
 sudo /etc/init.d/puck stop
 
-sudo rm -f /etc/puck/redis/dump.rdb 
-sudo rm -rf /etc/puck/pucks/*
+sudo rm -f redis/dump.rdb 
+sudo rm -rf pucks/*
 
-sudo /etc/init.d/redis-server start
+sudo /etc/init.d/redis*  start
 sudo /etc/init.d/puck start
 

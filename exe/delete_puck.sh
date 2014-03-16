@@ -37,6 +37,8 @@ echo "using curl to nuke PUCK..."
 
 curl -k -v -H "Accept: application/json" -H "Content-type: application/json" -X DELETE "$puck_url/$puck"
 
+rm -rf /etc/puck/pucks/$puck
+
 # not sure how to check success/fail yet....
 
 exit 0
