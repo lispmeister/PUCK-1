@@ -11,6 +11,9 @@ var Tail    = require('tail').Tail;
     util    = require('util'),
     when    = require('when')
 
+// sue me
+var sleep = require('sleep');
+
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
 console.log(config);
@@ -60,17 +63,24 @@ function watch_logs(logfile) {
         // xxx - for client openvpn - config
         var magic_client_up   = "/sbin/route add"
         var magic_client_down = "VPN is down"
+
+        // xxx - server openvpn
+        var magic_server_up   = "PUSH_REPLY,route"
+        var magic_server_down = "ECONNREFUSED"
+
 //      var vpn_status_file  = "/etc/puck/logs/open_vpn_status.log"
-        if (line.indexOf(magic_client_up) > -1 || line.indexOf(magic_client_down) > -1) {
+        if (line.indexOf(magic_client_up) > -1 || line.indexOf(magic_client_down) > -1 ||
+            line.indexOf(magic_server_up) > -1 || line.indexOf(magic_server_down) > -1) {
+
             console.log('\n\n\n++++++++++++\n\n Openvpn changed status!\n\n')
 
-            
             // yeah, yeah, sync, cry me a river
             if (fs.existsSync(logfile_status)) {
                 console.log('status file exists...!')
                 fs.readFileSync(logfile_status, {encoding: 'utf8'}, function (err, data) {
                     if (err) { 
-                        console.log('no status file, will create')
+                        console.log('errz reading status file... hmm...')
+                        throw("errz reading status file" + err)
                     }
                     else {
                         console.log(data);
@@ -87,17 +97,20 @@ function watch_logs(logfile) {
 
             var magic      = {}
 
-            if (line.indexOf(magic_client_up) > -1) {
+            // up
+            if (line.indexOf(magic_client_up) > -1 || line.indexOf(magic_server_up) > -1) {
                 // if starting simply take the current stuff
                 magic = {
                     vpn_status : "up",
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
-                    duration   : "n/a",
-                    stop       : "n/a"
+                    duration   : "n/a",             // this should only hit once per connection
+                    stop       : "n/a",
+                    stop_s     : "n/a"
                     }
             }
-            else {
+            // down
+            else if (line.indexOf(magic_client_down) > -1 || line.indexOf(magic_server_down) > -1) {
                 var v_duration = 0
 
                 // if stopping read the status for when we started
@@ -107,26 +120,36 @@ function watch_logs(logfile) {
 
                 magic = {
                     vpn_status : "down",
-                    start      : moment_in_time,
-                    start_s    : moment_in_secs,
+                    start      : "n/a",
+                    start_s    : "n/a",
                     duration   : v_duration,
-                    stop       : "n/a"
+                    stop       : moment_in_time,
+                    stop_s     : moment_in_time
                     }
             }
 
+            // else if (line.indexOf(magic_server_up) > -1) 
+            // else if (line.indexOf(magic_server_down) > -1) 
+
+            // I've gone feral
+            else {
+                console.log('dan, you idiot')
+                throw('dan, you idiot')
+            }
+
+            // Server
+
             magic = JSON.stringify(magic)
 
-            console.log("vpn-client-status" + magic)
+            console.log("status: " + magic)
             console.log("write to: " + logfile_status)
 
-            // fs.writeFileSync(vpn_status_file, magic, function (err) {
             fs.writeFile(logfile_status, magic, function (err) {
                 // xxx need flag error
                 if (err) { console.log('errz ' + err)  }
                 else     { console.log('wrote status') }
             })
         }
-
    })
 
    tail.on('error', function(err) {
@@ -434,6 +457,58 @@ function getPuck(req, res, next) {
 }
 
 /**
+ *  Swap PUCK data - you give yours, it gives its back
+ */
+function swapPuck(req, res, next) {
+
+    console.log('swap meat')
+    console.log(req.params)
+    // console.log(req.params.PUCK)
+
+    var their_puck = req.params.PUCK['PUCK-ID']
+
+    var puck = {
+        key: their_puck,
+        value:  '{ "PUCK":'  + JSON.stringify(req.params.PUCK) + "}"
+    };
+
+    console.log('their_puck: ' + their_puck)
+
+    // store theirs
+    rclient.set(puck.key, puck.value, function(err) {
+        console.log('trying to store theirs...')
+        if (err) {
+            console.log('failzor...')
+            req.log.warn(err, 'putPuck: unable to store in Redis db');
+            next(err);
+        } else {
+            req.log.debug({puck: req.body}, 'putPuck: done');
+            console.log('success storing theirs...')
+        }
+    });
+
+    // return ours
+    rclient.get(puck_id, function (err, reply) {
+
+        if (err) {
+            req.log.warn(err, 'getPuck: unable to retrieve %s', req.puck);
+            next(err);
+        } else {
+            if (reply == null) {
+                req.log.warn(err, 'getPuck: unable to retrieve %s', req.puck);
+                next(new PuckNotFoundError(req.params.key));
+            } else {
+                // console.log("Value retrieved: " + reply.toString());
+                console.log('taking a short nap...')
+                sleep.sleep(5)
+                res.send(200, reply);
+                next(); 
+            }
+        }
+    })
+}
+
+/**
  * Simple returns the list of Puck Ids that are stored in redis
  */
 function listPucks(req, res, next) {
@@ -504,8 +579,9 @@ function startVPN(req, res, next) {
     console.log('start vpn2')
     console.log(req.params)
 
-    var puck_web_home = "/puck.html"
-    var vpn_log       = "client_vpn"
+    var puck_web_home  = "/puck.html"
+    var server_vpn_log = "server_vpn"
+    var client_vpn_log = "client_vpn"
 
     // bail if we don't get ID
     if (typeof req.params.puckid === 'undefined' || req.params.puckid == "") {
@@ -518,7 +594,8 @@ function startVPN(req, res, next) {
     }
    
     // xxxx - wonder if this shouldn't be done via REST
-    watch_logs(vpn_log)
+    watch_logs(server_vpn_log)
+    watch_logs(client_vpn_log)
 
     console.log('onto the execution...')
 
@@ -708,7 +785,6 @@ function someday_get_https(url) {
 }
 
 
-
 function formCreate(req, res, next) {
 
     console.log("creating puck...")
@@ -785,26 +861,6 @@ function formCreate(req, res, next) {
                             if (err) { console.log('err: ' + err) }
                             else { console.log('wrote crt') }
                         });
-                        // fs.writeFile(puck_dir + '/ta.key', tls, function(err) {
-                        //     if (err) { console.log('err: ' + err) }
-                        //     else { console.log('wrote tlsauth') }
-                        // });
-                        // fs.writeFile(puck_dir + '/dh.params', dh, function(err) {
-                        //     if (err) { console.log('err: ' + err) }
-                        //     else { console.log('wrote dh') }
-                        // });
-
-                        // now actually create the PUCK
-                        // puck-id picture IP-addr owner email
-
-                        //
-                        // PUCK: 
-                        //    { name: '?',
-                        //    'PUCK-ID': '1FCF1073DBB25FD0DB535403741F23913DFD7FA2',
-                        //    image: 'img/puck.png',
-                        //    ip_addr: '192.168.0.138',
-                        //    ip_addr_vpn: '192.168.0.138',
-                        //    owner: { name: '?', email: 'puck@example.com' },
 
                         var puck_fs_home = __dirname
 
@@ -818,7 +874,7 @@ function formCreate(req, res, next) {
 
                         // this simply takes the pwd and finds the exe area...
 
-                            console.log(puck_fs_home + '/../exe/create_puck.sh',   [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
+                            console  .log(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
                         var pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
 
                         // now slice and dice output, errors, etc.
@@ -939,9 +995,11 @@ function createServer(options) {
     server.get('/getip', getIP);
 
     // Return a Puck by key
-
     server.get('/puck/:key', getPuck);
     server.head('/puck/:key', getPuck);
+
+    // send yours and get theirs
+    server.post('/puck/swap', swapPuck);
 
     // Overwrite a complete Puck - here we require that the body
     // be JSON - otherwise the caller will get a 415 if they try
@@ -1006,10 +1064,11 @@ function createServer(options) {
         server.on('after', restify.auditLogger({
             body: true,
             log: bunyan.createLogger({
-                level: 'info',
-                name: 'PuckApp-audit',
+                level: 'error',         // 'info' is a bit much most of the time! :)
+                name: 'PUCK-audit',
                 stream: process.stdout
             })
+
         }));
     }
 
