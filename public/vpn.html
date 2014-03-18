@@ -22,7 +22,6 @@
          color: gray:
       }
 
-
    div.growlUI { background: url(check48.png) no-repeat 10px 10px }
    div.growlUI h1, div.growlUI h2 {
       color: white; padding: 5px 5px 5px 75px; text-align: left
@@ -70,8 +69,10 @@
 
     </div>
 
-
     <div class="container">
+
+        <div> <a href="#" id="outgoing" class="button left"></a></div>
+        <div> </div>
 
         <video id="localVideo"></video>
         <div id="remoteVideos"></div>
@@ -90,9 +91,14 @@
     <script type="text/javascript" src="/js/jquery.inputmask.js"></script>
     <script type="text/javascript" src="/js/spin.js"></script>
     <script type="text/javascript" src="/js/jquery.blockUI.js"></script>
+    <script type="text/javascript" src="/js/sockjs-0.3.min.js"> </script>
+
+    <!-- messaging between browser/server -->
+    <script type="text/javascript" src="/primus/primus.js"></script>
 
     <!-- some stuff by zen in here - all the actions on this page concerning pucks... -->
     <script type="text/javascript" src="/js/puck_server_misc.js"></script>
+    <script type="text/javascript" src="/js/puck_bottom.js"></script>
 
 <script type='text/javascript'>
 
@@ -111,8 +117,6 @@ webrtc.on('readyToCall', function () {
     webrtc.joinRoom('roomy');
 });
 
-
-poll_status('client_vpn.json', 1000)
 
 </script>
 

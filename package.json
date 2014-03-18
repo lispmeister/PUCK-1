@@ -1,33 +1,35 @@
 {
-    "name": "PuckApp",
-    "version": "0.0.1",
-    "description": "REST prototype of Puck backend",
-    "main": "main.js",
-    "dependencies": {
-        "asn1": "latest",
-        "assert-plus": "0.1.2",
-        "bunyan": "0.21.1",
-        "httpsync": "0.0.8",
-        "moment": "latest",
-        "nodemon": "latest",
-        "node-static": "0.6.9",
-        "posix-getopt": "1.0.0",
-        "q": "1.0.0",
-        "rest": "latest",
-        "restify": "latest",
-        "redis": "0.8.3",
-        "sleep": "latest",
-        "tail": "latest",
-        "when": "latest"
-    },
-    "devDependencies": {
-        "nodeunit": "0.8.0"
-    },
-    "scripts": {
-        "start": "node main.js 2>&1 | bunyan",
-        "test": "nodeunit test"
-    },
-    "author": "dan f & Markus Fix",
-    "license": "MIT"
+  "name": "PuckApp",
+  "version": "0.0.1",
+  "description": "REST prototype of Puck backend",
+  "main": "main.js",
+  "dependencies": {
+    "asn1": "latest",
+    "assert-plus": "0.1.2",
+    "bunyan": "0.21.1",
+    "ejs": "latest",
+    "httpsync": "0.0.8",
+    "moment": "latest",
+    "nodemon": "latest",
+    "node-static": "0.6.9",
+    "posix-getopt": "1.0.0",
+    "primus": "latest",
+    "q": "1.0.0",
+    "rest": "latest",
+    "restify": "latest",
+    "redis": "0.8.3",
+    "sleep": "latest",
+    "tail": "latest",
+    "when": "latest",
+    "ws": "^0.4.31"
+  },
+  "devDependencies": {
+    "nodeunit": "0.8.0"
+  },
+  "scripts": {
+    "start": "node main.js 2>&1 | bunyan",
+    "test": "nodeunit test"
+  },
+  "author": "dan f & Markus Fix",
+  "license": "MIT"
 }
-

@@ -1,16 +1,14 @@
 
 // module includes
 var fs      = require('fs'),
-    path    = require('path'),
-    util    = require('util'),
     assert  = require('assert-plus'),
     bunyan  = require('bunyan'),
+    path    = require('path'),
     getopt  = require('posix-getopt'),
-    restify = require('restify');
+    restify = require('restify'),
+    util    = require('util');
 
 var puck = require('./modules');
-
-///--- Globals
 
 var NAME = 'PuckApp';
 
@@ -115,9 +113,8 @@ function usage(msg) {
         LOG.debug(options, 'command line arguments parsed');
 
         var server = puck.createServer({
-                log: LOG
+            log: LOG
         });
-
 
         // At last, let's rock and roll
         var port = options.port || 8080;
@@ -125,6 +122,7 @@ function usage(msg) {
         // server.listen(port, hostname, function onListening() {
         server.listen(port, function onListening() {
                 LOG.info('listening at %s', server.url);
+                console.log('listening at %s', server.url);
         });
 
 

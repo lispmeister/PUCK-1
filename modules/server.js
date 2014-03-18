@@ -8,11 +8,23 @@ var Tail    = require('tail').Tail;
     restify = require('restify'),
     path    = require('path'),
     rest    = require('rest'),
+    sockjs  = require('sockjs'),
     util    = require('util'),
     when    = require('when')
 
+
+var Primus = require('primus')
+
 // sue me
 var sleep = require('sleep');
+
+// status chex
+var puck_status  = "{}",
+    server_magic = {},
+    client_magic = {}
+    sServer      = ""
+    server       = ""
+    p_client     = ""
 
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
@@ -102,8 +114,48 @@ if (isEmpty(bwana_puck)) {
     emitter.emit('loaded')
 }
 
+// send a message out that things are different
+function change_status() {
+
+    console.log('changing status...')
+
+    // in with the old, out with the new... er, reverse that
+    puck_status = {}
+    puck_status.openvpn_server = server_magic
+    puck_status.openvpn_client = client_magic
+    puck_status = JSON.stringify(puck_status)
+
+    console.log("status: " + puck_status)
+
+    var Socket = require('primus.io').createSocket({ transformer: 'websockets' });
+
+    var socket = new Socket('https://localhost:8080');
+
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
+    console.log('connecting...')
+
+    socket.on('open', function () {
+        console.log('opened')
+        socket.send('status', 'gimme')
+    })
+
+//  socket.on('data', function (data) {
+//      console.log('got SOMETHING!')
+//      console.log(data)
+//  });
+
+    socket.on('error', function error(err) {
+        console.error('bad... very bad... could be snakes... you go first.\n\t', err, err.message);
+    });
+
+    console.log('end status')
+}
+
+//
 // log file watcher
-function watch_logs(logfile) {
+//
+function watch_logs(logfile, log_type) {
 
     // create if doesn't exist...?
     if (!fs.existsSync(logfile)) {
@@ -114,15 +166,18 @@ function watch_logs(logfile) {
         console.log('watching ' + logfile)
     }
 
+    console.log('watching logs from ' + log_type)
+
     // status in public, logs in logs
-    var logfile_status = "/etc/puck/public/" + logfile + ".json",
-        status_data    = ""
+//  var logfile_status = "/etc/puck/public/" + logfile + ".json",
+//      status_data    = ""
 
     logfile = "/etc/puck/logs/" + logfile + ".log"
 
     var tail = new Tail(logfile)
 
     tail.on("line", function(line) {
+
         // console.log("got line from " + logfile + ":" + line)
     
         // xxx - for client openvpn - config
@@ -133,88 +188,91 @@ function watch_logs(logfile) {
         var magic_server_up   = "PUSH_REPLY,route"
         var magic_server_down = "ECONNREFUSED"
 
-//      var vpn_status_file  = "/etc/puck/logs/open_vpn_status.log"
-        if (line.indexOf(magic_client_up) > -1 || line.indexOf(magic_client_down) > -1 ||
-            line.indexOf(magic_server_up) > -1 || line.indexOf(magic_server_down) > -1) {
+        var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
+            moment_in_secs =  (new Date).getTime();
 
-            console.log('\n\n\n++++++++++++\n\n Openvpn changed status!\n\n')
 
-            // yeah, yeah, sync, cry me a river
-            if (fs.existsSync(logfile_status)) {
-                console.log('status file exists...!')
-                fs.readFileSync(logfile_status, {encoding: 'utf8'}, function (err, data) {
-                    if (err) { 
-                        console.log('errz reading status file... hmm...')
-                        throw("errz reading status file" + err)
-                    }
-                    else {
-                        console.log(data);
-                        status_data = JSON.parse(data)
-                    }
-                })
-            }
-            else { console.log('will create status file') }
+        // console.log('moment: ' + moment_in_time + ' : ' + line)
 
-            var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
-                moment_in_secs =  (new Date).getTime();
-
-            console.log('moment: ' + moment_in_time)
-
-            var magic      = {}
-
-            // up
-            if (line.indexOf(magic_client_up) > -1 || line.indexOf(magic_server_up) > -1) {
-                // if starting simply take the current stuff
-                magic = {
-                    vpn_status : "up",
-                    start      : moment_in_time,
-                    start_s    : moment_in_secs,
-                    duration   : "n/a",             // this should only hit once per connection
-                    stop       : "n/a",
-                    stop_s     : "n/a"
-                    }
-            }
-            // down
-            else if (line.indexOf(magic_client_down) > -1 || line.indexOf(magic_server_down) > -1) {
-                var v_duration = 0
-
-                // if stopping read the status for when we started
-                if (status_data != "" && status_data.vpn_status == "up") {
-                    v_duration = moment_in_secs - status_data.start_s
+        // various states of up-id-ness and down-o-sity
+        if (line.indexOf(magic_server_up) > -1) {
+            console.log('\n\n\n++++++++++++\n\n Openvpn server up!\n\n')
+            server_magic = {
+                vpn_status : "up",
+                start      : moment_in_time,
+                start_s    : moment_in_secs,
+                duration   : "n/a",             // this should only hit once per connection
+                stop       : "n/a",
+                stop_s     : "n/a"
                 }
 
-                magic = {
-                    vpn_status : "down",
-                    start      : "n/a",
-                    start_s    : "n/a",
-                    duration   : v_duration,
-                    stop       : moment_in_time,
-                    stop_s     : moment_in_time
-                    }
-            }
+            change_status() // tell the world about it
 
-            // else if (line.indexOf(magic_server_up) > -1) 
-            // else if (line.indexOf(magic_server_down) > -1) 
-
-            // I've gone feral
-            else {
-                console.log('dan, you idiot')
-                throw('dan, you idiot')
-            }
-
-            // Server
-
-            magic = JSON.stringify(magic)
-
-            console.log("status: " + magic)
-            console.log("write to: " + logfile_status)
-
-            fs.writeFile(logfile_status, magic, function (err) {
-                // xxx need flag error
-                if (err) { console.log('errz ' + err)  }
-                else     { console.log('wrote status') }
-            })
         }
+        // down
+        else if (line.indexOf(magic_server_down) > -1) {
+            console.log('\n\n\n++++++++++++\n\n Openvpn server Down!\n\n')
+
+            var v_duration = 0
+
+            // if stopping read the status for when we started
+//          if (status_data != "" && status_data.vpn_status == "up") {
+//              v_duration = moment_in_secs - status_data.start_s
+//          }
+
+            server_magic = {
+                vpn_status : "down",
+                start      : "n/a",
+                start_s    : "n/a",
+                duration   : v_duration,
+                stop       : moment_in_time,
+                stop_s     : moment_in_time
+                }
+
+            change_status() // tell the world about it
+
+        }
+        else if (line.indexOf(magic_client_up) > -1) {
+            console.log('\n\n\n++++++++++++\n\n Openvpn client up!\n\n')
+
+            // if starting simply take the current stuff
+            client_magic = {
+                vpn_status : "up",
+                start      : moment_in_time,
+                start_s    : moment_in_secs,
+                duration   : "n/a",             // this should only hit once per connection
+                stop       : "n/a",
+                stop_s     : "n/a"
+                }
+
+            change_status() // tell the world about it
+
+        }
+        // down
+        else if (line.indexOf(magic_client_down) > -1) {
+            console.log('\n\n\n++++++++++++\n\n Openvpn client Down!\n\n')
+
+            var v_duration = 0
+
+            // if stopping read the status for when we started
+//          if (status_data != "" && status_data.vpn_status == "up") {
+//              v_duration = moment_in_secs - status_data.start_s
+//          }
+
+            client_magic = {
+                vpn_status : "down",
+                start      : "n/a",
+                start_s    : "n/a",
+                duration   : v_duration,
+                stop       : moment_in_time,
+                stop_s     : moment_in_time
+                }
+
+            change_status() // tell the world about it
+
+        }
+        // I've gone feral... or it wasn't meant to be
+
    })
 
    tail.on('error', function(err) {
@@ -593,8 +651,8 @@ function startVPN(req, res, next) {
     }
    
     // xxxx - wonder if this shouldn't be done via REST
-    watch_logs(server_vpn_log)
-    watch_logs(client_vpn_log)
+    watch_logs(server_vpn_log, "OpenVPN Server")
+    watch_logs(client_vpn_log, "OpenVPN Client")
 
     console.log('onto the execution...')
 
@@ -622,9 +680,15 @@ function startVPN(req, res, next) {
     console.log('post execution')
 
     var vpn_home = "/vpn.html"
-    res.header('Location', vpn_home);
+
+    res.header('Location', puck_web_home);
+
     res.send(302);
     return next(false);
+
+    // res.send(200, "{\"status\": \"OK\"}");
+    // next();
+                                 
 }
 
 
@@ -874,6 +938,8 @@ function formCreate(req, res, next) {
                         var util  = require('util')
                         var spawn = require('child_process').spawn
 
+                        console.log("executing create_puck.sh")
+
                         // this simply takes the pwd and finds the exe area...
                         var pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
 
@@ -912,34 +978,33 @@ function createServer(options) {
     // Cert stuff
     var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key")
     var cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt")
+    var ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
 
     // Create a server with our logger and custom formatter
     // Note that 'version' means all routes will default to
     // 1.0.0
-    var server = restify.createServer({
-	certificate : cert,
-	key         : key,
-	puck_id     : puck_id,
+    server = restify.createServer({
+	    certificate : cert,
+	    key         : key,
+	    ca          : ca,
+	    puck_id     : puck_id,
         log         : options.log,
         name        : 'PuckApp',
         version     : '0.0.2',
         formatters: {
-            'application/puck; q=0.9': formatPuck
+            'application/puck; q=0.9': formatPuck,
+            'text/html': function(req, res, body){ return body; }
         }
     });
 
     // Ensure we don't drop data on uploads
     server.pre(restify.pre.pause());
-
     // Clean up sloppy paths like //puck//////1//
     server.pre(restify.pre.sanitizePath());
-
     // Handles annoying user agents (curl)
     server.pre(restify.pre.userAgentConnection());
-
     // Set a per request bunyan logger (with requestid filled in)
     server.use(restify.requestLogger());
-
     // Allow 5 requests/second by IP, and burst to 10
     server.use(restify.throttle({
         burst: 99,
@@ -974,6 +1039,20 @@ function createServer(options) {
     });
     server.use(authenticate);
 
+    // socket time... hand me that wrench...
+    var primus = new Primus(server)
+    var Socket = primus.Socket
+
+    // send me anything... I'll give you a chicken.  Or... status.
+    primus.on('connection', function (spark) {
+        console.log('connection from: ', spark.address);
+        // spark.write(puck_status)
+        primus.write(puck_status)
+    })
+
+    primus.on('error', function error(err) {
+      console.error('OMFG', err, err.message);
+    })
 
     /// Now the real handlers. Here we just CRUD on Puck blobs
 
@@ -1045,19 +1124,46 @@ function createServer(options) {
 
     server.del('/puck/:key', deletePuck);
 
-    /// zen....
     server.post('/form', handleForm);
 
     server.post('/vpn/start', startVPN);
     // stop
     server.get('/vpn/stop', stopVPN);
 
-    server.get(".*", restify.serveStatic({ 
-      directory: './public', 
-      default: 'index.html' 
-    }));
+    // do it the hard way to make ejs work
+    server.get(".*.html", function(req, res, next) {
+        console.log(req)
+        var full_path = './public' + req._url.pathname
+        // fs.readFileSync(full_path, 'utf-8', function(error, content)
+        fs.readFile(full_path, 'utf-8', function(err, content) {
+            console.log('servin up: ' + full_path)
 
-    // EOZen
+            if (err) { 
+                console.log('errz: ' + err); 
+                res.setHeader('Content-Type', 'text/html');
+                res.send(404, content);
+                next();
+                return
+            }
+
+            var ejs     = require('ejs')
+            var content = ejs.render(content,{ filename: full_path })
+
+            res.setHeader('Content-Type', 'text/html');
+            res.send(200, content);
+            next();
+
+            return
+
+        })
+
+    })
+
+    // if all else fails
+    server.get(".*", restify.serveStatic({
+        directory: './public',
+        default: 'index.html' 
+    }))
 
 
     // Setup an audit logger
