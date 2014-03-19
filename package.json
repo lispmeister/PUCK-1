@@ -7,6 +7,7 @@
     "asn1": "latest",
     "assert-plus": "0.1.2",
     "bunyan": "0.21.1",
+    "ctype": "latest",
     "ejs": "latest",
     "httpsync": "0.0.8",
     "moment": "latest",

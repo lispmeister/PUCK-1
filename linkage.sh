@@ -7,7 +7,7 @@ fi
 
 # rm -rf /etc/puck
 sudo mv /etc/puck /etc/puck.old
-sudo mkdir /etc/puck
+sudo ln -s `pwd` /etc/puck
 
 sudo ls -l /etc/redis/redis.conf
 sudo ls -l /etc/init.d/puck
