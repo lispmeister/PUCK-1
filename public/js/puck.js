@@ -15,6 +15,8 @@ puck_current.outgoing   = false
 var puck_status     = "{}"
 var old_puck_status = "{}"
 
+var ring = ""
+
 var poll = 500  // 2x a second
 var poll = 5000  // every 5 secs
 var poll = 1000  // once a second
@@ -65,13 +67,13 @@ function post(url, parameters) {
 //
 // hang up the phone, return to home
 //
-function hang_up(sound) {
+function hang_up() {
 
     console.log('hanging up!')
 
     // the bells... the bells... make them stop!
-    sound.pause();
-    sound.currentTime = 0;
+    ring.pause();
+    ring.currentTime = 0;
 
     var url = "/vpn/stop"
 
@@ -83,16 +85,17 @@ function hang_up(sound) {
     jqXHR_getIP.done(function (data, textStatus, jqXHR) {
         console.log('jxq hangup wootz')
         console.log(data)
-//      window.location = '/puck.html'
-
     }).fail(function(err) {
         console.log('errz on hangup' + err)
         alert('error on hangup!')
-//      window.location = '/puck.html'
     })
 
     // kill the UI signs
     remove_signs_of_call()
+
+    // XXX - need to see if initiated call or not and set appropriately
+    puck_current.incoming = false
+    puck_current.outgoing = false
 
 }
 
@@ -260,16 +263,17 @@ function status_or_die() {
     if (typeof jdata.openvpn_server == "undefined") {
         jdata.openvpn_server = {}
         jdata.openvpn_server.vpn_status = "down"
-        // puck_current.incoming = false
+        puck_current.incoming = false
     }
     if (typeof jdata.openvpn_client == "undefined") {
         jdata.openvpn_client = {}
         jdata.openvpn_client.vpn_status = "down"
-        // puck_current.outgoing = false
+        puck_current.outgoing = false
     }
 
     console.log('I hear something...')
     console.log(puck_current)
+    console.log(puck_status)
 
     // server
     if (jdata.openvpn_server.vpn_status == "up") {
@@ -282,7 +286,7 @@ function status_or_die() {
             $('#incoming')[0].click()
         }
 
-        puck_current.incoming = false
+        puck_current.incoming = true
     }
 
     // client
@@ -293,19 +297,18 @@ function status_or_die() {
                 
         if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
         // xxx ... kill avg?
-            console.log('incoming ring!')
+            console.log('outgoing ring!')
             // ring them gongs
             $('#outgoing')[0].click()
         }
 
-        puck_current.outgoing = false
+        puck_current.outgoing = true
     }
-
 
     if (jdata.openvpn_server.vpn_status == "down" && jdata.openvpn_client.vpn_status == "down") {
         console.log('everything dead, shut it down...!')
         $('#puck_video').addClass('disabled')
-        // xxx ... kill avg?
+        hang_up()
     }
 
 }
@@ -355,7 +358,7 @@ $('body').on('click', 'a.disabled', function(event) {
 });
 
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
-var ring = new Audio("media/ringring.mp3") // load it up
+ring = new Audio("media/ringring.mp3") // load it up
 
 // toss your ip in the footer
 get_ip('#ip_diddy')
@@ -363,7 +366,7 @@ get_ip('#ip_diddy')
 // ... bye bye
 $('body').on('click', '#puck_disconnect', function() { 
     $('body').removeClass('avgrund-active');
-    hang_up(ring) 
+    hang_up() 
 })
 
 // adapted from http://css-tricks.com/css3-progress-bars/
