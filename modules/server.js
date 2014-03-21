@@ -862,7 +862,7 @@ function httpsPing(ipaddr, res, next) {
       })
 
    }).on('error', function(e) {
-      console.log('sping dead')
+      console.log('sping to ' + ipaddr + ' is dead, jim')
       console.error(e);
       var response = {status: "OK", "name": 'err', "pid": 'errxxx'}
       res.send(200, response)
