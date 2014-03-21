@@ -14,15 +14,14 @@
     "nodemon": "latest",
     "node-static": "0.6.9",
     "posix-getopt": "1.0.0",
-    "primus": "latest",
     "q": "1.0.0",
     "rest": "latest",
     "restify": "latest",
     "redis": "0.8.3",
     "sleep": "latest",
+    "socket.io": "latest",
     "tail": "latest",
-    "when": "latest",
-    "ws": "^0.4.31"
+    "when": "latest"
   },
   "devDependencies": {
     "nodeunit": "0.8.0"

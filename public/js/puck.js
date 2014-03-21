@@ -12,6 +12,13 @@ puck_current = {}
 puck_current.incoming   = false
 puck_current.outgoing   = false
 
+var puck_status     = "{}"
+var old_puck_status = "{}"
+
+var poll = 500  // 2x a second
+var poll = 5000  // every 5 secs
+var poll = 1000  // once a second
+
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
 
@@ -58,9 +65,13 @@ function post(url, parameters) {
 //
 // hang up the phone, return to home
 //
-function hang_up() {
+function hang_up(sound) {
 
     console.log('hanging up!')
+
+    // the bells... the bells... make them stop!
+    sound.pause();
+    sound.currentTime = 0;
 
     var url = "/vpn/stop"
 
@@ -79,6 +90,10 @@ function hang_up() {
         alert('error on hangup!')
 //      window.location = '/puck.html'
     })
+
+    // kill the UI signs
+    remove_signs_of_call()
+
 }
 
 //
@@ -104,61 +119,25 @@ function get_ip(element) {
 //
 // fire up the VPN
 //
-function puck_vpn(pid, ip) {
+function puck_vpn(puckid, ipaddr) {
 
-   $('#puck_vpn' + pid).text("... connecting to " + ip + " : " + pid)
+    console.log('firing up VPN')
+    console.log(puckid, ipaddr)
 
-   console.log('firing up VPN ' + pid)
+    $.ajax({
+        type: "POST",
+        url: "/vpn/start",
+        data: {"puckid": puckid, "ipaddr": ipaddr},
+        complete : function(result){callback(result, form)}
+    });       
 
-   // pack it all in
-   var vpn_puck    = {}
+    var callback = function(result, form){
+        if(!result)
+            form.submit();
+    }
 
-   vpn_puck['pid']    = pid
-   vpn_puck['ip']     = ip
-   vpn_puck['action'] = '/vpn/start'
-
-   var json_puck = JSON.stringify(vpn_puck);
-
-   console.log('posting' + json_puck)
-
-   post ("/vpn/start", vpn_puck)
-
-   window.location = '/puck.html'
 
 }
-
-//
-// if they hit create puck... post data to target server,
-// 
-// function puck_create(ip_addr) {
-// 
-//     console.log('js puck_create')
-// 
-//     var delay = 10000
-// 
-//     $('#puck_button_create').text("... creating ...")
-// 
-//     var json_puck = JSON.stringify(puck_data);
-// 
-//     $.ajax({
-//         url : 'https://' + ip_addr + ':8080/puck/swap',
-//         type: "post",
-//         data : json_puck,
-//         success: function(data, textStatus, jqXHR) {
-//             console.log('successfully posted request')
-//             console.log(data)
-//         },
-//         error: function (jqXHR, textStatus, errorThrown) {
-//             console.log('down, down, down she goes... post failed')
-//             console.log('"' + errorThrown + '"')
-//         }
-//     });
-// 
-// }
-
-
-// for love notes to the server and back
-
 
 //
 // well...  sort of... pingish... send ping request to PUCK server
@@ -225,93 +204,125 @@ function check_ring() {
     console.log("have I rang?");
 }
 
-//
-// deal with the browser<->server messages... we get status notes this way,
-// among potentially other things
-//
-function message_or_die() {
-
-    var host = window.document.location.host.replace(/:.*/, '')
-    var socket = io.connect()
-
-    // deals with all the message stuff... if we see anything... go here:
-    socket.on('connect', function () {
-            socket.emit('weasels in your trou!');
-    });
-  
-    socket.on('status', function (data) {
-
-        console.log('sailing on the sneeze of cheeze')
-        console.log(data)
-
-        // real json or the fake stuff?
-        try {
-            jdata = JSON.parse(data)
-        }
-        // catch and move on
-        catch(e){
-            console.log('not json data...' + e)
-            return
-        }
- 
-        // default to down
-        if (typeof jdata.openvpn_server == "undefined") {
-            jdata.openvpn_server = {}
-            jdata.openvpn_server.vpn_status = "down"
-            // puck_current.incoming = false
-        }
-        if (typeof jdata.openvpn_client == "undefined") {
-            jdata.openvpn_client = {}
-            jdata.openvpn_client.vpn_status = "down"
-            // puck_current.outgoing = false
-        }
-
-        console.log('I hear something...')
-        console.log(puck_current)
-
-        // where are we?
-        // var page = window.location.pathname.split('/')[1]
-
-        // server
-        if (jdata.openvpn_server.vpn_status == "up") {
-            // ensure video button is enabled if a call is in progress
-            $('#puck_video').removeClass('disabled')
-        
-            if (typeof puck_current.incoming != "undefined" && ! puck_current.incoming) {
-                console.log('incoming ring!')
-                // ring them gongs
-                $('#incoming')[0].click()
-            }
-
-            puck_current.incoming = false
-        }
-
-        // client
-        if (jdata.openvpn_client.vpn_status == "up") {
-
-            $('#puck_video').removeClass('disabled')
-        
-                
-            if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
-            // xxx ... kill avg?
-                console.log('incoming ring!')
-                // ring them gongs
-                $('#outgoing')[0].click()
-            }
-
-            puck_current.outgoing = false
-        }
-
-
-        if (jdata.openvpn_server.vpn_status == "down" && jdata.openvpn_client.vpn_status == "down") {
-            console.log('everything dead, shut it down...!')
-            $('#puck_video').addClass('disabled')
-            // xxx ... kill avg?
-        }
-
-    })
+function ajaxError( jqXHR, textStatus, errorThrown ) {
+    console.log('jquery threw a hair ball on that one: ' + textStatus + ' - ' + errorThrown);
 }
 
+//
+// ... snag /status all the time
+//
+function get_status(){
+
+    // console.log('gs')
+
+    var url = "/status"
+
+    var jqXHR_get_status = $.ajax({ url: url, })
+
+    jqXHR_get_status.done(function (data, textStatus, jqXHR) {
+        // console.log('status wootz');
+        puck_status = data
+
+        // if something is new, do something!
+        if (old_puck_status != puck_status) {
+            console.log('something new in the state of denmark!')
+            old_puck_status = puck_status
+            status_or_die()
+        }
+            
+    }).fail(ajaxError);
+
+}
+
+function infinite() {
+    get_status()
+    setTimeout(infinite, poll)
+}
+
+//
+// get status... or... well....
+//
+function status_or_die() {
+
+    console.log('sailing on the sneeze of cheeze')
+
+    // real json or the fake stuff?
+    try {
+        jdata = JSON.parse(puck_status)
+    }
+    // catch and move on
+    catch(e){
+        console.log('not json data...' + e)
+        return
+    }
+ 
+    // default to down
+    if (typeof jdata.openvpn_server == "undefined") {
+        jdata.openvpn_server = {}
+        jdata.openvpn_server.vpn_status = "down"
+        // puck_current.incoming = false
+    }
+    if (typeof jdata.openvpn_client == "undefined") {
+        jdata.openvpn_client = {}
+        jdata.openvpn_client.vpn_status = "down"
+        // puck_current.outgoing = false
+    }
+
+    console.log('I hear something...')
+    console.log(puck_current)
+
+    // server
+    if (jdata.openvpn_server.vpn_status == "up") {
+        // ensure video button is enabled if a call is in progress
+        $('#puck_video').removeClass('disabled')
+    
+        if (typeof puck_current.incoming != "undefined" && ! puck_current.incoming) {
+            console.log('incoming ring!')
+            // ring them gongs
+            $('#incoming')[0].click()
+        }
+
+        puck_current.incoming = false
+    }
+
+    // client
+    if (jdata.openvpn_client.vpn_status == "up") {
+
+        $('#puck_video').removeClass('disabled')
+        
+                
+        if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
+        // xxx ... kill avg?
+            console.log('incoming ring!')
+            // ring them gongs
+            $('#outgoing')[0].click()
+        }
+
+        puck_current.outgoing = false
+    }
+
+
+    if (jdata.openvpn_server.vpn_status == "down" && jdata.openvpn_client.vpn_status == "down") {
+        console.log('everything dead, shut it down...!')
+        $('#puck_video').addClass('disabled')
+        // xxx ... kill avg?
+    }
+
+}
+
+
+//
+// when disconnected, kill all the UI signs we put up
+// 
+function remove_signs_of_call() {
+
+    console.log('killing call signatures...')
+
+    $('.puck_vpn').text("Call").removeClass("btn-danger").addClass("btn-success")
+    $('#puck_video').addClass('disabled')
+    $('.avgrund-popin').remove();
+
+}
 
 //
 // after all is said and done... let the JS fur fly
@@ -324,13 +335,27 @@ var image     = ""
 var puck_id   = ""
 puck_data     = ""
 
-// all the message handlers and logic stuffed in here
-message_or_die()
+// status loop
+infinite();
+
+// $('body').on('click', '.puck_vpn', function(event) { barber($(this).closest("button").attr("id")) })
+
+// create a suspenseful message
+// $('.puckvpn').live('submit', function() { 
+$('body').on('click', '.puck_vpn', function() { 
+    $(this).text("connecting...").removeClass("btn-success").addClass("btn-danger")
+    var puckid = $("#puckid").val()
+    var ipaddr = $("#ipaddr").val()
+    puck_vpn(puckid, ipaddr)
+    })
 
 // disable a/href pushing if disabled
 $('body').on('click', 'a.disabled', function(event) {
     event.preventDefault();
 });
+
+// xxx - from http://soundbible.com/1411-Telephone-Ring.html
+var ring = new Audio("media/ringring.mp3") // load it up
 
 // toss your ip in the footer
 get_ip('#ip_diddy')
@@ -338,13 +363,20 @@ get_ip('#ip_diddy')
 // ... bye bye
 $('body').on('click', '#puck_disconnect', function() { 
     $('body').removeClass('avgrund-active');
-    $('.avgrund-popin').remove();
-
-    hang_up() 
+    hang_up(ring) 
 })
 
-// xxx - from http://soundbible.com/1411-Telephone-Ring.html
-// var ring = new Audio("media/ringring.mp3") // load it up
+// adapted from http://css-tricks.com/css3-progress-bars/
+function barber(element) {
+    console.log('barberizing ' + element)
+
+//  $(element).data("origWidth", $(element).width())
+//      .width(0)
+//      .animate({
+//          width: $(element).data("origWidth")
+//      }, 1200);
+
+}
 
 // var in_or_out = "Calling..."
 
@@ -481,10 +513,10 @@ $.getJSON('/puck', function(pucks) {
                        '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                        '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
                        '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                             +
-                       '<input style="display:none" name="puckid"  value={{puckid}}>'    +
-                       '<input style="display:none" name="ipaddr"  value={{ipaddr}}>'           +
+                       '<input style="display:none" id="puckid" name="puckid"  value={{puckid}}>'    +
+                       '<input style="display:none" id="ipaddr" name="ipaddr"  value={{ipaddr}}>'           +
                        '<input style="display:none" name="vpn_action" value="VPN" />'     +
-                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="btn disabled">Call</button>' +
+                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="puck_vpn meter btn disabled">Call</button>' +
                        '</form>'                                                                          +
                     '</div>'                                                                              +
                  '</div>'                                                                                 +

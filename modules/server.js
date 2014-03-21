@@ -1,7 +1,6 @@
 
 // general includes
-var Primus = require('primus'),
-    Tail    = require('tail').Tail,
+var Tail    = require('tail').Tail,
     assert  = require('assert-plus'),
     bunyan  = require('bunyan'),
     fs      = require('fs'),
@@ -16,14 +15,10 @@ var Primus = require('primus'),
 var sleep = require('sleep');
 
 // status chex
-var puck_status  = "{}",
-    server_magic = {},
+var server_magic = {},
     client_magic = {}
-    sServer      = ""
+// lazy
     server       = ""
-    p_client     = ""
-
-var ws_clients = [];
 
 
 // simple conf file...
@@ -33,7 +28,9 @@ console.log(config);
 console.log(config.PUCK)
 console.log(config.PUCK.keystore)
 
+//
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
+//
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 ///--- Redis
@@ -61,6 +58,15 @@ catch (e) {
     console.log(e)
     process.exit(2)
 }
+
+//
+// get the latest status... create the file if it doesn't exist...
+//
+var puck_status      = "{}",
+    puck_status_file = "/etc/puck/status.puck"
+
+// keep an eye on the above
+pollStatus(puck_status_file)
 
 //
 // drag in PUCK data to the server
@@ -127,16 +133,11 @@ function change_status() {
 
     console.log("status: " + puck_status)
 
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
-
-    console.log('ws connecting...')
-
-    var socket = require('socket.io-client')('https:/localhost:8080')
-
-    socket.on('connection', function()     { console.log('#socket disconnect')})
-    socket.on('event', function(data)      { console.log('#socket event')})
-    socket.on('disconnect', function()     { console.log('#socket d/c')})
-    socket.on('error', function error(err) { console.error('#socket bad... very bad... could be snakes... you go first....\n\t', err)})
+    // xxx - errs to user!
+    fs.writeFile(puck_status_file, puck_status, function(err) {
+        if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
+        else { console.log('wrote status') }
+    });
 
     console.log('end status')
 }
@@ -179,7 +180,6 @@ function watch_logs(logfile, log_type) {
 
         var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
             moment_in_secs =  (new Date).getTime();
-
 
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
@@ -340,6 +340,67 @@ function getIP(req, res, next) {
 
     res.send(200, '{"ip" : "' + ip + '"}');
     next(); 
+}
+
+//
+// watch the status file for changes
+//
+function pollStatus(file) {
+
+    console.log('here to statusfy you...')
+
+    // read or create it initially
+    if (puck_status == "{}") {
+        if (!fs.existsSync(puck_status_file)) {
+            console.log('creating ' + puck_status_file)
+            fs.writeFileSync(puck_status_file, puck_status)
+        }
+    }
+    fs.readFile(puck_status_file, function (err, data) {
+        if (err) {
+            console.log('file errz - ' + err)
+        }
+        else {
+            console.log(data.toString())
+            puck_status = data.toString()
+        }
+    })
+
+    //
+    // now keep an eye on the above...if it changes, change
+    // the status with the new contents
+    //
+
+    console.log("I'm watching you, punk " + puck_status_file)
+
+    fs.watchFile(puck_status_file, function (curr, prev) {
+        console.log('changezor')
+        // simple conf file...
+        fs.readFile(puck_status_file, function (err, data) {
+            if (err) {
+                console.log('errz - ' + err)
+            }
+            else {
+                console.log(data.toString())
+                puck_status = data.toString()
+            }
+         })
+    })
+
+    console.log('trigger set')
+
+}
+
+//
+// hand out the latest news
+//
+function puckStatus(req, res, next) {
+
+    // console.log('puck status check...' + puck_status)
+
+    res.send(200, puck_status)
+    next()
+
 }
 
 
@@ -670,14 +731,11 @@ function startVPN(req, res, next) {
 
     var vpn_home = "/vpn.html"
 
-    res.header('Location', puck_web_home);
+    // prevents calling form from leaving page
+    res.send(204)
 
-    res.send(302);
-    return next(false);
+    return next();
 
-    // res.send(200, "{\"status\": \"OK\"}");
-    // next();
-                                 
 }
 
 
@@ -1009,6 +1067,8 @@ function createServer(options) {
     server.use(restify.queryParser());
     server.use(restify.gzipResponse());
     server.use(restify.bodyParser());
+    server.use(restify.jsonp());
+
 
     // zen
     server.use(restify.CORS());
@@ -1030,41 +1090,8 @@ function createServer(options) {
 
     server.use(authenticate);
 
-    io = require('socket.io').listen(server)
-
-    io.set('log level',1); // tame the flood
-
     // send me anything... I'll give you a chicken.  Or... status.
-    io.sockets.on('connection', function(sock) {
-        console.log('[+] io: connection')
-        sock.broadcast.emit(puck_status)
-
-        // sock on, dudette!
-        sock.on('message', function(data, flags) {
-            console.log('#io - message - Roundtrip time: ' + (Date.now() - parseInt(data)) + 'ms', flags);
-            sock.broadcast.emit(puck_status)
-        })
-
-        sock.on('open', function message(data) {
-            console.log('#io - open...', data);
-            sock.broadcast.emit(puck_status)
-        });
-
-        sock.on('error', function error(err) {
-            console.log('#io - OMFG')
-            console.log(err)
-        })
-
-        sock.on('disconnect', function error(err) {
-            console.log('[-]io - disconnect...', err, err.message);
-        })
-
-    })
-
-    io.sockets.on('error', function error(err) {
-        console.log('#io - OMFG')
-        console.log(err)
-    })
+    server.get("/status", puckStatus);
 
     /// Now the real handlers. Here we just CRUD on Puck blobs
 
@@ -1141,36 +1168,6 @@ function createServer(options) {
     server.post('/vpn/start', startVPN);
     // stop
     server.get('/vpn/stop', stopVPN);
-
-    // do it the hard way to make ejs work
-//  server.get(".*.html", function(req, res, next) {
-    server.get("xxxx", function(req, res, next) {
-        // console.log(req)
-        var full_path = './public' + req._url.pathname
-        // fs.readFileSync(full_path, 'utf-8', function(error, content)
-        fs.readFile(full_path, 'utf-8', function(err, content) {
-            console.log('servin up: ' + full_path)
-
-            if (err) { 
-                console.log('errz: ' + err); 
-                res.setHeader('Content-Type', 'text/html');
-                res.send(404, content);
-                next();
-                return
-            }
-
-            var ejs     = require('ejs')
-            var content = ejs.render(content,{ filename: full_path })
-
-            res.setHeader('Content-Type', 'text/html');
-            res.send(200, content);
-            next();
-
-            return
-
-        })
-
-    })
 
     // if all else fails
     server.get(".*", restify.serveStatic({
