@@ -69,6 +69,15 @@ var puck_status      = "{}",
 pollStatus(puck_status_file)
 
 //
+// watch vpn logs for incoming/outgoing connections
+//
+var server_vpn_log = "server_vpn"
+var client_vpn_log = "client_vpn"
+// xxxx - wonder if this shouldn't be done via REST
+watch_logs(server_vpn_log, "OpenVPN Server")
+watch_logs(client_vpn_log, "OpenVPN Client")
+
+//
 // drag in PUCK data to the server
 //
 // the very first time it's a bit of a chicken and egg thing;
@@ -175,7 +184,8 @@ function watch_logs(logfile, log_type) {
         var magic_client_down = "VPN is down"
 
         // xxx - server openvpn
-        var magic_server_up   = "PUSH_REPLY,route"
+        // var magic_server_up   = "PUSH_REPLY,route"
+        var magic_server_up   = "Peer Connection Initiated"
         var magic_server_down = "ECONNREFUSED"
 
         var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
@@ -687,8 +697,6 @@ function startVPN(req, res, next) {
     console.log(req.params)
 
     var puck_web_home  = "/puck.html"
-    var server_vpn_log = "server_vpn"
-    var client_vpn_log = "client_vpn"
 
     // bail if we don't get ID
     if (typeof req.params.puckid === 'undefined' || req.params.puckid == "") {
@@ -700,10 +708,6 @@ function startVPN(req, res, next) {
       return next(false);
     }
    
-    // xxxx - wonder if this shouldn't be done via REST
-    watch_logs(server_vpn_log, "OpenVPN Server")
-    watch_logs(client_vpn_log, "OpenVPN Client")
-
     console.log('onto the execution...')
 
     puckid = req.params.puckid
@@ -864,7 +868,7 @@ function httpsPing(ipaddr, res, next) {
    }).on('error', function(e) {
       console.log('sping to ' + ipaddr + ' is dead, jim')
       console.error(e);
-      var response = {status: "OK", "name": 'err', "pid": 'errxxx'}
+      var response = {status: "dead", "name": e.code, "pid": e.syscall}
       res.send(200, response)
       next();
    })

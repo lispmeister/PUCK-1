@@ -171,16 +171,17 @@ function puck_ping(ipaddr, id, url) {
    .done(function(data) {
       console.log('success with ' + element_id) 
 
-      if (id == '') { return(data) }
-
       // make the button clickable and green
-      $('#'+element_id).addClass('btn-success')
-      $('#'+element_id).removeClass('disabled')
+      if (data.status == "OK")
+          $('#'+element_id).addClass('btn-success').removeClass('disabled')
+      else
+          $('#'+element_id).removeClass('btn-success').addClass('disabled')
+
    })
    .fail(function(data) { 
       console.log( "ping failure for " + ping_url)
       console.log(data)
-      if (id == '') { return(data) }
+      $('#'+element_id).removeClass('btn-success').addClass('disabled')
    })
    
 console.log('post-pingy ' + id + '... putting into ' + element_id)
@@ -351,6 +352,14 @@ infinite();
 // $('.puckvpn').live('submit', function() { 
 $('body').on('click', '.puck_vpn', function() { 
     $(this).text("connecting...").removeClass("btn-success").addClass("btn-danger")
+
+    // adapted from http://css-tricks.com/css3-progress-bars/
+    console.log('barberizing')
+    // get width, nuke width, animate to old width
+    $(this).data("oldWidth", $(this).width() * 2)
+        .width(0)
+        .animate({ width: $(this).data("oldWidth") }, 1000);
+
     var puckid = $("#puckid").val()
     var ipaddr = $("#ipaddr").val()
     puck_vpn(puckid, ipaddr)
@@ -372,18 +381,6 @@ $('body').on('click', '#puck_disconnect', function() {
     $('body').removeClass('avgrund-active');
     hang_up() 
 })
-
-// adapted from http://css-tricks.com/css3-progress-bars/
-function barber(element) {
-    console.log('barberizing ' + element)
-
-//  $(element).data("origWidth", $(element).width())
-//      .width(0)
-//      .animate({
-//          width: $(element).data("origWidth")
-//      }, 1200);
-
-}
 
 // var in_or_out = "Calling..."
 
@@ -523,7 +520,7 @@ $.getJSON('/puck', function(pucks) {
                        '<input style="display:none" id="puckid" name="puckid"  value={{puckid}}>'    +
                        '<input style="display:none" id="ipaddr" name="ipaddr"  value={{ipaddr}}>'           +
                        '<input style="display:none" name="vpn_action" value="VPN" />'     +
-                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="puck_vpn meter btn disabled">Call</button>' +
+                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="puck_vpn meter cherry btn disabled">Call</button>' +
                        '</form>'                                                                          +
                     '</div>'                                                                              +
                  '</div>'                                                                                 +
