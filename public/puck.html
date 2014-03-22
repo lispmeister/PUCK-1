@@ -35,33 +35,41 @@
 
 <body>
 
-    <div class="container">
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-6 column">
+            <ul class="nav nav-pills">
 
-        <div class="masthead">
-            <ul class="nav nav-pills pull-right">
-                <li> <a style="text-decoration: none" href="/vpn.html"> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></button></a></li>
-                <li class="muted"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></li>
-                <li class="muted"><a href="/logs.html">Logs</a></li>
-                <li class="muted"><a href="#">Help</a></li>
+                <li> <button type="button" class="btn btn-default"><h5 class="active"> <a href="/puck.html">PUCK!</a></h5> </button></li>
+                <li> <button type="button" class="btn btn-default muted disabled"><h5 class="muted disabled"> <a href="#">Profile</a></h5></button></li>
+                <li> <button type="button" class="btn btn-default muted disabled"><h5 class="muted disabled"> <a href="#">Messages</a></h5></button></li>
+
             </ul>
-            <h3 class="active"><a href="/puck.html">The PUCK!</a></h3>
+        </div>
+
+        <div class="col-md-6 column">
+            <ul class="nav nav-pills pull-right">
+
+                <li> <button type="button" class="btn btn-sm disabled" id="puck_status">Status</button></li>
+
+                <li> <button type="button" class="btn btn-danger btn-sm disabled" id="puck_video"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;"> Video</span></button></a></li>
+
+                <li> <button type="button" class="btn btn-default btn-sm"><a href="#"><span class="glyphicon glyphicon-question-sign"></span> Help</a></button></li>
+
+                <li> <button type="button" class="btn btn-default btn-sm"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></button></li>
+
+            </ul>
+
+       </div>
+
+        <div class="row clearfix spacer50">
+            <div class="col-md-12 column">
+            </div>
         </div>
 
         <hr>
 
         <div class="hero-unit">
-
-            <!-- <div id="incoming"></div> -->
-            <a href="#" id="incoming" class="button left"></a>
-            <a href="#" id="outgoing" class="button left"></a>
-
-            <button class="btn disabled" id="my_puck" type="button"><span>My PUCK</span></button>
-
-            <button class="btn btn-success disabled nounderline" id="puck_status" type="button"><span>status</span></button>
-
-            <a href="#modalPuck" role="button" class="btn btn-primary btn-medium" data-toggle="modal">Add PUCK</a>
-
-<!-- based on http://bootsnipp.com/snipps/simple-registration-form -->
 
             <form id="modalPuck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
                 <div class="modal-dialog">
@@ -98,12 +106,22 @@
 
         </div> 
         </div> <!-- end of form/top stuff -->
-        <div class="btn-toolbar spacer20"></div>
+
+
+        <div class="btn-toolbar spacer20">
+            <li><a href="#" id="incoming" class="button left"></a></li>
+            <li><a href="#" id="outgoing" class="button left"></a></li>
+        </div>
 
         <!-- puck pals show up here -->
 
         <div class="row-fluid marketing" id="puck_friends">
-            <div class="muted"><h3>Friends</h3></div>
+            <div class="muted">
+                <h3 style="clear:both">Friends</h3>
+                <a href="#modalPuck" style="float:left" role="button" class="btn btn-primary btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span> PUCK</a>
+            </div>
+
+                
 
             <div id="puck_loading" class="spinner">
                 <div class="double-bounce1"></div>

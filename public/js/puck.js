@@ -82,12 +82,12 @@ function hang_up() {
 
     var url = "/vpn/stop"
 
-    var jqXHR_getIP = $.ajax({
+    var jqXHR_stopVPN = $.ajax({
         url: url,
         dataType: 'json',
     }) 
 
-    jqXHR_getIP.done(function (data, textStatus, jqXHR) {
+    jqXHR_stopVPN.done(function (data, textStatus, jqXHR) {
         console.log('jxq hangup wootz')
         console.log(data)
     }).fail(function(err) {
@@ -251,6 +251,33 @@ function infinite() {
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
+
+// function puck_create(ip_addr) {
+// 
+//     console.log('js puck_create')
+// 
+//     var delay = 10000
+// 
+//     $('#puck_button_create').text("... creating ...")
+// 
+//     var json_puck = JSON.stringify(puck_data);
+// 
+//     $.ajax({
+//         url : 'https://' + ip_addr + ':8080/puck/swap',
+//         type: "post",
+//         data : json_puck,
+//         success: function(data, textStatus, jqXHR) {
+//             console.log('successfully posted request')
+//             console.log(data)
+//         },
+//         error: function (jqXHR, textStatus, errorThrown) {
+//             console.log('down, down, down she goes... post failed')
+//             console.log('"' + errorThrown + '"')
+//         }
+//     });
+// 
+// }
+
 
 //
 // get status... or... well....
@@ -422,7 +449,7 @@ $('#incoming').avgrund({
     onBlurContainer: '.container',
     template: '<div class="row">' +
               '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
-              '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Call...</span></a></button></div>'  +
+              '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Incoming Call</span></a></button></div>'  +
               '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
               '</div>'
     })
@@ -438,11 +465,11 @@ $.getJSON('/ping', function(puck) {
     console.log('my name/id/status are: ', my_puck.name, my_puck.pid, my_puck.status)
 
     if (my_puck.status == "OK")
-        $('#my_puck').addClass('btn-success').removeClass('disabled')
+        $('#puck_status').addClass('btn-success').removeClass('disabled')
     else
-        $('#my_puck').removeClass('btn-success').addClass('disabled')
+        $('#puck_status').removeClass('btn-success').addClass('disabled')
 
-    $('#my_puck').attr("data-toggle", "popover").attr("data-placement", "auto right").attr("title", my_puck.pid).popover({delay: { show: 300, hide: 200 }, trigger: "hover"})
+    $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "auto right").attr("title", my_puck.pid).popover({delay: { show: 300, hide: 200 }, trigger: "hover"})
 
 })
 
@@ -567,7 +594,7 @@ $.getJSON('/puck', function(pucks) {
             // add the real ID
             // CHANGE THE ID!   make the VPN button point to the right PUCK
             $('#puck_vpn').attr('id', 'puck_vpn_' + puckid)
-    
+
             // pingy - check if system is up
             puck_ping(ipaddr, puckid, puck_url)
     

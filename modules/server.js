@@ -604,7 +604,7 @@ function swapPuck(req, res, next) {
         }
     });
 
-    // return ours
+    // give them ours
     rclient.get(puck_id, function (err, reply) {
 
         if (err) {
@@ -673,19 +673,35 @@ function stopVPN(req, res, next) {
     var exec    = require('child_process').exec;
     var command = '/etc/puck/exe/stop_vpn.sh';
 
+    console.log('stop VPN!')
     var child = exec(command,
         function (error, stdout, stderr) {
             req.log.debug('stop VPN stdout: ' + stdout);
             req.log.debug('stop VPN stderr: ' + stderr);
             if (error !== null) {
                 req.log.error('exec error: ' + error);
+                // if we get an error something is borked... so crush the status so
+                // we dont get harassed again
+                client_magic = {
+                    vpn_status : "down",
+                    start      : "n/a",
+                    start_s    : "n/a",
+                    duration   : "unknown",
+                    stop       : "unknown",
+                    stop_s     : "unknown"
+                }
+                change_status() // make sure everyone hears this
+
                 res.send(200, "{\"status\": \"Failed\"}");
                 next();
+
             } else {
                 res.send(200, "{\"status\": \"OK\"}");
                 next();
             }
         });
+
+
 }
 
  /**
