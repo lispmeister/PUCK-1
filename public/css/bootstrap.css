@@ -1,3 +1,15 @@
+
+/* one change... this:
+
+  max-width: 276px;
+
+To:
+
+  max-width:none;
+
+*/
+
+
 /*!
  * Bootstrap v3.1.1 (http://getbootstrap.com)
  * Copyright 2011-2014 Twitter, Inc.
@@ -5298,7 +5310,9 @@ button.close {
   left: 0;
   z-index: 1010;
   display: none;
-  max-width: 276px;
+  /* max-width: 276px; */
+  max-width:none;
+
   padding: 1px;
   text-align: left;
   white-space: normal;

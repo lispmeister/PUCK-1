@@ -72,8 +72,13 @@ function hang_up() {
     console.log('hanging up!')
 
     // the bells... the bells... make them stop!
-    ring.pause();
-    ring.currentTime = 0;
+    try {
+        ring.pause();
+        ring.currentTime = 0;
+    }
+    catch(e) {
+        console.log("haven't played anything yet - " + e)
+    }
 
     var url = "/vpn/stop"
 
@@ -346,8 +351,6 @@ puck_data     = ""
 // status loop
 infinite();
 
-// $('body').on('click', '.puck_vpn', function(event) { barber($(this).closest("button").attr("id")) })
-
 // create a suspenseful message
 // $('.puckvpn').live('submit', function() { 
 $('body').on('click', '.puck_vpn', function() { 
@@ -426,6 +429,24 @@ $('#incoming').avgrund({
 
 // if click above, disconnect
 
+var my_puck = {}
+
+// get the pucks we know about from local REST
+$.getJSON('/ping', function(puck) {
+    my_puck = puck
+
+    console.log('my name/id/status are: ', my_puck.name, my_puck.pid, my_puck.status)
+
+    if (my_puck.status == "OK")
+        $('#my_puck').addClass('btn-success').removeClass('disabled')
+    else
+        $('#my_puck').removeClass('btn-success').addClass('disabled')
+
+    $('#my_puck').attr("data-toggle", "popover").attr("data-placement", "auto right").attr("title", my_puck.pid).popover({delay: { show: 300, hide: 200 }, trigger: "hover"})
+
+})
+
+
 // get the pucks we know about from local REST
 $.getJSON('/puck', function(pucks) {
 
@@ -433,6 +454,13 @@ $.getJSON('/puck', function(pucks) {
     $.each(pucks, function(key, val) {
 
         $('#puck_loading').hide()
+
+        // bit of a race condition... figure out how to get the puckID of
+        // this PUCK prior to these
+        if (my_puck.pid == val) {
+            console.log("don't need more data on me")
+            }
+        else {
 
         // for each puck get more detailed data
         $.getJSON('/puck/' + val, function(puckinfo) {
@@ -507,7 +535,7 @@ $.getJSON('/puck', function(pucks) {
                // '<div class="thumbnail">'                                                                +
            var template = 
                 '<div class="col-md-3">' + 
-                 '<div class="thumbnail" id="{{puckid}}">'                                                +               
+                 '<div class="thumbnail" style="background-color: #eaf1f1" id="{{puckid}}">'                                                +               
                     '<a href="/puck_details.html?puckid={{puckid}}">'                                     +
                     '<img id="{{puckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
                     '<div class="caption">'                                                               +
@@ -550,7 +578,8 @@ $.getJSON('/puck', function(pucks) {
 //            'hoverEffect' : 'normal'
 //          })
 
-        })
+            })
+        }
     })
 })
 

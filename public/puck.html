@@ -8,7 +8,10 @@
 <meta name="description" content="rawr!">
 
 <!-- Le styles -->
-<link href="/css/bootstrap.min.css" rel="stylesheet">
+<!-- <link href="/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<!-- made a one line change in this, noted at top -->
+<link href="/css/bootstrap.css" rel="stylesheet">
 
 <!-- for calls -->
 <link href="/css/avgrund.css" rel="stylesheet">
@@ -41,7 +44,7 @@
                 <li class="muted"><a href="/logs.html">Logs</a></li>
                 <li class="muted"><a href="#">Help</a></li>
             </ul>
-            <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
+            <h3 class="active"><a href="/puck.html">The PUCK!</a></h3>
         </div>
 
         <hr>
@@ -52,9 +55,12 @@
             <a href="#" id="incoming" class="button left"></a>
             <a href="#" id="outgoing" class="button left"></a>
 
+            <button class="btn disabled" id="my_puck" type="button"><span>My PUCK</span></button>
+
+            <button class="btn btn-success disabled nounderline" id="puck_status" type="button"><span>status</span></button>
+
             <a href="#modalPuck" role="button" class="btn btn-primary btn-medium" data-toggle="modal">Add PUCK</a>
 
-            <button class="btn btn-success disabled nounderline" id="puck_status" type="button"><span>status</span></button></li>
 <!-- based on http://bootsnipp.com/snipps/simple-registration-form -->
 
             <form id="modalPuck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
@@ -97,7 +103,8 @@
         <!-- puck pals show up here -->
 
         <div class="row-fluid marketing" id="puck_friends">
-            <div class="muted"> loading </div>
+            <div class="muted"><h3>Friends</h3></div>
+
             <div id="puck_loading" class="spinner">
                 <div class="double-bounce1"></div>
                 <div class="double-bounce2"></div>

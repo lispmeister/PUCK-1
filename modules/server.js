@@ -679,7 +679,7 @@ function stopVPN(req, res, next) {
             req.log.debug('stop VPN stderr: ' + stderr);
             if (error !== null) {
                 req.log.error('exec error: ' + error);
-                res.send(500, "{\"status\": \"Failed\"}");
+                res.send(200, "{\"status\": \"Failed\"}");
                 next();
             } else {
                 res.send(200, "{\"status\": \"OK\"}");
