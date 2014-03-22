@@ -242,6 +242,10 @@ function infinite() {
     setTimeout(infinite, poll)
 }
 
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+
 //
 // get status... or... well....
 //
@@ -260,12 +264,12 @@ function status_or_die() {
     }
  
     // default to down
-    if (typeof jdata.openvpn_server == "undefined") {
+    if (typeof jdata.openvpn_server == "undefined" || isEmpty(jdata.openvpn_server)) {
         jdata.openvpn_server = {}
         jdata.openvpn_server.vpn_status = "down"
         puck_current.incoming = false
     }
-    if (typeof jdata.openvpn_client == "undefined") {
+    if (typeof jdata.openvpn_client == "undefined" || isEmpty(jdata.openvpn_client)) {
         jdata.openvpn_client = {}
         jdata.openvpn_client.vpn_status = "down"
         puck_current.outgoing = false
