@@ -1,0 +1,19 @@
+
+# Installed node from:
+# 
+#    http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
+#
+
+cd /tmp
+wget http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
+
+mkdir /usr/local/puck_stuff
+cd /usr/local/puck_stuff
+
+tar xvf /tmp/node-v0.10.24-linux-arm-pi.tar.gz
+rm /tmp/node-v0.10.24-linux-arm-pi.tar.gz
+
+# add line to .bash_profile
+
+echo export PATH=$PATH:/usr/local/puck_stuff/node-v0.10.24-linux-arm-pi/bin >> ~/.bash_profile
+

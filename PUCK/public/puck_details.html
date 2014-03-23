@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+<meta charset="utf-8">
+<title>PUCKasaurus Rex!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="rawr!">
+
+<!-- Le styles -->
+<!-- <link href="/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<!-- made a one line change in this, noted at top -->
+<link href="/css/bootstrap.css" rel="stylesheet">
+
+<!-- for calls -->
+<link href="/css/avgrund.css" rel="stylesheet">
+
+<!-- trivial bits here -->
+<link href="/css/puck.css" rel="stylesheet">
+
+<!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+  <script src="/js/html5shiv.js"></script>
+<![endif]-->
+
+<!-- for pucks -->
+<!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
+<!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <div class="masthead">
+            <ul class="nav nav-pills pull-right">
+                <li> <a style="text-decoration: none" href="/vpn.html"> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></button></a></li>
+                <li class="muted"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></li>
+                <li class="muted"><a href="/logs.html">Logs</a></li>
+                <li class="muted"><a href="#">Help</a></li>
+            </ul>
+            <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
+        </div>
+
+      <hr>
+
+        <div class="container">
+
+        <!-- make it so -->
+          <div id="puck_details">
+          </div>
+
+        <!-- make it so -->
+        <form action='/form' method="POST">
+        <fieldset>
+            <div class="control-group">
+                <span> <input style="display:none" id="puck_action" name="puck_action" value="DELETE" /> </span>
+                <span> <input style="display:none" id="puckid_form" name="puckid" value="" /> </span>
+                <div class="controls">
+                <!-- this does some javascript fu below to post the data and redirect back to this page -->
+                <button id="puck_button_delete" class="btn btn-large btn-danger" onclick="puck_delete()">DELETE w NO CONFIRM </button>
+                </div>
+            </div>
+        </fieldset>
+        </form>
+
+        </div>
+
+    <!-- le javascript -->
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.js"></script>
+    <script type="text/javascript" src="/js/moustache.js"></script>
+
+    <!-- make the known pucks appear in the correct section -->
+    <script type='text/javascript'>
+
+       puckid = ""
+       //
+       // if they hit nuke puck... post data to server to make it happen
+       // 
+       // TODO - check if it worked :)
+       function puck_delete() {
+
+          $('#puck_button_delete').text("... nuking ...")
+
+          var puckid = document.getElementById('puckid').textContent
+
+          console.log('deleting ' + puckid)
+
+          var dead_puck    = {}
+          dead_puck['puckid'] = puckid
+          dead_puck['action'] = 'DELETE'
+
+          var json_puck = JSON.stringify(dead_puck);
+
+          var postify = $.ajax({
+               type: "POST",
+               // XXXX
+               url: "https://localhost:8080/puck",
+               dataType: "json",
+               data: dead_puck
+          })
+              .done(function()   { console.log("success"); })
+              .fail(function()   { console.log("error"); })
+              .always(function() { console.log("finished"); });
+       window.location = '/puck.html'
+       }
+
+       $(document).ready(function () {
+
+         // perhaps look for a better way :)
+         var query = location.search.substr(1);
+         var data = query.split("&");
+
+         for(var i=0; i<data.length; i++) {
+            var item = data[i].split("=");
+            if (item[0] = "puckid") {
+               $('#puck_vpn').append(item[1])
+               // global
+               puckid = item[1]
+               console.log("puckid: " + item[1])
+            }
+            else {
+               error = 1
+               $('#puck_id').append("Error - this page must be called with a puckid=valid-id")
+               console.log('Error - this page must be called with a valid-id, like https://localhost/puck_details.html?puck=markus007')
+            }
+         }
+         $('input[id=puckid_form]').val(puckid)
+
+         // get more detailed data...
+         $.getJSON('/puck/' + puckid, function(puckinfo) {
+
+            console.log(puckinfo)
+
+            var puck = {
+               user           : puckinfo.PUCK.owner.name,
+               email          : puckinfo.PUCK.owner.email,
+               puckid         : puckid,
+               image          : puckinfo.PUCK.image
+               }
+
+            var template = 
+                  '<strong>user</strong>: {{user}} <br />' +
+                  '<strong>email</strong>: {{email}} <br />' +
+                  '<div style="width: 200px"><img style="max-width:100%" src="{{image}}"></div>' +
+                  '<div><h4>PUCK <span id="puckid">{{puckid}}</span></h3> <br />'
+
+            var html = Mustache.to_html(template, puck);
+
+            $('#puck_details').html(html);
+
+         })
+     })
+
+    </script>
+
+  </body>
+</html>
+

@@ -1,0 +1,42 @@
+# client
+dev tun
+
+# proto udp
+proto tcp-client
+
+remote 50.19.17.36 80
+
+# ifconfig 10.6.6.66 10.6.6.6
+# ifconfig 10.6.6.6  10.195.14.33
+# ifconfig 10.195.14.6  10.195.14.33
+# ifconfig 10.6.6.39  255.255.255.0
+
+resolv-retry infinite
+
+nobind
+
+persist-key
+persist-tun
+
+auth-user-pass creds.txt
+pull
+
+# verb 6
+
+tls-client
+tls-auth	puck_open_vpn.static 1
+key-direction 1
+remote-cert-tls server
+
+
+
+
+ca   ca.crt
+cert puck001.crt
+key  puck001.key
+
+script-security 4
+
+comp-lzo
+# why this isn't default... don't store keys in mem
+auth-nocache

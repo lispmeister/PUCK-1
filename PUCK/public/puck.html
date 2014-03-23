@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+<meta charset="utf-8">
+<title>PUCKasaurus Rex!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="rawr!">
+
+<!-- Le styles -->
+<!-- <link href="/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<!-- made a one line change in this, noted at top -->
+<link href="/css/bootstrap.css" rel="stylesheet">
+
+<!-- for calls -->
+<link href="/css/avgrund.css" rel="stylesheet">
+
+<!-- trivial bits here -->
+<link href="/css/puck.css" rel="stylesheet">
+
+<!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+<!--[if lt IE 9]>
+  <script src="/js/html5shiv.js"></script>
+<![endif]-->
+
+<!-- for pucks -->
+<!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
+<!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
+
+
+  </head>
+
+<body>
+
+<div class="container">
+    <div class="row clearfix">
+        <div class="col-md-6 column">
+            <ul class="nav nav-pills">
+
+                <li> <button type="button" class="btn btn-default"><h5 class="active"> <a href="/puck.html">PUCK Home</a></h5> </button></li>
+                <li> <button type="button" class="btn btn-default muted disabled"><h5 class="muted disabled"> <a href="#" style="color:gray">Profile</a></h5></button></li>
+                <li> <button type="button" class="btn btn-default muted disabled"><h5 class="muted disabled"> <a href="#" style="color:gray">Messages</a></h5></button></li>
+
+            </ul>
+        </div>
+
+        <div class="col-md-6 column">
+            <ul class="nav nav-pills pull-right">
+
+                <li> <button type="button" class="btn btn-sm disabled" id="puck_status">Status</button></li>
+
+                <li> <button type="button" class="btn btn-danger btn-sm disabled" id="puck_video"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;"> Video</span></button></a></li>
+
+                <li> <button type="button" class="btn btn-default btn-sm disabled"><a href="#"><span class="glyphicon glyphicon-question-sign" style="color:gray"></span> Help</a></button></li>
+
+                <li> <button type="button" class="btn btn-default btn-sm"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></button></li>
+
+            </ul>
+
+       </div>
+
+        <div class="row clearfix spacer50">
+            <div class="col-md-12 column">
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="hero-unit">
+
+            <form id="modalPuck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h3 id="modalPuckLabel">Get PUCK</h3>
+                        </div>
+                        <div class="modal-body">
+                            <fieldset>
+                            <div class="control-group">
+                                <label class="control-label" for="ip_addr">IP Address</label>
+                                <div class="controls">
+                                    <input type="text" id="ip_addr" name="ip_addr" placeholder="" maxlength="21" class="input-xlarge">
+                                    <p class="help-block"></p>
+                                </div>
+                            </div>
+                            <span> 
+                                <input style="display:none" id="puck_action" name="puck_action" value="CREATE" />
+                            </span>
+
+                            <div class="control-group">
+                                <div class="controls">
+                                <!-- this does some javascript fu below to post the data and redirect back to this page -->
+                                <button id="puck_button_create" class="btn btn-success">Create</button>
+                                </div>
+                            </div>
+
+                        </fieldset>
+
+                    </div>
+                </div>
+            </form>
+
+        </div> 
+        </div> <!-- end of form/top stuff -->
+
+
+        <div class="btn-toolbar spacer20">
+            <li><a href="#" id="incoming" class="button left"></a></li>
+            <li><a href="#" id="outgoing" class="button left"></a></li>
+        </div>
+
+        <!-- puck pals show up here -->
+
+        <div class="row-fluid marketing" id="puck_friends">
+            <div class="muted">
+                <h3 style="clear:both">Friends</h3>
+                <a href="#modalPuck" style="float:left" role="button" class="btn btn-primary btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span> PUCK</a>
+            </div>
+
+                
+
+            <div id="puck_loading" class="spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+            </div>
+        </div>
+
+        <div class="btn-toolbar"> <span></span></div>
+        <div class="btn-toolbar"> <span class="spacer100"></span></div>
+
+
+        <!--
+        <div class="row-fluid marketing"> 
+            <form action="/upload", method="post", enctype="multipart/form-data">
+                <input type="text" type="file" name="displayImage">
+            </form>
+        </div>
+        -->
+
+        <div class="footer" id="puck_footy">
+            <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
+        </div>
+
+    </div>
+
+
+</body>
+
+<!-- <% include foot %> -->
+
+<script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
+<script type="text/javascript" src='/js/bootstrap.js'></script>
+<script type="text/javascript" src='/js/moustache.js'></script>
+<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
+<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
+<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
+<script type="text/javascript" src='/js/spin.js'></script>
+<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
+<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
+
+<script type="text/javascript" src='/js/puck.js'></script>
+
+
+</html>
+

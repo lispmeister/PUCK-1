@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <!-- <script src="simplewebrtc.bundle.js"></script>  -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
+    </head>
+    <body>
+    </body>
+
+<script>
+
+$('body').append('bzi')
+
+// make the AJAX request
+var url = "https://192.168.0.250:8080/jp&callback=?"
+var url = "/status"
+var poll = 2000
+
+$(document).ready(function(){
+    console.log('jdaddy')
+
+    $.getJSON(url, function(jdata){
+        //response data are now in the result variable
+        console.log('sucky')
+        $('body').html(jdata);
+    });
+})
+
+
+</script>
+
+</html>
+

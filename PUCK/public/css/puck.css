@@ -1,0 +1,102 @@
+
+/* some simple additions */
+
+.nounderline{
+    text-decoration: none;
+}
+
+body {
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+.ip_address {
+    /* border-style: solid ; 
+    border-color: black; 
+    border-width: 2px; */
+    color: gray:
+}
+
+
+div.growlUI { 
+    background: url(check48.png) no-repeat 10px 10px 
+}
+div.growlUI h1, div.growlUI h2 {
+    color      : white; 
+    padding    : 5px 5px 5px 75px; 
+    text-align : left;
+}
+
+.top-spacer5   { margin-top:  5px; }
+.top-spacer10  { margin-top: 10px; }
+.top-spacer50  { margin-top: 50px; }
+.top-spacer100 { margin-top:100px; }
+
+.spacer5,
+.spacer10,
+.spacer20,
+.spacer50,
+.spacer100,
+.spacer200 {
+    display: block;
+    margin:      0; 
+    padding:     0; 
+    border:      0; 
+    font-size:   0; 
+    width:    100%; 
+}
+
+.spacer5   { height:   5px; }
+.spacer10  { height:  10px; }
+.spacer20  { height:  20px; }
+.spacer50  { height:  50px; }
+.spacer100 { height: 100px; }
+.spacer200 { height: 200px; }
+
+/* 
+  from:
+    http://www.jqueryrain.com/?C9yJS02s
+ */
+.spinner {
+  width: 40px;
+  height: 40px;
+
+  position: relative;
+  margin: 100px auto;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #333;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  
+  -webkit-animation: bounce 2.0s infinite ease-in-out;
+  animation: bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes bounce {
+  0%, 100% { 
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% { 
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+
+
