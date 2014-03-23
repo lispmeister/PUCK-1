@@ -14,10 +14,12 @@ var Tail    = require('tail').Tail,
 // sue me
 var sleep = require('sleep');
 
+// yes, yes, lazy too
+
 // status chex
 var server_magic = {},
-    client_magic = {}
-// lazy
+    client_magic = {},
+    puck_events  = {}
     server       = ""
 
 
@@ -135,10 +137,12 @@ function change_status() {
     console.log('changing status...')
 
     // in with the old, out with the new... er, reverse that
-    puck_status = {}
+    puck_status                = {}
+    puck_status.events         = puck_events
     puck_status.openvpn_server = server_magic
     puck_status.openvpn_client = client_magic
-    puck_status = JSON.stringify(puck_status)
+
+    puck_status                = JSON.stringify(puck_status)
 
     console.log("status: " + puck_status)
 
@@ -195,7 +199,10 @@ function watch_logs(logfile, log_type) {
 
         // various states of up-id-ness and down-o-sity
         if (line.indexOf(magic_server_up) > -1) {
-            console.log('\n\n\n++++++++++++\n\n Openvpn server up!\n\n')
+            console.log('\n\n\n++++++++++++\n\n Openvpn server up:\n\n')
+            console.log(line)
+            console.log('\n\n')
+
             server_magic = {
                 vpn_status : "up",
                 start      : moment_in_time,
@@ -512,10 +519,27 @@ function createPuck(req, res, next) {
             if (isEmpty(bwana_puck)) {
                 emitter.emit('loaded')
             }
+
+            //
+            // if it's from a remote system, wake up local UI and tell user
+            //
+            var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+            if (client_ip != "127.0.0.1") {
+                console.log(req)
+                console.log('create appears to be coming from remote: ' + client_ip)
+                puck_events = { new_puck : true }
+                change_status() // make sure everyone hears this
+            }
+            else {
+                console.log('create appears to be coming from localhost: ' + client_ip)
+            }
+
             res.send(204);
             next();
         }
-    });
+    })
+
 }
 
 function isEmpty(obj) {
@@ -1152,9 +1176,6 @@ function createServer(options) {
     // send yours and get theirs
     server.post('/puck/swap', swapPuck);
 
-    // Overwrite a complete Puck - here we require that the body
-    // be JSON - otherwise the caller will get a 415 if they try
-    // to send a different type
     // With the body parser, req.body will be the fully JSON
     // parsed document, so we just need to serialize and save
     server.put({

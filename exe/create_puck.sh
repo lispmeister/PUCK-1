@@ -29,6 +29,7 @@ if [ $# -lt 5 ] ; then
    exit 1
 fi
 
+puck_host="@"
 if [ $# -eq 6 ] ; then
     echo creating puck on remote host
     puck_host="https://$6"
@@ -66,9 +67,14 @@ $puck_home/create_tlsauth.sh $puck_id
 
 # clumsy way to get the content into json form
 v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puckroot.crt)
-v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.key)
 v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.crt)
 v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/ta.key)
+
+# dont give our secret key to remotes ;)
+v_key="{}"
+if [ $puck_host -eq "@" ] ; then
+    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.key)
+fi
 
 v_dh="{}"
 if [ -f $keystores/$puck_id/dh.params ] ; then

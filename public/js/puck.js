@@ -204,22 +204,6 @@ function puck_create(element, ip_addr) {
         }
     })
 
-//      function (data, textStatus, jqXHR) {
-//           console.log("Post response:"); 
-//           console.dir(data); 
-//           console.log(textStatus); 
-//           console.dir(jqXHR); 
-
-//  $.ajax({
-//      type: "POST",
-//      url: "/form",
-//      data: JSON.stringify(data),
-//      contentType: 'application/json',
-//      complete : function(result){
-//          post_callback(ip_addr, result)
-//      }
-//  })
-
 }
 
 //
@@ -345,6 +329,8 @@ function status_or_die() {
         return
     }
  
+    console.log(jdata)
+
     // default to down
     if (typeof jdata.openvpn_server == "undefined" || isEmpty(jdata.openvpn_server)) {
         jdata.openvpn_server = {}
@@ -357,16 +343,33 @@ function status_or_die() {
         puck_current.outgoing = false
     }
 
+    // new kid on the block?  Happens when a remote adds you
+    if (typeof jdata.puck_events.new_puck == "undefined" || isEmpty(jdata.puck_events)) {
+        jdata.puck_events = {}
+        jdata.puck_events.new_puck = false
+    }
+
     console.log('I hear something...')
     console.log(puck_current)
     console.log(puck_status)
+
+    // if someone has added you, create a modest sized div that tells you and
+    // hopefully won't fuck up anything you're doing
+    if (jdata.puck_events.new_puck) {
+        console.log('added!')
+        $.bootstrapGrowl(ip_addr + " added you as a friend (refresh to see their PUCK)");
+        jdata.puck_events.new_puck = false
+    }
+    else {
+        console.log('did not add anything')
+    }
 
     // server
     if (jdata.openvpn_server.vpn_status == "up") {
         // ensure video button is enabled if a call is in progress
         $('#puck_video').removeClass('disabled')
     
-        if (typeof puck_current.incoming != "undefined" && ! puck_current.incoming) {
+        if (typeof puck_current.incoming != "undefined" && puck_current.incoming) {
             console.log('incoming ring!')
             // ring them gongs
             $('#incoming')[0].click()
@@ -381,7 +384,7 @@ function status_or_die() {
         $('#puck_video').removeClass('disabled')
         
                 
-        if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
+        if (typeof puck_current.outgoing != "undefined" && puck_current.outgoing) {
         // xxx ... kill avg?
             console.log('outgoing ring!')
             // ring them gongs
@@ -393,7 +396,7 @@ function status_or_die() {
 
     if (jdata.openvpn_server.vpn_status == "down" && jdata.openvpn_client.vpn_status == "down") {
         console.log('everything dead, shut it down...!')
-        $('#puck_video').addClass('disabled')
+        $('body').removeClass('avgrund-active');
         hang_up()
     }
 
@@ -542,23 +545,20 @@ $.getJSON('/puck', function(pucks) {
 
         $('#puck_loading').hide()
 
-        // bit of a race condition... figure out how to get the puckID of
-        // this PUCK prior to these
-        if (my_puck.pid == val) {
-            console.log("don't need more data on me")
-            }
-        else {
-
         // for each puck get more detailed data
         $.getJSON('/puck/' + val, function(puckinfo) {
             console.log('v/p')
             console.log(val)
             console.log(puck_id)
     
-            if (puck_id == val) {
-                puck_data = puckinfo
+            // bit of a race condition... figure out how to get the puckID of
+            // this PUCK (see above) prior to these so I can not put it up
+            // on the screen... lots of ways to do this....
+            if (my_puck.pid == val) {
+                my_puck = puckinfo
             }
-    
+            else {
+
            var name        = truncate(puckinfo.PUCK.name)
            var owner       = truncate(puckinfo.PUCK.owner.name)
            var email       = truncate(puckinfo.PUCK.owner.email)
@@ -659,16 +659,17 @@ $.getJSON('/puck', function(pucks) {
             puck_ping(ipaddr, puckid, puck_url)
     
             // start images in gray, color (if avail) on mouseover
-            // console.log('adipoli: ' + puckid)
-//          $('#' + puckid).adipoli({
-//            'startEffect' : 'grayscale',
-//            'hoverEffect' : 'normal'
-//          })
+            console.log('adipoli: ' + puckid)
+            $('#' + puckid).adipoli({
+              'startEffect' : 'grayscale',
+              'hoverEffect' : 'normal'
+            })
+
+            } // else ... pucks other than this one
 
             })
-        }
+        })
     })
-})
 
 })
 
