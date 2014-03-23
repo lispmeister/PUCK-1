@@ -1,2 +1,0 @@
-V	240320171656Z		EA8FE6AFBBA6448ACE8A4169D12AF7F6	unknown	/C=AQ/ST=N/A/L=Delphia/O=PUCK/OU=Crypto Cops/CN=puckasaurus/name=PUCK/emailAddress=puck@example.com
-V	150323171656Z		EA8FE6AFBBA6448ACE8A4169D12AF7F7	unknown	/C=AQ/ST=N/A/L=Delphia/O=PUCK/OU=Crypto Cops/CN=puckasaurus/name=PUCK/emailAddress=puck@example.com

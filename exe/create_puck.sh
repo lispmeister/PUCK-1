@@ -4,7 +4,7 @@
 #
 # Usage: $0 puck-id picture IP-addr owner email [puck-ip]
 #
-puck_host="https://localhost"
+puck_host="localhost"
 puck_port="8080"
 puck_home="/etc/puck"
 keystores="/etc/puck/pucks"
@@ -29,13 +29,13 @@ if [ $# -lt 5 ] ; then
    exit 1
 fi
 
-puck_host="@"
+puck_ip="@"
 if [ $# -eq 6 ] ; then
     echo creating puck on remote host
-    puck_host="https://$6"
+    puck_host=$puck_ip
 fi
 
-puck_url="$puck_host:$puck_port/puck"
+puck_url="https://$puck_host:$puck_port/puck"
 
 # kill off the evidence
 # trap "rm -f $tmp_files" EXIT
@@ -72,7 +72,7 @@ v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json,
 
 # dont give our secret key to remotes ;)
 v_key="{}"
-if [ $puck_host -eq "@" ] ; then
+if [ "$puck_ip" = "@" ] ; then
     v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.key)
 fi
 

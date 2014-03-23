@@ -77,7 +77,6 @@ else
 
 fi
 
-
 # for testing only... get something in the 10.x.y/24 zone
 x=$((RANDOM%254+1))
 y=$((RANDOM%254+1))
