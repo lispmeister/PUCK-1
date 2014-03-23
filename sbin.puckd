@@ -20,7 +20,10 @@ KEY_SIZE=512
 KEY_SIZE=64
 
 # nuke any past status
-rm -f status.puck
+rm -f $PUCK_HOME/status.puck
+# clear server and client logs
+echo > $PUCK_HOME/logs/client_vpn.log
+echo > $PUCK_HOME/logs/server_vpn.log
 
 # if no dir or symlink
 if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then

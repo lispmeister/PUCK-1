@@ -93,17 +93,14 @@ function parseOptions() {
 
 
 function usage(msg) {
-        if (msg)
-                console.error(msg);
+    if (msg)
+        console.error(msg);
 
-        var str = 'usage: ' +
-                NAME +
-                ' [-v] [-p port] [-u user] [-z password]';
-        console.error(str);
-        process.exit(msg ? 1 : 0);
+    var str = 'usage: ' + NAME + ' [-v] [-p port] [-u user] [-z password]';
+
+    console.error(str);
+    process.exit(msg ? 1 : 0);
 }
-
-
 
 ///--- Mainline
 
@@ -112,19 +109,16 @@ function usage(msg) {
 
         LOG.debug(options, 'command line arguments parsed');
 
-        var server = puck.createServer({
-            log: LOG
-        });
+        var server   = puck.createServer({ log: LOG });
 
         // At last, let's rock and roll
         var port = options.port || 8080;
 	// hostname = '192.168.0.141'
         // server.listen(port, hostname, function onListening() {
         server.listen(port, function onListening() {
-                LOG.info('listening at %s', server.url);
-                console.log('listening at %s', server.url);
+            LOG.info('listening at %s', server.url);
+            console.log('listening at %s', server.url);
         });
-
 
 })();
 

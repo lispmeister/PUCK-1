@@ -1,12 +1,15 @@
 #!/bin/bash -x
 
+if [ -s /etc/puck ] ; then
+    echo removing /etc/puck symlink
+    rm -f /etc/puck
+fi
 if [ -d /etc/puck ] ; then
     echo Looks like the PUCK is already installed, bailin out
     exit 1
 fi
-
 # rm -rf /etc/puck
-sudo mv /etc/puck /etc/puck.old
+# sudo mv /etc/puck /etc/puck.old
 sudo ln -s `pwd` /etc/puck
 
 sudo ls -l /etc/redis/redis.conf
@@ -29,6 +32,11 @@ sudo mkdir /etc/puck/logs
 sudo mkdir /etc/puck/redis
 sudo mkdir /etc/puck/pucks
 sudo chown redis.redis /etc/puck/redis
+
+touch /etc/puck/logs/client_vpn.log
+touch /etc/puck/logs/server_vpn.log
+chmod 777 /etc/puck/logs/client_vpn.log
+chmod 777 /etc/puck/logs/server_vpn.log
 
 sudo chown -R pi /etc/puck
 sudo chown -R redis /etc/puck/redis

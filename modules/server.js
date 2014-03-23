@@ -675,32 +675,32 @@ function stopVPN(req, res, next) {
 
     console.log('stop VPN!')
     var child = exec(command,
-        function (error, stdout, stderr) {
-            req.log.debug('stop VPN stdout: ' + stdout);
-            req.log.debug('stop VPN stderr: ' + stderr);
-            if (error !== null) {
-                req.log.error('exec error: ' + error);
-                // if we get an error something is borked... so crush the status so
-                // we dont get harassed again
-                client_magic = {
-                    vpn_status : "down",
-                    start      : "n/a",
-                    start_s    : "n/a",
-                    duration   : "unknown",
-                    stop       : "unknown",
-                    stop_s     : "unknown"
-                }
-                change_status() // make sure everyone hears this
-
-                res.send(200, "{\"status\": \"Failed\"}");
-                next();
-
-            } else {
-                res.send(200, "{\"status\": \"OK\"}");
-                next();
+    function (error, stdout, stderr) {
+        req.log.debug('stop VPN stdout: ' + stdout);
+        req.log.debug('stop VPN stderr: ' + stderr);
+        if (error !== null) {
+            req.log.error('exec error: ' + error);
+            console.log('exec error: ' + error);
+            // if we get an error something is borked... so crush the status so
+            // we dont get harassed again
+            client_magic = {
+                vpn_status : "down",
+                start      : "n/a",
+                start_s    : "n/a",
+                duration   : "unknown",
+                stop       : "unknown",
+                stop_s     : "unknown"
             }
-        });
+            change_status() // make sure everyone hears this
 
+            res.send(200, "{\"status\": \"Failed\"}");
+            next();
+
+        } else {
+            res.send(200, "{\"status\": \"OK\"}");
+            next();
+        }
+    });
 
 }
 
@@ -800,6 +800,11 @@ function handleForm(req, res, next) {
 
     else if (req.params.puck_action == 'CREATE') {
         formCreate(req, res, next)
+        console.log('... suck... sess...?')
+        // works, to some definition of working
+//      res.send(201, {"status": "success"});
+//      return next()
+        return next()
     }
 
     else if (req.params.puck_action == 'DELETE') {
@@ -922,7 +927,9 @@ function formCreate(req, res, next) {
 
     console.log("creating puck...")
 
-    // have to have these
+    console.log(req.body)
+    console.log(req.params)
+
     var ip_addr = req.params.ip_addr
 
     console.log(ip_addr)
@@ -932,102 +939,107 @@ function formCreate(req, res, next) {
     console.log('get_https ' + url)
 
     // is it a puck?
-    someday_get_https(url)
-        .done(function(res) {
+    someday_get_https(url).done(function(res) {
 
-            // console.log(res)
+        // console.log(res)
 
-            if (res.indexOf("was not found") != -1) {
-                console.log('no woman no ping: ' + res)
-            }
-            else {
-                console.log('ping sez yes')
-                console.log(res)
+        if (res.indexOf("was not found") != -1) {
+            console.log('no woman no ping: ' + res)
+        }
+        else {
+            console.log('ping sez yes')
+            console.log(res)
 
-                console.log('starting... writing...')
-                // make the puck's dir... should not exist!
+            console.log('starting... writing...')
+            // make the puck's dir... should not exist!
+
+            res = JSON.parse(res)
+            // now get remote information
+            url = 'https://' + ip_addr + ':8080/puck/' + res.pid
+
+            var puck_dir = config.PUCK.keystore + '/' + res.pid
+
+            fs.mkdir(puck_dir, function(err){
+                if(err) {
+                    // xxx - user error, bail
+                    console.log(e);
+                }
+            });
+
+            // if ping is successful, rustle up and write appropriate data
+            someday_get_https(url).done(function(res) {
 
                 res = JSON.parse(res)
-                // now get remote information
-                url = 'https://' + ip_addr + ':8080/puck/' + res.pid
+                console.log('remote puck info in...!')
 
-                var puck_dir = config.PUCK.keystore + '/' + res.pid
+                // console.log(res);
 
-                fs.mkdir(puck_dir, function(err){
-                    if(err) {
-                        // xxx - user error, bail
-                        console.log(e);
-                    }
+                // write the key stuff to the FS
+
+                var ca   = res.PUCK.vpn_client.ca.join('\n')
+                var key  = res.PUCK.vpn_client.key.join('\n')
+                var cert = res.PUCK.vpn_client.cert.join('\n')
+                // var dh   = res.PUCK.vpn_client.dh.join('\n')
+                // var tls  = res.PUCK.vpn_client.tlsauth.join('\n')
+
+                // xxx - errs to user!
+                fs.writeFile(puck_dir + '/puck.pid', res.PUCK['PUCK-ID'], function(err) {
+                    if (err) { console.log('err: ' + err) }
+                    else { console.log('wrote pid') }
+                });
+                fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
+                    if (err) { console.log('err: ' + err) }
+                    else { console.log('wrote root crt') }
+                });
+                fs.writeFile(puck_dir + '/puck.key', key, function(err) {
+                    if (err) { console.log('err: ' + err) }
+                    else { console.log('wrote key') }
+                });
+                fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
+                    if (err) { console.log('err: ' + err) }
+                    else { console.log('wrote crt') }
                 });
 
-                // if successful, write appropriate data
-                someday_get_https(url)
-                    .done(function(res) {
+                var puck_fs_home = __dirname
 
-                        res = JSON.parse(res)
-                        console.log('remote puck info in...!')
+                //
+                // execute a shell script with appropriate args to create a puck.
+                // ... of course... maybe should be done in node/js anyway...
+                // have to ponder the ponderables....
+                //
+                // Apparently the word ponder comes from the 14th century, coming from the
+                // word heavy or weighty in the physical sense... which makes a certain
+                // amount of sense... funny how we continually grasp for physical analogues (!)
+                // to our philosophical or digital concepts.
+                //
+                // ... back to the program, dog!
+                //
+                var util  = require('util')
+                var spawn = require('child_process').spawn
 
-                        // console.log(res);
+                console.log("executing create_puck.sh")
 
-                        // write the key stuff to the FS
+                // this simply takes the pwd and finds the exe area...
+                var pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
 
-                        var ca   = res.PUCK.vpn_client.ca.join('\n')
-                        var key  = res.PUCK.vpn_client.key.join('\n')
-                        var cert = res.PUCK.vpn_client.cert.join('\n')
-                        // var dh   = res.PUCK.vpn_client.dh.join('\n')
-                        // var tls  = res.PUCK.vpn_client.tlsauth.join('\n')
+                // now slice and dice output, errors, etc.
+                pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
+                pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
+                pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
 
-                        // xxx - errs to user!
-                        fs.writeFile(puck_dir + '/puck.pid', res.PUCK['PUCK-ID'], function(err) {
-                            if (err) { console.log('err: ' + err) }
-                            else { console.log('wrote pid') }
-                        });
-                        fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
-                            if (err) { console.log('err: ' + err) }
-                            else { console.log('wrote root crt') }
-                        });
-                        fs.writeFile(puck_dir + '/puck.key', key, function(err) {
-                            if (err) { console.log('err: ' + err) }
-                            else { console.log('wrote key') }
-                        });
-                        fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
-                            if (err) { console.log('err: ' + err) }
-                            else { console.log('wrote crt') }
-                        });
+                if (!isEmpty(bwana_puck)) {
+                    console.log("posting our puck to the puck who asked for ours....")
+                    var remote_pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
 
-                        var puck_fs_home = __dirname
-
-                        //
-                        // execute a shell script with appropriate args to create a puck.
-                        // ... of course... maybe should be done in node/js anyway...
-                        // have to ponder some imponderables....
-                        //
-                        var util  = require('util')
-                        var spawn = require('child_process').spawn
-
-                        console.log("executing create_puck.sh")
-
-                        // this simply takes the pwd and finds the exe area...
-                        var pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [res.PUCK['PUCK-ID'], res.PUCK.image, res.PUCK.ip_addr, res.PUCK.owner.name, res.PUCK.owner.email])
-
-                        // now slice and dice output, errors, etc.
-                        pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
-                        pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
-                        pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
-
-                        if (!isEmpty(bwana_puck)) {
-                            console.log("posting our puck to the puck who asked for ours....")
-                            var remote_pucky = spawn(puck_fs_home + '/../exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
-
-                            // output, errors, etc.
-                            remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
-                            remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
-                            remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
-                        }
-                    })
+                    // output, errors, etc.
+                    remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
+                    remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
+                    remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
+                    res.send(201, {"status": "zoomer"});
                 }
-        })
-
+            })
+        }
+    })
 
 }
   

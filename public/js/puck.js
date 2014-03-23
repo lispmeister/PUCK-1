@@ -122,15 +122,26 @@ function get_ip(element) {
     }).fail(function(err) {
         console.log('errz on getIP' + err)
     })
+
 }
 
 //
 // fire up the VPN
 //
-function puck_vpn(puckid, ipaddr) {
+function puck_vpn(element, puckid, ipaddr) {
 
     console.log('firing up VPN')
     console.log(puckid, ipaddr)
+
+    $(element).text("connecting...").removeClass("btn-success").addClass("btn-danger")
+
+    // adapted from http://css-tricks.com/css3-progress-bars/
+    console.log('barberizing')
+
+    // get width, nuke width, animate to old width
+    $(element).data("oldWidth", $(element).width() * 2)
+        .width(0)
+        .animate({ width: $(element).data("oldWidth") }, 1000);
 
     $.ajax({
         type: "POST",
@@ -144,6 +155,70 @@ function puck_vpn(puckid, ipaddr) {
             form.submit();
     }
 
+}
+
+// function post_callback (ip_addr, res){
+//         console.log('submitz')
+//         console.log(res)
+//         window.location.href('https://' + ip_addr + ':8080//puck.html')
+// }
+
+function puck_create(element, ip_addr) {
+
+    $(element).text("creating...").removeClass("btn-success").addClass("btn-danger")
+
+    // adapted from http://css-tricks.com/css3-progress-bars/
+    console.log('barberizing -> ' + ip_addr)
+    // get width, nuke width, animate to old width
+    $(element).data("oldWidth", $(element).width() * 2)
+        .width(0)
+        .animate({ width: $(element).data("oldWidth") }, 1000);
+
+    console.log('touch the hand of ... ')
+
+    console.log('ip addr: ' + ip_addr)
+
+    var post_data         = {}
+    post_data.ip_addr     = ip_addr
+    post_data.puck_action = "CREATE"
+    
+    //
+    // ok.... broken... stupid... but works for now... I'll figure it out later.
+    //
+    $.ajax({ 
+        url: '/form',
+        type: 'POST',
+        data: JSON.stringify(post_data),
+        contentType: 'application/json',
+        success: function(data){
+            console.log('suck... me.... ')
+            console.log(data)
+            console.log(location.href)
+            window.location.href = location.href
+        }, 
+        // ironically seems to work
+        error: function(jqXHR, textStatus, err) {
+            console.log('fuck... me')
+            console.log('text status '+textStatus+', err '+err)
+            window.location.href = location.href
+        }
+    })
+
+//      function (data, textStatus, jqXHR) {
+//           console.log("Post response:"); 
+//           console.dir(data); 
+//           console.log(textStatus); 
+//           console.dir(jqXHR); 
+
+//  $.ajax({
+//      type: "POST",
+//      url: "/form",
+//      data: JSON.stringify(data),
+//      contentType: 'application/json',
+//      complete : function(result){
+//          post_callback(ip_addr, result)
+//      }
+//  })
 
 }
 
@@ -252,32 +327,6 @@ function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-// function puck_create(ip_addr) {
-// 
-//     console.log('js puck_create')
-// 
-//     var delay = 10000
-// 
-//     $('#puck_button_create').text("... creating ...")
-// 
-//     var json_puck = JSON.stringify(puck_data);
-// 
-//     $.ajax({
-//         url : 'https://' + ip_addr + ':8080/puck/swap',
-//         type: "post",
-//         data : json_puck,
-//         success: function(data, textStatus, jqXHR) {
-//             console.log('successfully posted request')
-//             console.log(data)
-//         },
-//         error: function (jqXHR, textStatus, errorThrown) {
-//             console.log('down, down, down she goes... post failed')
-//             console.log('"' + errorThrown + '"')
-//         }
-//     });
-// 
-// }
-
 
 //
 // get status... or... well....
@@ -378,27 +427,36 @@ puck_data     = ""
 // status loop
 infinite();
 
-// create a suspenseful message
-// $('.puckvpn').live('submit', function() { 
-$('body').on('click', '.puck_vpn', function() { 
-    $(this).text("connecting...").removeClass("btn-success").addClass("btn-danger")
-
-    // adapted from http://css-tricks.com/css3-progress-bars/
-    console.log('barberizing')
-    // get width, nuke width, animate to old width
-    $(this).data("oldWidth", $(this).width() * 2)
-        .width(0)
-        .animate({ width: $(this).data("oldWidth") }, 1000);
-
-    var puckid = $("#puckid").val()
-    var ipaddr = $("#ipaddr").val()
-    puck_vpn(puckid, ipaddr)
-    })
-
 // disable a/href pushing if disabled
 $('body').on('click', 'a.disabled', function(event) {
     event.preventDefault();
 });
+
+//
+// user clicks vpn, and....
+//
+// create a suspenseful message
+$('body').on('click', '.puck_vpn', function() { 
+    console.log('clix on vpn')
+    var puckid = $("#puckid").val()
+    var ipaddr = $("#ipaddr").val()
+    puck_vpn(this, puckid, ipaddr)
+})
+
+//
+// user clicks create, and....
+//
+// build suspense....
+$('body').on('click', '#puck_button_create', function(event) { 
+    console.log('hijax create')
+    event.preventDefault();
+
+    var ip_addr = $("#ip_addr").val()
+
+    puck_create(this, ip_addr)
+
+})
+
 
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
 ring = new Audio("media/ringring.mp3") // load it up
@@ -464,12 +522,14 @@ $.getJSON('/ping', function(puck) {
 
     console.log('my name/id/status are: ', my_puck.name, my_puck.pid, my_puck.status)
 
+    my_puck_status = 'Name: ' + my_puck.name + '<br />Status: ' + my_puck.status + '<br />ID: ' + my_puck.pid
+
     if (my_puck.status == "OK")
         $('#puck_status').addClass('btn-success').removeClass('disabled')
     else
         $('#puck_status').removeClass('btn-success').addClass('disabled')
 
-    $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "auto right").attr("title", my_puck.pid).popover({delay: { show: 300, hide: 200 }, trigger: "hover"})
+    $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "auto left").attr("data-html", "true").attr("title", "This PUCK").attr("data-content", my_puck_status).popover({delay: { show: 300, hide: 200 }, trigger: "hover"})
 
 })
 

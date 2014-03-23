@@ -68,8 +68,12 @@ $puck_home/create_tlsauth.sh $puck_id
 v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puckroot.crt)
 v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.key)
 v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.crt)
-v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/dh.params)
 v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/ta.key)
+
+v_dh="{}"
+if [ -f $keystores/$puck_id/dh.params ] ; then
+    v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/dh.params)
+fi
 
 # XXX hardcoding port/proto for a bit
 vpn='"vpn" : {
