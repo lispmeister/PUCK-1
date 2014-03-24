@@ -5,6 +5,7 @@ var Tail    = require('tail').Tail,
     bunyan  = require('bunyan'),
     fs      = require('fs'),
     moment  = require('moment'),
+    os      = require('os'),
     restify = require('restify'),
     path    = require('path'),
     rest    = require('rest'),
@@ -162,6 +163,26 @@ function change_status() {
 }
 
 //
+// get the server's IP addrs, including localhost
+//
+// http://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
+//
+
+var ifaces=os.networkInterfaces();
+var my_ips = {}
+for (var dev in ifaces) {
+    var alias=0
+    ifaces[dev].forEach(function(details){
+        if (details.family=='IPv4') {
+            my_ips[details.address] = details.address
+            console.log(dev+(alias?':'+alias:''),details.address)
+            ++alias
+        }
+    })
+}
+
+
+//
 // log file watcher
 //
 function watch_logs(logfile, log_type) {
@@ -203,85 +224,95 @@ function watch_logs(logfile, log_type) {
 
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
-        // various states of up-id-ness and down-o-sity
-        if (line.indexOf(magic_server_up) > -1) {
-            console.log('\n\n\n++++++++++++\n\n Openvpn server up:\n\n')
-            console.log(line)
-            console.log('\n\n')
+        if (log_type.indexOf("Server")) {
+            // various states of up-id-ness and down-o-sity
+            if (line.indexOf(magic_server_up) > -1) {
+                console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn server up:\n\n')
+                console.log(line)
+                console.log('\n\n')
 
-            server_magic = {
-                vpn_status : "up",
-                start      : moment_in_time,
-                start_s    : moment_in_secs,
-                duration   : "n/a",             // this should only hit once per connection
-                stop       : "n/a",
-                stop_s     : "n/a"
-                }
+                server_magic = {
+                    vpn_status : "up",
+                    start      : moment_in_time,
+                    start_s    : moment_in_secs,
+                    duration   : "n/a",             // this should only hit once per connection
+                    stop       : "n/a",
+                    stop_s     : "n/a"
+                    }
 
-            change_status() // tell the world about it
+                change_status() // tell the world about it
+            }
+            // down
+            else if (line.indexOf(magic_server_down) > -1) {
+                console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn server down:\n\n')
+                console.log(line)
+                console.log('\n\n')
 
+                var v_duration = 0
+
+                // if stopping read the status for when we started
+    //          if (status_data != "" && status_data.vpn_status == "up") {
+    //              v_duration = moment_in_secs - status_data.start_s
+    //          }
+    
+                server_magic = {
+                    vpn_status : "down",
+                    start      : "n/a",
+                    start_s    : "n/a",
+                    duration   : v_duration,
+                    stop       : moment_in_time,
+                    stop_s     : moment_in_time
+                    }
+
+                change_status() // tell the world about it
+
+            }
         }
-        // down
-        else if (line.indexOf(magic_server_down) > -1) {
-            console.log('\n\n\n++++++++++++\n\n Openvpn server Down!\n\n')
+        else if (log_type.indexOf("Client")) {
 
-            var v_duration = 0
-
-            // if stopping read the status for when we started
-//          if (status_data != "" && status_data.vpn_status == "up") {
-//              v_duration = moment_in_secs - status_data.start_s
-//          }
-
-            server_magic = {
-                vpn_status : "down",
-                start      : "n/a",
-                start_s    : "n/a",
-                duration   : v_duration,
-                stop       : moment_in_time,
-                stop_s     : moment_in_time
-                }
-
-            change_status() // tell the world about it
-
-        }
-        else if (line.indexOf(magic_client_up) > -1) {
-            console.log('\n\n\n++++++++++++\n\n Openvpn client up!\n\n')
-
-            // if starting simply take the current stuff
-            client_magic = {
-                vpn_status : "up",
-                start      : moment_in_time,
-                start_s    : moment_in_secs,
-                duration   : "n/a",             // this should only hit once per connection
-                stop       : "n/a",
-                stop_s     : "n/a"
-                }
-
-            change_status() // tell the world about it
-
-        }
-        // down
-        else if (line.indexOf(magic_client_down) > -1) {
-            console.log('\n\n\n++++++++++++\n\n Openvpn client Down!\n\n')
-
-            var v_duration = 0
-
-            // if stopping read the status for when we started
-//          if (status_data != "" && status_data.vpn_status == "up") {
-//              v_duration = moment_in_secs - status_data.start_s
-//          }
-
-            client_magic = {
-                vpn_status : "down",
-                start      : "n/a",
-                start_s    : "n/a",
-                duration   : v_duration,
-                stop       : moment_in_time,
-                stop_s     : moment_in_time
-                }
-
-            change_status() // tell the world about it
-
+            if (line.indexOf(magic_client_up) > -1) {
+                console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn client up!\n\n')
+                console.log(line)
+                console.log('\n\n')
+    
+                // if starting simply take the current stuff
+                client_magic = {
+                    vpn_status : "up",
+                    start      : moment_in_time,
+                    start_s    : moment_in_secs,
+                    duration   : "n/a",             // this should only hit once per connection
+                    stop       : "n/a",
+                    stop_s     : "n/a"
+                    }
+    
+                change_status() // tell the world about it
+    
+            }
+            // down
+            else if (line.indexOf(magic_client_down) > -1) {
+                console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn client Down!\n\n')
+                console.log(line)
+                console.log('\n\n')
+    
+                var v_duration = 0
+    
+                // if stopping read the status for when we started
+    //          if (status_data != "" && status_data.vpn_status == "up") {
+    //              v_duration = moment_in_secs - status_data.start_s
+    //          }
+    
+                client_magic = {
+                    vpn_status : "down",
+                    start      : "n/a",
+                    start_s    : "n/a",
+                    duration   : v_duration,
+                    stop       : moment_in_time,
+                    stop_s     : moment_in_time
+                    }
+    
+                change_status() // tell the world about it
+    
+            }
         }
         // I've gone feral... or it wasn't meant to be
 
@@ -482,6 +513,58 @@ function authenticate(req, res, next) {
     next();
 }
 
+//
+// write the crypto key stuff to the FS
+//
+function create_puck_key_store(puck) {
+
+    console.log('PUUUUUUCKKKKKK!')
+    console.log(puck)
+
+    if (typeof puck != 'object') {
+        puck = JSON.parse(puck)
+        puck = puck.PUCK
+    }
+
+    console.log('typeof : ' + typeof puck)
+
+    console.log(puck)
+
+    var ca   = puck.vpn_client.ca.join('\n')
+    var key  = puck.vpn_client.key.join('\n')
+    var cert = puck.vpn_client.cert.join('\n')
+
+    // var dh   = res.PUCK.vpn_client.dh.join('\n')
+    // var tls  = res.PUCK.vpn_client.tlsauth.join('\n')
+
+    var puck_dir = config.PUCK.keystore + '/' + puck['PUCK-ID']
+
+    fs.mkdir(puck_dir, function(err){
+        if(err) {
+            // xxx - user error, bail
+            console.log(err);
+        }
+    });
+
+    // xxx - errs to user!
+    fs.writeFile(puck_dir + '/puck.pid', puck['PUCK-ID'], function(err) {
+        if (err) { console.log('err: ' + err) }
+        else { console.log('wrote pid') }
+    });
+    fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
+        if (err) { console.log('err: ' + err) }
+        else { console.log('wrote root crt') }
+    });
+    fs.writeFile(puck_dir + '/puck.key', key, function(err) {
+        if (err) { console.log('err: ' + err) }
+        else { console.log('wrote key') }
+    });
+    fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
+        if (err) { console.log('err: ' + err) }
+        else { console.log('wrote crt') }
+    });
+
+}
 
 /**
  * Note this handler looks in `req.params`, which means we can load request
@@ -531,14 +614,15 @@ function createPuck(req, res, next) {
             //
             var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-            if (client_ip != "127.0.0.1") {
+            if (typeof my_ips[client_ip] == "undefined") {
                 console.log(req)
                 console.log('create appears to be coming from remote: ' + client_ip)
                 puck_events = { new_puck : client_ip }
+                create_puck_key_store(puck.value)
             }
             else {
                 puck_events = { new_puck : "" }
-                console.log('create appears to be coming from localhost: ' + client_ip)
+                console.log('create appears to be coming from local PUCK/host: ' + client_ip)
             }
 
             change_status() // make sure everyone hears this
@@ -1006,31 +1090,7 @@ function formCreate(req, res, next) {
 
                 // console.log(res);
 
-                // write the key stuff to the FS
-
-                var ca   = res.PUCK.vpn_client.ca.join('\n')
-                var key  = res.PUCK.vpn_client.key.join('\n')
-                var cert = res.PUCK.vpn_client.cert.join('\n')
-                // var dh   = res.PUCK.vpn_client.dh.join('\n')
-                // var tls  = res.PUCK.vpn_client.tlsauth.join('\n')
-
-                // xxx - errs to user!
-                fs.writeFile(puck_dir + '/puck.pid', res.PUCK['PUCK-ID'], function(err) {
-                    if (err) { console.log('err: ' + err) }
-                    else { console.log('wrote pid') }
-                });
-                fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
-                    if (err) { console.log('err: ' + err) }
-                    else { console.log('wrote root crt') }
-                });
-                fs.writeFile(puck_dir + '/puck.key', key, function(err) {
-                    if (err) { console.log('err: ' + err) }
-                    else { console.log('wrote key') }
-                });
-                fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
-                    if (err) { console.log('err: ' + err) }
-                    else { console.log('wrote crt') }
-                });
+                create_puck_key_store(res.PUCK)
 
                 var puck_fs_home = __dirname
 

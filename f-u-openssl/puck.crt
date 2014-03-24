@@ -2,22 +2,22 @@ Certificate:
     Data:
         Version: 3 (0x2)
         Serial Number:
-            6e:ac:1f:19:79:df:35:d1:4d:9b:c1:fb:19:81:89:5e
+            bf:db:68:fc:12:45:42:51:08:2a:d8:8a:35:4f:f3:c5
         Signature Algorithm: sha256WithRSAEncryption
         Issuer: C=AQ, ST=N/A, L=Delphia, O=PUCK, OU=Crypto Cops, CN=puckasaurus/name=PUCK/emailAddress=puck@example.com
         Validity
-            Not Before: Mar 23 22:54:54 2014 GMT
-            Not After : Mar 20 22:54:54 2024 GMT
+            Not Before: Mar 24 11:56:11 2014 GMT
+            Not After : Mar 21 11:56:11 2024 GMT
         Subject: C=AQ, ST=N/A, L=Delphia, O=PUCK, OU=Crypto Cops, CN=puckasaurus/name=PUCK/emailAddress=puck@example.com
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
             RSA Public Key: (512 bit)
                 Modulus (512 bit):
-                    00:b7:2d:28:b2:30:f0:b8:f2:a0:8b:74:82:4a:43:
-                    a8:a9:81:69:c6:dc:fc:1f:e8:f0:12:ae:61:95:b0:
-                    3d:46:e7:5f:8d:89:f4:27:db:82:31:10:0a:b9:78:
-                    86:2a:ee:5b:25:bf:05:90:ef:1f:e7:28:7e:48:f5:
-                    8c:06:f5:9a:0f
+                    00:c9:f9:9b:e1:2f:f1:45:fd:05:da:82:5e:14:3f:
+                    0d:84:01:68:d7:78:20:c2:c8:25:16:d4:98:84:d4:
+                    18:c2:96:fb:8e:b0:59:47:e6:82:dd:ee:44:4c:03:
+                    dd:d5:0d:4f:27:a6:a0:ae:4e:a3:23:92:9a:0c:64:
+                    a6:c2:00:52:41
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: 
@@ -27,40 +27,40 @@ Certificate:
             Netscape Comment: 
                 Easy-RSA Generated Server Certificate
             X509v3 Subject Key Identifier: 
-                54:F5:67:97:66:F2:16:46:A7:60:46:6F:43:72:53:ED:CB:E2:B2:C0
+                A5:38:71:FE:A0:70:CE:10:6B:FC:72:DA:80:B6:5E:F7:AC:CF:44:57
             X509v3 Authority Key Identifier: 
-                keyid:A1:5C:A9:15:A5:9D:FB:5E:BE:F2:72:27:5E:12:34:8B:70:B7:C9:E4
+                keyid:3B:00:56:7B:B8:3A:97:0A:AF:C5:F8:98:B1:0C:08:D5:EA:99:6F:BB
                 DirName:/C=AQ/ST=N/A/L=Delphia/O=PUCK/OU=Crypto Cops/CN=puckasaurus/name=PUCK/emailAddress=puck@example.com
-                serial:99:FB:1A:A2:B8:34:E0:C8
+                serial:C3:59:00:84:31:15:E2:A5
 
             X509v3 Extended Key Usage: 
                 TLS Web Server Authentication
             X509v3 Key Usage: 
                 Digital Signature, Key Encipherment
     Signature Algorithm: sha256WithRSAEncryption
-        2c:e0:b8:23:6f:6e:21:6c:49:82:9d:6b:8f:11:9c:3d:d2:ed:
-        01:3b:2c:7a:64:d9:04:33:dd:bd:1e:ec:d6:fc:a7:76:3a:c4:
-        d2:25:79:bd:db:69:e7:0c:dc:de:77:d5:4c:81:64:7c:91:98:
-        c6:c0:44:bd:76:4d:4a:3c:37:63
+        a5:5a:9d:bb:5f:c6:4a:31:ca:ad:e7:fb:fe:9f:ba:df:ca:7b:
+        cc:31:53:73:e3:d3:f2:9b:df:59:75:99:9b:e9:f4:eb:19:fb:
+        a2:49:cc:59:c3:cc:51:80:fe:5f:a2:71:ff:62:8e:ee:7d:86:
+        36:6a:95:4c:7e:57:76:51:c9:a8
 -----BEGIN CERTIFICATE-----
-MIIDnTCCA0egAwIBAgIQbqwfGXnfNdFNm8H7GYGJXjANBgkqhkiG9w0BAQsFADCB
-mDELMAkGA1UEBhMCQVExDDAKBgNVBAgTA04vQTEQMA4GA1UEBxMHRGVscGhpYTEN
-MAsGA1UEChMEUFVDSzEUMBIGA1UECxMLQ3J5cHRvIENvcHMxFDASBgNVBAMTC3B1
-Y2thc2F1cnVzMQ0wCwYDVQQpEwRQVUNLMR8wHQYJKoZIhvcNAQkBFhBwdWNrQGV4
-YW1wbGUuY29tMB4XDTE0MDMyMzIyNTQ1NFoXDTI0MDMyMDIyNTQ1NFowgZgxCzAJ
-BgNVBAYTAkFRMQwwCgYDVQQIEwNOL0ExEDAOBgNVBAcTB0RlbHBoaWExDTALBgNV
-BAoTBFBVQ0sxFDASBgNVBAsTC0NyeXB0byBDb3BzMRQwEgYDVQQDEwtwdWNrYXNh
-dXJ1czENMAsGA1UEKRMEUFVDSzEfMB0GCSqGSIb3DQEJARYQcHVja0BleGFtcGxl
-LmNvbTBcMA0GCSqGSIb3DQEBAQUAA0sAMEgCQQC3LSiyMPC48qCLdIJKQ6ipgWnG
-3Pwf6PASrmGVsD1G51+NifQn24IxEAq5eIYq7lslvwWQ7x/nKH5I9YwG9ZoPAgMB
-AAGjggFpMIIBZTAJBgNVHRMEAjAAMBEGCWCGSAGG+EIBAQQEAwIGQDA0BglghkgB
-hvhCAQ0EJxYlRWFzeS1SU0EgR2VuZXJhdGVkIFNlcnZlciBDZXJ0aWZpY2F0ZTAd
-BgNVHQ4EFgQUVPVnl2byFkanYEZvQ3JT7cvissAwgc0GA1UdIwSBxTCBwoAUoVyp
-FaWd+16+8nInXhI0i3C3yeShgZ6kgZswgZgxCzAJBgNVBAYTAkFRMQwwCgYDVQQI
-EwNOL0ExEDAOBgNVBAcTB0RlbHBoaWExDTALBgNVBAoTBFBVQ0sxFDASBgNVBAsT
-C0NyeXB0byBDb3BzMRQwEgYDVQQDEwtwdWNrYXNhdXJ1czENMAsGA1UEKRMEUFVD
-SzEfMB0GCSqGSIb3DQEJARYQcHVja0BleGFtcGxlLmNvbYIJAJn7GqK4NODIMBMG
-A1UdJQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDANBgkqhkiG9w0BAQsFAANB
-ACzguCNvbiFsSYKda48RnD3S7QE7LHpk2QQz3b0e7Nb8p3Y6xNIleb3baecM3N53
-1UyBZHyRmMbARL12TUo8N2M=
+MIIDnjCCA0igAwIBAgIRAL/baPwSRUJRCCrYijVP88UwDQYJKoZIhvcNAQELBQAw
+gZgxCzAJBgNVBAYTAkFRMQwwCgYDVQQIEwNOL0ExEDAOBgNVBAcTB0RlbHBoaWEx
+DTALBgNVBAoTBFBVQ0sxFDASBgNVBAsTC0NyeXB0byBDb3BzMRQwEgYDVQQDEwtw
+dWNrYXNhdXJ1czENMAsGA1UEKRMEUFVDSzEfMB0GCSqGSIb3DQEJARYQcHVja0Bl
+eGFtcGxlLmNvbTAeFw0xNDAzMjQxMTU2MTFaFw0yNDAzMjExMTU2MTFaMIGYMQsw
+CQYDVQQGEwJBUTEMMAoGA1UECBMDTi9BMRAwDgYDVQQHEwdEZWxwaGlhMQ0wCwYD
+VQQKEwRQVUNLMRQwEgYDVQQLEwtDcnlwdG8gQ29wczEUMBIGA1UEAxMLcHVja2Fz
+YXVydXMxDTALBgNVBCkTBFBVQ0sxHzAdBgkqhkiG9w0BCQEWEHB1Y2tAZXhhbXBs
+ZS5jb20wXDANBgkqhkiG9w0BAQEFAANLADBIAkEAyfmb4S/xRf0F2oJeFD8NhAFo
+13ggwsglFtSYhNQYwpb7jrBZR+aC3e5ETAPd1Q1PJ6agrk6jI5KaDGSmwgBSQQID
+AQABo4IBaTCCAWUwCQYDVR0TBAIwADARBglghkgBhvhCAQEEBAMCBkAwNAYJYIZI
+AYb4QgENBCcWJUVhc3ktUlNBIEdlbmVyYXRlZCBTZXJ2ZXIgQ2VydGlmaWNhdGUw
+HQYDVR0OBBYEFKU4cf6gcM4Qa/xy2oC2Xvesz0RXMIHNBgNVHSMEgcUwgcKAFDsA
+Vnu4OpcKr8X4mLEMCNXqmW+7oYGepIGbMIGYMQswCQYDVQQGEwJBUTEMMAoGA1UE
+CBMDTi9BMRAwDgYDVQQHEwdEZWxwaGlhMQ0wCwYDVQQKEwRQVUNLMRQwEgYDVQQL
+EwtDcnlwdG8gQ29wczEUMBIGA1UEAxMLcHVja2FzYXVydXMxDTALBgNVBCkTBFBV
+Q0sxHzAdBgkqhkiG9w0BCQEWEHB1Y2tAZXhhbXBsZS5jb22CCQDDWQCEMRXipTAT
+BgNVHSUEDDAKBggrBgEFBQcDATALBgNVHQ8EBAMCBaAwDQYJKoZIhvcNAQELBQAD
+QQClWp27X8ZKMcqt5/v+n7rfynvMMVNz49Pym99ZdZmb6fTrGfuiScxZw8xRgP5f
+onH/Yo7ufYY2apVMfld2Ucmo
 -----END CERTIFICATE-----

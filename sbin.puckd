@@ -20,7 +20,7 @@ KEY_SIZE=512
 KEY_SIZE=64
 
 # nuke any past status
-rm -f $PUCK_HOME/status.puck
+echo '{"events":{"new_puck":""},"openvpn_server":{},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}}' > $PUCK_HOME/status.puck
 # clear server and client logs
 echo > $PUCK_HOME/logs/client_vpn.log
 echo > $PUCK_HOME/logs/server_vpn.log

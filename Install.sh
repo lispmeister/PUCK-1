@@ -1,17 +1,18 @@
-
 # 
 # stuff you need to run a PUCK
 #
 # - zen
 #
-# Fri Mar  7 10:44:04 PST 2014
+# Sun Mar 23 18:16:36 PDT 2014
 #
 
 apt-get install -y aptitude
 apt-get install -y python-software-properties
 
 # install node... better way?
-add-apt-repository ppa:chris-lea/node.js
+#
+# add-apt-repository ppa:chris-lea/node.js
+#
 
 aptitude update
 
@@ -27,14 +28,12 @@ apt-get install -y nodejs
 
 git clone https://github.com/zenfish/PUCK
 
-cd prototype
+cd PUCK
 
 npm install
 
-
 # creates various bits
 ./linkage.sh
-
 
 # and finally....
 

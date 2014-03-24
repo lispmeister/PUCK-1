@@ -364,7 +364,7 @@ function status_or_die() {
         var remote_ip = jdata.events.new_puck
         console.log(remote_ip + ' added!')
         // a bit down from the top, and stay until wiped away or refreshed
-        $.bootstrapGrowl(remote_ip + " added you as a friend (click to reload page)", {offset: {from: 'top', amount: 70}, delay: -1})
+        $.bootstrapGrowl(remote_ip + " added you as a friend (refresh page to see more)", {offset: {from: 'top', amount: 70}, delay: -1})
         jdata.events.new_puck = ""
 
 // <input type="button" value="Reload Page" onClick="history.go(0)">
@@ -433,7 +433,6 @@ function remove_signs_of_call() {
 
 $(document).ready(function () {
 
-
 var image     = ""
 var puck_id   = ""
 puck_data     = ""
@@ -445,6 +444,12 @@ infinite();
 $('body').on('click', 'a.disabled', function(event) {
     event.preventDefault();
 });
+
+// enable tabs
+$('#home a').click(function     (e) { e.preventDefault(); $(this).tab('show') })
+$('#profile a').click(function  (e) { e.preventDefault(); $(this).tab('show') })
+$('#messages a').click(function (e) { e.preventDefault(); $(this).tab('show') })
+
 
 //
 // user clicks vpn, and....
