@@ -367,7 +367,7 @@ function status_or_die() {
         $.bootstrapGrowl(remote_ip + " added you as a friend (click to reload page)", {offset: {from: 'top', amount: 70}, delay: -1})
         jdata.events.new_puck = ""
 
-<input type="button" value="Reload Page" onClick="history.go(0)">
+// <input type="button" value="Reload Page" onClick="history.go(0)">
 
 
     }
