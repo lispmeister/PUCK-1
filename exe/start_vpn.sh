@@ -32,8 +32,8 @@ ip=$2
 ca="       --ca  $puck_home/pucks/$pid/puckroot.crt"
 key="     --key  $puck_home/pucks/$pid/puck.key"
 cert="   --cert  $puck_home/pucks/$pid/puck.crt"
+tls="--tls-auth  $puck_home/pucks/$pid/ta.key"
 # dh="       --dh  $puck_home/pucks/$pid/dh_param"
-# tls="--tls-auth  $puck_home/pucks/$pid/ta.key"
 
 date >> $tmp/vvveeeeppppn
 chmod 777 $tmp/vvveeeeppppn
@@ -47,7 +47,7 @@ echo "vpn-ing away to $ip" | tee -a $tmp/vvveeeeppppn
 # $bin_dir/p0v.py -m client &
 
 # openvpn $ca $tls $key $cert $dh --remote $ip --config C.conf
-openvpn $ca $key $cert --remote $ip --config C.conf
+openvpn $ca $tls $key $cert --remote $ip --config C.conf
 
 exit 0
 

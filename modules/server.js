@@ -536,6 +536,7 @@ function create_puck_key_store(puck) {
     var ca   = puck.vpn_client.ca.join('\n')
     var key  = puck.vpn_client.key.join('\n')
     var cert = puck.vpn_client.cert.join('\n')
+    var tls  = puck.vpn.tlsauth.join('\n')
 
     // var dh   = res.PUCK.vpn_client.dh.join('\n')
     // var tls  = res.PUCK.vpn_client.tlsauth.join('\n')
@@ -550,21 +551,25 @@ function create_puck_key_store(puck) {
     });
 
     // xxx - errs to user!
-    fs.writeFile(puck_dir + '/puck.pid', puck['PUCK-ID'], function(err) {
-        if (err) { console.log('err: ' + err) }
-        else { console.log('wrote pid') }
+    fs.writeFile(puck_dir + '/puck.pid', bwana_puck['PUCK-ID'], function(err) {
+        if (err) { console.log('err writing pid - : ' + err) }
+        else     { console.log('wrote pid') }
     });
     fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
-        if (err) { console.log('err: ' + err) }
-        else { console.log('wrote root crt') }
+        if (err) { console.log('err writing ca - : ' + err) }
+        else     { console.log('wrote root crt') }
     });
     fs.writeFile(puck_dir + '/puck.key', key, function(err) {
-        if (err) { console.log('err: ' + err) }
-        else { console.log('wrote key') }
+        if (err) { console.log('err writing key - : ' + err) }
+        else     { console.log('wrote key') }
     });
     fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
-        if (err) { console.log('err: ' + err) }
-        else { console.log('wrote crt') }
+        if (err) { console.log('err writing crt - : ' + err) }
+        else     { console.log('wrote crt') }
+    });
+    fs.writeFile(puck_dir + '/ta.key', tls, function(err) {
+        if (err) { console.log('err writing tls - : ' + err) }
+        else     { console.log('wrote tls') }
     });
 
 }
