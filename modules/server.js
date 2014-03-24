@@ -221,6 +221,7 @@ function watch_logs(logfile, log_type) {
         // var magic_server_up   = "PUSH_REPLY,route"
         var magic_server_up   = "Peer Connection Initiated"
         var magic_server_down = "ECONNREFUSED"
+        var magic_server_down = "OpenVPN Server lost client"
 
         var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
             moment_in_secs =  (new Date).getTime();
