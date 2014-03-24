@@ -213,6 +213,7 @@ function watch_logs(logfile, log_type) {
         // xxx - for client openvpn - config... which ones to choose?  Another method?
         var magic_client_up   = "Initialization Sequence Completed"
         var magic_client_up   = "/sbin/route add"
+        var magic_client_up   = "VPN is up"
 
         var magic_client_down = "VPN is down"
 
