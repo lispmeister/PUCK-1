@@ -357,6 +357,8 @@ function status_or_die() {
 
     console.log('I hear something...')
     console.log(puck_current)
+    console.log('big data')
+    console.log(jdata)
 
     // if someone has added you, create a modest sized div that tells you and
     // hopefully won't fuck up anything you're doing
@@ -368,11 +370,6 @@ function status_or_die() {
         jdata.events.new_puck = ""
 
 // <input type="button" value="Reload Page" onClick="history.go(0)">
-
-
-    }
-    else {
-        console.log('did not add anything')
     }
 
     // server
@@ -380,7 +377,7 @@ function status_or_die() {
         // ensure video button is enabled if a call is in progress
         $('#puck_video').removeClass('disabled')
     
-        if (typeof puck_current.incoming != "undefined" && puck_current.incoming) {
+        if (typeof puck_current.incoming != "undefined" && ! puck_current.incoming) {
             console.log('incoming ring!')
             // ring them gongs
             $('#incoming')[0].click()
@@ -395,7 +392,7 @@ function status_or_die() {
         $('#puck_video').removeClass('disabled')
         
                 
-        if (typeof puck_current.outgoing != "undefined" && puck_current.outgoing) {
+        if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
         // xxx ... kill avg?
             console.log('outgoing ring!')
             // ring them gongs
