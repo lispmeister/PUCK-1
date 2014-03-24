@@ -210,8 +210,10 @@ function watch_logs(logfile, log_type) {
 
         // console.log("got line from " + logfile + ":" + line)
     
-        // xxx - for client openvpn - config
+        // xxx - for client openvpn - config... which ones to choose?  Another method?
+        var magic_client_up   = "Initialization Sequence Completed"
         var magic_client_up   = "/sbin/route add"
+
         var magic_client_down = "VPN is down"
 
         // xxx - server openvpn
@@ -224,7 +226,7 @@ function watch_logs(logfile, log_type) {
 
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
-        if (log_type.indexOf("Server")) {
+        if (log_type.indexOf("Server") > -1) {
             // various states of up-id-ness and down-o-sity
             if (line.indexOf(magic_server_up) > -1) {
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn server up:\n\n')
@@ -268,7 +270,7 @@ function watch_logs(logfile, log_type) {
 
             }
         }
-        else if (log_type.indexOf("Client")) {
+        else if (log_type.indexOf("Client") > -1) {
 
             if (line.indexOf(magic_client_up) > -1) {
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn client up!\n\n')
