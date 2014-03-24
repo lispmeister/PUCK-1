@@ -32,10 +32,13 @@ fi
 puck_ip="@"
 if [ $# -eq 6 ] ; then
     echo creating puck on remote host
+    puck_ip=$6
     puck_host=$6
 fi
 
 puck_url="https://$puck_host:$puck_port/puck"
+
+echo $puck_url
 
 # kill off the evidence
 # trap "rm -f $tmp_files" EXIT

@@ -58,7 +58,7 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     ln -s /etc/puck/pucks/$pid /etc/puck/pucks/PUCK
 
     # current eth0 ip addr
-    ip=$(ifconfig eth0:0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
+    ip=$(ifconfig eth0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
 
     # need to start this before we try a REST call to it....
 
