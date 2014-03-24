@@ -32,7 +32,7 @@ fi
 puck_ip="@"
 if [ $# -eq 6 ] ; then
     echo creating puck on remote host
-    puck_host=$puck_ip
+    puck_host=$6
 fi
 
 puck_url="https://$puck_host:$puck_port/puck"

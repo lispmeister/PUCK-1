@@ -14,15 +14,6 @@ var Tail    = require('tail').Tail,
 // sue me
 var sleep = require('sleep');
 
-// yes, yes, lazy too
-
-// status chex
-var server_magic = {},
-    client_magic = {},
-    puck_events  = {}
-    server       = ""
-
-
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
 console.log(config);
@@ -64,11 +55,23 @@ catch (e) {
 //
 // get the latest status... create the file if it doesn't exist...
 //
+
+// yes, yes, lazy too
+
+// status chex
+var server_magic = {},
+    client_magic = {},
+    puck_events  = {}
+    server       = ""
+
 var puck_status      = "{}",
     puck_status_file = "/etc/puck/status.puck"
 
 // keep an eye on the above
 pollStatus(puck_status_file)
+
+// start with a clean slate
+change_status()
 
 //
 // watch vpn logs for incoming/outgoing connections
@@ -143,6 +146,9 @@ function change_status() {
     puck_status.openvpn_client = client_magic
 
     puck_status                = JSON.stringify(puck_status)
+
+    // this one I'm wiping out manually once used
+    puck_events = { new_puck : "" }
 
     console.log("status: " + puck_status)
 
@@ -528,12 +534,14 @@ function createPuck(req, res, next) {
             if (client_ip != "127.0.0.1") {
                 console.log(req)
                 console.log('create appears to be coming from remote: ' + client_ip)
-                puck_events = { new_puck : true }
-                change_status() // make sure everyone hears this
+                puck_events = { new_puck : client_ip }
             }
             else {
+                puck_events = { new_puck : "" }
                 console.log('create appears to be coming from localhost: ' + client_ip)
             }
+
+            change_status() // make sure everyone hears this
 
             res.send(204);
             next();

@@ -344,21 +344,32 @@ function status_or_die() {
     }
 
     // new kid on the block?  Happens when a remote adds you
-    if (typeof jdata.puck_events.new_puck == "undefined" || isEmpty(jdata.puck_events)) {
-        jdata.puck_events = {}
-        jdata.puck_events.new_puck = false
+    if (typeof jdata.events == "undefined" || isEmpty(jdata.events)) {
+        console.log('jdata.events who?')
+        console.log(jdata.events)
+        jdata.events = {}
+        jdata.events.new_puck = ""
+    }
+    else {
+        console.log('jdata.events:')
+        console.log(jdata.events)
     }
 
     console.log('I hear something...')
     console.log(puck_current)
-    console.log(puck_status)
 
     // if someone has added you, create a modest sized div that tells you and
     // hopefully won't fuck up anything you're doing
-    if (jdata.puck_events.new_puck) {
-        console.log('added!')
-        $.bootstrapGrowl(ip_addr + " added you as a friend (refresh to see their PUCK)");
-        jdata.puck_events.new_puck = false
+    if (jdata.events.new_puck.length) {
+        var remote_ip = jdata.events.new_puck
+        console.log(remote_ip + ' added!')
+        // a bit down from the top, and stay until wiped away or refreshed
+        $.bootstrapGrowl(remote_ip + " added you as a friend (click to reload page)", {offset: {from: 'top', amount: 70}, delay: -1})
+        jdata.events.new_puck = ""
+
+<input type="button" value="Reload Page" onClick="history.go(0)">
+
+
     }
     else {
         console.log('did not add anything')
