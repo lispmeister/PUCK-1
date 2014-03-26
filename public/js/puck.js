@@ -219,32 +219,35 @@ function puck_create(element, ip_addr) {
 //
 // farm out https requests to remote systems since js/jquery balk at that kinda shit
 //
-function puck_ping(ipaddr, all_ips, puckid, url) {
+function puck_ping(all_ips, puckid, url) {
 
     var all_ip_string = ""
 
     console.log('in puck_ping')
 
-    console.log(ipaddr, puckid, url)
+    console.log(puckid, url)
+    console.log(all_ips)
 
     // var ping_url = url + '/ping'
 
     for (var i = 0 ; i < all_ips.length; i++) {
-        all_ip_string = "&" + all_ip_string + all_ips[i]
+        all_ip_string = all_ip_string + "&" + all_ips[i]
     }
-    all_ip_string = all_ip_string[all_ips.length -1]
+    all_ip_string = all_ip_string.substr(1, all_ip_string.length-1)
 
-    var ping_url = '/sping/' + "/" + puckid + "/" + all_ip_string
+    console.log('AIPs -> ' + all_ip_string)
+
+    var ping_url = '/sping/' + puckid + "/" + all_ip_string
+
+    console.log('pinging ' + puckid + ' ... URL ... ' + ping_url)
 
     var ping_id  = ''
 
     // if we're alive, this will get put in
-    var vpn_form = 'vpn_form_' + id
+    var vpn_form = 'vpn_form_' + puckid
 
     // element_id='puck_' + id + '_ip_addr'
-    var element_id='puck_vpn_' + id
-
-    console.log('pinging ' + id + ' ... URL ... ' + ping_url)
+    var element_id='puck_vpn_' + puckid
 
     $.getJSON(ping_url)
         .done(function(data) {
@@ -264,7 +267,7 @@ function puck_ping(ipaddr, all_ips, puckid, url) {
       $('#'+element_id).removeClass('btn-success').addClass('disabled')
    })
    
-console.log('post-pingy ' + id + '... putting into ' + element_id)
+console.log('post-pingy ' + puckid + '... putting into ' + element_id)
 
 }
 
@@ -688,7 +691,7 @@ $.getJSON('/puck', function(pucks) {
             $('#puck_vpn').attr('id', 'puck_vpn_' + puckid)
 
             // pingy - check if system is up
-            puck_ping(ipaddr, all_ips, puckid, puck_url)
+            puck_ping(all_ips, puckid, puck_url)
     
             // start images in gray, color (if avail) on mouseover
             console.log('adipoli: ' + puckid)
