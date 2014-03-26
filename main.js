@@ -392,7 +392,16 @@ function NotImplementedError() {
 
 // the browser's IP
 function get_client_ip() {
-   return req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+
+    var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+
+    if (typeof client_ip == "undefined") {
+        console.log('no IP here...')
+        return("") 
+    }
+    else
+        return client_ip
+
 }
 
 // quick bit to get the user's ip addr
