@@ -1063,7 +1063,7 @@ function formDelete(req, res, next) {
 //
 function httpsPing(puckid, ipaddr, res, next) {
 
-    console.log("pinging... " + puckid + ' / ' + ipaddr)
+    console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
 
     var all_ips = ipaddr.split(','),
         n       = all_ips.length,
@@ -1083,8 +1083,10 @@ function httpsPing(puckid, ipaddr, res, next) {
     for (var i = 0; i<all_ips.length ; i++ ) {
         var ip = all_ips[i]
 
-        if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip))
+        if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip)) {
+            responses = responses + 1
             continue
+        }
 
         console.log(ip)
 
@@ -1120,18 +1122,21 @@ function httpsPing(puckid, ipaddr, res, next) {
         }
         else if (error) {
             console.log('errzz...' + error)
+            var datum = error
         }
         else {
             console.log('hmmm... weirdz - code; ' + res.statusCode)
         }
 
-        if (!all_done && responses == all_ips.length) {
+        console.log(all_done, responses + " vs. " + all_ips.length)
+
+        if (!all_done && responses >= all_ips.length) {
             console.log('no dice')
             console.log(datum)
 
             if (datum) response = {status: "dead", "name": datum.code, "pid": datum.syscall}
             else response = {status: "dead", "name": 'unknown error'}
-            res.send(200, response)
+            res.send(408, response)
         }
 
     }

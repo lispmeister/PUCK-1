@@ -239,22 +239,31 @@ function puck_ping(all_ips, puckid, url) {
     var element_id='puck_vpn_' + puckid
 
     $.getJSON(ping_url)
-        .done(function(data) {
+        .success(function(data) {
             console.log('success with ' + element_id) 
 
 
-      // make the button clickable and green
-      if (data.status == "OK")
-          $('#'+element_id).addClass('btn-success').removeClass('disabled')
-      else
-          $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            // make the button clickable and green
+            if (data.status == "OK") {
+                console.log('ok...')
+                $('#'+element_id).addClass('btn-success').removeClass('disabled')
+            }
+            else {
+                console.log('not ok...')
+                $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            }
 
-   })
-   .fail(function(data) { 
-      console.log( "ping failure for " + ping_url)
-      console.log(data)
-      $('#'+element_id).removeClass('btn-success').addClass('disabled')
-   })
+        })
+        .error(function(error){
+            console.log( "ping error for " + ping_url)
+            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            console.log(error)
+        })
+        .fail(function(error) { 
+            console.log( "ping failure for " + ping_url)
+            console.log(error)
+            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+        })
    
 console.log('post-pingy ' + puckid + '... putting into ' + element_id)
 
@@ -682,8 +691,8 @@ $.getJSON('/puck', function(pucks) {
             // check interval
             ping_poll = 10000
 
-            // pingy - check if system is up
-            // setInterval(puck_ping(all_ips, puckid, puck_url), ping_poll) 
+            // pingy - check if system is up... do it once, then at regular intervals
+            puck_ping(all_ips, puckid, puck_url)
             setInterval(puck_ping, ping_poll, all_ips, puckid, puck_url)
     
             // start images in gray, color (if avail) on mouseover
