@@ -63,7 +63,7 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     # need to start this before we try a REST call to it....
 
 #   NODE_PATH="/etc/puck/" node main.js &
-    NODE_PATH="/etc/puck/" nodemon main.js &
+    NODE_PATH="/etc/puck/" node main.js &
 
     # XXX - make REST pings or something every sec until an answer, but for now...
     sleep 10
@@ -75,7 +75,7 @@ else
 
     # if not started above, do so now
 #   NODE_PATH="/etc/puck/" node main.js &
-    NODE_PATH="/etc/puck/" nodemon main.js &
+    NODE_PATH="/etc/puck/" node main.js &
 
 fi
 
