@@ -1050,8 +1050,8 @@ function httpsPing(puckid, ipaddr, res, next) {
             responses = responses + 1
 
             if(body) {
-                response = body
-                wait_for(url)
+                // response = body
+                wait_for(url, body)
             }
             else if (err){
                 console.log('err:' + err)
@@ -1060,32 +1060,33 @@ function httpsPing(puckid, ipaddr, res, next) {
             }
         })
 
-        function wait_for(url){
+        function wait_for(loc, datum){
             console.log('into waiting...')
-            console.log(response)
+            console.log(loc)
+            console.log(datum)
 
-            if (!all_done && response) {
+            if (!all_done && datum) {
                 console.log('ping werx - ' + i)
                 // {"status":"OK","name":"?","pid":"0FE4224CBE3E238BB06097192E424258D125626A"}Object null  HTTP/1.1
 
                 // don't want the wrong one!
-                if (response.pid != puckid) {
-                    var ret = {status: "OK", "name": response.name, "pid": response.pid}
+                if (datum.pid != puckid) {
+                    var ret = {status: "OK", "name": datum.name, "pid": datum.pid}
 
-                    var curr_ip = url.split('/')[2].split(':')[0]
+                    var curr_ip = loc.split('/')[2].split(':')[0]
                     current_ip[puckid] = curr_ip
 
                     console.log('ping werked: ' + puckid + ' -> ' + curr_ip)
                     all_done = true
-                    res.send(200, response)
+                    res.send(200, datum)
                 }
             }
 
             if (!all_done && responses == all_ips.length) {
                 console.log('no dice')
-                console.log(errorz)
+                console.log(datum)
 
-                if (errorz) response = {status: "dead", "name": errorz.code, "pid": errorz.syscall}
+                if (datum) response = {status: "dead", "name": datum.code, "pid": datum.syscall}
                 else response = {status: "dead", "name": 'unknown error'}
                 res.send(200, response)
             }
