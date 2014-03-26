@@ -35,14 +35,6 @@ cert="   --cert  $puck_home/pucks/$pid/puck.crt"
 tls="--tls-auth  $puck_home/pucks/$pid/ta.key"
 # dh="       --dh  $puck_home/pucks/$pid/dh_param"
 
-date >> $tmp/vvveeeeppppn
-chmod 777 $tmp/vvveeeeppppn
-
-echo ""
-echo ""
-echo ""
-echo "vpn-ing away to $ip" | tee -a $tmp/vvveeeeppppn
-
 # cd $HOME
 # $bin_dir/p0v.py -m client &
 
