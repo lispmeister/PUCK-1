@@ -1060,12 +1060,10 @@ function httpsPing(puckid, ipaddr, res, next) {
 
     var all_ips = ipaddr.split(','),
         n       = all_ips.length,
-        request   = require('request'),
         response  = "",
         responses = 0,
         errorz    = "",
         all_done  = false
-
 
     console.log(all_ips)
 
@@ -1082,55 +1080,50 @@ function httpsPing(puckid, ipaddr, res, next) {
 
         console.log('trying... ' + url)
 
-        request.get(url, function(err, data, body) {
-            console.log('got something...')
-            responses = responses + 1
+        request.get(url, cb)
 
-            if(body) {
-                // response = body
-                wait_for(url, body)
-            }
-            else if (err){
-                console.log('err:' + err)
-                errorz = err
-                wait_for()
-            }
-        })
-
-        function wait_for(loc, datum){
-            console.log('into waiting...')
-            console.log(loc)
-            console.log(datum)
-
-            if (!all_done && datum) {
-                console.log('ping werx - ' + i)
-                // {"status":"OK","name":"?","pid":"0FE4224CBE3E238BB06097192E424258D125626A"}Object null  HTTP/1.1
-
-                // don't want the wrong one!
-                if (datum.pid != puckid) {
-                    var ret = {status: "OK", "name": datum.name, "pid": datum.pid}
-
-                    var curr_ip = loc.split('/')[2].split(':')[0]
-                    current_ip[puckid] = curr_ip
-
-                    console.log('ping werked: ' + puckid + ' -> ' + curr_ip)
-                    all_done = true
-                    res.send(200, datum)
-                }
-            }
-
-            if (!all_done && responses == all_ips.length) {
-                console.log('no dice')
-                console.log(datum)
-
-                if (datum) response = {status: "dead", "name": datum.code, "pid": datum.syscall}
-                else response = {status: "dead", "name": 'unknown error'}
-                res.send(200, response)
-            }
-
-        }
     }
 
+    // process the ping results
+    function cb(error, result, body) {
+
+        console.log('ping werx')
+        console.log(body)
+
+        responses = responses + 1
+
+        if (!error && result.statusCode == 200) {
+            var datum = JSON.parse(body);
+            var remote = result.request.uri.hostname
+
+//          if (typeof current_ip[puckid] == "undefined" || datum.pid != puckid) {
+            var ret = {status: "OK", "name": datum.name, "pid": datum.pid}
+            current_ip[puckid] = remote
+            all_done = true
+            console.log('ping werked: ' + puckid + ' -> ' + remote)
+            res.send(200, datum)
+//          }
+//          else {
+//              console.log('dup... someone else is using their IP now -> ' + remote)
+//          }
+        }
+        else if (error) {
+            console.log('errzz...' + error)
+        }
+        else {
+            console.log('hmmm... weirdz - code; ' + res.statusCode)
+        }
+
+        if (!all_done && responses == all_ips.length) {
+            console.log('no dice')
+            console.log(datum)
+
+            if (datum) response = {status: "dead", "name": datum.code, "pid": datum.syscall}
+            else response = {status: "dead", "name": 'unknown error'}
+            res.send(200, response)
+        }
+
+    }
 }
 
 //
