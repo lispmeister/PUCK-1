@@ -390,11 +390,16 @@ function NotImplementedError() {
     this.name = 'NotImplementedError';
 }
 
+// the browser's IP
+function get_client_ip() {
+   return req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+}
+
 // quick bit to get the user's ip addr
 
 function getIP(req, res, next) {
 
-   var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+    var ip = get_client_ip()
 
     res.send(200, '{"ip" : "' + ip + '"}');
 }
@@ -579,7 +584,28 @@ function createPuck(req, res, next) {
     var puck = {
         key: req.body.key || req.body.value.replace(/\W+/g, '_'),
         value:  JSON.stringify(req.body.value)
-    };
+    }
+
+    var client_ip      = get_client_ip()
+    var all_client_ips = puck.value.PUCK.all_ips
+
+
+    // if the IP we get the add from isn't in the ips the other puck
+    // says it has... add it in; they may be coming from a NAT or
+    // something weird
+    console.log('looking to see if your current ip is in your pool')
+    var found = false
+    for (var i = 0; i < all_client_ips.length; i++) {
+        if (all_client_ips[i] == client_ip) {
+            console.log('found it!')
+            found = true
+            break
+        }
+    }
+    if (! found) {
+        console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
+        puck.value.PUCK.all_ips[all_client_ips.length] = client_ip
+    }
 
     // TODO: Check if Puck exists using EXISTS and fail if it does
 
@@ -600,8 +626,6 @@ function createPuck(req, res, next) {
             //
             // if it's from a remote system, wake up local UI and tell user
             //
-            var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
             if (typeof my_net[client_ip] == "undefined") {
                 console.log(req)
                 console.log('create appears to be coming from remote: ' + client_ip)
@@ -750,9 +774,12 @@ function listPucks(req, res, next) {
  */
 function echoReply(req, res, next) {
 
-    console.log('pingasaurus')
+    var client_ip = get_client_ip()
+
+    console.log('pingasaurus from ' + client_ip)
 
     var response = {status: "OK", "name": bwana_puck.PUCK.name, "pid": puck_id}
+
     res.send(200, response)
 
 }
@@ -823,12 +850,12 @@ function knockKnock(req, res, next) {
    
     console.log("you've passed the first test...")
 
-    var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+    var client_ip = get_client_ip()
 
     // You're not from around here, are ya, boy?
     if (typeof my_net[client_ip] == "undefined") {
        // console.log(req)
-        console.log('create appears to be coming from remote: ' + client_ip)
+        console.log('appears to be coming from remote: ' + client_ip)
         puck_events = { ring_ring : client_ip }
     }
     // Local
