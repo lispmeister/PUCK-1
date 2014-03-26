@@ -788,7 +788,14 @@ function echoReply(req, res, next) {
 
     console.log('pingasaurus from ' + client_ip)
 
-    var response = {status: "OK", "name": bwana_puck.PUCK.name, "pid": puck_id}
+    if (typeof bwana_puck.PUCK.name == "undefined") {
+        console.log('no echo here...')
+        var response = {status: "bad"}
+    }
+    else {
+        console.log('echo, echo, echo....')
+        var response = {status: "OK", "name": bwana_puck.PUCK.name, "pid": puck_id}
+    }
 
     res.send(200, response)
 
