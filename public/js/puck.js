@@ -225,7 +225,7 @@ function puck_ping(ipaddr, all_ips, puckid, url) {
 
     console.log('in puck_ping')
 
-    console.log(ipaddr, id, url)
+    console.log(ipaddr, puckid, url)
 
     // var ping_url = url + '/ping'
 
