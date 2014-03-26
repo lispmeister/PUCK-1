@@ -149,7 +149,8 @@ function change_status() {
     puck_status                = JSON.stringify(puck_status)
 
     // this one I'm wiping out manually once used
-    puck_events = { new_puck : "" }
+    // xxx zero ring ring?
+    puck_events = { ring_ring : "", new_puck : "" }
 
     console.log("status: " + puck_status)
 
@@ -818,14 +819,61 @@ function stopVPN(req, res, next) {
             }
             change_status() // make sure everyone hears this
 
-            res.send(200, "{\"status\": \"Failed\"}");
+            res.send(200, {"status": "Failed"});
             next();
 
         } else {
-            res.send(200, "{\"status\": \"OK\"}");
+            res.send(200, {"status": "OK"});
             next();
         }
     });
+
+}
+
+/*
+ *
+ * knock on the door... anyone home?
+ *
+ * Check welcome/black lists to see if your PUCK will talk
+ *
+*/
+function knockKnock(req, res, next) {
+
+    console.log('knock knock')
+    //console.log(req.params)
+
+    // bail if we don't get ID
+    if (typeof req.params.puckid === 'undefined' || req.params.puckid == "") {
+      var bad_dog = "No ID, no love";
+      console.log(bad_dog)
+      res.send(403, { "bad": "dog"});
+      return next(false);
+    }
+   
+    console.log("you've passed the first test...")
+
+    var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+    // You're not from around here, are ya, boy?
+    if (typeof my_ips[client_ip] == "undefined") {
+       // console.log(req)
+        console.log('create appears to be coming from remote: ' + client_ip)
+        puck_events = { ring_ring : client_ip }
+    }
+    // Local
+    else {
+      console.log('local yokel')
+    }
+
+//    var invisible_girl = "I can't see you, no IP...?";
+//    console.log(invisible_girl)
+//    res.send(403, invisible_girl);
+//    return next(false);
+
+    console.log(req.url, req.params.puckid)
+
+    res.send(200, {"hey" : client_ip});
+    return next(false);
 
 }
 
@@ -1144,6 +1192,63 @@ function formCreate(req, res, next) {
 
 }
   
+//
+// server stuff... perhaps a bit odd... but so am I
+//
+function serverStatus(req, res, next) {
+
+    console.log('status masta?')
+
+    var response = {status: "still kicking", version: server.version}
+    res.send(200, response)
+    next();
+}
+
+//
+// goodbye sweet world... nodemon doesn't really die; instead it
+// puts up a note like:
+//
+//   24 Mar 14:26:42 - [nodemon] app crashed - waiting for file changes before starting...
+//
+//
+function serverDie(req, res, next) {
+
+    console.log('et tu, zen?')
+
+    process.exit(code=666)
+
+    // presumably never get here ;)
+    var response = {status: "I'm not dead yet... just a flesh wound"}
+    res.send(200, response)
+    next();
+}
+
+//
+// presumes on, and relies upon, nodemon to bring me back to life
+//
+// simply "touch main.js" and let node, mon, to do the work
+//
+function serverRestart(req, res, next) {
+
+    console.log('laying my hands upon the server, killin it, and bringing it back from the abys')
+
+    var exec    = require('child_process').exec;
+    var command = 'touch /etc/puck/main.js';
+
+    var child = exec(command, function (error, stdout, stderr) {
+        if (error !== null) {
+            req.log.error('exec error: ' + error);
+            console.log('exec error: ' + error);
+            res.send(200, {status: "Failed"});
+            next();
+
+        } else {
+            res.send(200, {status: "goodbye... I'll be back!"});
+            next();
+        }
+    })
+
+}
 
 ///--- API
 
@@ -1202,8 +1307,6 @@ function createServer(options) {
     server.use(restify.bodyParser());
     server.use(restify.jsonp());
 
-
-    // zen
     server.use(restify.CORS());
     server.use(restify.fullResponse());
 
@@ -1295,9 +1398,18 @@ function createServer(options) {
 
     server.post('/form', handleForm);
 
+    // knock knock?
+    server.post('/vpn/knock', knockKnock);
+
     server.post('/vpn/start', startVPN);
     // stop
     server.get('/vpn/stop', stopVPN);
+
+    // server stuff
+    server.get('/server',         serverStatus);   // status
+    server.get('/server/stop',    serverDie);      // die, die, die!
+    server.get('/server/restart', serverRestart);  // die and restart
+
 
     // if all else fails
     server.get(".*", restify.serveStatic({

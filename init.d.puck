@@ -47,7 +47,7 @@ unlock_puckdate() {
 
 all_da_ps() {
         # only works on PUCK... will kill others if not careful...!   ;)
-        echo $(ps axuww|egrep 'openv|yate|node'|grep -v grep | awk '{print $2}')
+        echo $(ps axuww|egrep 'openv|yate|node main.js'|grep -v grep | awk '{print $2}')
 }
 
 

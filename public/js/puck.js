@@ -163,6 +163,12 @@ function puck_vpn(element, puckid, ipaddr) {
 //         window.location.href('https://' + ip_addr + ':8080//puck.html')
 // }
 
+
+// whimsey
+function go_puck_or_go_home() {
+    window.location.href = location.href
+}
+
 function puck_create(element, ip_addr) {
 
     $(element).text("creating...").removeClass("btn-success").addClass("btn-danger")
@@ -185,23 +191,25 @@ function puck_create(element, ip_addr) {
     //
     // ok.... broken... stupid... but works for now... I'll figure it out later.
     //
-    $.ajax({ 
-        url: '/form',
-        type: 'POST',
-        data: JSON.stringify(post_data),
-        contentType: 'application/json',
-        success: function(data){
-            console.log('suck... me.... ')
+    var postify = $.ajax({
+       type: "POST",
+       // url: "https://localhost:8080/form",
+       url: "/form",
+       dataType: "json",
+       data: post_data
+    })
+    .done(function() {
+            console.log('suck... sess.... ')
             console.log(data)
+
             console.log(location.href)
             window.location.href = location.href
-        }, 
+    })
         // ironically seems to work
-        error: function(jqXHR, textStatus, err) {
-            console.log('fuck... me')
-            console.log('text status '+textStatus+', err '+err)
-            window.location.href = location.href
-        }
+    .fail(function() {
+        console.log('fuck... me')
+        // yes... I suck
+        setTimeout(go_puck_or_go_home, 2000)
     })
 
 }
@@ -211,29 +219,37 @@ function puck_create(element, ip_addr) {
 //
 // farm out https requests to remote systems since js/jquery balk at that kinda shit
 //
-function puck_ping(ipaddr, id, url) {
+function puck_ping(ipaddr, all_ips, puckid, url) {
 
-   console.log('in puck_ping')
+    var all_ip_string = ""
 
-   console.log(ipaddr, id, url)
+    console.log('in puck_ping')
 
-   // var ping_url = url + '/ping'
+    console.log(ipaddr, id, url)
 
-   var ping_url = '/sping/' + ipaddr
+    // var ping_url = url + '/ping'
 
-   var ping_id  = ''
+    for (var i = 0 ; i < all_ips.length; i++) {
+        all_ip_string = "&" + all_ip_string + all_ips[i]
+    }
+    all_ip_string = all_ip_string[all_ips.length -1]
 
-   // if we're alive, this will get put in
-   var vpn_form = 'vpn_form_' + id
+    var ping_url = '/sping/' + "/" + puckid + "/" + all_ip_string
 
-   // element_id='puck_' + id + '_ip_addr'
-   var element_id='puck_vpn_' + id
+    var ping_id  = ''
 
-   console.log('pinging ' + id + ' ... URL ... ' + ping_url)
+    // if we're alive, this will get put in
+    var vpn_form = 'vpn_form_' + id
 
-   $.getJSON(ping_url)
-   .done(function(data) {
-      console.log('success with ' + element_id) 
+    // element_id='puck_' + id + '_ip_addr'
+    var element_id='puck_vpn_' + id
+
+    console.log('pinging ' + id + ' ... URL ... ' + ping_url)
+
+    $.getJSON(ping_url)
+        .done(function(data) {
+            console.log('success with ' + element_id) 
+
 
       // make the button clickable and green
       if (data.status == "OK")
@@ -395,6 +411,7 @@ function status_or_die() {
         if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
         // xxx ... kill avg?
             console.log('outgoing ring!')
+
             // ring them gongs
             $('#outgoing')[0].click()
         }
@@ -577,6 +594,7 @@ $.getJSON('/puck', function(pucks) {
            var email       = truncate(puckinfo.PUCK.owner.email)
            var puckid      = puckinfo.PUCK['PUCK-ID']
            var ipaddr      = puckinfo.PUCK.ip_addr
+           var all_ips     = puckinfo.PUCK.all_ips
            var port        = puckinfo.PUCK.port
            var ipaddr_ext  = puckinfo.PUCK.ip_addr_ext
            var port_ext    = puckinfo.PUCK.port_ext
@@ -624,6 +642,7 @@ $.getJSON('/puck', function(pucks) {
               email          : email,
               image          : image,
               ipaddr         : ipaddr,
+              all_ips        : all_ips,
               url            : puck_url,
               vpn_form       : vpn_form,
               span_owner     : 'span_' + owner,
@@ -669,7 +688,7 @@ $.getJSON('/puck', function(pucks) {
             $('#puck_vpn').attr('id', 'puck_vpn_' + puckid)
 
             // pingy - check if system is up
-            puck_ping(ipaddr, puckid, puck_url)
+            puck_ping(ipaddr, all_ips, puckid, puck_url)
     
             // start images in gray, color (if avail) on mouseover
             console.log('adipoli: ' + puckid)

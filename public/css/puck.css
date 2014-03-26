@@ -100,3 +100,9 @@ div.growlUI h1, div.growlUI h2 {
 }
 
 
+div.glow {
+    -webkit-box-shadow: 0 0 10px green; 
+    -moz-box-shadow:    0 0 10px green; 
+    box-shadow:         0 0 10px green;
+}
+

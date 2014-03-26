@@ -93,11 +93,9 @@
 
           console.log('deleting ' + puckid)
 
-          var dead_puck    = {}
+          var    dead_puck    = {}
           dead_puck['puckid'] = puckid
           dead_puck['action'] = 'DELETE'
-
-          var json_puck = JSON.stringify(dead_puck);
 
           var postify = $.ajax({
                type: "POST",

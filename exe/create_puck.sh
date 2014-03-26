@@ -2,7 +2,7 @@
 #
 # create a new puck via curl
 #
-# Usage: $0 puck-id picture IP-addr owner email [puck-ip]
+# Usage: $0 puck-id picture IP-addr 'ints-n-ips-in-json' owner email [puck-ip]
 #
 puck_host="localhost"
 puck_port="8080"
@@ -24,16 +24,16 @@ serverborkage="InternalError"
 
 echo ARGZ: $*
 
-if [ $# -lt 5 ] ; then
+if [ $# -lt 6 ] ; then
    echo "Usage: $0 key picture puck-ID  IP-addr owner email"
    exit 1
 fi
 
 puck_ip="@"
-if [ $# -eq 6 ] ; then
+if [ $# -eq 7 ] ; then
     echo creating puck on remote host
-    puck_ip=$6
-    puck_host=$6
+    puck_ip=$7
+    puck_host=$7
 fi
 
 puck_url="https://$puck_host:$puck_port/puck"
@@ -49,8 +49,9 @@ echo $puck_url
 puck_id=$1
 image=$2
 ip_addr=$3
-name=$4
-email=$5
+all_net=$4
+name=$5
+email=$6
 
 # from remote puck
 #   public CA stuff
@@ -111,6 +112,7 @@ cat <<E_O_C
             "image"       : "$image",
             "ip_addr"     : "$ip_addr",
             "ip_addr_vpn" : "$ip_addr_vpn",
+            $all_net,
             "owner" : {
                 "name"    : "$name",
                 "email"   : "$email"
@@ -122,6 +124,8 @@ cat <<E_O_C
 }
 E_O_C
 ) > $new_puck
+
+echo $new_puck
 
 #
 # use curl to put the JSON into the DB
