@@ -1064,7 +1064,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             console.log('into waiting...')
             console.log(response)
 
-            if (response) {
+            if (!all_done && response) {
                 console.log('ping werx - ' + i)
                 // {"status":"OK","name":"?","pid":"0FE4224CBE3E238BB06097192E424258D125626A"}Object null  HTTP/1.1
 

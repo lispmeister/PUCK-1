@@ -1,12 +1,17 @@
 #!/bin/bash -x
 
+if [ $(pwd) = "/etc/puck" ] ; then
+    echo cannot run this script while in /etc/puck
+    exit 1
+fi
+
 if [ -s /etc/puck ] ; then
     echo removing /etc/puck symlink
     rm -f /etc/puck
 fi
 if [ -d /etc/puck ] ; then
     echo Looks like the PUCK is already installed, bailin out
-    exit 1
+    exit 2
 fi
 # rm -rf /etc/puck
 # sudo mv /etc/puck /etc/puck.old
