@@ -10,6 +10,7 @@
     "cors": "latest",
     "ctype": "latest",
     "ejs": "latest",
+    "express": "latest",
     "httpsync": "0.0.8",
     "moment": "latest",
     "nodemon": "latest",
