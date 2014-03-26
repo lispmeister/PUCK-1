@@ -1179,6 +1179,7 @@ function formCreate(req, res, next) {
 
                 if (!isEmpty(bwana_puck)) {
                     console.log("posting our puck to the puck who asked for ours....")
+                    console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr)
                     var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
 
                     // output, errors, etc.
