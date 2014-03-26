@@ -221,23 +221,12 @@ function puck_create(element, ip_addr) {
 //
 function puck_ping(all_ips, puckid, url) {
 
-    var all_ip_string = ""
-
     console.log('in puck_ping')
-
     console.log(puckid, url)
     console.log(all_ips)
 
-    // var ping_url = url + '/ping'
-
-    for (var i = 0 ; i < all_ips.length; i++) {
-        all_ip_string = all_ip_string + "&" + all_ips[i]
-    }
-    all_ip_string = all_ip_string.substr(1, all_ip_string.length-1)
-
-    console.log('AIPs -> ' + all_ip_string)
-
-    var ping_url = '/sping/' + puckid + "/" + all_ip_string
+    // var ping_url = '/sping/' + puckid + "/" + all_ip_string
+    var ping_url = '/sping/' + puckid + "/" + all_ips
 
     console.log('pinging ' + puckid + ' ... URL ... ' + ping_url)
 

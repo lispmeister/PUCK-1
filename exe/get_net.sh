@@ -26,4 +26,9 @@
 #
 # just want IPs, so:
 #
-ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]")) { n = 1; dev = $1; all[dev]="" }} END { printf("\"all_ips\" : ["); for (i in all) printf("\"%s\",", all[i]) ; printf("]")}'| sed 's/,]$/]/'
+# ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]")) { n = 1; dev = $1; all[dev]="" }} END { printf("\"all_ips\" : ["); for (i in all) printf("\"%s\",", all[i]) ; printf("]")}'| sed 's/,]$/]/'
+
+#
+# and... if you don't want 127.0.0.1 or the vpn... kill if dev == "lo" (mostly linux only) and if dev starts with "tun"
+#
+ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && !match($1, "^tun")) { n = 1; dev = $1; all[dev]="" }} END { printf("\"all_ips\" : ["); for (i in all) printf("\"%s\",", all[i]) ; printf("]")}'| sed 's/,]$/]/'

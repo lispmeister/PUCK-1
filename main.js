@@ -62,11 +62,12 @@ catch (e) {
 
 // yes, yes, lazy too
 
-// status chex
+// status and other bits
 var server_magic = {},
     client_magic = {},
-    puck_events  = {}
-    server       = ""
+    puck_events  = {},
+    server       = "",
+    current_ip   = {}
 
 var puck_status      = "{}",
     puck_status_file = "/etc/puck/status.puck"
@@ -852,12 +853,12 @@ function knockKnock(req, res, next) {
 function startVPN(req, res, next) {
 
     console.log('start vpn2')
-    console.log(req.params)
+    console.log(req.body)
 
     var puck_web_home  = "/puck.html"
 
     // bail if we don't get ID
-    if (typeof req.params.puckid === 'undefined' || req.params.puckid == "") {
+    if (typeof req.body.puckid === 'undefined' || req.body.puckid == "") {
       console.log("error... requires a PUCK ID!");
       // redirect to the home-o-the-puck
       // fix ;)
@@ -867,14 +868,24 @@ function startVPN(req, res, next) {
    
     console.log('onto the execution...')
 
-    puckid = req.params.puckid
-    ipaddr = req.params.ipaddr
+    puckid = req.body.puckid
+    ipaddr = req.body.ipaddr
 
     console.log(puckid, ipaddr)
 
     var vpn   = '/etc/puck/exe/start_vpn.sh'
 
-    args = [puckid, ipaddr]
+    // this means you're trying to do it despite ping not working
+    if (typeof current_ip[puckid] == 'undefined') {
+        console.log("hmmm... trying to VPN when ping couldn't reach it... good luck!")
+        args = [puckid, ipaddr]
+    }
+
+    else {
+        console.log("using pinged IP addr to VPN: " + current_ip[puckid])
+        args = [puckid, current_ip[puckid]]
+    }
+    
     cmd = vpn
 
     var spawn = require('child_process').spawn,
@@ -893,6 +904,7 @@ function startVPN(req, res, next) {
     var vpn_home = "/vpn.html"
 
     // prevents calling form from leaving page
+// XXX ?
     res.send(204)
 
 }
@@ -1009,7 +1021,7 @@ function httpsPing(puckid, ipaddr, res, next) {
 
     console.log("pinging... " + puckid + ' / ' + ipaddr)
 
-    var all_ips = ipaddr.split('&'),
+    var all_ips = ipaddr.split(','),
         n       = all_ips.length,
         request   = require('request'),
         response  = "",
@@ -1024,9 +1036,9 @@ function httpsPing(puckid, ipaddr, res, next) {
     for (var i = 0; i<all_ips.length ; i++ ) {
         var ip = all_ips[i]
 
-        console.log(ip)
-
         if (ip == "127.0.0.1") continue
+
+        console.log(ip)
 
         // xxx - read port/+ from conf
         var url = 'https://' + ip + ':' + puck_port + '/ping'
@@ -1039,7 +1051,7 @@ function httpsPing(puckid, ipaddr, res, next) {
 
             if(body) {
                 response = body
-                wait_for(body)
+                wait_for(url)
             }
             else if (err){
                 console.log('err:' + err)
@@ -1048,16 +1060,25 @@ function httpsPing(puckid, ipaddr, res, next) {
             }
         })
 
-        function wait_for(){
+        function wait_for(url){
             console.log('into waiting...')
             console.log(response)
 
             if (response) {
                 console.log('ping werx - ' + i)
                 // {"status":"OK","name":"?","pid":"0FE4224CBE3E238BB06097192E424258D125626A"}Object null  HTTP/1.1
-                var ret = {status: "OK", "name": response.name, "pid": response.pid}
-                all_done = true
-                res.send(200, response)
+
+                // don't want the wrong one!
+                if (response.pid != puckid) {
+                    var ret = {status: "OK", "name": response.name, "pid": response.pid}
+
+                    var curr_ip = url.split('/')[2].split(':')[0]
+                    current_ip[puckid] = curr_ip
+
+                    console.log('ping werked: ' + puckid + ' -> ' + curr_ip)
+                    all_done = true
+                    res.send(200, response)
+                }
             }
 
             if (!all_done && responses == all_ips.length) {
@@ -1170,7 +1191,8 @@ function formCreate(req, res, next) {
                 console.log("executing create_puck.sh")
 
                 // this simply takes the pwd and finds the exe area...
-                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.ip_addr + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
+                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
+                console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email)
 
                 // now slice and dice output, errors, etc.
                 pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
