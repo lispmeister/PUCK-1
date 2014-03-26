@@ -590,14 +590,8 @@ function createPuck(req, res, next) {
         return;
     }
 
-    var puck = {
-        key: req.body.key || req.body.value.replace(/\W+/g, '_'),
-        value:  JSON.stringify(req.body.value)
-    }
-
     var client_ip      = get_client_ip(req)
-    var all_client_ips = puck.value.PUCK.all_ips
-
+    var all_client_ips = req.body.value.PUCK.all_ips
 
     // if the IP we get the add from isn't in the ips the other puck
     // says it has... add it in; they may be coming from a NAT or
@@ -613,8 +607,15 @@ function createPuck(req, res, next) {
     }
     if (! found) {
         console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
-        puck.value.PUCK.all_ips[all_client_ips.length] = client_ip
+        req.body.value.PUCK.all_ips[all_client_ips.length] = client_ip
     }
+
+
+    var puck = {
+        key: req.body.key || req.body.value.replace(/\W+/g, '_'),
+        value:  JSON.stringify(req.body.value)
+    }
+
 
     // TODO: Check if Puck exists using EXISTS and fail if it does
 
