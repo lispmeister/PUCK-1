@@ -679,8 +679,12 @@ $.getJSON('/puck', function(pucks) {
             // CHANGE THE ID!   make the VPN button point to the right PUCK
             $('#puck_vpn').attr('id', 'puck_vpn_' + puckid)
 
+            // check interval
+            ping_poll = 10000
+
             // pingy - check if system is up
-            puck_ping(all_ips, puckid, puck_url)
+            // setInterval(puck_ping(all_ips, puckid, puck_url), ping_poll) 
+            setInterval(puck_ping, ping_poll, all_ips, puckid, puck_url)
     
             // start images in gray, color (if avail) on mouseover
             console.log('adipoli: ' + puckid)

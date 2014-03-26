@@ -1067,21 +1067,25 @@ function httpsPing(puckid, ipaddr, res, next) {
 
     console.log(all_ips)
 
+    // use the last known good one, if it exists
+    if (typeof current_ip[puckid] != "undefined") {
+        request.get('https://' + current_ip[puckid] + ':' + puck_port + '/ping', cb)
+    }
+
     // make sure we've tried the other IPs for them?
     for (var i = 0; i<all_ips.length ; i++ ) {
         var ip = all_ips[i]
 
-        if (ip == "127.0.0.1") continue
+        if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip))
+            continue
 
         console.log(ip)
 
         // xxx - read port/+ from conf
         var url = 'https://' + ip + ':' + puck_port + '/ping'
-
         console.log('trying... ' + url)
 
         request.get(url, cb)
-
     }
 
     // process the ping results
