@@ -1170,7 +1170,7 @@ function formCreate(req, res, next) {
                 console.log("executing create_puck.sh")
 
                 // this simply takes the pwd and finds the exe area...
-                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + ip_addr + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
+                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.ip_addr + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
 
                 // now slice and dice output, errors, etc.
                 pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
@@ -1178,7 +1178,7 @@ function formCreate(req, res, next) {
                 pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
 
                 if (puck_id != data.PUCK['PUCK-ID'] && !isEmpty(bwana_puck)) {
-                    console.log("posting our puck to the puck who asked for ours....")
+                    console.log("posting our puck data to the puck we just added....")
                     console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr)
                     var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
 
