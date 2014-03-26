@@ -391,7 +391,7 @@ function NotImplementedError() {
 }
 
 // the browser's IP
-function get_client_ip() {
+function get_client_ip(req) {
 
     var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
 
@@ -408,7 +408,7 @@ function get_client_ip() {
 
 function getIP(req, res, next) {
 
-    var ip = get_client_ip()
+    var ip = get_client_ip(req)
 
     res.send(200, '{"ip" : "' + ip + '"}');
 }
@@ -595,7 +595,7 @@ function createPuck(req, res, next) {
         value:  JSON.stringify(req.body.value)
     }
 
-    var client_ip      = get_client_ip()
+    var client_ip      = get_client_ip(req)
     var all_client_ips = puck.value.PUCK.all_ips
 
 
@@ -783,7 +783,7 @@ function listPucks(req, res, next) {
  */
 function echoReply(req, res, next) {
 
-    var client_ip = get_client_ip()
+    var client_ip = get_client_ip(req)
 
     console.log('pingasaurus from ' + client_ip)
 
@@ -859,7 +859,7 @@ function knockKnock(req, res, next) {
    
     console.log("you've passed the first test...")
 
-    var client_ip = get_client_ip()
+    var client_ip = get_client_ip(req)
 
     // You're not from around here, are ya, boy?
     if (typeof my_net[client_ip] == "undefined") {
