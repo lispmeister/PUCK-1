@@ -1,17 +1,18 @@
 
-var Tail    = require('tail').Tail,
-    cors    = require('cors'),
-    crypto  = require('crypto'),
-    express = require('express'),
-    fs      = require('fs'),
-    https   = require('https'),
-    moment  = require('moment'),
-    os      = require('os'),
-    path    = require('path'),
-    request = require('request'),
-    rest    = require('rest'),
-    util    = require('util'),
-    puck    = require('./modules');
+var Tail     = require('tail').Tail,
+    cors     = require('cors'),
+    crypto   = require('crypto'),
+    express  = require('express'),
+    fs       = require('fs'),
+    https    = require('https'),
+    moment   = require('moment'),
+    os       = require('os'),
+    path     = require('path'),
+    tcpProxy = require('tcp-proxy'),
+    request  = require('request'),
+    rest     = require('rest'),
+    util     = require('util'),
+    puck     = require('./modules');
 
 
 // sue me
@@ -687,6 +688,45 @@ function deleteAll(req, res, next) {
         return;
 }
 
+
+//
+// creates a tcp proxy to a given host.  For instance, you could call it with:
+//
+//  curl -k 'https://192.168.0.1:8080/setproxy?proxy_remote_host=10.0.0.1&proxy_remote_port=22&proxy_local_port=6666'
+//
+// From now on connections to 192.168.0.1 on port 6666 will be 
+// redirected to port 22 on the host 10.0.0.1
+//
+function setTCPProxy(req, res, next) {
+
+    console.log('set proxy')
+
+    if (typeof req.query.proxy_remote_host == "undefined" || 
+        typeof req.query.proxy_remote_port == "undefined" ||
+        typeof req.query.proxy_local_port  == "undefined") {
+            console.log('requires both remote & local ports and remote host to be defined')
+            next({"error": "proxy_remote_host, proxy_remote_port, and proxy_local_port must all be defined"})
+    }
+
+    proxy_remote_host = req.query.proxy_remote_host
+    proxy_remote_port = req.query.proxy_remote_port
+    proxy_local_port  = req.query.proxy_local_port
+
+    var proxy = tcpProxy.createServer({
+        target: {
+            host: proxy_remote_host,
+            port: proxy_remote_port
+        }
+    })
+
+    proxy.listen(proxy_local_port)
+
+    console.log('set proxy to listen on port ' + proxy_local_port)
+
+    res.send(200, {"puck_local_port": proxy_local_port, "proxy_remote_port": proxy_remote_port, "proxy_remote_host": proxy_remote_host})
+
+        }
+
 /**
  * Loads a Puck by key
  */
@@ -1183,7 +1223,7 @@ function formCreate(req, res, next) {
     // is it a puck?
     someday_get_https(url).done(function(data) {
 
-        // console.log(data)
+        console.log(data)
 
         if (data.indexOf("was not found") != -1) {
             console.log('no woman no ping: ' + data)
@@ -1413,6 +1453,9 @@ server.get('/vpn/stop', stopVPN);
 server.get('/server',         serverStatus);   // status
 server.get('/server/stop',    serverDie);      // die, die, die!
 server.get('/server/restart', serverRestart);  // die and restart
+
+// get a url from wherever the puck is
+server.get('/setproxy', setTCPProxy)
 
 // if all else fails
 server.use(express.static(__dirname + '/public'));

@@ -1,1 +1,1 @@
-{"events":{"ring_ring":"","new_puck":""},"openvpn_server":{},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}}
+{"events":{},"openvpn_server":{},"openvpn_client":{}}

@@ -1,0 +1,4 @@
+
+curl -k 'https://localhost:8080/setproxy?proxy_remote_host=192.168.0.6&proxy_remote_port=22&proxy_local_port=6666'
+
+
