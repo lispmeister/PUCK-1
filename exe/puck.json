@@ -1,7 +1,7 @@
 {
    "PUCK" : {
 
-      "PUCK-ID" : "5C6B A08E 8D9B 8419 EB71  201B D89D 04AB E35D 5B36",
+      "PUCK_ID" : "5C6B A08E 8D9B 8419 EB71  201B D89D 04AB E35D 5B36",
 
       "owner" : {
          "name"            : "dan farmer",

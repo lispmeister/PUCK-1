@@ -157,13 +157,6 @@ function puck_vpn(element, puckid, ipaddr) {
 
 }
 
-// function post_callback (ip_addr, res){
-//         console.log('submitz')
-//         console.log(res)
-//         window.location.href('https://' + ip_addr + ':8080//puck.html')
-// }
-
-
 // whimsey
 function go_puck_or_go_home() {
     console.log('go puck or...')
@@ -373,8 +366,8 @@ function status_or_die() {
     console.log('big data')
     console.log(jdata)
 
-    // if someone has added you, create a modest sized div that tells you and
-    // hopefully won't fuck up anything you're doing
+    // if someone has added you, create a modest sized bit of text that tells you 
+    // and hopefully won't fuck up anything you're doing
     if (jdata.events.new_puck.length) {
         var remote_ip = jdata.events.new_puck
         console.log(remote_ip + ' added!')

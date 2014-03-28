@@ -20,7 +20,7 @@ success="upload completely sent off"
 method="Method Not Allowed"
 
 if [ $# -ne 7 ] ; then
-   echo "Usage: $0 PUCK-ID picture puck-ID  IP-addr owner email pgp_fingerprint"
+   echo "Usage: $0 PUCK_ID picture puck-ID  IP-addr owner email pgp_fingerprint"
    exit 1
 fi
 
@@ -68,7 +68,7 @@ cat <<E_O_C
    "value":{
       "image" : "$image",
       "PUCK" : {
-         "PUCK-ID"       : "$puck_id",
+         "PUCK_ID"       : "$puck_id",
          "ip_addr"       : "$ip_addr",
          "ip_addr_ext"   : "$ip_addr_vpn",
          "puck_port"     : "8080",

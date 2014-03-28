@@ -108,7 +108,7 @@ cat <<E_O_C
     "value":{
         "PUCK" : {
             "name"        : "$name",
-            "PUCK-ID"     : "$puck_id",
+            "PUCK_ID"     : "$puck_id",
             "image"       : "$image",
             "ip_addr"     : "$ip_addr",
             "ip_addr_vpn" : "$ip_addr_vpn",

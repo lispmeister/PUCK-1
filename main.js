@@ -569,7 +569,7 @@ function create_puck_key_store(puck) {
     var cert = puck.vpn_client.cert.join('\n')
     var tls  = puck.vpn.tlsauth.join('\n')
 
-    var puck_dir = config.PUCK.keystore + '/' + puck['PUCK-ID']
+    var puck_dir = config.PUCK.keystore + '/' + puck.PUCK_ID
 
     fs.mkdir(puck_dir, function(err){
         if(err) {
@@ -579,7 +579,7 @@ function create_puck_key_store(puck) {
     });
 
     // xxx - errs to user!
-    fs.writeFile(puck_dir + '/puck.pid', bwana_puck['PUCK-ID'], function(err) {
+    fs.writeFile(puck_dir + '/puck.pid', bwana_puck.PUCK_ID, function(err) {
         if (err) { console.log('err writing pid - : ' + err) }
         else     { console.log('wrote pid') }
     });
@@ -617,8 +617,10 @@ function create_puck_key_store(puck) {
  */
 function createPuck(req, res, next) {
 
+    console.log ('creating puck')
     console.log (req.params)
-    console.log (req.body)
+
+    var ip_addr = req.body.ip_addr
 
     if (!req.body.value) {
         console.log('createPuck: missing value');
@@ -682,6 +684,8 @@ function createPuck(req, res, next) {
                 puck_events = { new_puck : "" }
                 console.log('create appears to be coming from local PUCK/host: ' + client_ip)
             }
+            // log it
+            createEvent(req, {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
 
             change_status() // make sure everyone hears this
 
@@ -690,6 +694,29 @@ function createPuck(req, res, next) {
     })
 
 }
+
+function createEvent(req, event_data) {
+
+    console.log('in createEvent - ' + JSON.stringify(event_data))
+
+    var client_ip   = get_client_ip(req)
+    var key         = "event_" + event_data.time
+    var e_type      = event_data.event_type
+
+    event_data.from = client_ip
+    event_data.time = Date.now()
+
+    rclient.rpush(e_type, event_data, function(err) {
+        if (err) {
+            console.log(err, e_type + ' Revent: unable to store in Redis db');
+            next(err);
+        } else {
+            console.log({key: event_data}, e_type + ' event : saved');
+        }
+    })
+
+}
+
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
@@ -708,6 +735,7 @@ function deletePuck(req, res, next) {
             next(err);
         } else {
             console.log('deletePuck: success deleting %s', req.puck);
+            createEvent(req, {event_type: "delete", puck_id: req.params.value.PUCK.PUCK_ID})
             res.send(204);
         }
     });
@@ -804,7 +832,7 @@ function swapPuck(req, res, next) {
     console.log(req.params)
     // console.log(req.params.PUCK)
 
-    var their_puck = req.params.PUCK['PUCK-ID']
+    var their_puck = req.params.PUCK.PUCK_ID
 
     var puck = {
         key: their_puck,
@@ -1028,6 +1056,8 @@ function startVPN(req, res, next) {
 
     console.log('post execution')
 
+    createEvent(req, {event_type: "VPN start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
+
     var vpn_home = "/vpn.html"
 
     // prevents calling form from leaving page
@@ -1188,7 +1218,7 @@ function httpsPing(puckid, ipaddr, res, next) {
     function cb(error, result, body) {
 
         console.log('ping werx')
-        console.log(body)
+        if (body) console.log(body)
 
         responses = responses + 1
 
@@ -1311,15 +1341,15 @@ function formCreate(req, res, next) {
                 console.log("executing create_puck.sh")
     
                 // this simply takes the pwd and finds the exe area...
-                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
-                console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK['PUCK-ID'], data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email)
+                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK.PUCK_ID, data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
+                console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK.PUCK_ID, data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email)
     
                 // now slice and dice output, errors, etc.
                 pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
                 pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
                 pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
     
-                if (puck_id != data.PUCK['PUCK-ID'] && !isEmpty(bwana_puck)) {
+                if (puck_id != data.PUCK.PUCK_ID && !isEmpty(bwana_puck)) {
                     console.log("posting our puck data to the puck we just added....")
                     console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr)
                     var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
@@ -1413,7 +1443,15 @@ server.use(cors());
 server.use(express.compress());
 server.use(express.methodOverride());
 
-server.use(express.bodyParser());
+server.use(express.json());
+server.use(express.urlencoded());
+server.use(express.multipart());
+
+server.use(express.methodOverride());
+server.use(server.router);
+
+// if all else fails
+server.use(express.static(__dirname + '/public'));
 
 
 //
@@ -1498,10 +1536,6 @@ server.get('/setproxy', setTCPProxy)
 
 // get a url from wherever the puck is
 server.all('/url', webProxy)
-
-// if all else fails
-server.use(express.static(__dirname + '/public'));
-
 
 // and... listen
 https.createServer(credentials, server).listen(puck_port, function(){

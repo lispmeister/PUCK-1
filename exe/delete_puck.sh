@@ -18,7 +18,7 @@ noserver="couldn't connect to host"
 success="upload completely sent off"
 
 if [ $# -ne 1 ] ; then
-   echo "Usage: $0 PUCK-ID"
+   echo "Usage: $0 PUCK_ID"
    exit 1
 fi
 
