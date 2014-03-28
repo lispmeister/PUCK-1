@@ -23,6 +23,7 @@
     "sleep": "latest",
     "socket.io": "latest",
     "tail": "latest",
+    "tcp-proxy": "latest",
     "when": "latest"
   },
   "devDependencies": {
