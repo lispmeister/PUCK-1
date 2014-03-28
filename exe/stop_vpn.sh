@@ -16,7 +16,7 @@
 
 pid=$(ps axuww | grep ' openvpn ' | grep C.conf | awk '{print $2}')
 
-kill $pid
+kill $pid &> /dev/null
 
 # 0 is good
 exit $?

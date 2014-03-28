@@ -615,6 +615,9 @@ function create_puck_key_store(puck) {
  *
  * Which would have `key` and `value` available in req.params
  */
+
+// Redis PUCKs key are all upper case+digits
+
 function createPuck(req, res, next) {
 
     console.log ('creating puck')
@@ -695,6 +698,11 @@ function createPuck(req, res, next) {
 
 }
 
+//
+// info about events is stored here.
+//
+// Redis keys will all be lowercase, while PUCKs are all upper case+digits
+//
 function createEvent(req, event_data) {
 
     console.log('in createEvent - ' + JSON.stringify(event_data))
@@ -796,12 +804,104 @@ function setTCPProxy(req, res, next) {
 
     res.send(200, {"puck_local_port": proxy_local_port, "proxy_remote_port": proxy_remote_port, "proxy_remote_host": proxy_remote_host})
 
+}
+
+//
+// get all the redis lists in the DB
+//
+get_list = function(req, res) {
+    var data = []
+
+    // non PUCKs
+    rclient.keys('[^A-Z0-9]*', function(err, lists) {
+        var multi = rclient.multi()
+        var keys  = Object.keys(lists)
+        var i     = 0
+ 
+        keys.forEach(function (l) {
+
+            var temp_data = {}
+
+            rclient.hget(lists[l], "modified_at", function(e, o) {
+                i++
+                if (e) {
+                    console.log(e)
+                } 
+                else {
+                    temp_data = {'key':lists[l], 'modified_at':o}
+                    data.push(temp_data)
+                }
+ 
+                if (i == keys.length) {
+                    console.log('logger/list', {logs:data})
+                }
+ 
+            })
+        })
+ 
+    })
+}
+
+
+/**
+ *  lists the types of events
+ */
+function listEvents(req, res, next) {
+
+    var data = []
+
+    // non PUCKs
+    rclient.keys('[^A-Z0-9]*', function(err, lists) {
+        var multi = rclient.multi()
+        var keys  = Object.keys(lists)
+        var i     = 0
+ 
+        keys.forEach(function (l) {
+            console.log('E: ' + l)
+            data.push(l)
+            })
+        })
+
+    reply = { events: JSON.stringify(data) }
+
+    res.send(200, reply);
+ 
+}
+
+
+
+/**
+ *  gets an events data
+ */
+function getEvent(req, res, next) {
+
+    rclient.get(req.params.key, function (err, reply) {
+        if (!err) {
+            if (reply == null) {
+                console.log(err, 'getEvent: unable to retrieve %s', req.puck);
+                // next(new PuckNotFoundError(req.params.key));
+                next({'error': 'Event Not Found'})
+            } 
+            else {
+                // console.log("Value retrieved: " + reply.toString());
+                res.send(200, reply);
+            }
         }
+        else {
+            console.log(err, 'getEvent: unable to retrieve %s', req.puck);
+            next(err);
+        }
+    });
+}
 
 /**
  * Loads a Puck by key
  */
 function getPuck(req, res, next) {
+
+    console.log('getPuck')
+
+    console.log(req.params)
 
     rclient.get(req.params.key, function (err, reply) {
 
@@ -878,7 +978,7 @@ function swapPuck(req, res, next) {
  * Simple returns the list of Puck Ids that are stored in redis
  */
 function listPucks(req, res, next) {
-    rclient.keys('*', function (err, keys) {
+    rclient.keys('[A-Z0-9]*', function (err, keys) {
         if (err) {
             console.log(err, 'listPuck: unable to retrieve all Pucks');
             next(err);            
@@ -1471,7 +1571,7 @@ server.head('/puck', listPucks);
 server.get('/ping', echoReply);
 server.get('/ping/:key', echoStatus);
 
-   // cuz ajax doesn't like to https other sites...
+// cuz ajax doesn't like to https other sites...
 server.get('/sping/:key1/:key2', function (req, res, next) {
     console.log('spinging')
     httpsPing(req.params.key1, req.params.key2, res, next)
@@ -1499,6 +1599,7 @@ server.del('/puck', deleteAll, function respond(req, res, next) {
 
 // Register a default '/' handler
 
+// xxx - update!
 server.get('/', function root(req, res, next) {
     var routes = [
         'GET     /',
@@ -1523,8 +1624,17 @@ server.post('/form', handleForm);
 server.post('/vpn/knock', knockKnock);
 
 server.post('/vpn/start', startVPN);
+
 // stop
 server.get('/vpn/stop', stopVPN);
+
+// events
+
+// list event types
+server.get('/events', listEvents);
+// get elements of a particular kind of event (create, delete, etc.); 
+server.get('/events/:key', getEvent);
+
 
 // server stuff
 server.get('/server',         serverStatus);   // status
