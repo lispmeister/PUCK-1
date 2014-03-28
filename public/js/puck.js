@@ -166,6 +166,7 @@ function puck_vpn(element, puckid, ipaddr) {
 
 // whimsey
 function go_puck_or_go_home() {
+    console.log('go puck or...')
     window.location.href = location.href
 }
 
@@ -181,35 +182,30 @@ function puck_create(element, ip_addr) {
         .animate({ width: $(element).data("oldWidth") }, 1000);
 
     console.log('touch the hand of ... ')
-
     console.log('ip addr: ' + ip_addr)
 
     var post_data         = {}
     post_data.ip_addr     = ip_addr
     post_data.puck_action = "CREATE"
+    post_data = JSON.stringify(post_data)
     
-    //
-    // ok.... broken... stupid... but works for now... I'll figure it out later.
-    //
-    var postify = $.ajax({
-       type: "POST",
-       // url: "https://localhost:8080/form",
-       url: "/form",
-       dataType: "json",
-       data: post_data
-    })
-    .done(function() {
+    $.ajax({
+        type: "POST",
+        url: "/form",
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        data: post_data,
+        success: function(data, status) {
             console.log('suck... sess.... ')
-            console.log(data)
-
-            console.log(location.href)
-            window.location.href = location.href
-    })
-        // ironically seems to work
-    .fail(function() {
-        console.log('fuck... me')
-        // yes... I suck
-        setTimeout(go_puck_or_go_home, 2000)
+            // yes... I suck
+            setTimeout(go_puck_or_go_home, 2000)
+        },
+        fail: function(data, err) {
+            console.log('fuck... me')
+            // yes... I suck
+            setTimeout(go_puck_or_go_home, 2000)
+        }
     })
 
 }
