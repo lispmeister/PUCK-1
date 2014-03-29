@@ -95,9 +95,9 @@ function populate_events(cat) {
         "bScrollCollapse": true,
         "aoColumns": [
             { "sTitle": "Event", "mData": "event_type" },
-            { "sTitle": "ID", "mData": "puck_id" },
-            { "sTitle": "From", "mData": "from" },
-            { "sTitle": "Date", "mData": "time" }
+            { "sTitle": "ID",    "mData": "puck_id" },
+            { "sTitle": "From",  "mData": "from" },
+            { "sTitle": "Date",  "mData": "time" }
             ]
     } )
 
@@ -501,7 +501,7 @@ function remove_signs_of_call() {
 $(document).ready(function () {
 
 var image     = ""
-var puck_id   = ""
+// var puck_id   = ""
 puck_data     = ""
 
 // status loop
@@ -524,9 +524,9 @@ $('#messages a').click(function (e) { e.preventDefault(); $(this).tab('show') })
 // create a suspenseful message
 $('body').on('click', '.puck_vpn', function() { 
     console.log('clix on vpn')
-    var puckid = $("#puckid").val()
-    var ipaddr = $("#ipaddr").val()
-    puck_vpn(this, puckid, ipaddr)
+    var vpuckid = $("#puckid").val()
+    var ipaddr  = $("#ipaddr").val()
+    puck_vpn(this, vpuckid, ipaddr)
 })
 
 //
@@ -636,7 +636,6 @@ $.getJSON('/puck', function(pucks) {
         $.getJSON('/puck/' + val, function(puckinfo) {
             console.log('v/p')
             console.log(val)
-            console.log(puck_id)
     
             // bit of a race condition... figure out how to get the puckID of
             // this PUCK (see above) prior to these so I can not put it up
@@ -646,119 +645,120 @@ $.getJSON('/puck', function(pucks) {
             }
             else {
 
-           var name        = truncate(puckinfo.PUCK.name)
-           var owner       = truncate(puckinfo.PUCK.owner.name)
-           var email       = truncate(puckinfo.PUCK.owner.email)
-           var puckid      = puckinfo.PUCK.PUCK_ID
-           var ipaddr      = puckinfo.PUCK.ip_addr
-           var all_ips     = puckinfo.PUCK.all_ips
-           var port        = puckinfo.PUCK.port
-           var ipaddr_ext  = puckinfo.PUCK.ip_addr_ext
-           var port_ext    = puckinfo.PUCK.port_ext
-           var proto       = puckinfo.PUCK.proto
-           var image       = puckinfo.PUCK.image
-           var ca          = puckinfo.PUCK.vpn.ca
-           var key         = puckinfo.PUCK.vpn.key
-           var cert        = puckinfo.PUCK.vpn.cert
-           var dh          = puckinfo.PUCK.vpn.dh
-           
-           var vpn_form    = 'vpn_form_' + puckid
-    
-           console.log('puckasaurus:')
-           console.log(puckinfo)
-           console.log('puck particulars:')
-           console.log(puckinfo.PUCK)
-    
-           if (typeof port === 'undefined' || port == "") {
-               // XXXX
-               port     = 8080
-               port_ext = port
-           }
-           if (typeof ipaddr_ext === 'undefined' || ipaddr_ext == "") {
-               ipaddr_ext = ipaddr
-           }
-           if (typeof proto === 'undefined' || proto == "") {
-               proto = 'https'
-           }
-    
-           var puck_url         = proto + '://' + ipaddr_ext + ':' + port_ext
-    
-           // have to kill spaces... die, die, die!
-           puckid = puckid.replace(/\s+/g, '');
-    
-           var trunc_puckid     = truncate(puckid)
-    
-           // keep track of everything
-           all_puck_ids[puckid] = puckid
-    
-           var puck = {
-              puckid         : puckid,
-              name           : name,
-              trunc_puckid   : trunc_puckid,
-              owner          : owner,
-              email          : email,
-              image          : image,
-              ipaddr         : ipaddr,
-              all_ips        : all_ips,
-              url            : puck_url,
-              vpn_form       : vpn_form,
-              span_owner     : 'span_' + owner,
-              span_email     : 'span_' + email
-              }
-    
-           // basic single puck layout, 'stache style
-               // '<li class="span3" id="{{puckid}}">'                                                        +
-               // '<div class="thumbnail">'                                                                +
-           var template = 
-                '<div class="col-md-3">' + 
-                 '<div class="thumbnail" style="background-color: #eaf1f1" id="{{puckid}}">'                                                +               
-                    '<a href="/puck_details.html?puckid={{puckid}}">'                                     +
-                    '<img id="{{puckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
-                    '<div class="caption">'                                                               +
-                       '<span id="{{name}}"><h5>PUCK: {{name}} </h5> </span> <br />'                      +
-                       '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +
-                       '<span id="{{ipaddr}}">Server: <strong>{{ipaddr}}</strong> </span> <br />'         +
-                       '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
-                       '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
-                       '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                             +
-                       '<input style="display:none" id="puckid" name="puckid"  value={{puckid}}>'    +
-                       '<input style="display:none" id="ipaddr" name="ipaddr"  value={{ipaddr}}>'           +
-                       '<input style="display:none" name="vpn_action" value="VPN" />'     +
-                       '<button type="submit" id="puck_vpn" style="margin: 10px" class="puck_vpn meter cherry btn disabled">Call</button>' +
-                       '</form>'                                                                          +
-                    '</div>'                                                                              +
-                 '</div>'                                                                                 +
-               '</div>'                                                                                   
-    
-            //   '</div>'                                                                                 +
-            //'</li>'
-    
-            // let the 'stache go to town!
-            var puck_html = Mustache.to_html(template, puck);
-    
-            // $('#puck_details').html(html);
-            $("#puck_friends").append(puck_html)
-            // console.log('\nMUSTACHE!!!:\n' + puck_html + '\n\n')
-    
-            // add the real ID
-            // CHANGE THE ID!   make the VPN button point to the right PUCK
-            $('#puck_vpn').attr('id', 'puck_vpn_' + puckid)
-
-            // check interval
-            ping_poll = 10000
-
-            // pingy - check if system is up... do it once, then at regular intervals
-            puck_ping(all_ips, puckid, puck_url)
-            setInterval(puck_ping, ping_poll, all_ips, puckid, puck_url)
-    
-            // start images in gray, color (if avail) on mouseover
-            console.log('adipoli: ' + puckid)
-            $('#' + puckid).adipoli({
-              'startEffect' : 'grayscale',
-              'hoverEffect' : 'normal'
-            })
-
-            } // else ... pucks other than this one
+                var name        = truncate(puckinfo.PUCK.name)
+                var owner       = truncate(puckinfo.PUCK.owner.name)
+                var email       = truncate(puckinfo.PUCK.owner.email)
+                var puckid      = puckinfo.PUCK.PUCK_ID
+                var ipaddr      = puckinfo.PUCK.ip_addr
+                var all_ips     = puckinfo.PUCK.all_ips
+                var port        = puckinfo.PUCK.port
+                var ipaddr_ext  = puckinfo.PUCK.ip_addr_ext
+                var port_ext    = puckinfo.PUCK.port_ext
+                var proto       = puckinfo.PUCK.proto
+                var image       = puckinfo.PUCK.image
+                var ca          = puckinfo.PUCK.vpn.ca
+                var key         = puckinfo.PUCK.vpn.key
+                var cert        = puckinfo.PUCK.vpn.cert
+                var dh          = puckinfo.PUCK.vpn.dh
+                
+                var vpn_form    = 'vpn_form_' + puckid
+         
+                console.log('puckasaurus:')
+                console.log(puckinfo)
+                console.log('puck particulars:')
+                console.log(puckinfo.PUCK)
+         
+                if (typeof port === 'undefined' || port == "") {
+                    // XXXX
+                    port     = 8080
+                    port_ext = port
+                }
+                if (typeof ipaddr_ext === 'undefined' || ipaddr_ext == "") {
+                    ipaddr_ext = ipaddr
+                }
+                if (typeof proto === 'undefined' || proto == "") {
+                    proto = 'https'
+                }
+         
+                var puck_url         = proto + '://' + ipaddr_ext + ':' + port_ext
+         
+                // have to kill spaces... die, die, die!
+                puckid = puckid.replace(/\s+/g, '');
+         
+                var trunc_puckid     = truncate(puckid)
+         
+                // keep track of everything
+                all_puck_ids[puckid] = puckid
+         
+                var puck = {
+                   puckid         : puckid,
+                   name           : name,
+                   trunc_puckid   : trunc_puckid,
+                   owner          : owner,
+                   email          : email,
+                   image          : image,
+                   ipaddr         : ipaddr,
+                   all_ips        : all_ips,
+                   url            : puck_url,
+                   vpn_form       : vpn_form,
+                   span_owner     : 'span_' + owner,
+                   span_email     : 'span_' + email
+                   }
+         
+                // basic single puck layout, 'stache style
+                    // '<li class="span3" id="{{puckid}}">'                                                        +
+                    // '<div class="thumbnail">'                                                                +
+                var template = 
+                     '<div class="col-md-3">' + 
+                      '<div class="thumbnail" style="background-color: #eaf1f1" id="{{puckid}}">'                                                +               
+                         '<a href="/puck_details.html?puckid={{puckid}}">'                                     +
+                         '<img id="{{puckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
+                         '<div class="caption">'                                                               +
+                            '<span id="{{name}}"><h5>PUCK: {{name}} </h5> </span> <br />'                      +
+                            '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +
+                            '<span id="{{ipaddr}}">Server: <strong>{{ipaddr}}</strong> </span> <br />'         +
+                            '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
+                            '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
+                            '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                             +
+                            '<input style="display:none" id="puckid" name="puckid"  value={{puckid}}>'    +
+                            '<input style="display:none" id="ipaddr" name="ipaddr"  value={{ipaddr}}>'           +
+                            '<input style="display:none" name="vpn_action" value="VPN" />'     +
+                            '<button type="submit" id="puck_vpn" style="margin: 10px" class="puck_vpn meter cherry btn disabled">Call</button>' +
+                            '</form>'                                                                          +
+                         '</div>'                                                                              +
+                      '</div>'                                                                                 +
+                    '</div>'                                                                                   
+         
+                 //   '</div>'                                                                                 +
+                 //'</li>'
+         
+                 // let the 'stache go to town!
+                 var puck_html = Mustache.to_html(template, puck);
+         
+                 // $('#puck_details').html(html);
+                 $("#puck_friends").append(puck_html)
+                 // console.log('\nMUSTACHE!!!:\n' + puck_html + '\n\n')
+         
+                 // add the real ID
+                 // CHANGE THE ID!   make the VPN button point to the right PUCK
+                 $('#puck_vpn').attr('id', 'puck_vpn_' + puckid)
+     
+                 // check interval
+                 ping_poll = 10000
+     
+                 // pingy - check if system is up... do it once, then at regular intervals
+                 puck_ping(all_ips, puckid, puck_url)
+                 // args are function, timeout, function (ips, pid, and url)
+                 setInterval(puck_ping, ping_poll, all_ips, puckid, puck_url)
+         
+                 // start images in gray, color (if avail) on mouseover
+                 console.log('adipoli: ' + puckid)
+                 $('#' + puckid).adipoli({
+                   'startEffect' : 'grayscale',
+                   'hoverEffect' : 'normal'
+                 })
+     
+                 } // else ... pucks other than this one
 
             })
         })
