@@ -159,7 +159,7 @@ var uber_puck = function uber_puck() {
             // console.log(res)
             res = JSON.parse(res)
             bwana_puck = res
-            createEvent(req, {event_type: "create", puck_id: bwana_puck.PUCK_ID})
+            createEvent(get_client_ip(req), {event_type: "create", puck_id: bwana_puck.PUCK_ID})
        }
     }
 
@@ -277,6 +277,9 @@ function watch_logs(logfile, log_type) {
 
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
+
+// XXX - for all of these need to get the IP addr from the logs... or somewhere!
+
         if (log_type.indexOf("Server") > -1) {
             // various states of up-id-ness and down-o-sity
             if (line.indexOf(magic_server_up) > -1) {
@@ -294,6 +297,7 @@ function watch_logs(logfile, log_type) {
                     }
 
                 change_status() // tell the world about it
+                createEvent('internal server', {event_type: "vpn server connected", puck_id: bwana_puck.PUCK_ID})
             }
             // down
             else if (line.indexOf(magic_server_down) > -1) {
@@ -319,6 +323,7 @@ function watch_logs(logfile, log_type) {
 
                 change_status() // tell the world about it
 
+                createEvent('internal server', {event_type: "vpn server disconnected", puck_id: bwana_puck.PUCK_ID})
             }
         }
         else if (log_type.indexOf("Client") > -1) {
@@ -339,6 +344,7 @@ function watch_logs(logfile, log_type) {
                     }
     
                 change_status() // tell the world about it
+                createEvent('internal server', {event_type: "vpn client connected", puck_id: bwana_puck.PUCK_ID})
     
             }
             // down
@@ -364,6 +370,7 @@ function watch_logs(logfile, log_type) {
                     }
     
                 change_status() // tell the world about it
+                createEvent('internal server', {event_type: "vpn client disconnected", puck_id: bwana_puck.PUCK_ID})
     
             }
         }
@@ -691,7 +698,7 @@ function createPuck(req, res, next) {
             }
 
             change_status() // make sure everyone hears this
-            createEvent(req, {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
+            createEvent(get_client_ip(req), {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
 
             res.send(204);
         }
@@ -716,7 +723,7 @@ function deletePuck(req, res, next) {
             next(err);
         } else {
             console.log('deletePuck: success deleting %s', req.params.key)
-            createEvent(req, {event_type: "delete", puck_id: req.params.key})
+            createEvent(get_client_ip(req), req, {event_type: "delete", puck_id: req.params.key})
             res.send(204);
         }
     });
@@ -785,13 +792,13 @@ function setTCPProxy(req, res, next) {
 //
 // Redis keys will all be lowercase, while PUCKs are all upper case+digits
 //
-function createEvent(req, event_data) {
+function createEvent(client_ip, event_data) {
 
     console.log('in createEvent - ' + JSON.stringify(event_data))
 
     console.log(event_data)
 
-    var client_ip   = get_client_ip(req)
+
     var e_type      = event_data.event_type
     event_data.from = client_ip
     // event_data.time = Date.now()
@@ -1224,7 +1231,7 @@ function startVPN(req, res, next) {
 
     console.log('post execution')
 
-    createEvent(req, {event_type: "VPN start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
+    createEvent(get_client_ip(req), {event_type: "VPN start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
 
     var vpn_home = "/vpn.html"
 
@@ -1360,13 +1367,16 @@ function httpsPing(puckid, ipaddr, res, next) {
     console.log(all_ips)
 
     // use the last known good one, if it exists
-    if (typeof current_ip[puckid] != "undefined") {
-        request.get('https://' + current_ip[puckid] + ':' + puck_port + '/ping', cb)
-    }
+//xxxx
+//  if (typeof current_ip[puckid] != "undefined") {
+//      request.get('https://' + current_ip[puckid] + ':' + puck_port + '/ping', cb(puckid))
+//  }
 
-    // make sure we've tried the other IPs for them?
-    for (var i = 0; i<all_ips.length ; i++ ) {
-        var ip = all_ips[i]
+    for (var i = 0; i < all_ips.length; i++) {
+
+        var done = false,
+            results = {},
+            ip      = all_ips[i]
 
         if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip)) {
             responses = responses + 1
@@ -1375,65 +1385,39 @@ function httpsPing(puckid, ipaddr, res, next) {
 
         console.log(ip)
 
-        // xxx - read port/+ from conf
-        var url = 'https://' + ip + ':' + puck_port + '/ping'
-        console.log('trying... ' + url)
+        request('https://' + all_ips[i] + ':8080/ping', function (err, resu, msg) {
 
-        request.get(url, cb)
-    }
+            if (done) return
 
-    // process the ping results
-    function cb(error, result, body) {
-
-        console.log('ping werx')
-        if (body) console.log(body)
-
-        responses = responses + 1
-
-        if (!error && result.statusCode == 200) {
-
-            var datum = JSON.parse(body);
-            var remote = result.request.uri.hostname
-
-//          if (typeof current_ip[puckid] == "undefined" || datum.pid != puckid) {
-
-            if (datum.pid != puckid) {
-                console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
-                console.log(puck_id + ' != ' + datum.pid)
-                response = {status: "mismatch", "name": 'mismatched PID'}
-                res.send(420, response) // enhance your calm!
+            if (err) {
+                console.log('errzz...')
+                console.log(err)
             }
+            else {
+            msg = JSON.parse(msg)
 
-            var ret = {status: "OK", "name": datum.name, "pid": datum.pid}
-            current_ip[puckid] = remote
-            all_done = true
-            console.log('ping werked: ' + datum.pid + ' -> ' + remote)
-            res.send(200, datum)
+                console.log('ping werx?  ' + msg)
 
-//          }
-//          else {
-//              console.log('dup... someone else is using their IP now -> ' + remote)
-//          }
-        }
-        else if (error) {
-            console.log('errzz...' + error)
-            var datum = error
-        }
-        else {
-            console.log('hmmm... weirdz - code; ' + res.statusCode)
-        }
+                var remote = resu.request.host
 
-        console.log(all_done, responses + " vs. " + all_ips.length)
+                if (msg.pid != puckid) {
+                    console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
+                    console.log(msg.pid + ' != ' + puck_id)
+                    response = {status: "mismatch", "name": 'mismatched PID'}
+                    res.send(420, response) // enhance your calm!
+                }
 
-        if (!all_done && responses >= all_ips.length) {
-            console.log('no dice')
-            console.log(datum)
+                console.log(msg)
+                results[all_ips[i]] = msg
+                done = true
+                res.send(200, msg)
+            }
+        })
 
-            if (datum) response = {status: "dead", "name": datum.code, "pid": datum.syscall}
-            else response = {status: "dead", "name": 'unknown error'}
+        if (i == (all_ips.length - 1)) {
+            response = {status: "ping failure", "name": 'unknown problem'}
             res.send(408, response)
         }
-
     }
 }
 

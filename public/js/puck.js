@@ -623,6 +623,10 @@ $.getJSON('/ping', function(puck) {
 // get the pucks we know about from local REST
 $.getJSON('/puck', function(pucks) {
 
+    if (pucks.length == 1) {
+        $('#puck_friends').append("<div class='row'><div class='col-md-4 top-spacer-50'>It appears you have no friends... but don't worry, we won't tell everyone you're a loser.  Click on the green/white plus button above to add another PUCK, assuming their owner would be willing to talk to you (and you know their IP address or hostname).  Maybe I can link in some <a target='_blank' href='https://www.youtube.com/watch?v=oHg5SJYRHA0'>youtube videos</a> and break out <a target='_blank' href='http://www.amazon.com/Orville-Redenbacher-Butter-Popcorn-10-Count/dp/B0049M7LA2'>the popcorn</a> if that doesn't work for you.'</div></div>")
+    }
+
     // loop over all valid pucks
     $.each(pucks, function(key, val) {
 
