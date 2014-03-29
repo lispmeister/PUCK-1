@@ -24,6 +24,7 @@
     "socket.io": "latest",
     "tail": "latest",
     "tcp-proxy": "latest",
+    "underscore": "latest",
     "when": "latest"
   },
   "devDependencies": {

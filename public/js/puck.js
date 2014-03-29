@@ -41,6 +41,69 @@ function formatErrorMessage(jqXHR, exception) {
     }
 }
 
+//
+// some funs to grab the event data
+//
+function list_events() {
+
+    console.log('listing events')
+
+    var url = "/events"
+
+    var jqXHR_list = $.ajax({
+        url: url,
+        dataType: 'json'
+    }) 
+
+    jqXHR_list.done(function (data, textStatus, jqXHR) {
+        console.log('jxq list events wootz')
+        console.log(data)
+
+        for (var i = 0; i < data.length; i++) {
+            var cat = data[i]
+            console.log(cat)
+
+            // $('#puck_messages').append('<div id=' + cat + '_events> category ' + cat + '<table id="' + cat + '_table_events"></table></div>')
+
+            // suck in the data in the current cat
+            populate_events(cat)
+        }
+
+    }).fail(function(err) {
+        console.log('events errz on hangup' + err)
+    })
+
+}
+
+//
+// put the category data where it belongs
+//
+function populate_events(cat) {
+
+    console.log('sucking in table data for ' + cat)
+
+    //  "sDom": "<'row'<'span8'l><'span8'f>r>t<'row'<'span8'i><'span8'p>>",
+    //  "bProcessing": true,
+    //  "sPaginationType": "bs_normal",
+//    $('#' + cat + "_table_events").dataTable( {
+    $('#' + cat + "_table_events").dataTable( {
+        "sAjaxSource": "/events/" + cat,
+        "sAjaxDataProp": "",
+        "bFilter": false,
+        "sScrollY": "200px",
+        "bPaginate": false,
+        "bScrollCollapse": true,
+        "aoColumns": [
+            { "sTitle": "Event", "mData": "event_type" },
+            { "sTitle": "ID", "mData": "puck_id" },
+            { "sTitle": "From", "mData": "from" },
+            { "sTitle": "Date", "mData": "time" }
+            ]
+    } )
+
+}
+
+
 // http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
 function post(url, parameters) {
     var form = $('<form></form>');
@@ -582,7 +645,7 @@ $.getJSON('/puck', function(pucks) {
            var name        = truncate(puckinfo.PUCK.name)
            var owner       = truncate(puckinfo.PUCK.owner.name)
            var email       = truncate(puckinfo.PUCK.owner.email)
-           var puckid      = puckinfo.PUCK['PUCK-ID']
+           var puckid      = puckinfo.PUCK.PUCK_ID
            var ipaddr      = puckinfo.PUCK.ip_addr
            var all_ips     = puckinfo.PUCK.all_ips
            var port        = puckinfo.PUCK.port
@@ -696,6 +759,10 @@ $.getJSON('/puck', function(pucks) {
             })
         })
     })
+
+
+// message data
+list_events()
 
 })
 

@@ -13,6 +13,7 @@ var Tail     = require('tail').Tail,
     request  = require('request'),
     rest     = require('rest'),
     util     = require('util'),
+    __       = require('underscore'),   // two _'s, just for node
     puck     = require('./modules');
 
 
@@ -158,6 +159,7 @@ var uber_puck = function uber_puck() {
             // console.log(res)
             res = JSON.parse(res)
             bwana_puck = res
+            createEvent(req, {event_type: "create", puck_id: bwana_puck.PUCK_ID})
        }
     }
 
@@ -687,44 +689,15 @@ function createPuck(req, res, next) {
                 puck_events = { new_puck : "" }
                 console.log('create appears to be coming from local PUCK/host: ' + client_ip)
             }
-            // log it
-            createEvent(req, {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
 
             change_status() // make sure everyone hears this
+            createEvent(req, {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
 
             res.send(204);
         }
     })
 
 }
-
-//
-// info about events is stored here.
-//
-// Redis keys will all be lowercase, while PUCKs are all upper case+digits
-//
-function createEvent(req, event_data) {
-
-    console.log('in createEvent - ' + JSON.stringify(event_data))
-
-    var client_ip   = get_client_ip(req)
-    var key         = "event_" + event_data.time
-    var e_type      = event_data.event_type
-
-    event_data.from = client_ip
-    event_data.time = Date.now()
-
-    rclient.rpush(e_type, event_data, function(err) {
-        if (err) {
-            console.log(err, e_type + ' Revent: unable to store in Redis db');
-            next(err);
-        } else {
-            console.log({key: event_data}, e_type + ' event : saved');
-        }
-    })
-
-}
-
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
@@ -739,11 +712,11 @@ function deletePuck(req, res, next) {
 
     rclient.del(req.params.key, function (err) {
         if (err) {
-            console.log(err, 'deletePuck: unable to delete %s', req.puck);
+            console.log(err, 'deletePuck: unable to delete %s', req.params.key)
             next(err);
         } else {
-            console.log('deletePuck: success deleting %s', req.puck);
-            createEvent(req, {event_type: "delete", puck_id: req.params.value.PUCK.PUCK_ID})
+            console.log('deletePuck: success deleting %s', req.params.key)
+            createEvent(req, {event_type: "delete", puck_id: req.params.key})
             res.send(204);
         }
     });
@@ -806,10 +779,76 @@ function setTCPProxy(req, res, next) {
 
 }
 
+
 //
-// get all the redis lists in the DB
+// info about events is stored here.
 //
-get_list = function(req, res) {
+// Redis keys will all be lowercase, while PUCKs are all upper case+digits
+//
+function createEvent(req, event_data) {
+
+    console.log('in createEvent - ' + JSON.stringify(event_data))
+
+    console.log(event_data)
+
+    var client_ip   = get_client_ip(req)
+    var e_type      = event_data.event_type
+    event_data.from = client_ip
+    // event_data.time = Date.now()
+    event_data.time = Date()
+    var key         = e_type + ":" + event_data.time
+
+    rclient.set(key, JSON.stringify(event_data), function(err) {
+        if (err) {
+            console.log(err, e_type + ' Revent: unable to store in Redis db');
+            next(err);
+        } else {
+            console.log({key: event_data}, e_type + ' event : saved');
+        }
+    })
+
+}
+
+//
+// async helper function to get list data... moved from lists, so this is defunct for now
+//
+function red_getAsync(lists, cb) {
+
+    console.log('redasy')
+
+    var keys  = Object.keys(lists)
+
+    keys.forEach(function (k) {
+
+        console.log(keys)
+
+        var data = {}
+
+        rclient.lrange(lists[k], 0, -1, function(err, objs) {
+            if (err) { 
+                console.log('listing errz') 
+                console.log(err) 
+                cb({})
+            } 
+            else {
+                console.log('all ' + key)
+                console.log(objs)
+                cb(objs)
+                // data.push(objs);
+            }
+        })
+
+    })
+
+}
+
+/**
+ *  lists the types of events and #'s of events in each... this is the list version
+ */
+function _old_listEvents(req, res, next) {
+
+    console.log('listEvents')
+
     var data = []
 
     // non PUCKs
@@ -818,28 +857,19 @@ get_list = function(req, res) {
         var keys  = Object.keys(lists)
         var i     = 0
  
-        keys.forEach(function (l) {
+        console.log('all lists...')
+        // console.log(lists)
+        // console.log(keys)
 
-            var temp_data = {}
-
-            rclient.hget(lists[l], "modified_at", function(e, o) {
-                i++
-                if (e) {
-                    console.log(e)
-                } 
-                else {
-                    temp_data = {'key':lists[l], 'modified_at':o}
-                    data.push(temp_data)
-                }
- 
-                if (i == keys.length) {
-                    console.log('logger/list', {logs:data})
-                }
- 
-            })
+        red_getAsync(lists, function(resu) {
+            console.log('done!')
+            // reply = { events: JSON.stringify(resu) }
+            reply = { events: JSON.parse(resu) }
+            console.log(reply)
+            res.send(200, reply);
         })
- 
     })
+
 }
 
 
@@ -848,50 +878,88 @@ get_list = function(req, res) {
  */
 function listEvents(req, res, next) {
 
-    var data = []
+    var you_nique = []
 
-    // non PUCKs
-    rclient.keys('[^A-Z0-9]*', function(err, lists) {
-        var multi = rclient.multi()
-        var keys  = Object.keys(lists)
-        var i     = 0
- 
-        keys.forEach(function (l) {
-            console.log('E: ' + l)
-            data.push(l)
-            })
-        })
+    rclient.keys('[^A-Z0-9]*', function (err, keys) {
+        if (err) {
+            console.log(err, 'listEvents: unable to retrieve events');
+            next(err);
+        } else {
+            var len = you_nique.length
+            you_nique = __.uniq(__.map(keys, function(p){ return p.substr(0,p.indexOf(":"))}))
+        }
 
-    reply = { events: JSON.stringify(data) }
+        console.log('Number of Events found: ', len)
+        res.send(200, JSON.stringify(you_nique));
+    })
 
-    res.send(200, reply);
- 
 }
 
-
-
 /**
- *  gets an events data
+ *  gets a particular event type's data
+ *
  */
 function getEvent(req, res, next) {
 
-    rclient.get(req.params.key, function (err, reply) {
+    console.log('getting event')
+
+    if (typeof req.params.key == "undefined") {
+        console.log('type of even required')
+        var reply = {error: "missing required even type"}
+        res.send(200, reply);
+    }
+
+
+    // get keys first, then data for all keys
+
+    // rclient.get(req.params.key + ':.*', function (err, reply) {
+    rclient.keys(req.params.key + '*', function (err, replies) {
         if (!err) {
-            if (reply == null) {
-                console.log(err, 'getEvent: unable to retrieve %s', req.puck);
+            console.log(replies)
+            if (replies == null) {
+                console.log(err, 'getEvent: unable to retrieve keys matching %s', req.params.key);
                 // next(new PuckNotFoundError(req.params.key));
                 next({'error': 'Event Not Found'})
+                res.send(418, replies)  // 418 I'm a teapot (RFC 2324)
             } 
             else {
-                // console.log("Value retrieved: " + reply.toString());
-                res.send(200, reply);
+                console.log("keys retrieved: ")
+                console.log(replies)
+
+                // get data that matches the keys we just matched
+                rclient.mget(replies, function (err, data) {
+
+                    if (!err) {
+                        console.log(data)
+                        if (data == null) {
+                            console.log('no data returned with key ', req.params.key);
+                            // next(new PuckNotFoundError(req.params.key));
+                            next({'error': 'Event data not found'})
+                            res.send(418, data)  // 418 I'm a teapot (RFC 2324)
+                        } 
+                        else {
+                            console.log("event data retrieved: " + data.toString());
+                            jdata = data.toString()
+                            // hack it into a json string
+                            jdata = JSON.parse('[{' + jdata.substr(1,jdata.length-1) + ']')
+                            console.log(jdata)
+                            res.send(200, jdata)
+                        }
+                    }
+                    else {
+                        console.log(err, 'getEvent: unable to retrieve data from keys matching %s', req.params.key);
+                        res.send(418, data);   // 418 I'm a teapot (RFC 2324)
+                    }
+                })
             }
+
         }
         else {
             console.log(err, 'getEvent: unable to retrieve %s', req.puck);
-            next(err);
+            res.send(418, reply);   // 418 I'm a teapot (RFC 2324)
         }
-    });
+    })
+
 }
 
 /**
@@ -1631,9 +1699,9 @@ server.get('/vpn/stop', stopVPN);
 // events
 
 // list event types
-server.get('/events', listEvents);
+server.get('/events',           listEvents);
 // get elements of a particular kind of event (create, delete, etc.); 
-server.get('/events/:key', getEvent);
+server.get('/events/:key',      getEvent);
 
 
 // server stuff

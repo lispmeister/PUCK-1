@@ -11,7 +11,11 @@
 <!-- <link href="/css/bootstrap.min.css" rel="stylesheet"> -->
 
 <!-- made a one line change in this, noted at top -->
-<link href="/css/bootstrap.css" rel="stylesheet">
+<!-- <link href="/css/bootstrap.css" rel="stylesheet"> -->
+<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+
+<link href="/css/jquery.dataTables.css" rel="stylesheet">
 
 <!-- for calls -->
 <link href="/css/avgrund.css" rel="stylesheet">
@@ -42,7 +46,7 @@
                 <li class="active"><a href="#home"     data-toggle="tab">Home</a></li>
                 <li>               <a href="#profile"  data-toggle="tab">Profile</a></li>
                 <li>               <a href="#trust"    data-toggle="tab">Trust</a></li>
-                <li>               <a href="#messages" data-toggle="tab">Messages</a></li>
+                <li>               <a href="#messages" data-toggle="tab">Message Center</a></li>
             </ul>
         </div>
 
@@ -153,11 +157,20 @@
     
             <!-- message center -->
             <div class="tab-pane fade" id="messages">
-                <div class="row-fluid marketing" id="puck_messages">
-                    <div class="muted">
-                        <h3 style="clear:both">Message Center</h3>
-                    </div>
+                <div class="row-fluid marketing">
+                    <div class="spacer50"></div>
+                    <h4> <span class="muted danger">Create</span></h4>
+                    <table id="create_table_events">
+                    </table>
                 </div>
+
+                <div class="row-fluid marketing">
+                    <div class="spacer50"> </div>
+                    <h4 class="muted danger">Delete</h4>
+                    <table id="delete_table_events">
+                    </table>
+                </div>
+
             </div>
 
         </div>
@@ -189,6 +202,7 @@
 <script type="text/javascript" src='/js/jquery.blockUI.js'></script>
 <script type="text/javascript" src='/js/jquery.avgrund.js'></script>
 <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
+<script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
 
 <script type="text/javascript" src='/js/puck.js'></script>
 
