@@ -237,20 +237,12 @@ function puck_vpn(element, puckid, ipaddr) {
 
     $(element).text("connecting...").removeClass("btn-success").addClass("btn-danger")
 
-    // adapted from http://css-tricks.com/css3-progress-bars/
-    console.log('barberizing')
-
-    // get width, nuke width, animate to old width
-    $(element).data("oldWidth", $(element).width() * 2)
-        .width(0)
-        .animate({ width: $(element).data("oldWidth") }, 1000);
-
     $.ajax({
         type: "POST",
         url: "/vpn/start",
         data: {"puckid": puckid, "ipaddr": ipaddr},
         complete : function(result){callback(result, form)}
-    });       
+    });
 
     var callback = function(result, form){
         if(!result)
@@ -474,7 +466,7 @@ function status_or_die() {
         var remote_ip = jdata.events.new_puck
         console.log(remote_ip + ' added!')
         // a bit down from the top, and stay until wiped away or refreshed
-        $.bootstrapGrowl(remote_ip + " added you as a friend (refresh page to see more)", {offset: {from: 'top', amount: 70}, delay: -1})
+        $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see more)", {offset: {from: 'top', amount: 70}, delay: -1})
         jdata.events.new_puck = ""
 
 // <input type="button" value="Reload Page" onClick="history.go(0)">
@@ -504,8 +496,6 @@ function status_or_die() {
         // xxx ... kill avg?
             console.log('outgoing ring!')
 
-            // ring them gongs
-            $('#outgoing')[0].click()
         }
 
         puck_current.outgoing = true
@@ -527,7 +517,7 @@ function remove_signs_of_call() {
 
     console.log('killing call signatures...')
 
-    $('.puck_vpn').text("Call").removeClass("btn-danger").addClass("btn-success")
+    $('.puck_vpn').text("Call").removeClass("btn-danger")
     $('#puck_video').addClass('disabled')
     $('.avgrund-popin').remove();
 
@@ -556,15 +546,23 @@ $('#home a').click(function     (e) { e.preventDefault(); $(this).tab('show') })
 $('#profile a').click(function  (e) { e.preventDefault(); $(this).tab('show') })
 $('#messages a').click(function (e) { e.preventDefault(); $(this).tab('show') })
 
-
 //
 // user clicks vpn, and....
 //
-// create a suspenseful message
 $('body').on('click', '.puck_vpn', function() { 
+    console.log('clix on vpn')
+    console.log('clix on vpn')
     console.log('clix on vpn')
     var vpuckid = $("#puckid").val()
     var ipaddr  = $("#ipaddr").val()
+    var target  = $("#name").val()
+    // ring them gongs
+    $('#outgoing')[0].click()
+    // put in vpn target when calling someone
+    $('body').on('change', '#vpn_target', function() {
+        $('#vpn_target').append(' ' + target)
+    })
+
     puck_vpn(this, vpuckid, ipaddr)
 })
 
@@ -612,7 +610,7 @@ $('#outgoing').avgrund({
     onBlurContainer: '.container',
     template: '<div class="row">' +
               '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
-              '<a style="text-decoration: none" href="/vpn.html"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Calling</span></button></div></a>'  +
+              '<a style="text-decoration: none" href="/vpn.html"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
               '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
               '</div>'
     })

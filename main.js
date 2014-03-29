@@ -261,36 +261,32 @@ function watch_logs(logfile, log_type) {
         // console.log("got line from " + logfile + ":" + line)
     
         // xxx - for client openvpn - config... which ones to choose?  Another method?
-        var magic_client_up   = "Initialization Sequence Completed"
-        var magic_client_up   = "/sbin/route add"
-        var magic_client_up   = "VPN is up"
+        var magic_client_up     = "Initialization Sequence Completed",
+            magic_client_up     = "/sbin/route add",
+            magic_client_up     = "VPN is up",
+            magic_client_down   = "VPN is down",
 
-        var magic_client_down = "VPN is down"
+            magic_server_up     = "Peer Connection Initiated",
+            magic_server_down   = "ECONNREFUSED",
+            magic_server_down   = "OpenVPN Server lost client",
+            magic_server_remote = "Peer Connection Initiated",
 
-        // xxx - server openvpn
-        // var magic_server_up   = "PUSH_REPLY,route"
-        var magic_server_up   = "Peer Connection Initiated"
-        var magic_server_down = "ECONNREFUSED"
-        var magic_server_down = "OpenVPN Server lost client"
-
-
-        var magic_server_remote = "Peer Connection Initiated"
-
-        var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
-            moment_in_secs =  (new Date).getTime();
+            moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
+            moment_in_secs =  (new Date).getTime(),
+            client_remote_ip = "",
+            server_remote_ip = "";
 
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
-// XXX - for all of these need to get the IP addr from the logs... or somewhere!
+        // Peer Connection Initiated with 192.168.0.141:41595
+        if (line.indexOf(magic_server_remote) > -1) {
+            // http://www.geekzilla.co.uk/view0CBFD9A7-621D-4B0C-9554-91FD48AADC77.htm
+            client_remote_ip = line.match(/Peer Connection Initiated with.*(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/)[0]
+            console.log('incoming call from ' + client_remote_ip)
+        }
+
 
         if (log_type.indexOf("Server") > -1) {
-
-            // Peer Connection Initiated with 192.168.0.141:41595
-            if (line.indexOf(magic_server_remote) > -1) {
-                // http://www.geekzilla.co.uk/view0CBFD9A7-621D-4B0C-9554-91FD48AADC77.htm
-                var remote_ip = line.match(/Peer Connection Initiated with (\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/)[0]
-                console.log('incoming call from ' + remote_ip)
-            }
 
             // various states of up-id-ness and down-o-sity
             if (line.indexOf(magic_server_up) > -1) {
@@ -302,6 +298,7 @@ function watch_logs(logfile, log_type) {
                     vpn_status : "up",
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
+                    client     : client_remote_ip,
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
@@ -1189,7 +1186,7 @@ function knockKnock(req, res, next) {
 }
 
  /**
- * Start the local OpenVPN server via an external bash script.
+ * Start the local OpenVPN client via an external bash script
  */
 function startVPN(req, res, next) {
 
