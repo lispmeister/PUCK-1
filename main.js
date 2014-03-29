@@ -1401,13 +1401,16 @@ function httpsPing(puckid, ipaddr, res, next) {
 
                 if (msg.pid != puckid) {
                     console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
-                    console.log(msg.pid + ' != ' + puck_id)
+                    console.log(msg.pid + ' != ' + puckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     res.send(420, response) // enhance your calm!
                 }
 
+                console.log('worked - caching ' + remote)
                 console.log(msg)
                 results[all_ips[i]] = msg
+                // cache the latest
+                current_ip[puckid] = remote
                 done = true
                 res.send(200, msg)
             }
