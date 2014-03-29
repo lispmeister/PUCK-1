@@ -1367,9 +1367,11 @@ function httpsPing(puckid, ipaddr, res, next) {
     console.log(all_ips)
 
     // use the last known good one, if it exists
-    if (typeof current_ip[puckid] != "undefined") {
-        request.get('https://' + current_ip[puckid] + ':' + puck_port + '/ping', cb(puckid))
-    }
+
+// XXXX - fix
+//  if (typeof current_ip[puckid] != "undefined") {
+//      request.get('https://' + current_ip[puckid] + ':' + puck_port + '/ping', cb(puckid))
+//  }
 
     for (var i = 0; i < all_ips.length; i++) {
 
