@@ -18,6 +18,7 @@
     "posix-getopt": "1.0.0",
     "q": "1.0.0",
     "request": "latest",
+    "response-time": "latest",
     "rest": "latest",
     "redis": "0.8.3",
     "sleep": "latest",

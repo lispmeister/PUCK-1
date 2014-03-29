@@ -11,6 +11,7 @@ var Tail     = require('tail').Tail,
     path     = require('path'),
     tcpProxy = require('tcp-proxy'),
     request  = require('request'),
+    response = require('response-time'),
     rest     = require('rest'),
     util     = require('util'),
     __       = require('underscore'),   // two _'s, just for node
@@ -272,15 +273,25 @@ function watch_logs(logfile, log_type) {
         var magic_server_down = "ECONNREFUSED"
         var magic_server_down = "OpenVPN Server lost client"
 
+
+        var magic_server_remote = "Peer Connection Initiated"
+
         var moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
             moment_in_secs =  (new Date).getTime();
 
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
-
 // XXX - for all of these need to get the IP addr from the logs... or somewhere!
 
         if (log_type.indexOf("Server") > -1) {
+
+            // Peer Connection Initiated with 192.168.0.141:41595
+            if (line.indexOf(magic_server_remote) > -1) {
+                // http://www.geekzilla.co.uk/view0CBFD9A7-621D-4B0C-9554-91FD48AADC77.htm
+                var remote_ip = line.match(/Peer Connection Initiated with (\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/)[0]
+                console.log('incoming call from ' + remote_ip)
+            }
+
             // various states of up-id-ness and down-o-sity
             if (line.indexOf(magic_server_up) > -1) {
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn server up:\n\n')
@@ -297,7 +308,7 @@ function watch_logs(logfile, log_type) {
                     }
 
                 change_status() // tell the world about it
-                createEvent('internal server', {event_type: "vpn server connected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_server_connected", puck_id: bwana_puck.PUCK_ID})
             }
             // down
             else if (line.indexOf(magic_server_down) > -1) {
@@ -323,7 +334,7 @@ function watch_logs(logfile, log_type) {
 
                 change_status() // tell the world about it
 
-                createEvent('internal server', {event_type: "vpn server disconnected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_server_disconnected", puck_id: bwana_puck.PUCK_ID})
             }
         }
         else if (log_type.indexOf("Client") > -1) {
@@ -344,7 +355,7 @@ function watch_logs(logfile, log_type) {
                     }
     
                 change_status() // tell the world about it
-                createEvent('internal server', {event_type: "vpn client connected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_client_connected", puck_id: bwana_puck.PUCK_ID})
     
             }
             // down
@@ -370,7 +381,7 @@ function watch_logs(logfile, log_type) {
                     }
     
                 change_status() // tell the world about it
-                createEvent('internal server', {event_type: "vpn client disconnected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_client_disconnected", puck_id: bwana_puck.PUCK_ID})
     
             }
         }
@@ -723,7 +734,7 @@ function deletePuck(req, res, next) {
             next(err);
         } else {
             console.log('deletePuck: success deleting %s', req.params.key)
-            createEvent(get_client_ip(req), req, {event_type: "delete", puck_id: req.params.key})
+            createEvent(get_client_ip(req), {event_type: "delete", puck_id: req.params.key})
             res.send(204);
         }
     });
@@ -1231,7 +1242,7 @@ function startVPN(req, res, next) {
 
     console.log('post execution')
 
-    createEvent(get_client_ip(req), {event_type: "VPN start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
+    createEvent(get_client_ip(req), {event_type: "VPN_start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
 
     var vpn_home = "/vpn.html"
 
@@ -1379,7 +1390,8 @@ function httpsPing(puckid, ipaddr, res, next) {
             results = {},
             ip      = all_ips[i]
 
-        if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip)) {
+        // if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip)) {
+        if (ip == "127.0.0.1") {
             responses = responses + 1
             continue
         }
@@ -1596,6 +1608,7 @@ var server      = express()
 
 // various helpers
 server.use(cors());
+server.use(response());
 
 // server.use(express.logger());
 server.use(express.compress());

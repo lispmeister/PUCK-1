@@ -61,9 +61,7 @@ function list_events() {
 
         for (var i = 0; i < data.length; i++) {
             var cat = data[i]
-            console.log(cat)
-
-            // $('#puck_messages').append('<div id=' + cat + '_events> category ' + cat + '<table id="' + cat + '_table_events"></table></div>')
+            console.log('looping into... ' + cat)
 
             // suck in the data in the current cat
             populate_events(cat)
@@ -82,24 +80,65 @@ function populate_events(cat) {
 
     console.log('sucking in table data for ' + cat)
 
-    //  "sDom": "<'row'<'span8'l><'span8'f>r>t<'row'<'span8'i><'span8'p>>",
-    //  "bProcessing": true,
-    //  "sPaginationType": "bs_normal",
-//    $('#' + cat + "_table_events").dataTable( {
-    $('#' + cat + "_table_events").dataTable( {
-        "sAjaxSource": "/events/" + cat,
-        "sAjaxDataProp": "",
-        "bFilter": false,
-        "sScrollY": "200px",
-        "bPaginate": false,
-        "bScrollCollapse": true,
-        "aoColumns": [
-            { "sTitle": "Event", "mData": "event_type" },
-            { "sTitle": "ID",    "mData": "puck_id" },
-            { "sTitle": "From",  "mData": "from" },
-            { "sTitle": "Date",  "mData": "time" }
-            ]
-    } )
+    var url       = "/events/" + encodeURIComponent(cat)
+    var cat_e     = cat + "_table_events"
+
+    var base_table = '<div class="row-fluid marketing">'     +
+                     '<div class="spacer20"> </div>'         +
+                     '<div><h4 class="text-primary">' + cat + '</h4></div>'                  +
+                     '<table class="table table-condensed table-hover table-striped" id="' + cat_e + '"></table>'    +
+                     '<ul id="' + cat + '_pager"></ul>'      +
+                     '</div>'                                +
+                     '</div>'
+
+    var n = 0
+
+    $('#event_messages').append(base_table)
+    console.log('creating ' + base_table)
+    console.log(cat_e)
+
+    var t_headers = ""
+
+    $.getJSON(url, function(data) {
+        console.log('chopping up event data')
+        $.each(data, function(index) {
+            t_headers = ""
+            var t_row = ""
+            var obj   = data[index]
+
+            n++
+            console.log('-->', index, obj)
+
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)){
+                    console.log(">>>>" , prop, obj[prop])
+                    t_headers = t_headers + '<td><strong>' + prop + '</strong></td>'
+                    t_row     = t_row + '<td>' + obj[prop] + '</td>'
+                }
+            }
+            $('#' + cat_e).append('<tr><td>' + t_row + '</td></tr>')
+        })
+        $('#' + cat_e + ' > tbody > tr:first').before('<tr><td></td>' + t_headers + '</tr>')
+
+        console.log('table ' + cat_e + ' created?')
+
+        // bootstrap tables
+        var size_of_table = n
+        var size_of_pages = 10
+        var total_pages   = Math.round(size_of_table/size_of_pages)
+        if (!total_pages) total_pages = 1
+
+        console.log(size_of_table, total_pages)
+
+        var bs_options = {
+            currentPage: 1,
+            bootstrapMajorVersion: 3,
+            totalPages: total_pages
+        }
+
+        if (total_pages > 1) 
+            $('#' + cat + '_pager').bootstrapPaginator(bs_options);
+    })
 
 }
 
