@@ -1382,7 +1382,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             continue
         }
 
-        console.log(ip)
+        console.log('pinging ' + ip)
 
         request('https://' + all_ips[i] + ':8080/ping', function (err, resu, msg) {
 
@@ -1393,7 +1393,7 @@ function httpsPing(puckid, ipaddr, res, next) {
                 console.log(err)
             }
             else {
-            msg = JSON.parse(msg)
+                msg = JSON.parse(msg)
 
                 console.log('ping werx?  ' + msg)
 
@@ -1411,12 +1411,14 @@ function httpsPing(puckid, ipaddr, res, next) {
                 done = true
                 res.send(200, msg)
             }
+
+            if (i == (all_ips.length - 1) && !done) {
+                response = {status: "ping failure", "name": 'unknown problem'}
+                res.send(408, response)
+            }
+
         })
 
-        if (i == (all_ips.length - 1)) {
-            response = {status: "ping failure", "name": 'unknown problem'}
-            res.send(408, response)
-        }
     }
 }
 
