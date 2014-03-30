@@ -1720,12 +1720,15 @@ server.all('/url', webProxy)
 // and... listen
 
 var pucky = https.createServer(credentials, server)
-var io    = require('socket.io').listen(pucky, {key:key,cert:key,ca:ca})
 
 pucky.listen(puck_port)
 
+console.log('server listening at %s', puck_port)
+
+var io    = require('socket.io').listen(pucky, {key:key,cert:key,ca:ca})
+
+
 // https.createServer(credentials, server).listen(puck_port, function(){
-    console.log('server listening at %s', puck_port)
 //  var sio = require('socket.io');
 //  var io  = sio.listen(server,{key:key,cert:key,ca:ca});
 
