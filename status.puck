@@ -1,1 +1,1 @@
-{"events":{"ring_ring":"","new_puck":""},"openvpn_server":{},"openvpn_client":{"vpn_status":"up","start":"Sat  16:50:32 03-29-14","start_s":1396137032286,"duration":"n/a","stop":"n/a","stop_s":"n/a"}}
+{"events":{"ring_ring":"","new_puck":""},"openvpn_server":{},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}}

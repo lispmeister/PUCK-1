@@ -559,11 +559,13 @@ $('body').on('click', '.puck_vpn', function() {
     // ring them gongs
     $('#outgoing')[0].click()
     // put in vpn target when calling someone
-    $('body').on('change', '#vpn_target', function() {
+    $('body').on('change', '#puck_disconnect', function() {
         $('#vpn_target').append(' ' + target)
     })
 
+// setInterval(puck_ping, slight_hesitation)
     puck_vpn(this, vpuckid, ipaddr)
+
 })
 
 //
