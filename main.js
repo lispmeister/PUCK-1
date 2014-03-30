@@ -284,7 +284,7 @@ function watch_logs(logfile, log_type) {
             if (line.indexOf(magic_server_remote) > -1) {
                 // http://www.geekzilla.co.uk/view0CBFD9A7-621D-4B0C-9554-91FD48AADC77.htm
                 // took out the \b at the beginning & end... hopefully won't burn
-                client_remote_ip = line.match(/Peer Connection Initiated with.*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/)[0]
+                client_remote_ip = line.match(/Peer Connection Initiated with.*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/)[1]
                 console.log('incoming call from ' + client_remote_ip)
             }
 
@@ -1717,22 +1717,13 @@ server.get('/setproxy', setTCPProxy)
 // get a url from wherever the puck is
 server.all('/url', webProxy)
 
-// and... listen
-
+// and... finally... relax and listen
 var pucky = https.createServer(credentials, server)
 
 pucky.listen(puck_port)
 
 console.log('server listening at %s', puck_port)
 
+// tack on socket.io
 var io    = require('socket.io').listen(pucky, {key:key,cert:key,ca:ca})
-
-
-// https.createServer(credentials, server).listen(puck_port, function(){
-//  var sio = require('socket.io');
-//  var io  = sio.listen(server,{key:key,cert:key,ca:ca});
-
-    console.log(io)
-// })
-
 

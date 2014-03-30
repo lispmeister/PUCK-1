@@ -4,10 +4,6 @@
   "description": "REST prototype of Puck backend",
   "main": "main.js",
   "dependencies": {
-
-  "simplewebrtc": "= 0.6.0",
-  "ip": "= 0.1.0",
-
     "asn1": "latest",
     "assert-plus": "0.1.2",
     "bunyan": "0.21.1",
@@ -16,6 +12,7 @@
     "ejs": "latest",
     "express": "latest",
     "httpsync": "0.0.8",
+    "ip": "= 0.1.0",
     "moment": "latest",
     "nodemon": "latest",
     "node-static": "0.6.9",
@@ -25,6 +22,7 @@
     "response-time": "latest",
     "rest": "latest",
     "redis": "0.8.3",
+    "simplewebrtc": "= 0.6.0",
     "sleep": "latest",
     "socket.io": "latest",
     "tail": "latest",

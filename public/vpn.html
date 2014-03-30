@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="rawr!">
 
-    <!-- <link href="/css/bootstrap.css" rel="stylesheet"> -->
-
     <link href="/css/bootstrap.min.css" rel="stylesheet">
+
     <style type="text/css">
       body {
         padding-top: 20px;
@@ -27,6 +26,21 @@
       color: white; padding: 5px 5px 5px 75px; text-align: left
    }
 
+    <!-- webrtc vid stuff -->
+
+    #remoteVideos video { height: 400px; }
+    #localVideo         { height: 400px; }
+
+    <!-- borders -->
+
+    .dropshadowclass { 
+        border: solid 1px #CCC;
+         -moz-box-shadow: 5px 5px 0px #999;
+         -webkit-box-shadow: 5px 5px 0px #999;
+         box-shadow: 5px 5px 0px #999;
+     }
+
+
     </style>
     <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
@@ -38,11 +52,6 @@
    <!-- for pucks -->
    <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
    <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/>
-
-    <!-- webrtc vid stuff -->
-    <style> #remoteVideos video { height: 300px; }
-        #localVideo { height: 300px; }
-    </style>
 
 </head>
 
@@ -64,7 +73,7 @@
       <hr>
 
       <div class="hero-unit">
-          <p>VPN/Voice/etc... status... etc... </P>
+          <p>If you don't see pictures... something is wrong!</P>
       </div>
 
     </div>
@@ -80,18 +89,11 @@
     </div>
 
 <!-- le javascript -->
-<!-- <script type="text/javascript" src="/js/simplertc.js"></script> -->
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 
 <script src="/js/socket.io.js"></script>
-<!-- <script src="/js/simplewebrtc.bundle.js"></script> -->
-<script src="/sw.js"></script>
+<script src="/js/simplewebrtc.js"></script>
 
-<!-- <script type="text/javascript" src="/js/simplewebrtc.bundle.js"></script> -->
-
-<!-- <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script> -->
-
-<script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
 <script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
@@ -107,22 +109,21 @@
 
 <script type="text/javascript" src='/js/puck.js'></script>
 
-
 <script type='text/javascript'>
 
-var webrtc = new SimpleWebRTC({
-    // the id/element dom element that will hold "our" video
-    localVideoEl: 'localVideo',
-    // the id/element dom element that will hold remote videos
-    remoteVideosEl: 'remoteVideos',
-    // immediately ask for camera access
-    autoRequestMedia: true
-});
+    var webrtc = new SimpleWebRTC({
+        // the id/element dom element that will hold "our" video
+        localVideoEl: 'localVideo',
+        // the id/element dom element that will hold remote videos
+        remoteVideosEl: 'remoteVideos',
+        // immediately ask for camera access
+        autoRequestMedia: true
+    });
 
-// we have to wait until it's ready
-webrtc.on('readyToCall', function () {
-    // you can name it anything
-    webrtc.joinRoom('roomy');
+    // we have to wait until it's ready
+    webrtc.on('readyToCall', function () {
+        // you can name it anything
+        webrtc.joinRoom('roomy');
 });
 
 

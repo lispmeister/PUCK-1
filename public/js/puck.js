@@ -8,12 +8,14 @@
 all_puck_ids   = []
 
 // overall connection state
-puck_current = {}
-puck_current.incoming   = false
-puck_current.outgoing   = false
+var puck_current            = {}
+    puck_current.incoming   = false;
+    puck_current.outgoing   = false;
 
-var puck_status     = "{}"
-var old_puck_status = "{}"
+var puck_status     = "{}",
+    old_puck_status = "{}"
+
+var incoming_ip = "?"
 
 var ring = ""
 
@@ -489,7 +491,8 @@ function status_or_die() {
         $('#puck_video').removeClass('disabled')
     
         if (typeof puck_current.incoming != "undefined" && ! puck_current.incoming) {
-            console.log('incoming ring!')
+            console.log('incoming ring from ' +  jdata.openvpn_server.client)
+            incoming_ip = jdata.openvpn_server.client
             // ring them gongs
             $('#incoming')[0].click()
         }
