@@ -29,12 +29,15 @@ div.growlUI h1, div.growlUI h2 {
 
 .top-spacer5   { margin-top:  5px; }
 .top-spacer10  { margin-top: 10px; }
+.top-spacer20  { margin-top: 20px; }
+.top-spacer30  { margin-top: 30px; }
 .top-spacer50  { margin-top: 50px; }
 .top-spacer100 { margin-top:100px; }
 
 .spacer5,
 .spacer10,
 .spacer20,
+.spacer30,
 .spacer50,
 .spacer100,
 .spacer200 {
@@ -49,6 +52,7 @@ div.growlUI h1, div.growlUI h2 {
 .spacer5   { height:   5px; }
 .spacer10  { height:  10px; }
 .spacer20  { height:  20px; }
+.spacer30  { height:  30px; }
 .spacer50  { height:  50px; }
 .spacer100 { height: 100px; }
 .spacer200 { height: 200px; }

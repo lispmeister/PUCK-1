@@ -931,7 +931,7 @@ function getEvent(req, res, next) {
     // rclient.get(req.params.key + ':.*', function (err, reply) {
     rclient.keys(req.params.key + '*', function (err, replies) {
         if (!err) {
-            console.log(replies)
+            // console.log(replies)
             if (replies == null) {
                 console.log(err, 'getEvent: unable to retrieve keys matching %s', req.params.key);
                 // next(new PuckNotFoundError(req.params.key));
@@ -940,13 +940,13 @@ function getEvent(req, res, next) {
             } 
             else {
                 console.log("keys retrieved: ")
-                console.log(replies)
+                // console.log(replies)
 
                 // get data that matches the keys we just matched
                 rclient.mget(replies, function (err, data) {
 
                     if (!err) {
-                        console.log(data)
+                        // console.log(data)
                         if (data == null) {
                             console.log('no data returned with key ', req.params.key);
                             // next(new PuckNotFoundError(req.params.key));
@@ -954,11 +954,12 @@ function getEvent(req, res, next) {
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
                         } 
                         else {
-                            console.log("event data retrieved: " + data.toString());
+                            console.log("event data retrieved: ")
+                            // console.log("event data retrieved: " + data.toString());
                             jdata = data.toString()
                             // hack it into a json string
                             jdata = JSON.parse('[{' + jdata.substr(1,jdata.length-1) + ']')
-                            console.log(jdata)
+                            // console.log(jdata)
                             res.send(200, jdata)
                         }
                     }
@@ -1062,7 +1063,7 @@ function swapPuck(req, res, next) {
  * Simple returns the list of Puck Ids that are stored in redis
  */
 function listPucks(req, res, next) {
-    rclient.keys('[A-Z0-9]*', function (err, keys) {
+    rclient.keys('[A-F0-9]*', function (err, keys) {
         if (err) {
             console.log(err, 'listPuck: unable to retrieve all Pucks');
             next(err);            
@@ -1240,7 +1241,7 @@ function startVPN(req, res, next) {
 
     console.log('post execution')
 
-    createEvent(get_client_ip(req), {event_type: "VPN_start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
+    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
 
     var vpn_home = "/vpn.html"
 
@@ -1717,7 +1718,18 @@ server.get('/setproxy', setTCPProxy)
 server.all('/url', webProxy)
 
 // and... listen
-https.createServer(credentials, server).listen(puck_port, function(){
-    console.log('server listening at %s', server.get('port'));
-})
+
+var pucky = https.createServer(credentials, server)
+var io    = require('socket.io').listen(pucky, {key:key,cert:key,ca:ca})
+
+pucky.listen(puck_port)
+
+// https.createServer(credentials, server).listen(puck_port, function(){
+    console.log('server listening at %s', puck_port)
+//  var sio = require('socket.io');
+//  var io  = sio.listen(server,{key:key,cert:key,ca:ca});
+
+    console.log(io)
+// })
+
 
