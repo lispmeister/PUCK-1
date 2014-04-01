@@ -1187,6 +1187,148 @@ function knockKnock(req, res, next) {
 
 }
 
+
+// upload some content
+
+// req.files contains all the goods, including:
+//
+//  size
+//  path        local on server
+//  name        filename
+//  type        mimetype, aka image/png and such
+
+function uploadSchtuff(req, res, next) {
+
+    console.log('striving to upload....')
+    console.log(req.files)
+    console.log('name - ' + req.files.uppity.name)
+
+    var target_file = __dirname + "/uploads/" + req.files.uppity.name
+
+    var formidable = require('formidable')
+
+    //
+    // all this stuff here is from http://debuggable.com/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb
+    //
+    // seems to be turbo for uploads, so...
+    //
+
+    var multipartParser = require('formidable/lib/multipart_parser'),
+        MultipartParser = multipartParser.MultipartParser,
+        parser = new MultipartParser(),
+        Buffer = require('buffer').Buffer,
+        boundary = '-----------------------------168072824752491622650073',
+        mb = 100,
+        buffer = createMultipartBuffer(boundary, mb * 1024 * 1024),
+        callbacks =
+        { partBegin: -1,
+            partEnd: -1,
+            headerField: -1,
+            headerValue: -1,
+            partData: -1,
+            end: -1,
+        };
+
+    parser.initWithBoundary(boundary);
+
+    parser.onHeaderField = function() {
+      callbacks.headerField++;
+    };
+    
+    parser.onHeaderValue = function() {
+      callbacks.headerValue++;
+    };
+    
+    parser.onPartBegin = function() {
+      callbacks.partBegin++;
+    };
+    
+    parser.onPartData = function() {
+      callbacks.partData++;
+    };
+    
+    parser.onPartEnd = function() {
+      callbacks.partEnd++;
+    };
+    
+    parser.onEnd = function() {
+      callbacks.end++;
+    };
+    
+    var start = +new Date(),
+        nparsed = parser.write(buffer),
+        duration = +new Date() - start,
+        mbPerSec = (mb / (duration / 1000)).toFixed(2);
+    
+    console.log(mbPerSec+' mb/sec');
+
+    console.log(req.files.uppity.path + ' -> ' + target_file)
+
+    //
+    // NOTE - target & orig file MUST be in same file system
+    //
+
+    // also... slight race condition.  Life goes on.
+
+    // does target exist?
+    fs.exists(target_file, function(exists) {
+        if (exists) {
+            // xxx - error message to user
+            console.log('dying in flames... target already exists....')
+        }
+        else {
+            fs.rename(req.files.uppity.path, target_file, function (err) {
+                if (err) {
+                    console.log('error in upload - ')
+                    console.log(err)
+                }
+                else console.log('renamed complete');
+            })
+        }
+    })
+    
+    function createMultipartBuffer(boundary, size) {
+      var head =
+            '--'+boundary+'\r\n'
+          + 'content-disposition: form-data; name="field1"\r\n'
+          + '\r\n'
+        , tail = '\r\n--'+boundary+'--\r\n'
+        , buffer = new Buffer(size);
+    
+      buffer.write(head, 'ascii', 0);
+      buffer.write(tail, 'ascii', buffer.length - tail.length);
+      return buffer;
+    }
+    
+    process.on('exit', function() {
+      for (var k in callbacks) {
+        assert.equal(0, callbacks[k], k+' count off by '+callbacks[k]);
+      }
+    });
+
+    process.on('progress', function(bytesReceived, bytesExpected) {
+        //self.emit('progess', bytesReceived, bytesExpected)
+        var percent = (bytesReceived / bytesExpected * 100) | 0;
+        process.stdout.write('Uploading: %' + percent + '\r');
+    })
+
+    res.send(204)
+
+//     fs.readFile(req.files.uppity.path, function (err, data) {
+//         console.log('reading file...')
+//         var newFile = __dirname + "/uploads/" + req.files.uppity.name
+//         // XXX
+//         // if exists... dont overwrite; reject, pick new filename, etc.
+//         //
+//         fs.writeFile(newFile, data, function (err) {
+//             if (err) console.log('errz - ')
+//             if (err) console.log(err)
+//             res.redirect("back")
+//         })
+//     })
+
+}
+
  /**
  * Start the local OpenVPN client via an external bash script
  */
@@ -1205,7 +1347,7 @@ function startVPN(req, res, next) {
       res.header('Location', puck_web_home);
       res.send(302);
     }
-   
+
     console.log('onto the execution...')
 
     puckid = req.body.puckid
@@ -1374,7 +1516,7 @@ function httpsPing(puckid, ipaddr, res, next) {
         errorz    = "",
         all_done  = false
 
-    console.log(all_ips)
+    // console.log(all_ips)
 
     // use the last known good one, if it exists
 
@@ -1395,7 +1537,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             continue
         }
 
-        console.log('pinging ' + ip)
+        // console.log('pinging ' + ip)
 
         request('https://' + all_ips[i] + ':8080/ping', function (err, resu, msg) {
 
@@ -1416,16 +1558,18 @@ function httpsPing(puckid, ipaddr, res, next) {
                     console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
                     console.log(msg.pid + ' != ' + puckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
-                    res.send(420, response) // enhance your calm!
+                    // res.send(420, response) // enhance your calm!
                 }
+                else {
 
-                console.log('worked - caching ' + remote)
-                console.log(msg)
-                results[all_ips[i]] = msg
-                // cache the latest
-                current_ip[puckid] = remote
-                done = true
-                res.send(200, msg)
+                    console.log('worked - caching ' + remote)
+                    // console.log(msg)
+                    results[all_ips[i]] = msg
+                    // cache the latest
+                    current_ip[puckid] = remote
+                    done = true
+                    res.send(200, msg)
+                }
             }
 
             if (i == (all_ips.length - 1) && !done) {
@@ -1609,6 +1753,9 @@ var server      = express()
 server.use(cors());
 server.use(response());
 
+server.use(express.limit('1gb'))
+
+
 // server.use(express.logger());
 server.use(express.compress());
 server.use(express.methodOverride());
@@ -1713,6 +1860,9 @@ server.get('/server/restart', serverRestart);  // die and restart
 
 // setup a tcp proxy
 server.get('/setproxy', setTCPProxy)
+
+// get a url from wherever the puck is
+server.post('/up', uploadSchtuff)
 
 // get a url from wherever the puck is
 server.all('/url', webProxy)
