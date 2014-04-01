@@ -5,6 +5,7 @@ var Tail     = require('tail').Tail,
     crypto   = require('crypto'),
     express  = require('express'),
     fs       = require('fs'),
+    formidable = require('formidable'),
     https    = require('https'),
     moment   = require('moment'),
     os       = require('os'),
@@ -1190,104 +1191,8 @@ function knockKnock(req, res, next) {
 
 // upload some content
 
-// req.files contains all the goods, including:
-//
-//  size
-//  path        local on server
-//  name        filename
-//  type        mimetype, aka image/png and such
-
-function uploadSchtuff(req, res, next) {
-
-    console.log('striving to upload....')
-    console.log(req.files)
-    console.log('name - ' + req.files.uppity.name)
-
-    var target_file = __dirname + "/uploads/" + req.files.uppity.name
-
-    var formidable = require('formidable')
-
-    //
-    // all this stuff here is from http://debuggable.com/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb
-    //
-    // seems to be turbo for uploads, so...
-    //
-
-    var multipartParser = require('formidable/lib/multipart_parser'),
-        MultipartParser = multipartParser.MultipartParser,
-        parser = new MultipartParser(),
-        Buffer = require('buffer').Buffer,
-        boundary = '-----------------------------168072824752491622650073',
-        mb = 100,
-        buffer = createMultipartBuffer(boundary, mb * 1024 * 1024),
-        callbacks =
-        { partBegin: -1,
-            partEnd: -1,
-            headerField: -1,
-            headerValue: -1,
-            partData: -1,
-            end: -1,
-        };
-
-    parser.initWithBoundary(boundary);
-
-    parser.onHeaderField = function() {
-      callbacks.headerField++;
-    };
-    
-    parser.onHeaderValue = function() {
-      callbacks.headerValue++;
-    };
-    
-    parser.onPartBegin = function() {
-      callbacks.partBegin++;
-    };
-    
-    parser.onPartData = function() {
-      callbacks.partData++;
-    };
-    
-    parser.onPartEnd = function() {
-      callbacks.partEnd++;
-    };
-    
-    parser.onEnd = function() {
-      callbacks.end++;
-    };
-    
-    var start = +new Date(),
-        nparsed = parser.write(buffer),
-        duration = +new Date() - start,
-        mbPerSec = (mb / (duration / 1000)).toFixed(2);
-    
-    console.log(mbPerSec+' mb/sec');
-
-    console.log(req.files.uppity.path + ' -> ' + target_file)
-
-    //
-    // NOTE - target & orig file MUST be in same file system
-    //
-
-    // also... slight race condition.  Life goes on.
-
-    // does target exist?
-    fs.exists(target_file, function(exists) {
-        if (exists) {
-            // xxx - error message to user
-            console.log('dying in flames... target already exists....')
-        }
-        else {
-            fs.rename(req.files.uppity.path, target_file, function (err) {
-                if (err) {
-                    console.log('error in upload - ')
-                    console.log(err)
-                }
-                else console.log('renamed complete');
-            })
-        }
-    })
-    
-    function createMultipartBuffer(boundary, size) {
+// helper
+function createMultipartBuffer(boundary, size) {
       var head =
             '--'+boundary+'\r\n'
           + 'content-disposition: form-data; name="field1"\r\n'
@@ -1298,21 +1203,126 @@ function uploadSchtuff(req, res, next) {
       buffer.write(head, 'ascii', 0);
       buffer.write(tail, 'ascii', buffer.length - tail.length);
       return buffer;
-    }
+}
     
-    process.on('exit', function() {
-      for (var k in callbacks) {
-        assert.equal(0, callbacks[k], k+' count off by '+callbacks[k]);
-      }
-    });
+// req.files contains all the goods, including:
+//
+//  size
+//  path        local on server
+//  name        filename
+//  type        mimetype, aka image/png and such
 
-    process.on('progress', function(bytesReceived, bytesExpected) {
-        //self.emit('progess', bytesReceived, bytesExpected)
-        var percent = (bytesReceived / bytesExpected * 100) | 0;
-        process.stdout.write('Uploading: %' + percent + '\r');
-    })
+function uploadSchtuff(req, res, next) {
 
-    res.send(204)
+    console.log('striving to upload....')
+    // console.log(req.files)
+    console.log(req.files.uppity)
+
+    for (var i=0; i<req.files.uppity.length; i++) {
+        console.log('name - ' + req.files.uppity[i].name)
+
+        var target_file = __dirname + "/uploads/" + req.files.uppity[i].name
+        var tmpfile     = req.files.uppity[i].path
+
+    //
+    // most of all this stuff here is from http://debuggable.com/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb
+    //
+    // seems to be turbo for uploads, so...
+    //
+
+        var multipartParser = require('formidable/lib/multipart_parser'),
+            MultipartParser = multipartParser.MultipartParser,
+            parser = new MultipartParser(),
+            Buffer = require('buffer').Buffer,
+            boundary = '-----------------------------168072824752491622650073',
+            mb = 100,
+            buffer = createMultipartBuffer(boundary, mb * 1024 * 1024),
+            callbacks =
+            { partBegin: -1,
+                partEnd: -1,
+                headerField: -1,
+                headerValue: -1,
+                partData: -1,
+                end: -1,
+            };
+    
+        parser.initWithBoundary(boundary);
+    
+        parser.onHeaderField = function() {
+          callbacks.headerField++;
+        };
+        
+        parser.onHeaderValue = function() {
+          callbacks.headerValue++;
+        };
+        
+        parser.onPartBegin = function() {
+          callbacks.partBegin++;
+        };
+        
+        parser.onPartData = function() {
+          callbacks.partData++;
+        };
+        
+        parser.onPartEnd = function() {
+          callbacks.partEnd++;
+        };
+        
+        parser.onEnd = function() {
+          callbacks.end++;
+        };
+        
+        var start = +new Date(),
+            nparsed = parser.write(buffer),
+            duration = +new Date() - start,
+            mbPerSec = (mb / (duration / 1000)).toFixed(2);
+        
+        console.log(mbPerSec+' mb/sec');
+    
+        console.log(tmpfile + ' -> ' + target_file)
+    
+        //
+        // NOTE - target & orig file MUST be in same file system
+        //
+    
+        // also... slight race condition.  Life goes on.
+    
+        // does target exist?
+        fs.exists(target_file, function(exists) {
+            if (exists) {
+                // xxx - error message to user
+                console.log('dying in flames... target already exists....')
+            }
+            else {
+                fs.rename(tmpfile, target_file, function (err) {
+                    if (err) {
+                        console.log('error in upload - ')
+                        console.log(err)
+                    }
+                    else {
+    
+                        console.log('renamed complete');
+                        console.log('woohoo')
+                        res.send(204, {"status" : target_file})
+                    }
+    
+                })
+            }
+        })
+        
+        process.on('exit', function() {
+          for (var k in callbacks) {
+            assert.equal(0, callbacks[k], k+' count off by '+callbacks[k]);
+          }
+        });
+    
+        process.on('progress', function(bytesReceived, bytesExpected) {
+            //self.emit('progess', bytesReceived, bytesExpected)
+            var percent = (bytesReceived / bytesExpected * 100) | 0;
+            process.stdout.write('Uploading: %' + percent + '\r');
+        })
+
+    }
 
 //     fs.readFile(req.files.uppity.path, function (err, data) {
 //         console.log('reading file...')

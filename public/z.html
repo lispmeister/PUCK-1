@@ -11,17 +11,18 @@
 <!-- <link href="/css/bootstrap.min.css" rel="stylesheet"> -->
 
 <!-- made a one line change in this, noted at top -->
-<!-- <link href="/css/bootstrap.css" rel="stylesheet"> -->
-<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<link href="/css/bootstrap.css" rel="stylesheet"> 
+<link href="/css/bootstrap-theme.min.css" rel="stylesheet"> 
+<link href="/css/bootstrap3-wysihtml5.min.css" rel="stylesheet">
 
 <!-- for calls -->
 <link href="/css/avgrund.css" rel="stylesheet">
 
+<link href="/css/jquery.filer.css" rel="stylesheet">
+
 <!-- trivial bits here -->
 <link href="/css/puck.css" rel="stylesheet">
 
-<link rel="stylesheet" href="/css/font-awesome.css">
-<!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>
@@ -56,6 +57,27 @@
   text-shadow:2px 2px 2px black;
 }
 
+    .dragDropBox{
+        position:relative;
+        display:block;
+        min-height: 200px; 
+        width:500px; 
+        background-color:#f3f3f3;
+        border:2px dashed #aaa;
+    }
+    .dragDropBox span.message{
+        color:#333;
+        font-family:sans-serif;
+        position:absolute;
+        left:50%;
+        margin-left:-105px;
+        top:45%;
+    }
+    .dragDropBox:not(.done):hover, .dragDropBox.hover{
+        opacity: 0.7;
+        filter: alpha(opacity=70);
+        cursor:pointer;
+    }
 
 </style>
 
@@ -101,10 +123,12 @@
         <div class="hero-unit">
 
             <div> 
-                <textarea id="wysiwyg" class="form-control" rows="10" cols="80"></textarea>
-            </div>
 
-            <div> 
+                <textarea id="some-textarea" class="textarea" placeholder="Enter text ..." style="width: 60%; height: 300px; font-size: 14px; line-height: 18px;"></textarea>
+
+
+
+            </div>
 
         <div class="row clearfix spacer50">
             <div class="col-md-11 column">
@@ -112,29 +136,14 @@
             <div id='far_right' class="col-md-1 column">
             </div>
         </div>
+    <div>
 
+       <form action="/up" method="post" enctype="multipart/form-data">
+         <p>Basic Options:</p>
+         <input type="file" name="uppity" multiple="multiple" />
+       </form> 
 
-            <form id="upload" method="post" action="/up" enctype="multipart/form-data">
-                    <div id="drop">
-                    <div id="dropcircle">    <span class="innerTEXT">Drop!<br />Files!</span></div>
-                        <input type="file" name="uppity" multiple />
-                    </div>
-
-        <div class="row clearfix spacer10">
-            <div class="col-md-11 column">
-            </div>
-            <div id='far_right' class="col-md-1 column">
-            </div>
-        </div>
-
-                    <ul>
-                        <!-- The file uploads will be shown here -->
-                    </ul>
-
-             </form>
-
-
-            </div> 
+    </div>
 
         </div>
 
@@ -145,16 +154,16 @@
             <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
         </div>
 
+
+
+
     </div>
 
 
 </body>
 
 
-<!-- <% include foot %> -->
-
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
-
 
 <script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
 <script type="text/javascript" src='/js/bootstrap.js'></script>
@@ -170,31 +179,59 @@
 <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
 
+
 <script type="text/javascript" src='/js/puck.js'></script>
 <script type="text/javascript" src='/js/main_puck.js'></script>
 
-<script type="text/javascript" src="/js/jquery.wysiwyg.js"></script>
+<!-- editor -->
+<script type="text/javascript" src="/js/handlebars.runtime.min.js"></script>
+<script type="text/javascript" src="/js/wysihtml5.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap3-wysihtml5.min.js"></script>
 
-<script type="text/javascript" src="/js/wysiwyg.image.js"></script>
-<script type="text/javascript" src="/js/wysiwyg.link.js"></script>
-<script type="text/javascript" src="/js/wysiwyg.table.js"></script>
-
-<script type="text/javascript" src="/js/jquery.fileupload.js"></script>
-<script type="text/javascript" src="/js/jquery.iframe-transport.js"></script>
-<script type="text/javascript" src="/js/jquery.knob.js"></script>
-<script type="text/javascript" src="/js/script.js"></script>
-
+<!-- file uploads -->
+<script type="text/javascript" src="/js/jquery.filer.js"></script>
 
 <script type="text/javascript">
 
 (function($) {
     $(document).ready(function() {
-        $('#wysiwyg').wysiwyg();
+
+    $('#some-textarea').wysihtml5();
+
+
+        $('input[name="uppity"]').filer({
+            changeInput: '<div class="dragDropBox"><span class="message">Click or Drop files here to upload.</span></div>',
+            appendTo   : '.dragDropBox',
+            template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
+            maxSize    : 1024,
+            uploadFile: {
+                url:         '/up',
+                data:        {},
+                beforeSend:  function(parent){parent.append('<div class="progress-bar" />');},
+                success:     function(data, parent, progress){ },
+                error:       function(e, parent, progress){ },
+                progressEnd: function(progress){progress.addClass('done-erase');},
+                onUploaded:  function(parent){ }
+            },
+            dragDrop: {
+                dropBox:  '.dragDropBox',
+                dragOver: function(e, parent){ $('.dragDropBox').addClass('hover'); },
+                dragOut:  function(e, parent){ $('.dragDropBox').removeClass('hover'); },
+                drop:     function(e, formData, parent){ $('.dragDropBox').removeClass('hover'); },
+            },
+            onEmpty    : function(parent, appendBox){ $(appendBox).removeClass('done'); },
+            onSelect   : function(e,parent,appendBox){ $(appendBox).addClass('done'); }
+        })
+
+
+
+
     });
 })(jQuery);
 
-</script>
 
+
+</script>
 
 
 </html>

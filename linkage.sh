@@ -33,6 +33,7 @@ sudo rm -f /etc/udev/rules.d/10-puck-key.rules
 
 sudo ln -s `pwd` /etc/puck
 sudo mkdir /etc/puck/tmp
+sudo mkdir /etc/puck/uploads
 sudo mkdir /etc/puck/logs
 sudo mkdir /etc/puck/redis
 sudo mkdir /etc/puck/pucks

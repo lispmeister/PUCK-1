@@ -11,6 +11,7 @@
     "ctype": "latest",
     "ejs": "latest",
     "express": "latest",
+    "formidable": "latest",
     "httpsync": "0.0.8",
     "ip": "= 0.1.0",
     "moment": "latest",
