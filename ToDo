@@ -1,0 +1,80 @@
+
+
+add uploads
+
+
+
+* kill restify for client, or...?
+
+* bang out ipad/etc keys
+
+* look at redis log level... should it be notice, warning...?
+
+* pass status via STUN/ICE... even if can't use it initially, will be able to
+    see others... plus know their IP
+
+* change ciphers... I think they'll be:
+
+    cipher AES-256-CFB
+    auth SHA256
+
+    ... needs more research
+
+
+* on your puck's details show all the crypto key strength/alg stuff
+    (run certitude.sh on all crts, show up in UI)
+
+    * on a connection show the crypto details
+
+    * on other puck's cards show the crypto details
+
+* do like a 1 sec ping/heartbeat on VPN connections to be aware of D/C's... 
+  show in UI how many secs/mins it's been since your puck has heard from theirs
+
+* latency!
+
+* error checking on create - no dups
+
+* for openvpn need to get the remote IP addr from the logs... or somewhere!
+
+* in/out bound, who is calling/are you calling?
+
+#
+# if mucking with files remote system... git pull prob won't work, do:
+#
+#   git fetch origin master
+#   git reset --hard FETCH_HEAD
+#
+
+H * install from git... sigh.
+
+M * openvpn drops connection maybe... starts up 2nd interface (tun2)
+
+M * borders/highlighting the one you're talking to - possible:
+        outline: 2px solid orange
+
+M * poll other pucks in UI every.... 5s?  10? ...30/60/xxx?
+
+M/H * add who is calling you when you get incoming
+
+M * add failure checking when adding pucks
+
+L * add log watching feature (hard over https?)
+
+M * quote puck names/whatever for shell $x's... create_puck.sh in particular.
+
+H * need disconnect on vpn page
+
+L * when posting/creating puck from form... return success, not errz...!
+
+n/a?  * ... when does a client drop off a OVPN server's link?  Go to tcp?  Check out ping opts ... fixed with tls?
+
+H/? * when adding puck, immediately goes to home, have to refresh... wait for creation (maybe works, maybe not?)
+
+L * Currently... only caller can really hang up :)  (Will repeat, etc.)
+
+L * document - keys in local pucks subdir... for other pucks, they are
+     the ones in their (remote) vpn_client subdir
+
+L * don't send all your key stuffs to anyone who asks... only the min to communicate
+

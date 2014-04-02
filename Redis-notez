@@ -1,0 +1,15 @@
+
+# redis-cli
+
+# list all vars
+redis-cli keys *
+
+# list all PUCKs
+redis-cli keys '[A-Z0-9]*'
+
+# list all other things
+redis-cli keys '[^A-Z0-9]*'
+
+# list and dump all
+redis-cli keys '*' | xargs -n 1 redis-cli dump
+

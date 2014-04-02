@@ -72,7 +72,8 @@ var server_magic = {},
     client_magic = {},
     puck_events  = {},
     server       = "",
-    current_ip   = {}
+    puck2ip      = {}
+    ip2puck      = {}
 
 var bwana_puck   = {}
 
@@ -301,6 +302,7 @@ function watch_logs(logfile, log_type) {
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
                     client     : client_remote_ip,
+                    client_pid : client_remote_ip,
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
@@ -1215,127 +1217,55 @@ function createMultipartBuffer(boundary, size) {
 function uploadSchtuff(req, res, next) {
 
     console.log('striving to upload....')
-    // console.log(req.files)
-    console.log(req.files.uppity)
+    console.log(req.files)
+
+    var client_ip = get_client_ip(req)
+
+    console.log('from : ' + client_ip)
 
     for (var i=0; i<req.files.uppity.length; i++) {
-        console.log('name - ' + req.files.uppity[i].name)
 
-        var target_file = __dirname + "/uploads/" + req.files.uppity[i].name
+        var target_size = req.files.uppity[i].size
+        var target_file = req.files.uppity[i].name
+        var target_path = __dirname + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
 
-    //
-    // most of all this stuff here is from http://debuggable.com/posts/parsing-file-uploads-at-500-mb-s-with-node-js:4c03862e-351c-4faa-bb67-4365cbdd56cb
-    //
-    // seems to be turbo for uploads, so...
-    //
+        console.log('trying ' + tmpfile + ' -> ' + target_path)
 
-        var multipartParser = require('formidable/lib/multipart_parser'),
-            MultipartParser = multipartParser.MultipartParser,
-            parser = new MultipartParser(),
-            Buffer = require('buffer').Buffer,
-            boundary = '-----------------------------168072824752491622650073',
-            mb = 100,
-            buffer = createMultipartBuffer(boundary, mb * 1024 * 1024),
-            callbacks =
-            { partBegin: -1,
-                partEnd: -1,
-                headerField: -1,
-                headerValue: -1,
-                partData: -1,
-                end: -1,
-            };
-    
-        parser.initWithBoundary(boundary);
-    
-        parser.onHeaderField = function() {
-          callbacks.headerField++;
-        };
-        
-        parser.onHeaderValue = function() {
-          callbacks.headerValue++;
-        };
-        
-        parser.onPartBegin = function() {
-          callbacks.partBegin++;
-        };
-        
-        parser.onPartData = function() {
-          callbacks.partData++;
-        };
-        
-        parser.onPartEnd = function() {
-          callbacks.partEnd++;
-        };
-        
-        parser.onEnd = function() {
-          callbacks.end++;
-        };
-        
-        var start = +new Date(),
-            nparsed = parser.write(buffer),
-            duration = +new Date() - start,
-            mbPerSec = (mb / (duration / 1000)).toFixed(2);
-        
-        console.log(mbPerSec+' mb/sec');
-    
-        console.log(tmpfile + ' -> ' + target_file)
-    
         //
         // NOTE - target & orig file MUST be in same file system
         //
-    
         // also... slight race condition.  Life goes on.
-    
+
         // does target exist?
-        fs.exists(target_file, function(exists) {
+        fs.exists(target_path, function(exists) {
             if (exists) {
                 // xxx - error message to user
                 console.log('dying in flames... target already exists....')
             }
-            else {
-                fs.rename(tmpfile, target_file, function (err) {
-                    if (err) {
-                        console.log('error in upload - ')
+    
+            fs.readFile(tmpfile, function (err, data) {
+                console.log('reading file...')
+                // XXX
+                // if exists... dont overwrite; reject, pick new filename, etc.
+                //
+                fs.writeFile(target_path, data, function (err) {
+                    if (err)  {
+                        console.log('errz - ')
                         console.log(err)
                     }
                     else {
-    
                         console.log('renamed complete');
                         console.log('woohoo')
+
+                        createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
+
                         res.send(204, {"status" : target_file})
                     }
-    
                 })
-            }
+            })
         })
-        
-        process.on('exit', function() {
-          for (var k in callbacks) {
-            assert.equal(0, callbacks[k], k+' count off by '+callbacks[k]);
-          }
-        });
-    
-        process.on('progress', function(bytesReceived, bytesExpected) {
-            //self.emit('progess', bytesReceived, bytesExpected)
-            var percent = (bytesReceived / bytesExpected * 100) | 0;
-            process.stdout.write('Uploading: %' + percent + '\r');
-        })
-
     }
-
-//     fs.readFile(req.files.uppity.path, function (err, data) {
-//         console.log('reading file...')
-//         var newFile = __dirname + "/uploads/" + req.files.uppity.name
-//         // XXX
-//         // if exists... dont overwrite; reject, pick new filename, etc.
-//         //
-//         fs.writeFile(newFile, data, function (err) {
-//             if (err) console.log('errz - ')
-//             if (err) console.log(err)
-//             res.redirect("back")
-//         })
-//     })
 
 }
 
@@ -1368,14 +1298,14 @@ function startVPN(req, res, next) {
     var vpn   = '/etc/puck/exe/start_vpn.sh'
 
     // this means you're trying to do it despite ping not working
-    if (typeof current_ip[puckid] == 'undefined') {
+    if (typeof puck2ip[puckid] == 'undefined') {
         console.log("hmmm... trying to VPN when ping couldn't reach it... good luck!")
         args = [puckid, ipaddr]
     }
 
     else {
-        console.log("using pinged IP addr to VPN: " + current_ip[puckid])
-        args = [puckid, current_ip[puckid]]
+        console.log("using pinged IP addr to VPN: " + puck2ip[puckid])
+        args = [puckid, puck2ip[puckid]]
     }
     
     cmd = vpn
@@ -1393,7 +1323,7 @@ function startVPN(req, res, next) {
 
     console.log('post execution')
 
-    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: current_ip[puckid], remote_puck_id: puckid})
+    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
 
     var vpn_home = "/vpn.html"
 
@@ -1427,10 +1357,13 @@ function putPuck(req, res, next) {
 function back_to_home (res) {
 
     console.log('on my way home')
+
+    var body = {"status" : "OK"}
     var home = "/puck.html"
     res.statusCode = 302;
     res.setHeader("Location", home)
-    res.end()
+    res.setHeader('Content-Length', Buffer.byteLength(body));
+    res.end(body)
 }
 
 // this... unfortunately... is mine
@@ -1531,8 +1464,8 @@ function httpsPing(puckid, ipaddr, res, next) {
     // use the last known good one, if it exists
 
 // XXXX - fix
-//  if (typeof current_ip[puckid] != "undefined") {
-//      request.get('https://' + current_ip[puckid] + ':' + puck_port + '/ping', cb(puckid))
+//  if (typeof puck2ip[puckid] != "undefined") {
+//      request.get('https://' + puck2ip[puckid] + ':' + puck_port + '/ping', cb(puckid))
 //  }
 
     for (var i = 0; i < all_ips.length; i++) {
@@ -1541,7 +1474,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             results = {},
             ip      = all_ips[i]
 
-        // if (ip == "127.0.0.1" || (typeof current_ip[puckid] != "undefined" && current_ip[puckid] == ip)) {
+        // if (ip == "127.0.0.1" || (typeof puck2ip[puckid] != "undefined" && puck2ip[puckid] == ip)) {
         if (ip == "127.0.0.1") {
             responses = responses + 1
             continue
@@ -1576,7 +1509,8 @@ function httpsPing(puckid, ipaddr, res, next) {
                     // console.log(msg)
                     results[all_ips[i]] = msg
                     // cache the latest
-                    current_ip[puckid] = remote
+                    puck2ip[puckid] = remote
+                    ip2puck[remote] = puckid
                     done = true
                     res.send(200, msg)
                 }

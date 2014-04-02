@@ -181,7 +181,6 @@
 
 
 <script type="text/javascript" src='/js/puck.js'></script>
-<script type="text/javascript" src='/js/main_puck.js'></script>
 
 <!-- editor -->
 <script type="text/javascript" src="/js/handlebars.runtime.min.js"></script>
@@ -205,6 +204,7 @@
             template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
             maxSize    : 1024,
             uploadFile: {
+                // url:         'https://10.217.62.1:8080/up',
                 url:         '/up',
                 data:        {},
                 beforeSend:  function(parent){parent.append('<div class="progress-bar" />');},
