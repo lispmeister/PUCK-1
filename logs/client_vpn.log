@@ -1,0 +1,331 @@
+Thu Apr  3 12:11:44 2014 us=643188 Current Parameter Settings:
+Thu Apr  3 12:11:44 2014 us=643279   config = 'C.conf'
+Thu Apr  3 12:11:44 2014 us=643294   mode = 0
+Thu Apr  3 12:11:44 2014 us=643307   persist_config = DISABLED
+Thu Apr  3 12:11:44 2014 us=643319   persist_mode = 1
+Thu Apr  3 12:11:44 2014 us=643330   show_ciphers = DISABLED
+Thu Apr  3 12:11:44 2014 us=643342   show_digests = DISABLED
+Thu Apr  3 12:11:44 2014 us=643354   show_engines = DISABLED
+Thu Apr  3 12:11:44 2014 us=643365   genkey = DISABLED
+Thu Apr  3 12:11:44 2014 us=643377   key_pass_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643388   show_tls_ciphers = DISABLED
+Thu Apr  3 12:11:44 2014 us=643412 Connection profiles [default]:
+Thu Apr  3 12:11:44 2014 us=643426   proto = udp
+Thu Apr  3 12:11:44 2014 us=643438   local = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643450   local_port = 0
+Thu Apr  3 12:11:44 2014 us=643462   remote = '192.168.0.141'
+Thu Apr  3 12:11:44 2014 us=643473   remote_port = 80
+Thu Apr  3 12:11:44 2014 us=643485   remote_float = DISABLED
+Thu Apr  3 12:11:44 2014 us=643497   bind_defined = DISABLED
+Thu Apr  3 12:11:44 2014 us=643508   bind_local = DISABLED
+Thu Apr  3 12:11:44 2014 us=643520   connect_retry_seconds = 5
+Thu Apr  3 12:11:44 2014 us=643532   connect_timeout = 10
+Thu Apr  3 12:11:44 2014 us=643543   connect_retry_max = 0
+Thu Apr  3 12:11:44 2014 us=643555   socks_proxy_server = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643566   socks_proxy_port = 0
+Thu Apr  3 12:11:44 2014 us=643578   socks_proxy_retry = DISABLED
+Thu Apr  3 12:11:44 2014 us=643592 Connection profiles END
+Thu Apr  3 12:11:44 2014 us=643603   remote_random = DISABLED
+Thu Apr  3 12:11:44 2014 us=643615   ipchange = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643626   dev = 'tun'
+Thu Apr  3 12:11:44 2014 us=643638   dev_type = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643649   dev_node = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643660   lladdr = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643672   topology = 1
+Thu Apr  3 12:11:44 2014 us=643683   tun_ipv6 = DISABLED
+Thu Apr  3 12:11:44 2014 us=643695   ifconfig_local = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643706   ifconfig_remote_netmask = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=643718   ifconfig_noexec = DISABLED
+Thu Apr  3 12:11:44 2014 us=643729   ifconfig_nowarn = DISABLED
+Thu Apr  3 12:11:44 2014 us=643740   shaper = 0
+Thu Apr  3 12:11:44 2014 us=643751   tun_mtu = 1500
+Thu Apr  3 12:11:44 2014 us=643763   tun_mtu_defined = ENABLED
+Thu Apr  3 12:11:44 2014 us=643774   link_mtu = 1500
+Thu Apr  3 12:11:44 2014 us=643785   link_mtu_defined = DISABLED
+Thu Apr  3 12:11:44 2014 us=643797   tun_mtu_extra = 0
+Thu Apr  3 12:11:44 2014 us=643808   tun_mtu_extra_defined = DISABLED
+Thu Apr  3 12:11:44 2014 us=643819   fragment = 0
+Thu Apr  3 12:11:44 2014 us=643831   mtu_discover_type = -1
+Thu Apr  3 12:11:44 2014 us=643842   mtu_test = 0
+Thu Apr  3 12:11:44 2014 us=643853   mlock = DISABLED
+Thu Apr  3 12:11:44 2014 us=643864   keepalive_ping = 0
+Thu Apr  3 12:11:44 2014 us=643876   keepalive_timeout = 0
+Thu Apr  3 12:11:44 2014 us=643887   inactivity_timeout = 0
+Thu Apr  3 12:11:44 2014 us=643898   ping_send_timeout = 15
+Thu Apr  3 12:11:44 2014 us=643909   ping_rec_timeout = 0
+Thu Apr  3 12:11:44 2014 us=643920   ping_rec_timeout_action = 0
+Thu Apr  3 12:11:44 2014 us=643931   ping_timer_remote = DISABLED
+Thu Apr  3 12:11:44 2014 us=643943   remap_sigusr1 = 0
+Thu Apr  3 12:11:44 2014 us=643954   explicit_exit_notification = 0
+Thu Apr  3 12:11:44 2014 us=643965   persist_tun = ENABLED
+Thu Apr  3 12:11:44 2014 us=643976   persist_local_ip = ENABLED
+Thu Apr  3 12:11:44 2014 us=643987   persist_remote_ip = ENABLED
+Thu Apr  3 12:11:44 2014 us=643999   persist_key = ENABLED
+Thu Apr  3 12:11:44 2014 us=644010   mssfix = 1450
+Thu Apr  3 12:11:44 2014 us=644021   passtos = DISABLED
+Thu Apr  3 12:11:44 2014 us=644033   resolve_retry_seconds = 1000000000
+Thu Apr  3 12:11:44 2014 us=644044   username = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644055   groupname = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644067   chroot_dir = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644078   cd_dir = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644099   writepid = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644111   up_script = '/etc/puck/exe/vpn_client_up.sh'
+Thu Apr  3 12:11:44 2014 us=644123   down_script = '/etc/puck/exe/vpn_client_down.sh'
+Thu Apr  3 12:11:44 2014 us=644134   down_pre = DISABLED
+Thu Apr  3 12:11:44 2014 us=644146   up_restart = DISABLED
+Thu Apr  3 12:11:44 2014 us=644157   up_delay = DISABLED
+Thu Apr  3 12:11:44 2014 us=644168   daemon = DISABLED
+Thu Apr  3 12:11:44 2014 us=644180   inetd = 0
+Thu Apr  3 12:11:44 2014 us=644191   log = ENABLED
+Thu Apr  3 12:11:44 2014 us=644202   suppress_timestamps = DISABLED
+Thu Apr  3 12:11:44 2014 us=644214   nice = 0
+Thu Apr  3 12:11:44 2014 us=644225   verbosity = 5
+Thu Apr  3 12:11:44 2014 us=644236   mute = 0
+Thu Apr  3 12:11:44 2014 us=644247   gremlin = 0
+Thu Apr  3 12:11:44 2014 us=644259   status_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644270   status_file_version = 1
+Thu Apr  3 12:11:44 2014 us=644281   status_file_update_freq = 60
+Thu Apr  3 12:11:44 2014 us=644293   occ = ENABLED
+Thu Apr  3 12:11:44 2014 us=644304   rcvbuf = 65536
+Thu Apr  3 12:11:44 2014 us=644316   sndbuf = 65536
+Thu Apr  3 12:11:44 2014 us=644338   sockflags = 0
+Thu Apr  3 12:11:44 2014 us=644353   fast_io = DISABLED
+Thu Apr  3 12:11:44 2014 us=644366   lzo = 7
+Thu Apr  3 12:11:44 2014 us=644377   route_script = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644389   route_default_gateway = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644401   route_default_metric = 0
+Thu Apr  3 12:11:44 2014 us=644412   route_noexec = DISABLED
+Thu Apr  3 12:11:44 2014 us=644423   route_delay = 0
+Thu Apr  3 12:11:44 2014 us=644435   route_delay_window = 30
+Thu Apr  3 12:11:44 2014 us=644446   route_delay_defined = DISABLED
+Thu Apr  3 12:11:44 2014 us=644457   route_nopull = DISABLED
+Thu Apr  3 12:11:44 2014 us=644469   route_gateway_via_dhcp = DISABLED
+Thu Apr  3 12:11:44 2014 us=644481   allow_pull_fqdn = DISABLED
+Thu Apr  3 12:11:44 2014 us=644495   management_addr = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644507   management_port = 0
+Thu Apr  3 12:11:44 2014 us=644519   management_user_pass = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644531   management_log_history_cache = 250
+Thu Apr  3 12:11:44 2014 us=644543   management_echo_buffer_size = 100
+Thu Apr  3 12:11:44 2014 us=644554   management_write_peer_info_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644566   management_flags = 0
+Thu Apr  3 12:11:44 2014 us=644578   shared_secret_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644590   key_direction = 0
+Thu Apr  3 12:11:44 2014 us=644602   ciphername_defined = ENABLED
+Thu Apr  3 12:11:44 2014 us=644613   ciphername = 'BF-CBC'
+Thu Apr  3 12:11:44 2014 us=644625   authname_defined = ENABLED
+Thu Apr  3 12:11:44 2014 us=644636   authname = 'SHA1'
+Thu Apr  3 12:11:44 2014 us=644648   keysize = 0
+Thu Apr  3 12:11:44 2014 us=644660   engine = DISABLED
+Thu Apr  3 12:11:44 2014 us=644671   replay = ENABLED
+Thu Apr  3 12:11:44 2014 us=644683   mute_replay_warnings = DISABLED
+Thu Apr  3 12:11:44 2014 us=644695   replay_window = 64
+Thu Apr  3 12:11:44 2014 us=644707   replay_time = 15
+Thu Apr  3 12:11:44 2014 us=644719   packet_id_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644730   use_iv = ENABLED
+Thu Apr  3 12:11:44 2014 us=644742   test_crypto = DISABLED
+Thu Apr  3 12:11:44 2014 us=644776   tls_server = DISABLED
+Thu Apr  3 12:11:44 2014 us=644790   tls_client = ENABLED
+Thu Apr  3 12:11:44 2014 us=644802   key_method = 2
+Thu Apr  3 12:11:44 2014 us=644814   ca_file = '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/puckroot.crt'
+Thu Apr  3 12:11:44 2014 us=644826   ca_path = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644837   dh_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644849   cert_file = '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/puck.crt'
+Thu Apr  3 12:11:44 2014 us=644876   priv_key_file = '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/puck.key'
+Thu Apr  3 12:11:44 2014 us=644888   pkcs12_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644900   cipher_list = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644922   tls_verify = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644934   tls_remote = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644946   crl_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=644957   ns_cert_type = 0
+Thu Apr  3 12:11:44 2014 us=644969   remote_cert_ku[i] = 160
+Thu Apr  3 12:11:44 2014 us=644981   remote_cert_ku[i] = 136
+Thu Apr  3 12:11:44 2014 us=644992   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645004   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645015   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645031   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645061   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645072   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645083   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645095   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645106   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645117   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645128   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645140   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645151   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645162   remote_cert_ku[i] = 0
+Thu Apr  3 12:11:44 2014 us=645174   remote_cert_eku = 'TLS Web Server Authentication'
+Thu Apr  3 12:11:44 2014 us=645186   tls_timeout = 2
+Thu Apr  3 12:11:44 2014 us=645197   renegotiate_bytes = 0
+Thu Apr  3 12:11:44 2014 us=645209   renegotiate_packets = 0
+Thu Apr  3 12:11:44 2014 us=645220   renegotiate_seconds = 3600
+Thu Apr  3 12:11:44 2014 us=645232   handshake_window = 60
+Thu Apr  3 12:11:44 2014 us=645243   transition_window = 3600
+Thu Apr  3 12:11:44 2014 us=645255   single_session = DISABLED
+Thu Apr  3 12:11:44 2014 us=645266   tls_exit = DISABLED
+Thu Apr  3 12:11:44 2014 us=645278   tls_auth_file = '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/ta.key'
+Thu Apr  3 12:11:44 2014 us=645302   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645314   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645335   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645347   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645359   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645371   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645402   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645427   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645439   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645451   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645463   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645475   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645486   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645498   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645510   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645521   pkcs11_protected_authentication = DISABLED
+Thu Apr  3 12:11:44 2014 us=645534   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645546   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645557   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645569   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645581   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645593   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645605   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645616   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645628   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645640   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645652   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645663   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645675   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645687   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645709   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645721   pkcs11_private_mode = 00000000
+Thu Apr  3 12:11:44 2014 us=645733   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645745   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645756   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645768   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645780   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645791   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645803   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645815   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645836   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645849   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645861   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645892   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645905   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645916   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645928   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645940   pkcs11_cert_private = DISABLED
+Thu Apr  3 12:11:44 2014 us=645952   pkcs11_pin_cache_period = -1
+Thu Apr  3 12:11:44 2014 us=645976   pkcs11_id = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=645989   pkcs11_id_management = DISABLED
+Thu Apr  3 12:11:44 2014 us=646010   server_network = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646024   server_netmask = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646037   server_bridge_ip = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646050   server_bridge_netmask = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646063   server_bridge_pool_start = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646076   server_bridge_pool_end = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646088   ifconfig_pool_defined = DISABLED
+Thu Apr  3 12:11:44 2014 us=646101   ifconfig_pool_start = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646114   ifconfig_pool_end = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646127   ifconfig_pool_netmask = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646139   ifconfig_pool_persist_filename = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646150   ifconfig_pool_persist_refresh_freq = 600
+Thu Apr  3 12:11:44 2014 us=646162   n_bcast_buf = 256
+Thu Apr  3 12:11:44 2014 us=646174   tcp_queue_limit = 64
+Thu Apr  3 12:11:44 2014 us=646186   real_hash_size = 256
+Thu Apr  3 12:11:44 2014 us=646206   virtual_hash_size = 256
+Thu Apr  3 12:11:44 2014 us=646226   client_connect_script = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646239   learn_address_script = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646252   client_disconnect_script = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646264   client_config_dir = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646276   ccd_exclusive = DISABLED
+Thu Apr  3 12:11:44 2014 us=646288   tmp_dir = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646322   push_ifconfig_defined = DISABLED
+Thu Apr  3 12:11:44 2014 us=646336   push_ifconfig_local = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646371   push_ifconfig_remote_netmask = 0.0.0.0
+Thu Apr  3 12:11:44 2014 us=646383   enable_c2c = DISABLED
+Thu Apr  3 12:11:44 2014 us=646395   duplicate_cn = DISABLED
+Thu Apr  3 12:11:44 2014 us=646407   cf_max = 0
+Thu Apr  3 12:11:44 2014 us=646418   cf_per = 0
+Thu Apr  3 12:11:44 2014 us=646430   max_clients = 1024
+Thu Apr  3 12:11:44 2014 us=646450   max_routes_per_client = 256
+Thu Apr  3 12:11:44 2014 us=646463   client_cert_not_required = DISABLED
+Thu Apr  3 12:11:44 2014 us=646475   username_as_common_name = DISABLED
+Thu Apr  3 12:11:44 2014 us=646486   auth_user_pass_verify_script = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646498   auth_user_pass_verify_script_via_file = DISABLED
+Thu Apr  3 12:11:44 2014 us=646510   port_share_host = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646522   port_share_port = 0
+Thu Apr  3 12:11:44 2014 us=646533   client = ENABLED
+Thu Apr  3 12:11:44 2014 us=646545   pull = ENABLED
+Thu Apr  3 12:11:44 2014 us=646557   auth_user_pass_file = '[UNDEF]'
+Thu Apr  3 12:11:44 2014 us=646572 OpenVPN 2.1_rc11 i486-pc-linux-gnu [SSL] [LZO2] [EPOLL] [PKCS11] built on Mar  9 2009
+Thu Apr  3 12:11:44 2014 us=646674 NOTE: the current --script-security setting may allow this configuration to call user-defined scripts
+Thu Apr  3 12:11:44 2014 us=647071 WARNING: file '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/puck.key' is group or others accessible
+Thu Apr  3 12:11:44 2014 us=647585 /usr/bin/openssl-vulnkey -q -b 512 -m <modulus omitted>
+WARN: could not open database for 512 bits. Skipped 
+Thu Apr  3 12:11:44 2014 us=683141 WARNING: file '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/ta.key' is group or others accessible
+Thu Apr  3 12:11:44 2014 us=683171 Control Channel Authentication: using '/etc/puck/pucks/4A646CAF1DE98809891D66FE238476A60DEC52DE/ta.key' as a OpenVPN static key file
+Thu Apr  3 12:11:44 2014 us=683197 Outgoing Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
+Thu Apr  3 12:11:44 2014 us=683213 Incoming Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
+Thu Apr  3 12:11:44 2014 us=683245 LZO compression initialized
+Thu Apr  3 12:11:44 2014 us=683358 Control Channel MTU parms [ L:1542 D:166 EF:66 EB:0 ET:0 EL:0 ]
+Thu Apr  3 12:11:44 2014 us=683412 Data Channel MTU parms [ L:1542 D:1450 EF:42 EB:135 ET:0 EL:0 AF:3/1 ]
+Thu Apr  3 12:11:44 2014 us=683441 Local Options String: 'V4,dev-type tun,link-mtu 1542,tun-mtu 1500,proto UDPv4,comp-lzo,cipher BF-CBC,auth SHA1,keysize 128,tls-auth,key-method 2,tls-client'
+Thu Apr  3 12:11:44 2014 us=683453 Expected Remote Options String: 'V4,dev-type tun,link-mtu 1542,tun-mtu 1500,proto UDPv4,comp-lzo,cipher BF-CBC,auth SHA1,keysize 128,tls-auth,key-method 2,tls-server'
+Thu Apr  3 12:11:44 2014 us=683478 Local Options hash (VER=V4): '02af3434'
+Thu Apr  3 12:11:44 2014 us=683498 Expected Remote Options hash (VER=V4): '3f08d474'
+Thu Apr  3 12:11:44 2014 us=683519 Socket Buffers: R=[111616->131072] S=[111616->131072]
+Thu Apr  3 12:11:44 2014 us=683536 UDPv4 link local: [undef]
+Thu Apr  3 12:11:44 2014 us=683563 UDPv4 link remote: 192.168.0.141:80
+WRThu Apr  3 12:11:44 2014 us=693316 TLS: Initial packet from 192.168.0.141:80, sid=494cd59b b6afe278
+WWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRWRThu Apr  3 12:11:44 2014 us=765922 VERIFY OK: depth=1, /C=AQ/ST=N/A/L=Delphia/O=PUCK/OU=Crypto_Cops/CN=puckasaurus/name=PUCK/emailAddress=puck@example.com
+Thu Apr  3 12:11:44 2014 us=766183 Validating certificate key usage
+Thu Apr  3 12:11:44 2014 us=766200 ++ Certificate has key usage  00a0, expects 00a0
+Thu Apr  3 12:11:44 2014 us=766214 VERIFY KU OK
+Thu Apr  3 12:11:44 2014 us=766242 Validating certificate extended key usage
+Thu Apr  3 12:11:44 2014 us=766272 ++ Certificate has EKU (str) TLS Web Server Authentication, expects TLS Web Server Authentication
+Thu Apr  3 12:11:44 2014 us=766286 VERIFY EKU OK
+Thu Apr  3 12:11:44 2014 us=766298 VERIFY OK: depth=0, /C=AQ/ST=N/A/L=Delphia/O=PUCK/OU=Crypto_Cops/CN=puckasaurus/name=PUCK/emailAddress=puck@example.com
+WRWRWWWWRWRWRWRWRWRWRWRRRRWRWRWRWRWRWRWRWRWRWRWRWWWWRRRRWRWRThu Apr  3 12:11:44 2014 us=909120 Data Channel Encrypt: Cipher 'BF-CBC' initialized with 128 bit key
+Thu Apr  3 12:11:44 2014 us=909143 Data Channel Encrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
+Thu Apr  3 12:11:44 2014 us=909224 Data Channel Decrypt: Cipher 'BF-CBC' initialized with 128 bit key
+Thu Apr  3 12:11:44 2014 us=909240 Data Channel Decrypt: Using 160 bit message hash 'SHA1' for HMAC authentication
+WThu Apr  3 12:11:44 2014 us=909339 Control Channel: TLSv1, cipher TLSv1/SSLv3 DHE-RSA-AES256-SHA, 512 bit RSA
+Thu Apr  3 12:11:44 2014 us=909380 [puckasaurus] Peer Connection Initiated with 192.168.0.141:80
+Thu Apr  3 12:11:46 2014 us=103634 SENT CONTROL [puckasaurus]: 'PUSH_REQUEST' (status=1)
+WRRWRThu Apr  3 12:11:46 2014 us=108657 PUSH: Received control message: 'PUSH_REPLY,explicit-exit-notify 3,route 10.132.114.1,topology net30,ping 10,ping-restart 60,ifconfig 10.132.114.6 10.132.114.5'
+Thu Apr  3 12:11:46 2014 us=108722 OPTIONS IMPORT: timers and/or timeouts modified
+Thu Apr  3 12:11:46 2014 us=108752 OPTIONS IMPORT: explicit notify parm(s) modified
+Thu Apr  3 12:11:46 2014 us=108764 OPTIONS IMPORT: --ifconfig/up options modified
+Thu Apr  3 12:11:46 2014 us=108775 OPTIONS IMPORT: route options modified
+Thu Apr  3 12:11:46 2014 us=108983 ROUTE default_gateway=192.168.0.1
+Thu Apr  3 12:11:46 2014 us=110417 TUN/TAP device tun1 opened
+Thu Apr  3 12:11:46 2014 us=110444 TUN/TAP TX queue length set to 100
+Thu Apr  3 12:11:46 2014 us=110478 /sbin/ifconfig tun1 10.132.114.6 pointopoint 10.132.114.5 mtu 1500
+Thu Apr  3 12:11:46 2014 us=112276 /etc/puck/exe/vpn_client_up.sh tun1 1500 1542 10.132.114.6 10.132.114.5 init
++ echo 'VPN is up!'
+VPN is up!
++ up='{ status : up }'
++ dev=tun1
++ mtu=1500
++ mtu2=1542
++ local_ip=10.132.114.6
++ echo VPN IP : 10.132.114.6
+VPN IP : 10.132.114.6
+++ echo 10.132.114.6
+++ sed 's/\.[0-9]*$/.1/'
++ remote_ip=10.132.114.1
++ echo Server : 10.132.114.1
+Server : 10.132.114.1
++ echo Device : tun1
+Device : tun1
++ echo MTU : 1500
+MTU : 1500
++ echo MTU2 : 1542
+MTU2 : 1542
++ ping -c 5 10.132.114.1
++ tee -a /tmp/xoxo
+PING 10.132.114.1 (10.132.114.1) 56(84) bytes of data.
+
+--- 10.132.114.1 ping statistics ---
+5 packets transmitted, 0 received, 100% packet loss, time 4008ms
+
+Thu Apr  3 12:12:00 2014 us=126463 /sbin/route add -net 10.132.114.1 netmask 255.255.255.255 gw 10.132.114.5
+Thu Apr  3 12:12:00 2014 us=127392 Initialization Sequence Completed
+WRWRWRWRWRWRWRWRWRWRWRrWRWRWRWRWR
