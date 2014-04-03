@@ -328,4 +328,17 @@ PING 10.132.114.1 (10.132.114.1) 56(84) bytes of data.
 
 Thu Apr  3 12:12:00 2014 us=126463 /sbin/route add -net 10.132.114.1 netmask 255.255.255.255 gw 10.132.114.5
 Thu Apr  3 12:12:00 2014 us=127392 Initialization Sequence Completed
-WRWRWRWRWRWRWRWRWRWRWRrWRWRWRWRWR
+WRWRWRWRWRWRWRWRWRWRWRrWRWRWRWRWRWThu Apr  3 12:14:24 2014 us=200487 event_wait : Interrupted system call (code=4)
+Thu Apr  3 12:14:24 2014 us=200527 SIGTERM received, sending exit notification to peer
+WWWThu Apr  3 12:14:27 2014 us=703314 TCP/UDP: Closing socket
+Thu Apr  3 12:14:27 2014 us=703368 /sbin/route del -net 10.132.114.1 netmask 255.255.255.255
+Thu Apr  3 12:14:27 2014 us=704334 Closing TUN/TAP interface
+Thu Apr  3 12:14:27 2014 us=704363 /sbin/ifconfig tun1 0.0.0.0
+Thu Apr  3 12:14:27 2014 us=711977 /etc/puck/exe/vpn_client_down.sh tun1 1500 1542 10.132.114.6 10.132.114.5 init
+VPN is down!
+ex-VPN IP : 10.132.114.6
+ex-Server : 10.132.114.1
+Device : tun1
+MTU : 1500
+MTU2 : 1542
+Thu Apr  3 12:14:27 2014 us=718883 SIGTERM[soft,exit-with-notification] received, process exiting
