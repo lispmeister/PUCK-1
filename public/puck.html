@@ -11,8 +11,7 @@
 <!-- <link href="/css/bootstrap.min.css" rel="stylesheet"> -->
 
 <!-- made a one line change in this, noted at top -->
-<!-- <link href="/css/bootstrap.css" rel="stylesheet"> -->
-<link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<link href="/css/bootstrap.css" rel="stylesheet">
 
 <!-- for calls -->
 <link href="/css/avgrund.css" rel="stylesheet">
@@ -31,23 +30,53 @@
 <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
 <!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
 
+<style>
+@font-face {
+  font-family: 'Diplomata-Regular';
+  src: url('/fonts/Diplomata-Regular.ttf');
+}
+
+.diplomat { font-family: 'Diplomata-Regular', 'Georgia', serif; }
+
+.text-rotate {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform:    rotate(-45deg);
+    -o-transform:      rotate(-45deg);
+    -ms-transform:     rotate(-45deg);
+}
+</style>
+
 
   </head>
 
 <body>
 
+    <div class="col-sm-1 sidebar" style="float:left; opacity: 0.25">
+        <!-- <h4 class="diplomat text-rotate"> -->
+        <div class="row clearfix spacer50"></div>
+        <h4 class="diplomat text-rotate" >
+            <span id="puck_top_left" style="align: bottom" data-content="Programmatic Universal Cryptographic Key" data-toggle: "tooltip" data-placement: "right">PUCK</span>
+        </h4> 
+    </div>
+
 <div class="container">
     <div class="row clearfix">
+
         <div class="col-md-6 column">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#home"     data-toggle="tab"><h3>Home</h3></a></li>
-                <li>               <a href="#profile"  data-toggle="tab"><h3>Profile</h3></a></li>
-                <li>               <a href="#trust"    data-toggle="tab"><h3>Trust</h3></a></li>
-                <li>               <a href="#messages" data-toggle="tab"><h3>Message Center</h3></a></li>
+                <li class="active"><a href="#home" data-toggle="tab"><h2><span id="puck_top_home" data-content="Click your heels three times..." data-toggle: "tooltip" data-placement: "right"      class="glyphicon glyphicon-home"></span><h2></a></li>
+
+                <li> <a href="#profile" data-toggle="tab"><img style="margin-top:20px" id="puck_top_ewe" data-toggle="tooltip" data-content="All about Ewe!" data-placement: "right" title="All about Ewe!" src="images/sheep.png"></a></li>
+
+                <li> <a href="#trust" data-toggle="tab"><h2><span style=".active { color: red }" title="Who do you love? Friends, enemies, PUCKs, ..." class="glyphicon glyphicon-heart"></span><h2></a></li>
+
+                <li> <a href="#messages" data-toggle="tab"><h2><span title="Message center: notes, files, and events!" class="glyphicon glyphicon-envelope"></span><h2></a></li>
+
             </ul>
         </div>
 
-        <div class="col-md-6 column">
+
+        <div class="col-md-4 column">
             <ul class="nav nav-pills pull-right">
 
                 <li> <button type="button" class="btn disabled" id="puck_status">Status</button></li>
@@ -111,6 +140,7 @@
 
         </div> 
         </div> <!-- end of form/top stuff -->
+
 
         <div class="row clearfix spacer30"></div>
         <!-- content (puck pals, profile, etc.) show up below -->

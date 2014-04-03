@@ -1,23 +1,22 @@
 
-var Tail     = require('tail').Tail,
-    Q        = require('q'),
-    cors     = require('cors'),
-    crypto   = require('crypto'),
-    express  = require('express'),
-    fs       = require('fs'),
+var Tail       = require('tail').Tail,
+    Q          = require('q'),
+    cors       = require('cors'),
+    crypto     = require('crypto'),
+    express    = require('express'),
+    fs         = require('fs'),
     formidable = require('formidable'),
-    https    = require('https'),
-    moment   = require('moment'),
-    os       = require('os'),
-    path     = require('path'),
-    tcpProxy = require('tcp-proxy'),
-    request  = require('request'),
-    response = require('response-time'),
-    rest     = require('rest'),
-    util     = require('util'),
-    __       = require('underscore'),   // two _'s, just for node
-    puck     = require('./modules');
-
+    https      = require('https'),
+    moment     = require('moment'),
+    os         = require('os'),
+    path       = require('path'),
+    tcpProxy   = require('tcp-proxy'),
+    request    = require('request'),
+    response   = require('response-time'),
+    rest       = require('rest'),
+    util       = require('util'),
+    __         = require('underscore'),   // note; not one, two _'s, just for node
+    puck       = require('./modules');
 
 // sue me
 var sleep = require('sleep');
@@ -70,6 +69,7 @@ catch (e) {
 // status and other bits
 var server_magic = {},
     client_magic = {},
+    file_magic   = {},
     puck_events  = {},
     server       = "",
     puck2ip      = {}
@@ -190,12 +190,14 @@ function change_status() {
     puck_status.events         = puck_events
     puck_status.openvpn_server = server_magic
     puck_status.openvpn_client = client_magic
+    puck_status.file_events    = file_magic
 
     puck_status                = JSON.stringify(puck_status)
 
     // this one I'm wiping out manually once used
     // xxx zero ring ring?
-    puck_events = { ring_ring : "", new_puck : "" }
+    puck_events = {}
+    file_magic  = {}
 
     console.log("status: " + puck_status)
 
@@ -308,7 +310,6 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
-                change_status() // tell the world about it
                 createEvent('internal server', {event_type: "vpn_server_connected", puck_id: bwana_puck.PUCK_ID})
             }
             // down
@@ -333,8 +334,6 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
-                change_status() // tell the world about it
-
                 createEvent('internal server', {event_type: "vpn_server_disconnected", puck_id: bwana_puck.PUCK_ID})
             }
         }
@@ -355,7 +354,6 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
     
-                change_status() // tell the world about it
                 createEvent('internal server', {event_type: "vpn_client_connected", puck_id: bwana_puck.PUCK_ID})
     
             }
@@ -381,7 +379,6 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
     
-                change_status() // tell the world about it
                 createEvent('internal server', {event_type: "vpn_client_disconnected", puck_id: bwana_puck.PUCK_ID})
     
             }
@@ -709,7 +706,6 @@ function createPuck(req, res, next) {
                 console.log('create appears to be coming from local PUCK/host: ' + client_ip)
             }
 
-            change_status() // make sure everyone hears this
             createEvent(get_client_ip(req), {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
 
             res.send(204);
@@ -825,6 +821,8 @@ function createEvent(client_ip, event_data) {
             console.log({key: event_data}, e_type + ' event : saved');
         }
     })
+
+    change_status() // make sure everyone hears this
 
 }
 
@@ -1110,7 +1108,7 @@ function echoStatus(req, res, next) {
 }
 
  /**
- * Stop the local OpenVPN server via an external bash script.
+ * Stop the local OpenVPN client via an external bash script.
  */
 function stopVPN(req, res, next) {
     var exec    = require('child_process').exec;
@@ -1134,7 +1132,7 @@ function stopVPN(req, res, next) {
                 stop       : "unknown",
                 stop_s     : "unknown"
             }
-            change_status() // make sure everyone hears this
+            createEvent('internal server', {event_type: "vpn_client_stop", puck_id: bwana_puck.PUCK_ID})
 
             res.send(200, {"status": "Failed"});
 
@@ -1257,6 +1255,12 @@ function uploadSchtuff(req, res, next) {
                     else {
                         console.log('renamed complete');
                         console.log('woohoo')
+
+                        file_magic = {
+                            file_name : target_file,
+                            file_size : target_size,
+                            file_from : client_ip
+                        }
 
                         createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
 

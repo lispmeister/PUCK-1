@@ -8,6 +8,11 @@ $(document).ready(function () {
     // var puck_id   = ""
     puck_data     = ""
     
+
+    // xxx fix
+    $('#puck_top_left').tooltip({delay: { hide: 200 }, trigger: "hover"})
+
+
     // status loop
     infinite();
     
@@ -141,7 +146,7 @@ $(document).ready(function () {
         else
             $('#puck_status').removeClass('btn-success').addClass('disabled')
     
-        $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "auto left").attr("data-html", "true").attr("title", "This PUCK").attr("data-content", my_puck_status).popover({delay: { show: 300, hide: 200 }, trigger: "hover"})
+        $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "This PUCK").attr("data-content", my_puck_status).popover({delay: { hide: 200 }, trigger: "click"})
     
     })
     

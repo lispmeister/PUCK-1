@@ -426,7 +426,9 @@ function isEmpty(obj) {
 
 
 //
-// get status... or... well....
+// get events, status... or... well....
+//
+// this processes missives from the server and potentially says something about it
 //
 function status_or_die() {
 
@@ -479,7 +481,7 @@ function status_or_die() {
         var remote_ip = jdata.events.new_puck
         console.log(remote_ip + ' added!')
         // a bit down from the top, and stay until wiped away or refreshed
-        $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see more)", {offset: {from: 'top', amount: 70}, delay: -1})
+        $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see details)", {offset: {from: 'top', amount: 70}, delay: -1})
         jdata.events.new_puck = ""
 
 // <input type="button" value="Reload Page" onClick="history.go(0)">
@@ -490,7 +492,7 @@ function status_or_die() {
         // ensure video button is enabled if a call is in progress
         $('#puck_video').removeClass('disabled')
     
-        if (typeof puck_current.incoming != "undefined" && ! puck_current.incoming) {
+        if (puck_current.incoming) {
             console.log('incoming ring from ' +  jdata.openvpn_server.client)
             incoming_ip = jdata.openvpn_server.client
             // ring them gongs
@@ -506,7 +508,7 @@ function status_or_die() {
         $('#puck_video').removeClass('disabled')
         
                 
-        if (typeof puck_current.outgoing != "undefined" && ! puck_current.outgoing) {
+        if (puck_current.outgoing) {
             console.log('outgoing ring!')
             window.location.href = "/vpn.html"
         }
@@ -519,6 +521,25 @@ function status_or_die() {
         $('body').removeClass('avgrund-active');
         hang_up()
     }
+
+    // new package delivered
+    try {
+        if (typeof jdata.file_events.file_name != "undefined" && jdata.file_events.file_name != "") {
+
+            console.log('new file(z)!')
+
+            // put in or lookup PiD, then owner/puck's name!
+            $.bootstrapGrowl("New file: <strong>" + jdata.file_events.file_name + "</strong>  ("  + jdata.file_events.file_size + " bytes); from " + jdata.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+
+            jdata.file_events.file_name = ""
+        }
+    } 
+    catch(e) {
+        console.log('filename not defined')
+        console.log(e)
+    }
+
+
 
 }
 
