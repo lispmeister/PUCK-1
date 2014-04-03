@@ -10,7 +10,11 @@ $(document).ready(function () {
     
 
     // xxx fix
-    $('#puck_top_left').tooltip({delay: { hide: 200 }, trigger: "hover"})
+    $('#puck_top_left').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    $('#puck_top_home').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    $('#puck_top_ewe').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    $('#puck_top_love').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    $('#puck_top_messages').tooltip({delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
 
 
     // status loop

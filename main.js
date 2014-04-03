@@ -72,13 +72,15 @@ var server_magic = {},
     file_magic   = {},
     puck_events  = {},
     server       = "",
-    puck2ip      = {}
-    ip2puck      = {}
+    puck2ip      = {}       // puck ID to IP mapping
+    ip2puck      = {}       // IP mapping to puck ID
 
 var bwana_puck   = {}
 
 var puck_status      = "{}",
     puck_status_file = "/etc/puck/status.puck"
+
+
 
 // keep an eye on the above
 pollStatus(puck_status_file)
@@ -921,15 +923,14 @@ function getEvent(req, res, next) {
     console.log('getting event')
 
     if (typeof req.params.key == "undefined") {
-        console.log('type of even required')
-        var reply = {error: "missing required even type"}
+        console.log('type of event required')
+        var reply = {error: "missing required event type"}
         res.send(200, reply);
     }
 
 
     // get keys first, then data for all keys
 
-    // rclient.get(req.params.key + ':.*', function (err, reply) {
     rclient.keys(req.params.key + '*', function (err, replies) {
         if (!err) {
             // console.log(replies)
@@ -1007,57 +1008,6 @@ function getPuck(req, res, next) {
             next(err);
         }
     });
-}
-
-/**
- *  Swap PUCK data - you give yours, it gives its back
- */
-function swapPuck(req, res, next) {
-
-    console.log('swap meat')
-    console.log(req.params)
-    // console.log(req.params.PUCK)
-
-    var their_puck = req.params.PUCK.PUCK_ID
-
-    var puck = {
-        key: their_puck,
-        value:  '{ "PUCK":'  + JSON.stringify(req.params.PUCK) + "}"
-    };
-
-    console.log('their_puck: ' + their_puck)
-
-    // store theirs
-    rclient.set(puck.key, puck.value, function(err) {
-        console.log('trying to store theirs...')
-        if (err) {
-            console.log('failzor...')
-            console.log(err, 'putPuck: unable to store in Redis db');
-            next(err);
-        } else {
-            console.log({puck: req.body}, 'putPuck: done');
-            console.log('success storing theirs...')
-        }
-    });
-
-    // give them ours
-    rclient.get(puck_id, function (err, reply) {
-
-        if (err) {
-            console.log(err, 'getPuck: unable to retrieve %s', req.puck);
-            next(err);
-        } else {
-            if (reply == null) {
-                console.log(err, 'getPuck: unable to retrieve %s', req.puck);
-                next(new PuckNotFoundError(req.params.key));
-            } else {
-                // console.log("Value retrieved: " + reply.toString());
-                console.log('taking a short nap...')
-                sleep.sleep(5)
-                res.send(200, reply);
-            }
-        }
-    })
 }
 
 /**
@@ -1214,7 +1164,19 @@ function createMultipartBuffer(boundary, size) {
 
 function uploadSchtuff(req, res, next) {
 
-    console.log('striving to upload....')
+    console.log('uploadz!')
+
+    if (typeof req.params.key == "undefined") {
+        console.log('correct type of upload required')
+        var reply = {error: "type of upload required"}
+        res.send(200, reply);
+    }
+
+    // currently local & remote
+    var upload_target = req.params.key
+
+    console.log('striving to upload....' + upload_target)
+
     console.log(req.files)
 
     var client_ip = get_client_ip(req)
@@ -1262,11 +1224,38 @@ function uploadSchtuff(req, res, next) {
                             file_from : client_ip
                         }
 
-                        createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
+                        console.log('moment of truth.. local or no?  => ' + upload_target)
+                        // keep it here only
+                        if (upload_target == "local") {
+                            console.log('local')
+                            createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
+                            res.send(204, {"status" : target_file})
+                        }
 
-                        res.send(204, {"status" : target_file})
+                        // post to a remote PUCK, if connected... first look up IP based on PID, then post to it
+                        else {
+                            console.log("upload_target: " + upload_target)
+
+                            var restler = require("restler")
+
+                            var filey = "s.js"
+
+                            fs.stat(filey, function(err, stats) {
+                                restler.post("https://" + upload_target + ":8080/up/local", {
+                                    multipart: true,
+                                    data: {
+                                        "uppity[]": restler.file(filey, null, stats.size, null, "image/jpg")
+                                    }
+                                }).on("complete", function(data) {
+                                    console.log('done!')
+                                    console.log(data);
+                                    res.send(204, {"status" : target_file})
+                                })
+                            });
+                        }
                     }
                 })
+
             })
         })
     }
@@ -1750,9 +1739,6 @@ server.get('/getip', getIP);
 server.get('/puck/:key', getPuck);
 server.head('/puck/:key', getPuck);
 
-// send yours and get theirs
-server.post('/puck/swap', swapPuck);
-
 // Delete a Puck by key
 server.del('/puck/:key', deletePuck);
 
@@ -1809,8 +1795,8 @@ server.get('/server/restart', serverRestart);  // die and restart
 // setup a tcp proxy
 server.get('/setproxy', setTCPProxy)
 
-// get a url from wherever the puck is
-server.post('/up', uploadSchtuff)
+// send stuff up the pipe....
+server.post('/up/:key', uploadSchtuff)
 
 // get a url from wherever the puck is
 server.all('/url', webProxy)

@@ -1,4 +1,18 @@
 
+**** posting... locally... 
+        end status
+
+    { key: 
+    { event_type: 'vpn_client_stop',
+     puck_id: undefined,
+     from: 'internal server',
+     time: 'Wed Apr 02 2014 21:06:59 GMT-0700 (PDT)' } } 'vpn_client_stop event : saved'
+wrote status
+changezor
+
+
+
+
 
 add uploads
 
