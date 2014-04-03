@@ -12,8 +12,8 @@ var puck_current            = {}
     puck_current.incoming   = false;
     puck_current.outgoing   = false;
 
-var puck_status     = "{}",
-    old_puck_status = "{}"
+var puck_status     = {},
+    old_puck_status = {}
 
 var incoming_ip = "?"
 
@@ -212,6 +212,10 @@ function hang_up() {
     puck_current.incoming = false
     puck_current.outgoing = false
 
+//  if (window.location.pathname.split( '/' )[1] != "puck.html") {
+//      window.location.href = "/puck.html"
+//  }
+
 }
 
 //
@@ -402,11 +406,20 @@ function get_status(){
 
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
         // console.log('status wootz');
-        puck_status = data
+        puck_status = JSON.parse(data)
 
         // if something is new, do something!
-        if (old_puck_status != puck_status) {
+        if (_.isEqual(old_puck_status != puck_status)) {
+            console.log('\n\n')
             console.log('something new in the state of denmark!')
+            console.log('old')
+            console.log(old_puck_status)
+            console.log('\n\n')
+            console.log('new')
+            console.log(puck_status)
+
+            console.log('\n\n')
+
             old_puck_status = puck_status
             status_or_die()
         }
@@ -434,67 +447,57 @@ function status_or_die() {
 
     console.log('sailing on the sneeze of cheeze')
 
-    // real json or the fake stuff?
-    try {
-        jdata = JSON.parse(puck_status)
-    }
-    // catch and move on
-    catch(e){
-        console.log('not json data...' + e)
-        return
-    }
- 
-    console.log(jdata)
+    console.log(puck_status)
 
     // default to down
-    if (typeof jdata.openvpn_server == "undefined" || isEmpty(jdata.openvpn_server)) {
-        jdata.openvpn_server = {}
-        jdata.openvpn_server.vpn_status = "down"
+    if (typeof puck_status.openvpn_server == "undefined" || isEmpty(puck_status.openvpn_server)) {
+        puck_status.openvpn_server = {}
+        puck_status.openvpn_server.vpn_status = "down"
         puck_current.incoming = false
     }
-    if (typeof jdata.openvpn_client == "undefined" || isEmpty(jdata.openvpn_client)) {
-        jdata.openvpn_client = {}
-        jdata.openvpn_client.vpn_status = "down"
+    if (typeof puck_status.openvpn_client == "undefined" || isEmpty(puck_status.openvpn_client)) {
+        puck_status.openvpn_client = {}
+        puck_status.openvpn_client.vpn_status = "down"
         puck_current.outgoing = false
     }
 
     // new kid on the block?  Happens when a remote adds you
-    if (typeof jdata.events == "undefined" || isEmpty(jdata.events)) {
-        console.log('jdata.events who?')
-        console.log(jdata.events)
-        jdata.events = {}
-        jdata.events.new_puck = ""
+    if (typeof puck_status.events == "undefined" || isEmpty(puck_status.events)) {
+        console.log('puck_status.events who?')
+        console.log(puck_status.events)
+        puck_status.events = {}
+        puck_status.events.new_puck = ""
     }
     else {
-        console.log('jdata.events:')
-        console.log(jdata.events)
+        console.log('puck_status.events:')
+        console.log(puck_status.events)
     }
 
     console.log('I hear something...')
     console.log(puck_current)
     console.log('big data')
-    console.log(jdata)
+    console.log(puck_status)
 
     // if someone has added you, create a modest sized bit of text that tells you 
     // and hopefully won't fuck up anything you're doing
-    if (jdata.events.new_puck.length) {
-        var remote_ip = jdata.events.new_puck
+    if (puck_status.events.new_puck.length) {
+        var remote_ip = puck_status.events.new_puck
         console.log(remote_ip + ' added!')
         // a bit down from the top, and stay until wiped away or refreshed
         $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see details)", {offset: {from: 'top', amount: 70}, delay: -1})
-        jdata.events.new_puck = ""
+        puck_status.events.new_puck = ""
 
 // <input type="button" value="Reload Page" onClick="history.go(0)">
     }
 
     // server
-    if (jdata.openvpn_server.vpn_status == "up") {
+    if (puck_status.openvpn_server.vpn_status == "up") {
         // ensure video button is enabled if a call is in progress
         $('#puck_video').removeClass('disabled')
     
         if (puck_current.incoming) {
-            console.log('incoming ring from ' +  jdata.openvpn_server.client)
-            incoming_ip = jdata.openvpn_server.client
+            console.log('incoming ring from ' +  puck_status.openvpn_server.client)
+            incoming_ip = puck_status.openvpn_server.client
             // ring them gongs
             $('#incoming')[0].click()
         }
@@ -503,20 +506,20 @@ function status_or_die() {
     }
 
     // client
-    if (jdata.openvpn_client.vpn_status == "up") {
+    if (puck_status.openvpn_client.vpn_status == "up") {
 
         $('#puck_video').removeClass('disabled')
         
                 
         if (puck_current.outgoing) {
             console.log('outgoing ring!')
-            window.location.href = "/vpn.html"
+            // window.location.href = "/vpn.html"
         }
 
         puck_current.outgoing = true
     }
 
-    if (jdata.openvpn_server.vpn_status == "down" && jdata.openvpn_client.vpn_status == "down") {
+    if (puck_status.openvpn_server.vpn_status == "down" && puck_status.openvpn_client.vpn_status == "down") {
         console.log('everything dead, shut it down...!')
         $('body').removeClass('avgrund-active');
         hang_up()
@@ -524,22 +527,20 @@ function status_or_die() {
 
     // new package delivered
     try {
-        if (typeof jdata.file_events.file_name != "undefined" && jdata.file_events.file_name != "") {
+        if (typeof puck_status.file_events.file_name != "undefined" && puck_status.file_events.file_name != "") {
 
             console.log('new file(z)!')
 
             // put in or lookup PiD, then owner/puck's name!
-            $.bootstrapGrowl("New file: <strong>" + jdata.file_events.file_name + "</strong>  ("  + jdata.file_events.file_size + " bytes); from " + jdata.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+            $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
-            jdata.file_events.file_name = ""
+            puck_status.file_events.file_name = ""
         }
     } 
     catch(e) {
         console.log('filename not defined')
         console.log(e)
     }
-
-
 
 }
 
@@ -557,3 +558,33 @@ function remove_signs_of_call() {
 
 }
 
+function load_vault() {
+
+    console.log('loadin vault!')
+
+    var jqXHR_files = $.ajax({
+        url: '/down',
+        dataType: 'json'
+    }) 
+
+    var table_rowz = []
+
+    jqXHR_files.done(function (data, textStatus, jqXHR) {
+        console.log('jxq file vault listing')
+        console.log(data.files)
+
+        var vault = []
+
+        for (var i = 0; i < data.files.length; i++) {
+            console.log(data.files[i])
+            var file = data.files[i]
+            table_rowz.push('<tr><td><a target="_blank" href="/uploads/' + data.files[i] + '">' + data.files[i] + '</a></td></tr>')
+        }
+
+        console.log(table_rowz)
+
+        $('#puck_cloud_file_listing').append(table_rowz)
+
+    })
+
+}

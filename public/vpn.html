@@ -80,10 +80,13 @@
 
     <div class="container">
 
+
         <div> <a href="#" id="outgoing" class="button left"></a></div>
-        <div> </div>
 
         <video id="localVideo"></video>
+
+        <div><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>
+
         <div id="remoteVideos"></div>
 
     </div>
@@ -110,6 +113,13 @@
 <script type="text/javascript" src='/js/puck.js'></script>
 
 <script type='text/javascript'>
+
+    // ... bye bye
+    $('body').on('click', '#puck_disconnect', function() {
+        $('body').removeClass('avgrund-active');
+        hang_up()
+    })
+
 
     var webrtc = new SimpleWebRTC({
         // the id/element dom element that will hold "our" video

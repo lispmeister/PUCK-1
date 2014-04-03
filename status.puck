@@ -1,1 +1,1 @@
-{"events":{},"openvpn_server":{},"openvpn_client":{"vpn_status":"up","start":"Thu  06:15:13 04-03-14","start_s":1396530913017,"duration":"n/a","stop":"n/a","stop_s":"n/a"},"file_events":{}}
+{"events":{},"openvpn_server":{},"openvpn_client":{"vpn_status":"up","start":"Thu  12:11:46 04-03-14","start_s":1396552306117,"server":"10.132.114.1","duration":"n/a","stop":"n/a","stop_s":"n/a"},"file_events":{}}

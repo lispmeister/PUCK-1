@@ -14,6 +14,7 @@ $(document).ready(function () {
     $('#puck_top_home').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
     $('#puck_top_ewe').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
     $('#puck_top_love').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    $('#puck_top_cloud').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
     $('#puck_top_messages').tooltip({delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
 
 
@@ -29,6 +30,9 @@ $(document).ready(function () {
     $('#home a').click(function     (e) { e.preventDefault(); $(this).tab('show') })
     $('#profile a').click(function  (e) { e.preventDefault(); $(this).tab('show') })
     $('#messages a').click(function (e) { e.preventDefault(); $(this).tab('show') })
+
+    // load in files present in vault
+    load_vault()
     
     //
     // user clicks vpn, and....

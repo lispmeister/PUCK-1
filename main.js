@@ -14,6 +14,7 @@ var Tail       = require('tail').Tail,
     request    = require('request'),
     response   = require('response-time'),
     rest       = require('rest'),
+    restler    = require("restler"),
     util       = require('util'),
     __         = require('underscore'),   // note; not one, two _'s, just for node
     puck       = require('./modules');
@@ -270,6 +271,8 @@ function watch_logs(logfile, log_type) {
         var magic_client_up     = "Initialization Sequence Completed",
             magic_client_up     = "/sbin/route add",
             magic_client_up     = "VPN is up",
+            magic_client_up     = "Server : "
+
             magic_client_down   = "VPN is down",
 
             magic_server_up     = "Peer Connection Initiated",
@@ -331,6 +334,8 @@ function watch_logs(logfile, log_type) {
                     vpn_status : "down",
                     start      : "n/a",
                     start_s    : "n/a",
+                    client     : "",
+                    client_pid : "",
                     duration   : v_duration,
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
@@ -341,9 +346,14 @@ function watch_logs(logfile, log_type) {
         }
         else if (log_type.indexOf("Client") > -1) {
 
-            if (line.indexOf(magic_client_up) > -1) {
+
+            // Peer Connection Initiated with 192.168.0.141:41595
+            if (line.indexOf(magic_client_up) == 0) {
+                server_remote_ip = line.match(/^Server : ((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/)[1]
+
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn client up!\n\n')
                 console.log(line)
+                console.log('ougoing call to ' + server_remote_ip)
                 console.log('\n\n')
     
                 // if starting simply take the current stuff
@@ -351,6 +361,8 @@ function watch_logs(logfile, log_type) {
                     vpn_status : "up",
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
+                    server     : server_remote_ip,
+                    server_pid : ip2puck[server_remote_ip],
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
@@ -376,6 +388,8 @@ function watch_logs(logfile, log_type) {
                     vpn_status : "down",
                     start      : "n/a",
                     start_s    : "n/a",
+                    server     : "",
+                    server_pid : "",
                     duration   : v_duration,
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
@@ -941,7 +955,7 @@ function getEvent(req, res, next) {
                 res.send(418, replies)  // 418 I'm a teapot (RFC 2324)
             } 
             else {
-                console.log("keys retrieved: ")
+                // console.log("keys retrieved: ")
                 // console.log(replies)
 
                 // get data that matches the keys we just matched
@@ -956,7 +970,6 @@ function getEvent(req, res, next) {
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
                         } 
                         else {
-                            console.log("event data retrieved: ")
                             // console.log("event data retrieved: " + data.toString());
                             jdata = data.toString()
                             // hack it into a json string
@@ -1138,8 +1151,21 @@ function knockKnock(req, res, next) {
 
 }
 
+// upload and download some content from the vaults
 
-// upload some content
+function downloadStuff (req, res, next) {
+
+    console.log('in DL stuff')
+
+    var uploadz = "/etc/puck/public/uploads"
+
+    var files = fs.readdirSync(uploadz)
+
+    console.log(files)
+
+    res.send(200, {"files" : files });
+
+}
 
 // helper
 function createMultipartBuffer(boundary, size) {
@@ -1187,7 +1213,7 @@ function uploadSchtuff(req, res, next) {
 
         var target_size = req.files.uppity[i].size
         var target_file = req.files.uppity[i].name
-        var target_path = __dirname + "/uploads/" + target_file
+        var target_path = __dirname + "/public/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
 
         console.log('trying ' + tmpfile + ' -> ' + target_path)
@@ -1197,19 +1223,16 @@ function uploadSchtuff(req, res, next) {
         //
         // also... slight race condition.  Life goes on.
 
-        // does target exist?
-        fs.exists(target_path, function(exists) {
-            if (exists) {
-                // xxx - error message to user
-                console.log('dying in flames... target already exists....')
-            }
+            console.log('trying to rename....')
     
-            fs.readFile(tmpfile, function (err, data) {
-                console.log('reading file...')
+            // XXX if on different FS, have to copy
+//          fs.readFile(tmpfile, function (err, data) {
+//              console.log('reading file...')
                 // XXX
                 // if exists... dont overwrite; reject, pick new filename, etc.
                 //
-                fs.writeFile(target_path, data, function (err) {
+//              fs.writeFile(target_path, data, function (err) {
+                fs.rename(tmpfile, target_path, function (err) {
                     if (err)  {
                         console.log('errz - ')
                         console.log(err)
@@ -1234,30 +1257,29 @@ function uploadSchtuff(req, res, next) {
 
                         // post to a remote PUCK, if connected... first look up IP based on PID, then post to it
                         else {
-                            console.log("upload_target: " + upload_target)
+                            console.log("going to push it to the next in line: " + upload_target)
 
-                            var restler = require("restler")
+                            restler.post("https://" + upload_target + ":8080/up/local", {
+                                multipart: true,
+                                data: { "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg") }
+                            }).on("complete", function(data) {
 
-                            var filey = "s.js"
-
-                            fs.stat(filey, function(err, stats) {
-                                restler.post("https://" + upload_target + ":8080/up/local", {
-                                    multipart: true,
-                                    data: {
-                                        "uppity[]": restler.file(filey, null, stats.size, null, "image/jpg")
-                                    }
-                                }).on("complete", function(data) {
-                                    console.log('done!')
+                                if (data instanceof Error) {
+                                    console.log('Error:', data.message);
+                                    res.send(200, {"error" : data.message})
+                                } 
+                                else {
+                                    console.log('upload to ' + upload_target + ' complete')
+                                    createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[upload_target]})
                                     console.log(data);
                                     res.send(204, {"status" : target_file})
-                                })
-                            });
+                                }
+                            })
                         }
                     }
                 })
 
-            })
-        })
+//      })
     }
 
 }
@@ -1484,9 +1506,9 @@ function httpsPing(puckid, ipaddr, res, next) {
                 console.log(err)
             }
             else {
-                msg = JSON.parse(msg)
-
                 console.log('ping werx?  ' + msg)
+
+                msg = JSON.parse(msg)
 
                 var remote = resu.request.host
 
@@ -1797,6 +1819,9 @@ server.get('/setproxy', setTCPProxy)
 
 // send stuff up the pipe....
 server.post('/up/:key', uploadSchtuff)
+
+// see what's there and possibly get
+server.get('/down', downloadStuff)
 
 // get a url from wherever the puck is
 server.all('/url', webProxy)
