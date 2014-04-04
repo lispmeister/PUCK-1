@@ -196,7 +196,7 @@ function change_status() {
 
     puck_status                = JSON.stringify(puck_status)
 
-    // this one I'm wiping out manually once used
+    // wiping out manually once used
     // xxx zero ring ring?
     puck_events = {}
     file_magic  = {}
@@ -558,7 +558,6 @@ function formatPuck(req, res, body) {
         body = body.toString();
     }
 
-    res.setHeader('Content-Length', Buffer.byteLength(body));
     return (body);
 }
 
@@ -1299,15 +1298,12 @@ function startVPN(req, res, next) {
     console.log('start vpn2')
     console.log(req.body)
 
-    var puck_web_home  = "/puck.html"
+    var home  = "/puck.html"
 
     // bail if we don't get ID
     if (typeof req.body.puckid === 'undefined' || req.body.puckid == "") {
-      console.log("error... requires a PUCK ID!");
-      // redirect to the home-o-the-puck
-      // fix ;)
-      res.header('Location', puck_web_home);
-      res.send(302);
+        console.log("error... requires a PUCK ID!");
+        res.redirect(302, home)
     }
 
     console.log('onto the execution...')
@@ -1377,15 +1373,9 @@ function putPuck(req, res, next) {
 //
 
 function back_to_home (res) {
-
     console.log('on my way home')
-
-    var body = {"status" : "OK"}
     var home = "/puck.html"
-    res.statusCode = 302;
-    res.setHeader("Location", home)
-    res.setHeader('Content-Length', Buffer.byteLength(body));
-    res.end(body)
+    res.redirect(302, home)
 }
 
 // this... unfortunately... is mine
@@ -1607,7 +1597,7 @@ function formCreate(req, res, next) {
     
                 // console.log(data);
     
-                create_puck_key_store(data.PUCK)
+                create_puck_key_store(data)
     
                 var puck_fs_home = __dirname
     
@@ -1850,5 +1840,5 @@ pucky.listen(puck_port)
 console.log('server listening at %s', puck_port)
 
 // tack on socket.io
-var io    = require('socket.io').listen(pucky, {key:key,cert:key,ca:ca})
+var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
 

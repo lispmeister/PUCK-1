@@ -24,9 +24,8 @@ $(document).ready(function () {
     $('#puck_top_cloud').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
     $('#puck_top_messages').tooltip({delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
 
-
     // status loop
-    infinite();
+    infinite()
     
     // disable a/href pushing if disabled
     $('body').on('click', 'a.disabled', function(event) {
@@ -196,28 +195,28 @@ $(document).ready(function () {
                 }
                 else {
     
-                    var name        = truncate(puckinfo.PUCK.name)
-                    var owner       = truncate(puckinfo.PUCK.owner.name)
-                    var email       = truncate(puckinfo.PUCK.owner.email)
-                    var puckid      = puckinfo.PUCK.PUCK_ID
-                    var ipaddr      = puckinfo.PUCK.ip_addr
-                    var all_ips     = puckinfo.PUCK.all_ips
-                    var port        = puckinfo.PUCK.port
-                    var ipaddr_ext  = puckinfo.PUCK.ip_addr_ext
-                    var port_ext    = puckinfo.PUCK.port_ext
-                    var proto       = puckinfo.PUCK.proto
-                    var image       = puckinfo.PUCK.image
-                    var ca          = puckinfo.PUCK.vpn.ca
-                    var key         = puckinfo.PUCK.vpn.key
-                    var cert        = puckinfo.PUCK.vpn.cert
-                    var dh          = puckinfo.PUCK.vpn.dh
+                    var name        = truncate(puckinfo.name)
+                    var owner       = truncate(puckinfo.owner.name)
+                    var email       = truncate(puckinfo.owner.email)
+                    var puckid      = puckinfo.PUCK_ID
+                    var ipaddr      = puckinfo.ip_addr
+                    var all_ips     = puckinfo.all_ips
+                    var port        = puckinfo.port
+                    var ipaddr_ext  = puckinfo.ip_addr_ext
+                    var port_ext    = puckinfo.port_ext
+                    var proto       = puckinfo.proto
+                    var image       = puckinfo.image
+                    var ca          = puckinfo.vpn.ca
+                    var key         = puckinfo.vpn.key
+                    var cert        = puckinfo.vpn.cert
+                    var dh          = puckinfo.vpn.dh
                     
                     var vpn_form    = 'vpn_form_' + puckid
              
                     console.log('puckasaurus:')
                     console.log(puckinfo)
                     console.log('puck particulars:')
-                    console.log(puckinfo.PUCK)
+                    console.log(puckinfo)
              
                     if (typeof port === 'undefined' || port == "") {
                         // XXXX

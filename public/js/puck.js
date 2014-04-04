@@ -398,18 +398,19 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
 //
 function get_status(){
 
-    // console.log('gs')
+    console.log('get STATUS')
 
     var url = "/status"
 
     var jqXHR_get_status = $.ajax({ url: url, })
 
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
-        // console.log('status wootz');
+        console.log('status wootz\n' + data)
+        console.log('vs\n' + old_puck_status)
         puck_status = JSON.parse(data)
 
         // if something is new, do something!
-        if (_.isEqual(old_puck_status != puck_status)) {
+        if (!_.isEqual(old_puck_status, puck_status)) {
             console.log('\n\n')
             console.log('something new in the state of denmark!')
             console.log('old')
@@ -429,6 +430,7 @@ function get_status(){
 }
 
 function infinite() {
+    console.log('infinity... ' + poll)
     get_status()
     setTimeout(infinite, poll)
 }
@@ -513,7 +515,7 @@ function status_or_die() {
                 
         if (puck_current.outgoing) {
             console.log('outgoing ring!')
-            // window.location.href = "/vpn.html"
+            window.location.href = "/vpn.html"
         }
 
         puck_current.outgoing = true
@@ -621,7 +623,7 @@ function drag_and_puck() {
         $('.dragDropBox').remove()
 
     $('#uppity').filer({
-        changeInput: '<div class="dragDropBox"><span class="message">CLICK/DROP files to upload <span style="font-size:200%"><br />' + vpn_server + '</span></div>',
+        changeInput: '<div class="dragDropBox"><span class="message">CLICK -or- DROP files to upload <span style="font-size:200%"><br />' + vpn_server + '</span></div>',
         appendTo   : '.dragDropBox',
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
         maxSize    : 1024,
@@ -648,7 +650,5 @@ function drag_and_puck() {
     }
 
     already_polled = true
-
-    return(ping_poll)
 
 }
