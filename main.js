@@ -590,7 +590,6 @@ function create_puck_key_store(puck) {
 
     if (typeof puck != 'object') {
         puck = JSON.parse(puck)
-        puck = puck.PUCK
     }
 
     console.log('typeof : ' + typeof puck)
