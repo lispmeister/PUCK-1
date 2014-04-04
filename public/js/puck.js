@@ -174,6 +174,20 @@ function post(url, parameters) {
     form.submit();
 }
 
+// the bells... the bells... make them stop!
+function kill_ring() {
+
+    try {
+        ring.pause();
+        ring.currentTime = 0;
+        console.log('bells... no more?')
+    }
+    catch(e) {
+        console.log("haven't played anything yet - " + e)
+    }
+
+}
+
 //
 // hang up the phone, return to home
 //
@@ -181,14 +195,7 @@ function hang_up() {
 
     console.log('hanging up!')
 
-    // the bells... the bells... make them stop!
-    try {
-        ring.pause();
-        ring.currentTime = 0;
-    }
-    catch(e) {
-        console.log("haven't played anything yet - " + e)
-    }
+    kill_ring()
 
     var url = "/vpn/stop"
 
@@ -406,21 +413,14 @@ function get_status(){
 
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
         console.log('status wootz\n' + data)
-        console.log('vs\n' + old_puck_status)
+        console.log('vs\n' + JSON.stringify(old_puck_status))
         puck_status = JSON.parse(data)
 
         // if something is new, do something!
         if (!_.isEqual(old_puck_status, puck_status)) {
             console.log('\n\n')
             console.log('something new in the state of denmark!')
-            console.log('old')
-            console.log(old_puck_status)
             console.log('\n\n')
-            console.log('new')
-            console.log(puck_status)
-
-            console.log('\n\n')
-
             old_puck_status = puck_status
             status_or_die()
         }
@@ -476,9 +476,9 @@ function status_or_die() {
     }
 
     console.log('I hear something...')
-    console.log(puck_current)
+    console.log(JSON.stringify(puck_current))
     console.log('big data')
-    console.log(puck_status)
+    console.log(JSON.stringify(puck_status))
 
     // if someone has added you, create a modest sized bit of text that tells you 
     // and hopefully won't fuck up anything you're doing
@@ -515,6 +515,7 @@ function status_or_die() {
                 
         if (puck_current.outgoing) {
             console.log('outgoing ring!')
+            kill_ring()
             window.location.href = "/vpn.html"
         }
 

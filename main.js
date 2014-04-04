@@ -1417,7 +1417,9 @@ function handleForm(req, res, next) {
 function formDelete(req, res, next) {
 
     console.log("deleting puck...")
+    console.log(req.body)
     console.log(req.body.puckid)
+
     // script below needs: puck-id
 
     // have to have these
