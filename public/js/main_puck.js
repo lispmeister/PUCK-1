@@ -2,6 +2,13 @@
 // after all is said and done... let the JS fur fly
 //
 
+var vpn_server = "local"
+
+// poll until we get something, then stop polling
+var vault_poll     = 1000
+var already_polled = false
+var vpn_started    = false
+
 $(document).ready(function () {
     
     var image     = ""
@@ -31,7 +38,12 @@ $(document).ready(function () {
     $('#profile a').click(function  (e) { e.preventDefault(); $(this).tab('show') })
     $('#messages a').click(function (e) { e.preventDefault(); $(this).tab('show') })
 
-    // load in files present in vault
+    //
+    // setup user drag/click files to browser
+    //
+    setInterval(drag_and_puck, vault_poll)
+
+    // load up filenames already in vault
     load_vault()
     
     //

@@ -110,3 +110,33 @@ div.glow {
     box-shadow:         0 0 10px green;
 }
 
+/* almost verbatim from jquery-filer */
+
+.dragDropBox{
+    position:relative;
+    display:block;
+    min-height: 200px;
+    width:500px;
+    background-color:#f3f3f3;
+    border:2px dashed #aaa;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 100px; 
+}
+
+/*
+.dragDropBox span.message{
+    color:#333;
+    font-family:sans-serif;
+    position:absolute;
+    left:50%;
+    margin-left:-105px;
+    top:45%;
+}
+*/
+.dragDropBox:not(.done):hover, .dragDropBox.hover{
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+    cursor:pointer;
+}
+

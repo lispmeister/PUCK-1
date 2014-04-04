@@ -22,6 +22,7 @@
     "request": "latest",
     "response-time": "latest",
     "rest": "latest",
+    "restler": "latest",
     "redis": "0.8.3",
     "simplewebrtc": "= 0.6.0",
     "sleep": "latest",

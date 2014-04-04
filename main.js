@@ -162,9 +162,8 @@ var uber_puck = function uber_puck() {
         }
         else {
             console.log('puckarrific!')
-            // console.log(res)
-            res = JSON.parse(res)
-            bwana_puck = res
+            console.log(res)
+            bwana_puck = JSON.parse(res)
             createEvent(get_client_ip(req), {event_type: "create", puck_id: bwana_puck.PUCK_ID})
        }
     }
@@ -666,7 +665,7 @@ function createPuck(req, res, next) {
     }
 
     var client_ip      = get_client_ip(req)
-    var all_client_ips = req.body.value.PUCK.all_ips
+    var all_client_ips = req.body.value.all_ips
 
     // if the IP we get the add from isn't in the ips the other puck
     // says it has... add it in; they may be coming from a NAT or
@@ -682,7 +681,7 @@ function createPuck(req, res, next) {
     }
     if (! found) {
         console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
-        req.body.value.PUCK.all_ips[all_client_ips.length] = client_ip
+        req.body.value.all_ips[all_client_ips.length] = client_ip
     }
 
 
@@ -722,7 +721,7 @@ function createPuck(req, res, next) {
                 console.log('create appears to be coming from local PUCK/host: ' + client_ip)
             }
 
-            createEvent(get_client_ip(req), {event_type: "create", puck_id: req.body.value.PUCK.PUCK_ID})
+            createEvent(get_client_ip(req), {event_type: "create", puck_id: req.body.value.PUCK_ID})
 
             res.send(204);
         }
@@ -1048,13 +1047,13 @@ function echoReply(req, res, next) {
 
     console.log('pingasaurus from ' + client_ip)
 
-    if (typeof bwana_puck.PUCK == "undefined") {
+    if (typeof bwana_puck == "undefined") {
         console.log('no echo here...')
         var response = {status: "bad"}
     }
     else {
         console.log('echo, echo, echo....')
-        var response = {status: "OK", "name": bwana_puck.PUCK.name, "pid": puck_id}
+        var response = {status: "OK", "name": bwana_puck.name, "pid": puck_id}
     }
 
     res.send(200, response)
@@ -1247,14 +1246,23 @@ function uploadSchtuff(req, res, next) {
                             file_from : client_ip
                         }
 
+                        //
+                        // LOCAL or remote?
+                        //
                         console.log('moment of truth.. local or no?  => ' + upload_target)
-                        // keep it here only
+
+                        //
+                        // LOCAL - file still stashed here for now
+                        //
                         if (upload_target == "local") {
                             console.log('local')
                             createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
                             res.send(204, {"status" : target_file})
                         }
 
+                        //
+                        // REMOTE
+                        //
                         // post to a remote PUCK, if connected... first look up IP based on PID, then post to it
                         else {
                             console.log("going to push it to the next in line: " + upload_target)
@@ -1477,11 +1485,21 @@ function httpsPing(puckid, ipaddr, res, next) {
     // console.log(all_ips)
 
     // use the last known good one, if it exists
-
-// XXXX - fix
-//  if (typeof puck2ip[puckid] != "undefined") {
-//      request.get('https://' + puck2ip[puckid] + ':' + puck_port + '/ping', cb(puckid))
-//  }
+    if (typeof puck2ip[puckid] != "undefined") {
+        // console.log('using CACHED! ' + puck2ip[puckid])
+        restler.get('https://' + puck2ip[puckid] + ':' + puck_port + '/ping').on('complete', function(result) {
+            if (result instanceof Error) {
+                console.log('Error:', result.message);
+            } 
+            else {
+                console.log('(cached) ' + JSON.stringify(result))
+                results[all_ips[i]] = result
+                // cache the latest
+                done = true
+                res.send(200, result)
+            }
+        })
+    }
 
     for (var i = 0; i < all_ips.length; i++) {
 
@@ -1489,8 +1507,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             results = {},
             ip      = all_ips[i]
 
-        // if (ip == "127.0.0.1" || (typeof puck2ip[puckid] != "undefined" && puck2ip[puckid] == ip)) {
-        if (ip == "127.0.0.1") {
+        if (ip == "127.0.0.1" || (typeof puck2ip[puckid] != "undefined" && puck2ip[puckid] == ip)) {
             responses = responses + 1
             continue
         }
@@ -1613,18 +1630,18 @@ function formCreate(req, res, next) {
                 console.log("executing create_puck.sh")
     
                 // this simply takes the pwd and finds the exe area...
-                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK.PUCK_ID, data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email])
-                console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK.PUCK_ID, data.PUCK.image, data.PUCK.ip_addr, "\"all_ips\": [\"" + data.PUCK.all_ips + "\"]", data.PUCK.owner.name, data.PUCK.owner.email)
+                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email])
+                console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email)
     
                 // now slice and dice output, errors, etc.
                 pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
                 pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
                 pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
     
-                if (puck_id != data.PUCK.PUCK_ID && !isEmpty(bwana_puck)) {
+                if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
                     console.log("posting our puck data to the puck we just added....")
-                    console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr)
-                    var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.PUCK.image, bwana_puck.PUCK.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.PUCK.owner.name, bwana_puck.PUCK.owner.email, ip_addr])
+                    console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr)
+                    var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr])
     
                     // output, errors, etc.
                     remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
@@ -1749,7 +1766,7 @@ server.get('/ping/:key', echoStatus);
 
 // cuz ajax doesn't like to https other sites...
 server.get('/sping/:key1/:key2', function (req, res, next) {
-    console.log('spinging')
+    // console.log('spinging')
     httpsPing(req.params.key1, req.params.key2, res, next)
 });
 

@@ -558,9 +558,13 @@ function remove_signs_of_call() {
 
 }
 
+//
+// drag filenames from what's stored 
+//
+
 function load_vault() {
 
-    console.log('loadin vault!')
+    console.log('loadin n setting up vault!')
 
     var jqXHR_files = $.ajax({
         url: '/down',
@@ -586,5 +590,65 @@ function load_vault() {
         $('#puck_cloud_file_listing').append(table_rowz)
 
     })
+
+}
+
+// do this once... then wait for vpn to kick off
+
+// xxx - if were on the same page and you disconnect and reconect
+// again, this will probably be confused
+function drag_and_puck() {
+
+    if (already_polled && vpn_started) return -1
+
+    console.log('draggin n puckin')
+
+    if  (typeof puck_status != "undefined" &&
+         typeof puck_status.openvpn_client != "undefined" && 
+         typeof puck_status.openvpn_client['server'] != "undefined" && 
+         puck_status.openvpn_client['server'] != "") {
+
+            vpn_server = puck_status.openvpn_client.server
+            console.log('vpn server: ' + vpn_server)
+            vpn_started = true
+    }
+
+    if (!already_polled || vpn_started) {
+
+        console.log('drawin the box')
+
+        // out with the old, in with the new
+        $('.dragDropBox').remove()
+
+    $('#uppity').filer({
+        changeInput: '<div class="dragDropBox"><span class="message">CLICK/DROP files to upload <span style="font-size:200%"><br />' + vpn_server + '</span></div>',
+        appendTo   : '.dragDropBox',
+        template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
+        maxSize    : 1024,
+        uploadFile: {
+            // url:         'https://10.217.62.1:8080/up',
+            url:         '/up/' + vpn_server,
+            data:        {},
+            beforeSend:  function(parent){parent.append('<div class="progress-bar" />');},
+            success:     function(data, parent, progress){ },
+            error:       function(e, parent, progress){ },
+            progressEnd: function(progress){progress.addClass('done-erase');},
+            onUploaded:  function(parent){ }
+        },
+        dragDrop: {
+            dropBox:  '.dragDropBox',
+            dragOver: function(e, parent){ $('.dragDropBox').addClass('hover'); },
+            dragOut:  function(e, parent){ $('.dragDropBox').removeClass('hover'); },
+            drop:     function(e, formData, parent){ $('.dragDropBox').removeClass('hover'); },
+        },
+        onEmpty    : function(parent, appendBox){ $(appendBox).removeClass('done'); },
+        onSelect   : function(e,parent,appendBox){ $(appendBox).addClass('done'); }
+    })
+
+    }
+
+    already_polled = true
+
+    return(ping_poll)
 
 }

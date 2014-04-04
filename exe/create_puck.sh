@@ -106,7 +106,6 @@ cat <<E_O_C
 {
     "key"                 : "$puck_id",
     "value":{
-        "PUCK" : {
             "name"        : "$name",
             "PUCK_ID"     : "$puck_id",
             "image"       : "$image",
@@ -119,7 +118,6 @@ cat <<E_O_C
             },
             $vpn,
             $remote_vpn
-        }
     }
 }
 E_O_C
