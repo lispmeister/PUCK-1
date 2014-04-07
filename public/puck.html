@@ -35,6 +35,12 @@
 <!-- form to add files -->
 <link href="/css/jquery.filer.css" rel="stylesheet">
 
+<!-- a few more icons -->
+<link href="/css/whhg.css" rel="stylesheet">
+
+<!-- nav menus -->
+<link href="/css/yamm.css" rel="stylesheet">
+
 <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -67,56 +73,50 @@
 
 <body>
 
-    <div class="col-sm-1 sidebar" style="float:left; opacity: 0.25">
-        <!-- <h4 class="diplomat text-rotate"> -->
-        <div class="row clearfix spacer50"></div>
-        <h4 class="diplomat text-rotate" >
-            <span id="puck_top_left" style="align: bottom" data-content="Programmatic Universal Cryptographic Key" data-toggle: "tooltip" data-placement: "right">PUCK</span>
-        </h4> 
-    </div>
+    <div class="container">
 
-<div class="container">
-    <div class="row clearfix">
+        <nav class="navbar navbar-default zenlarge" role="navigation">
 
-        <div class="col-md-6 column">
-            <ul class="nav nav-tabs">
-                <li class="active"><a href="#home" data-toggle="tab"><h2><span id="puck_top_home" title="Click your heels three times..." class="glyphicon glyphicon-home"></span><h2></a></li>
+            <ul class="nav nav-tabs navbar-nav navbar-left">
 
-                <li> <a href="#profile" data-toggle="tab"><img style="margin-top:20px" id="puck_top_ewe" title="Enough about me, let's talk about Ewe!" src="images/sheep.png"></a></li>
+                <li class="active"><a href="#home" data-toggle="tab"><span id="puck_top_home" title="home" data-content="Click your heels three times..." class="glyphicon glyphicon-home"></span></a></li>
 
-                <li> <a href="#trust" data-toggle="tab"><h2><span id="puck_top_love" title="Loves, friends, enemies, PUCKs...." class="glyphicon glyphicon-heart"></span><h2></a></li>
+                <!-- need to find/make a good sheep icon! -->
+                <!-- <li> <a href="#profile" data-toggle="tab"><img style="margin-top:20px" id="puck_top_ewe" title="Enough about me, let's talk about Ewe!" src="images/sheep.png"></a></li> -->
 
-                <li> <a href="#puck_cloud" data-toggle="tab"><h2><span id="puck_top_cloud" title="Files-n-secret stuffz" class="glyphicon glyphicon-cloud"></span><h2></a></li>
+                <li> <a href="#ewe" data-toggle="tab"><span id="puck_top_ewe" title="You!" data-content="Enough about me, let's talk about Ewe!" class="glyphicon glyphicon-user"></span></a></li>
 
-                <li> <a href="#messages" data-toggle="tab"><h2><span id="puck_top_messages" title="Message center: notes, files, and events" class="glyphicon glyphicon-envelope"></span><h2></a></li>
+                <li class="dropdown">
+
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="puck_top_love" title="Love -n- Trust" data-content="Loves, friends, enemies, PUCKs...." class="glyphicon glyphicon-heart"></span><b class="caret"></b></a>
+
+                    <ul class="dropdown-menu">
+                        
+                        <li> <a tabindex="-1" data-toggle="tab" href="#puck_trust_generate"> Generate Authentication Tokens</a> </li>
+                        <li> <a tabindex="-1" data-toggle="tab" href="#puck_trust_explore"> Creating and seeing who you trust</a> </li>
+                        <li> <a tabindex="-1" data-toggle="tab" href="#puck_trust_you"> Who trusts your PUCK?</a> </li>
+
+                    </ul>
+                </li>
+
+                <li> <a href="#puck_cloud" data-toggle="tab"><span id="puck_top_cloud" title="File Vault" data-content="Files-n-secret stuffz" class="glyphicon glyphicon-cloud"></span></a></li>
+
+                <li> <a href="#messages" data-toggle="tab"><span id="puck_top_messages" title="Messages" data-content="Message center: notes, files, and events" class="glyphicon glyphicon-envelope"></span></a></li>
+    
+                </ul>
+
+            <ul class="nav nav-tabs navbar-nav navbar-right">
+
+                <li> <a href="#"><span class="green glyphicon icon-lightbulb-idea" id="puck_status"></span></a></li>
+                <li> <a href="/vpn.html"><span class="red glyphicon glyphicon-facetime-video"></span></a></li>
+                <li> <a target="_blank" href="https://github.com/zenfish/PUCK"><span title="github sources" class="glyphicon icon-github"></span></a></li>
 
             </ul>
-        </div>
+
+        </nav>
 
 
-        <div class="col-md-4 column">
-            <ul class="nav nav-pills pull-right">
-
-                <li> <button type="button" class="btn disabled" id="puck_status">Status</button></li>
-
-                <li> <button type="button" class="btn btn-danger disabled" id="puck_video"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;"> Video</span></button></a></li>
-
-                <li> <button type="button" class="btn btn-default disabled"><a href="#"><span class="glyphicon glyphicon-question-sign" style="color:gray"></span> Help</a></button></li>
-
-                <li> <button type="button" class="btn btn-default"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></button></li>
-
-            </ul>
-
-       </div>
-
-        <div class="row clearfix spacer50">
-            <div class="col-md-11 column">
-            </div>
-            <div id='far_right' class="col-md-1 column">
-            </div>
-        </div>
-
-        <div class="hero-unit">
+        <div class="container">
 
             <!-- for incoming/outgoing calls -->
 
@@ -150,7 +150,8 @@
                                 </div>
                             </div>
 
-                        </fieldset>
+                            </fieldset>
+                        </div>
 
                     </div>
                 </div>
@@ -160,17 +161,14 @@
         </div> <!-- end of form/top stuff -->
 
 
-        <div class="row clearfix spacer30"></div>
-        <!-- content (puck pals, profile, etc.) show up below -->
-
-        <div class="tab-content">
+        <div class="container tab-content">
 
         <!-- pucks -->
             <div class="tab-pane fade in active" id="home">
     
                 <div class="row-fluid marketing" id="puck_friends">
                     <div class="muted">
-                        <h3>Friends <a href="#modalPuck" role="button" class="btn btn-success btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></h3></span></a>
+                        <h3>Friends <a href="#modalPuck" role="button" class="btn btn-success btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span></a></h3>
                     </div>
         
                     <!-- spinner when loading pucks -->
@@ -184,7 +182,43 @@
             </div>
     
             <!-- profile -->
-            <div class="tab-pane fade" id="profile">
+            <div class="tab-pane fade" id="skull">
+                <div class="row-fluid marketing" id="puck_panic">
+
+                    <div class="muted">
+                        <h3 style="clear:both">&iexcl;PANIC!</h3>
+                    </div>
+
+                    <div>
+                        <p>
+                        Pushing these buttons is not for the faint of heart.
+                        <ul>
+                            <p>
+                            <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are
+                                hammering at your door wanting its data or keys.  UI will no longer work.</li>
+                            <p>
+                                <li><strong>Restart server</strong> does just that - the PUCK server restarts.  UI will no longer
+                                work until it finishes restarting.</li>
+                            <p>
+                                <li><strong>Stop server</strong> stops the PUCK server dead.  UI will no longer work until restarted!</li>
+                        </ul>
+                    </div>
+
+                    <p>
+                    <div>
+
+                    <button id="puck_panic" type="button" class="btn btn-danger">PANIC</button>
+                    <button id="restart_server" type="button" class="btn btn-warning">Restart Server</button>
+                    <button id="stop_server" type="button" class="btn">Stop Server</button>
+
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- profile -->
+            <div class="tab-pane fade" id="ewe">
                 <div class="row-fluid marketing" id="puck_profile">
                     <div class="muted">
                         <h3 style="clear:both">profilasaurus</h3>
@@ -205,17 +239,88 @@
                 </div>
             </div>
 
-            <!-- message center -->
-            <div class="tab-pane fade" id="trust">
-                <div class="row-fluid marketing" id="puck_trust">
+            <!-- trust/love -->
+
+            <div class="tab-pane fade" id="puck_trust_explore">
+                <div class="row-fluid marketing">
                     <div class="muted">
-                        <h3 style="clear:both">Trusty!</h3>
+                        <h3 style="clear:both">Who do you trust?</h3>
                     </div>
                     <div>
-                        This is where you can see who you allow to come/go to/from your PUCK.
+                        ...
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="puck_trust_you">
+                <div class="row-fluid marketing">
+                    <div class="muted">
+                        <h3 style="clear:both">Who trusts your PUCK?</h3>
+                    </div>
+                    <div>
+                        ...
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="tab-pane fade" id="puck_trust_generate">
+
+                <h3 style="clear:both">Trusty!</h3>
+
+                This is where you can create, choose, and see
+                who you allow to come/go to/from your PUCK.
+                Would you like to export:
+
+                <p>
+
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#puck_export" data-toggle="tab">Your PUCK data</a></li>
+                    <li><a href="#puck_export_openvpn" data-toggle="tab">OpenVPN profile </a></li>
+                    <li><a href="#puck_export_services" data-toggle="tab">Other services</a></li>
+                </ul>
+
+                        <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="puck_export">
+                        <p>
+                        Other PUCKs may use the import feature (TBD :)) to 
+                        import your PUCK's salient data.
+                        <p>
+                        Copy and paste the below and send it to a friendly PUCK owner.
+                        <p>
+                        This is essentially the same data what PUCKs
+                        share when you add them in the UI by IP address.
+                    </div>
+
+                    <div class="tab-pane" id="puck_export_openvpn">
+                        <p>
+                        Other normal computers (e.g. non-PUCKs) who can
+                        run OpenVPN will be able to use the below OVPN
+                        profile to connect to your PUCK as an OpenVPN
+                        client.
+
+                        <p>
+                        They must be able to connect to your PUCK server
+                        from wherever they are coming from; in addition
+                        only the "just make it work" security setting
+                        allows OpenVPN connectivity from non-PUCKs by
+                        default (higher security levels use a firewall
+                        to block the VPN port until they a trusted PUCK
+                        is trying to connect.)
 
                         <p>
 
+                        Finally if your PUCK changes its IP address you'll
+                        need to either generate a new profile or manually
+                        change the IP address in the client.
+
+                    </div>
+
+                    <div class="tab-pane" id="puck_export_services">
+
+                        <p>
                         You will also be able to stamp out PUCK slaves,
                         Laptop/generic computer/iOS/Android VPN
                         certificates so they can access the PUCK.
@@ -234,23 +339,25 @@
                         <li> incoming Video/Sound
                         <li> incoming Drag-n-Drop files
                         <li> remote systems to surf as if they were at your PUCK's
-                             physical location
+                            physical location
                         <li> arbitrary network connections from your PUCK
                         <li> execute commands on your PUCK
-                        <li> masquerade as your PUCK - essentially act on your 
-                             PUCK's behalf.  If Dan really trusts Charles,
-                             Charles may initiate actions as though Dan's
-                             PUCK was doing them.  This could cause long
-                             chains of traffic/activity being passed
-                             along, from PUCK A -> B -> C ... -> N. Each
-                             PUCK has to trust the PUCK attempting to
-                             pass through it.
+                        <li> masquerade as your PUCK - essentially act on your
+                            PUCK's behalf.  If Dan really trusts Charles,
+                            Charles may initiate actions as though Dan's
+                            PUCK was doing them.  This could cause long
+                            chains of traffic/activity being passed
+                            along, from PUCK A -&gt; B -&gt; C ... -&gt;> N. Each
+                            PUCK has to trust the PUCK attempting to
+                            pass through it.
                         </ul>
 
-                    </div>
-                </div>
-            </div>
+                     </div> <!-- this tab pane -->
+
+                </div> <!-- tab pane -->
     
+            </div> <!-- tab pane -->
+
             <!-- message center -->
             <div class="tab-pane fade" id="puck_cloud">
                 <div class="spacer30"></div>
@@ -267,8 +374,10 @@
                         </div>
                     </div>
                     <div class="col-md-6 column">
-                        <div id="puck_cloud_filez"> 
+                        <div id="puck_cloud_filez2"> 
                             <h3> Add to a vault </h3>
+                            <small class="text-muted">When connected this will transfer to the remote system</small>
+                            <br />
                         </div>
                         <div class="row-fluid marketing">
                             <form action="/up" method="post" enctype="multipart/form-data">
@@ -294,9 +403,7 @@
                     plus additions/deletions of PUCKs.
 
                 </div>
-            </div>
-
-        </div>
+             </div>
 
         <!-- spacer n feets below -->
 

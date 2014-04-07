@@ -1,11 +1,23 @@
 
-/* one change... this:
+/* three changes... this:
 
   max-width: 276px;
 
 To:
 
   max-width:none;
+
+Secondly, for menus:
+
+    .zenlarge li span {
+        font-size: 150%;
+    }
+
+
+Finally, for glyphicons:
+
+    .green { color:#5cb85c }
+    .red   { color:#d9534f }
 
 */
 
@@ -5797,3 +5809,13 @@ button.close {
   }
 }
 /*# sourceMappingURL=bootstrap.css.map */
+
+
+/* zen - for menu headers */
+.zenlarge li span {
+    font-size: 200%;
+}
+
+.green { color:#5cb85c }
+.red   { color:#d9534f }
+

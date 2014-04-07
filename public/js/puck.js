@@ -9,8 +9,10 @@ all_puck_ids   = []
 
 // overall connection state
 var puck_current            = {}
-    puck_current.incoming   = false;
-    puck_current.outgoing   = false;
+    puck_current.incoming   = false,
+    puck_current.outgoing   = false,
+    last_file               = "",
+    killed_call             = false;
 
 var puck_status     = {},
     old_puck_status = {}
@@ -180,7 +182,7 @@ function kill_ring() {
     try {
         ring.pause();
         ring.currentTime = 0;
-        console.log('bells... no more?')
+        // console.log('bells... no more?')
     }
     catch(e) {
         console.log("haven't played anything yet - " + e)
@@ -205,8 +207,8 @@ function hang_up() {
     }) 
 
     jqXHR_stopVPN.done(function (data, textStatus, jqXHR) {
-        console.log('jxq hangup wootz')
-        console.log(data)
+        // console.log('jxq hangup wootz')
+        // console.log(data)
     }).fail(function(err) {
         console.log('errz on hangup' + err)
         alert('error on hangup!')
@@ -412,15 +414,14 @@ function get_status(){
     var jqXHR_get_status = $.ajax({ url: url, })
 
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
-        console.log('status wootz\n' + data)
-        console.log('vs\n' + JSON.stringify(old_puck_status))
+        // console.log('status wootz\n' + data)
         puck_status = JSON.parse(data)
 
         // if something is new, do something!
-        if (!_.isEqual(old_puck_status, puck_status)) {
-            console.log('\n\n')
+        if (! _.isEqual(old_puck_status, puck_status)) {
             console.log('something new in the state of denmark!')
-            console.log('\n\n')
+            console.log(JSON.stringify(puck_status))
+            console.log('vs\n' + JSON.stringify(old_puck_status) + '\n\n')
             old_puck_status = puck_status
             status_or_die()
         }
@@ -452,37 +453,15 @@ function status_or_die() {
     console.log(puck_status)
 
     // default to down
-    if (typeof puck_status.openvpn_server == "undefined" || isEmpty(puck_status.openvpn_server)) {
-        puck_status.openvpn_server = {}
-        puck_status.openvpn_server.vpn_status = "down"
-        puck_current.incoming = false
-    }
-    if (typeof puck_status.openvpn_client == "undefined" || isEmpty(puck_status.openvpn_client)) {
-        puck_status.openvpn_client = {}
-        puck_status.openvpn_client.vpn_status = "down"
-        puck_current.outgoing = false
-    }
-
-    // new kid on the block?  Happens when a remote adds you
-    if (typeof puck_status.events == "undefined" || isEmpty(puck_status.events)) {
-        console.log('puck_status.events who?')
-        console.log(puck_status.events)
-        puck_status.events = {}
-        puck_status.events.new_puck = ""
-    }
-    else {
-        console.log('puck_status.events:')
-        console.log(puck_status.events)
-    }
+    // xxxx?
+    puck_current.incoming = false
+    puck_current.outgoing = false
 
     console.log('I hear something...')
-    console.log(JSON.stringify(puck_current))
-    console.log('big data')
-    console.log(JSON.stringify(puck_status))
 
     // if someone has added you, create a modest sized bit of text that tells you 
     // and hopefully won't fuck up anything you're doing
-    if (puck_status.events.new_puck.length) {
+    if (typeof puck_status.events.new_puck != "undefined" &&  puck_status.events.new_puck.length) {
         var remote_ip = puck_status.events.new_puck
         console.log(remote_ip + ' added!')
         // a bit down from the top, and stay until wiped away or refreshed
@@ -493,9 +472,9 @@ function status_or_die() {
     }
 
     // server
-    if (puck_status.openvpn_server.vpn_status == "up") {
+    if (typeof puck_status.openvpn_server != "undefined" && typeof puck_status.openvpn_server.vpn_status != "undefined" && puck_status.openvpn_server.vpn_status == "up") {
         // ensure video button is enabled if a call is in progress
-        $('#puck_video').removeClass('disabled')
+        $('#puck_video').removeClass('red').addClass('green')
     
         if (puck_current.incoming) {
             console.log('incoming ring from ' +  puck_status.openvpn_server.client)
@@ -504,14 +483,14 @@ function status_or_die() {
             $('#incoming')[0].click()
         }
 
+        killed_call           = false
         puck_current.incoming = true
     }
 
     // client
-    if (puck_status.openvpn_client.vpn_status == "up") {
+    if (typeof puck_status.openvpn_client != "undefined" && typeof puck_status.openvpn_client.vpn_status != "undefined" && puck_status.openvpn_client.vpn_status == "up") {
 
-        $('#puck_video').removeClass('disabled')
-        
+        $('#puck_video').removeClass('red').addClass('green')
                 
         if (puck_current.outgoing) {
             console.log('outgoing ring!')
@@ -519,25 +498,33 @@ function status_or_die() {
             window.location.href = "/vpn.html"
         }
 
+        killed_call           = false
         puck_current.outgoing = true
     }
 
-    if (puck_status.openvpn_server.vpn_status == "down" && puck_status.openvpn_client.vpn_status == "down") {
+    if (typeof puck_status.openvpn_server != "undefined" && typeof puck_status.openvpn_server.vpn_status != "undefined" &&
+        typeof puck_status.openvpn_client != "undefined" && typeof puck_status.openvpn_client.vpn_status != "undefined") {
         console.log('everything dead, shut it down...!')
         $('body').removeClass('avgrund-active');
         hang_up()
+        killed_call = true
     }
 
     // new package delivered
     try {
         if (typeof puck_status.file_events.file_name != "undefined" && puck_status.file_events.file_name != "") {
 
-            console.log('new file(z)!')
+            var this_file = puck_status.file_events.file_name + puck_status.file_events.file_size + puck_status.file_events.file_from
+            // XXX - would need digital signature to really tell... just a quick check
+            if (last_file != this_file) {
+                console.log('new file(z)!')
+                last_file = this_file
 
-            // put in or lookup PiD, then owner/puck's name!
-            $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+                // put in or lookup PiD, then owner/puck's name!
+                $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
-            puck_status.file_events.file_name = ""
+                puck_status.file_events.file_name = ""
+            }
         }
     } 
     catch(e) {
@@ -553,10 +540,11 @@ function status_or_die() {
 // 
 function remove_signs_of_call() {
 
-    console.log('killing call signatures...')
+    // console.log('killing call signatures...')
 
     $('.puck_vpn').text("Call").removeClass("btn-danger")
     $('#puck_video').addClass('disabled')
+    $('#puck_video').removeClass('green').addClass('red')
     $('.avgrund-popin').remove();
 
 }
@@ -596,6 +584,48 @@ function load_vault() {
 
 }
 
+function panic_button() {
+
+console.log('panic... not implemented yet... start really panicing!')
+
+}
+
+function restart_server() {
+
+    var url = "/server/restart"
+
+    var jqXHR_restart_server = $.ajax({
+        url: url,
+        dataType: 'json',
+    }) 
+
+    jqXHR_restart_server.done(function (data, textStatus, jqXHR) {
+        console.log('jxq restart server wootz... of course...if the server were really restarting...')
+        console.log(data)
+    }).fail(function(err) {
+        console.log('errz on restart... or is it?  ' + err)
+    })
+
+}
+
+function stop_server() {
+
+    var url = "/server/stop"
+
+    var jqXHR_stopVPN = $.ajax({
+        url: url,
+        dataType: 'json',
+    }) 
+
+    jqXHR_stopVPN.done(function (data, textStatus, jqXHR) {
+        console.log('jxq stop server wootz... of course...if the server were really dead...')
+        console.log(data)
+    }).fail(function(err) {
+        console.log('errz on stop server... or maybe not ;) ' + err)
+    })
+
+}
+
 // do this once... then wait for vpn to kick off
 
 // xxx - if were on the same page and you disconnect and reconect
@@ -604,7 +634,7 @@ function drag_and_puck() {
 
     if (already_polled && vpn_started) return -1
 
-    console.log('draggin n puckin')
+    // console.log('draggin n puckin')
 
     if  (typeof puck_status != "undefined" &&
          typeof puck_status.openvpn_client != "undefined" && 

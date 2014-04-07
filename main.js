@@ -1079,26 +1079,19 @@ function stopVPN(req, res, next) {
     function (error, stdout, stderr) {
         console.log('stop VPN stdout: ' + stdout);
         console.log('stop VPN stderr: ' + stderr);
-        if (error !== null) {
-            console.log('exec error: ' + error);
-            console.log('exec error: ' + error);
-            // if we get an error something is borked... so crush the status so
-            // we dont get harassed again
-            client_magic = {
-                vpn_status : "down",
-                start      : "n/a",
-                start_s    : "n/a",
-                duration   : "unknown",
-                stop       : "unknown",
-                stop_s     : "unknown"
-            }
-            createEvent('internal server', {event_type: "vpn_client_stop", puck_id: bwana_puck.PUCK_ID})
 
-            res.send(200, {"status": "Failed"});
-
-        } else {
-            res.send(200, {"status": "OK"});
+        client_magic = {
+            vpn_status : "down",
+            start      : "n/a",
+            start_s    : "n/a",
+            duration   : "unknown",
+            stop       : "unknown",
+            stop_s     : "unknown"
         }
+
+        // createEvent('internal server', {event_type: "vpn_client_stop", puck_id: bwana_puck.PUCK_ID})
+        res.send(200, {"status": "vpn down"});
+
     });
 
 }
@@ -1809,32 +1802,44 @@ server.post('/vpn/start', startVPN);
 // stop
 server.get('/vpn/stop', stopVPN);
 
-// events
+//
+// server stuff... start, stop, restart, etc.
+//
+server.get('/server',         serverStatus);   // status
+server.get('/server/stop',    serverDie);      // die, die, die!
+server.get('/server/restart', serverRestart);  // die and restart
 
+
+// setup a tcp proxy
+server.get('/setproxy', setTCPProxy)
+
+//
+// events... what's going on?  Maybe should be /marvin?
+//
 // list event types
 server.get('/events',           listEvents);
 // get elements of a particular kind of event (create, delete, etc.); 
 server.get('/events/:key',      getEvent);
 
-
-// server stuff
-server.get('/server',         serverStatus);   // status
-server.get('/server/stop',    serverDie);      // die, die, die!
-server.get('/server/restart', serverRestart);  // die and restart
-
-// setup a tcp proxy
-server.get('/setproxy', setTCPProxy)
-
+//
+// PUCK filestore - send up and getting down
+//
 // send stuff up the pipe....
 server.post('/up/:key', uploadSchtuff)
-
-// see what's there and possibly get
+// get down with what's up
 server.get('/down', downloadStuff)
+
 
 // get a url from wherever the puck is
 server.all('/url', webProxy)
 
+
+//
+//
+//
 // and... finally... relax and listen
+//
+//
 var pucky = https.createServer(credentials, server)
 
 pucky.listen(puck_port)

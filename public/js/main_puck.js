@@ -16,13 +16,21 @@ $(document).ready(function () {
     puck_data     = ""
     
 
-    // xxx fix
-    $('#puck_top_left').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    $('#puck_top_home').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    $('#puck_top_ewe').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    $('#puck_top_love').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    $('#puck_top_cloud').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    $('#puck_top_messages').tooltip({delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    var tt = ['puck_top_left', 'puck_top_cog', 'puck_top_home', 'puck_top_skull',
+              'puck_top_ewe', 'puck_top_love', 'puck_top_cloud', 'puck_top_messages']
+
+    for (var i = 0 ; i < tt.length; i++) {
+        $('#' + tt[i]).popover( {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    }
+
+    //  $('#puck_top_left').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_cog').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_home').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_skull').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_ewe').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_love').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_cloud').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+    //  $('#puck_top_messages').tooltip({delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
 
     // status loop
     infinite()
@@ -33,9 +41,17 @@ $(document).ready(function () {
     });
     
     // enable tabs
-    $('#home a').click(function     (e) { e.preventDefault(); $(this).tab('show') })
-    $('#profile a').click(function  (e) { e.preventDefault(); $(this).tab('show') })
-    $('#messages a').click(function (e) { e.preventDefault(); $(this).tab('show') })
+    $('.ul nav-tabs a').click(function (e) { e.preventDefault(); $(this).tab('show') })
+
+    // enable tabs
+    $('#puck_trust_generate a').click(function  (e) { e.preventDefault(); $(this).tab('show') })
+    $('#puck_trust_you a').click(function       (e) { e.preventDefault(); $(this).tab('show') })
+    $('#puck_trust_explore a').click(function   (e) { e.preventDefault(); $(this).tab('show') })
+
+    // enable some special buttons
+    $('#puck_panic').click(function     (e) { panic_button() })
+    $('#restart_server').click(function (e) { restart_server() })
+    $('#stop_server').click(function    (e) { stop_server() })
 
     //
     // setup user drag/click files to browser
@@ -161,11 +177,13 @@ $(document).ready(function () {
         my_puck_status = 'Name: ' + my_puck.name + '<br />Status: ' + my_puck.status + '<br />ID: ' + my_puck.pid
     
         if (my_puck.status == "OK")
-            $('#puck_status').addClass('btn-success').removeClass('disabled')
+            // $('#puck_status').addClass('btn-success').removeClass('disabled')
+            $('#puck_status').addClass('green').removeClass('red')
         else
-            $('#puck_status').removeClass('btn-success').addClass('disabled')
+            $('#puck_status').removeClass('green').addClass('red')
+            // $('#puck_status').removeClass('btn-success').addClass('disabled')
     
-        $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "This PUCK").attr("data-content", my_puck_status).popover({delay: { hide: 200 }, trigger: "click"})
+        $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "This PUCK").attr("data-content", my_puck_status).popover({delay: { hide: 200 }, trigger: "hover"})
     
     })
     
