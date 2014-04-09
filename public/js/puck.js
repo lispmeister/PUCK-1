@@ -21,6 +21,8 @@ var incoming_ip = "?"
 
 var ring = ""
 
+var browser_ip = ""
+
 var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
@@ -122,27 +124,6 @@ function populate_events(cat) {
         })
         t_rows = "<tr>" + t_headers + "</tr>" + t_rows
 
-        // bootstrap tables
-//      var size_of_table = n
-//      var size_of_pages = 10
-//      var total_pages   = Math.floor(size_of_table/size_of_pages) + 1
-
-//      console.log(size_of_table, total_pages)
-
-        // bootstrap tables
-//      var bs_options = {
-//          currentPage: 1,
-//          bootstrapMajorVersion: 3,
-//          totalPages: total_pages
-//      }
-
-//      $('body').on('change', '#' + cat + '_pager', function() {
-//          console.log('presto change-o')
-//          if (total_pages > 1) 
-//              $(this).bootstrapPaginator(bs_options);
-//              // $('#' + cat + '_pager').bootstrapPaginator(bs_options);
-//      })
-
         // finally paint everything on
         $('#event_messages').append(base_table)
         $('#' + cat_e).append(t_rows)
@@ -182,10 +163,10 @@ function kill_ring() {
     try {
         ring.pause();
         ring.currentTime = 0;
-        // console.log('bells... no more?')
+        console.log('bells... no more?')
     }
     catch(e) {
-        console.log("haven't played anything yet - " + e)
+        console.log("haven't played anything yet")
     }
 
 }
@@ -214,16 +195,12 @@ function hang_up() {
         alert('error on hangup!')
     })
 
-    // kill the UI signs
+    // kill the CSS UI signs
     remove_signs_of_call()
 
-    // XXX - need to see if initiated call or not and set appropriately
-    puck_current.incoming = false
-    puck_current.outgoing = false
-
-//  if (window.location.pathname.split( '/' )[1] != "puck.html") {
-//      window.location.href = "/puck.html"
-//  }
+    if (window.location.pathname.split( '/' )[1] != "puck.html") {
+        window.location.href = "/puck.html"
+    }
 
 }
 
@@ -240,8 +217,8 @@ function get_ip(element) {
     jqXHR_getIP.done(function (data, textStatus, jqXHR) {
         console.log('jxq getIP wootz')
         console.log(data)
-        var ip = data.ip
-        $('#ip_diddy').prepend("Your IP address is: " + ip + " ... ");
+        browser_ip = data.ip
+        $('#ip_diddy').prepend("Your IP address is: " + browser_ip + " ... ");
     }).fail(function(err) {
         console.log('errz on getIP' + err)
     })
@@ -452,88 +429,62 @@ function status_or_die() {
 
     console.log(puck_status)
 
-    // default to down
-    // xxxx?
-    puck_current.incoming = false
-    puck_current.outgoing = false
-
     console.log('I hear something...')
+
+    if (typeof puck_status.browser == "undefined") {
+        puck_status.browser = []
+        puck_status.browser_events[browser_ip] = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}}
+    }
 
     // if someone has added you, create a modest sized bit of text that tells you 
     // and hopefully won't fuck up anything you're doing
-    if (typeof puck_status.events.new_puck != "undefined" &&  puck_status.events.new_puck.length) {
+    console.log('a friend...?')
+    if (puck_status.events.new_puck.length && ! puck_status.browser_events[browser_ip].notify_add) {
         var remote_ip = puck_status.events.new_puck
         console.log(remote_ip + ' added!')
         // a bit down from the top, and stay until wiped away or refreshed
         $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see details)", {offset: {from: 'top', amount: 70}, delay: -1})
-        puck_status.events.new_puck = ""
 
+        puck_status.browser_events[browser_ip].notify_add = true
 // <input type="button" value="Reload Page" onClick="history.go(0)">
     }
 
-    // server
-    if (typeof puck_status.openvpn_server != "undefined" && typeof puck_status.openvpn_server.vpn_status != "undefined" && puck_status.openvpn_server.vpn_status == "up") {
+    console.log('incoming...?')
+    // server... incoming ring
+    if (puck_status.openvpn_server.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_file) {
         // ensure video button is enabled if a call is in progress
         $('#puck_video').removeClass('red').addClass('green')
     
-        if (puck_current.incoming) {
-            console.log('incoming ring from ' +  puck_status.openvpn_server.client)
-            incoming_ip = puck_status.openvpn_server.client
-            // ring them gongs
-            $('#incoming')[0].click()
-        }
+        console.log('incoming ring from ' +  puck_status.openvpn_server.client)
+        incoming_ip = puck_status.openvpn_server.client
+        // ring them gongs
+        $('#incoming')[0].click()
 
-        killed_call           = false
-        puck_current.incoming = true
+        puck_status.browser_events[browser_ip].notify_file = true
     }
 
-    // client
-    if (typeof puck_status.openvpn_client != "undefined" && typeof puck_status.openvpn_client.vpn_status != "undefined" && puck_status.openvpn_client.vpn_status == "up") {
-
+    console.log('outgoing...?')
+    // client... outgoing ring
+    if (puck_status.openvpn_client.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_ring) {
         $('#puck_video').removeClass('red').addClass('green')
-                
-        if (puck_current.outgoing) {
-            console.log('outgoing ring!')
-            kill_ring()
-            window.location.href = "/vpn.html"
-        }
-
-        killed_call           = false
-        puck_current.outgoing = true
-    }
-
-    if (typeof puck_status.openvpn_server != "undefined" && typeof puck_status.openvpn_server.vpn_status != "undefined" &&
-        typeof puck_status.openvpn_client != "undefined" && typeof puck_status.openvpn_client.vpn_status != "undefined") {
-        console.log('everything dead, shut it down...!')
-        $('body').removeClass('avgrund-active');
-        hang_up()
-        killed_call = true
+        console.log('outgoing ring!')
+        kill_ring()
+        window.location.href = "/vpn.html"
+        puck_status.browser_events[browser_ip].notify_ring = true
     }
 
     // new package delivered
-    try {
-        if (typeof puck_status.file_events.file_name != "undefined" && puck_status.file_events.file_name != "") {
+    console.log('new toyz...?')
+    if (puck_status.file_events.file_name.length && ! puck_status.browser_events[browser_ip].notify_file) {
+        console.log('new file(z)!')
+        // put in or lookup PiD, then owner/puck's name!
+        $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
-            var this_file = puck_status.file_events.file_name + puck_status.file_events.file_size + puck_status.file_events.file_from
-            // XXX - would need digital signature to really tell... just a quick check
-            if (last_file != this_file) {
-                console.log('new file(z)!')
-                last_file = this_file
-
-                // put in or lookup PiD, then owner/puck's name!
-                $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
-
-                puck_status.file_events.file_name = ""
-            }
-        }
-    } 
-    catch(e) {
-        console.log('filename not defined')
-        console.log(e)
+        puck_status.browser_events[browser_ip].notify_file = true
     }
 
+    fire_puck_status(puck_status)
 }
-
 
 //
 // when disconnected, kill all the UI signs we put up
@@ -541,7 +492,6 @@ function status_or_die() {
 function remove_signs_of_call() {
 
     // console.log('killing call signatures...')
-
     $('.puck_vpn').text("Call").removeClass("btn-danger")
     $('#puck_video').addClass('disabled')
     $('#puck_video').removeClass('green').addClass('red')
@@ -625,6 +575,29 @@ function stop_server() {
     })
 
 }
+
+//
+// fire status to puck
+//
+function fire_puck_status(jstatus) {
+
+    console.log('firing status off')
+
+    var status_xhr = $.ajax({
+        type: "POST",
+        url: "/status",
+        data: jstatus
+    })
+
+    status_xhr.done(function(msg) {
+        console.log("posto facto: " + msg );
+    })
+    status_xhr.fail(function(xhr, textStatus, errorThrown) {
+        console.log('failzor -> ' + xhr.responseText)
+    })
+
+}
+
 
 // do this once... then wait for vpn to kick off
 

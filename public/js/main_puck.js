@@ -111,13 +111,13 @@ $(document).ready(function () {
     
     // toss your ip in the footer
     get_ip('#ip_diddy')
-    
+
     // ... bye bye
     $('body').on('click', '#puck_disconnect', function() { 
         $('body').removeClass('avgrund-active');
         hang_up() 
     })
-    
+
     //
     // energize modals
     //
@@ -183,7 +183,7 @@ $(document).ready(function () {
             $('#puck_status').removeClass('green').addClass('red')
             // $('#puck_status').removeClass('btn-success').addClass('disabled')
     
-        $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "This PUCK").attr("data-content", my_puck_status).popover({delay: { hide: 200 }, trigger: "hover"})
+        $('#puck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "PUCK Status").attr("data-content", my_puck_status).popover({delay: { hide: 200 }, trigger: "hover"})
     
     })
     

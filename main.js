@@ -68,19 +68,25 @@ catch (e) {
 // yes, yes, lazy too
 
 // status and other bits
-var server_magic = {},
-    client_magic = {},
-    file_magic   = {},
-    puck_events  = {},
-    server       = "",
-    puck2ip      = {}       // puck ID to IP mapping
-    ip2puck      = {}       // IP mapping to puck ID
+var server_magic   = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
+    client_magic   = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
+    file_magic     = { "file_name" : "", "file_size" : "", "file_from" : ""},
+    puck_events    = {"new_puck":""},
+    browser_events = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
+    puck_status    = {}
 
-var bwana_puck   = {}
+    puck_status.events         = puck_events
+    puck_status.openvpn_server = server_magic
+    puck_status.openvpn_client = client_magic
+    puck_status.file_events    = file_magic
+    puck_status.browser_events = browser_events
 
-var puck_status      = "{}",
-    puck_status_file = "/etc/puck/status.puck"
 
+var server           = "",
+    puck2ip          = {},      // puck ID to IP mapping
+    ip2puck          = {},      // IP mapping to puck ID
+    bwana_puck       = {},
+    puck_status_file = "/etc/puck/status.puck";
 
 
 // keep an eye on the above
@@ -193,13 +199,19 @@ function change_status() {
     puck_status.openvpn_server = server_magic
     puck_status.openvpn_client = client_magic
     puck_status.file_events    = file_magic
+    puck_status.browser_events = browser_events
 
     puck_status                = JSON.stringify(puck_status)
 
+
+    //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
+
     // wiping out manually once used
     // xxx zero ring ring?
-    puck_events = {}
-    file_magic  = {}
+    file_magic  = { "file_name" : "", "file_size" : "", "file_from" : ""},
+    puck_events = {"new_puck":""},
+
+
 
     console.log("status: " + puck_status)
 
@@ -542,6 +554,28 @@ function puckStatus(req, res, next) {
 
 }
 
+//
+// as MG said, what's going on?
+//
+function postStatus (req, res, next) {
+
+    console.log ("posting browser's status")
+    console.log (req.body)
+
+    var client_ip      = get_client_ip(req)
+
+    console.log('posting from : ' + client_ip)
+
+    puck_events   = req.body.events
+    file_magic    = req.body.file_events
+    browser_magic = req.body.browser_events
+    server_magic  = req.body.openvpn_server
+    client_magic  = req.body.openvpn_client
+
+    change_status()
+
+}
+
 
 /**
  * This is a nonsensical custom content-type 'application/puck', just to
@@ -633,22 +667,9 @@ function create_puck_key_store(puck) {
 
 }
 
-/**
- * Note this handler looks in `req.params`, which means we can load request
- * parameters in a "mixed" way, like:
- *
- * POST /puck?key=foo HTTP/1.1
- * Host: localhost
- * Content-Type: application/json
- * Content-Length: ...
- *
- * {"value": "json value of Puck data"}
- *
- * Which would have `key` and `value` available in req.params
- */
-
+//
 // Redis PUCKs key are all upper case+digits
-
+//
 function createPuck(req, res, next) {
 
     console.log ('creating puck')
@@ -1737,6 +1758,13 @@ server.use(express.static(__dirname + '/public'));
 
 // send me anything... I'll give you a chicken.  Or... status.
 server.get("/status", puckStatus);
+
+//
+// send any actions done on client... like ringing a phone or whatever
+// this is to help keep state in case of moving off web page, browser
+// crashes, etc.
+//
+server.post("/status", postStatus);
 
 /// Now the real handlers. Here we just CRUD on Puck blobs
 

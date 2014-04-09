@@ -20,7 +20,8 @@ KEY_SIZE=512
 KEY_SIZE=64
 
 # nuke any past status
-echo '{"events":{"new_puck":""},"openvpn_server":{},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}}' > $PUCK_HOME/status.puck
+echo '{"events":{"new_puck":""},"openvpn_server":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, "browser":{"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}}, "file_events": { "file_name" : "", "file_size" : "", "file_from" : ""}}' > $PUCK_HOME/status.puck
+
 # clear server and client logs
 echo > $PUCK_HOME/logs/client_vpn.log
 echo > $PUCK_HOME/logs/server_vpn.log
