@@ -16,6 +16,7 @@
     "ip": "= 0.1.0",
     "moment": "latest",
     "nodemon": "latest",
+    "node-uuid": "latest",
     "node-static": "0.6.9",
     "posix-getopt": "1.0.0",
     "q": "1.0.0",

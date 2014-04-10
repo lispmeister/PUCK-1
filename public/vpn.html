@@ -43,6 +43,14 @@
      }
 
 
+    /* logs */
+
+    .output{margin:20px 40px;}
+
+    .output a{display:inline-block; text-decoration:none; padding:3px 15px; -webkit-border-radius:15px; -moz-border-radius:15px; border-radius:15px; background:#000; margin:5px 20px 5px 0;}
+
+    .content { margin:40px; width:1000px; height:500px; padding:20px; overflow:auto; background:#ddd; -webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px;}
+
     </style>
     <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
@@ -91,7 +99,21 @@
 
         <div id="remoteVideos"></div>
 
+        <div id="incoming"></div>
+
     </div>
+
+    <div id="ovpn_client_infinity" class="content">
+        <p>VPN client logs <hr/></p>
+    </div>
+
+    <hr />
+
+    <!-- content block -->
+    <div id="ovpn_server_infinity" class="content">
+        <p>VPN server logs <hr/></p>
+    </div>
+
 
 <!-- le javascript -->
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
@@ -115,6 +137,76 @@
 <script type="text/javascript" src='/js/puck.js'></script>
 
 <script type='text/javascript'>
+
+$(document).ready(function () {
+
+    $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
+    $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
+
+    var socket = io.connect(':8080/');
+
+    var ovpn_slogs = 'openvpn_server_logs'
+    var ovpn_clogs = 'openvpn_client_logs'
+
+    socket.on('connect', function(){
+        console.log('general connext note')
+        socket.on('cat_facts', function (data) {
+            console.log('cat facts!')
+            console.log(data)
+
+            $('body').append('<div>' + data + '</div>')
+
+            console.log('sending foo bak')
+            socket.emit('puck_chat', 'foo', function (data) {
+                console.log('returned... ')
+                console.log(data.fact)
+                console.log(data.server)
+
+                // connect to a different server if we get back something different
+                if (data.server != "") {
+                    console.log('trying to connect to....')
+
+                    var url = 'https://' + data.server + ':8080'
+
+                    socket = io.connect(url)
+
+                    socket.on('connect', function(){
+                        console.log('connected to ' + url)
+
+                        socket.emit('puck_chat', 'foo', function (data) {
+                            console.log('sent missive to other server')
+                            console.log(data.fact)
+                            console.log(data.server)
+                        })
+
+                    })
+
+                }
+
+            })
+
+        })
+        socket.emit('puck', 'foo', function (data) {
+            console.log('hey pucks... ')
+            console.log(data)
+        })
+
+    })
+
+
+    socket.on(ovpn_clogs, function (data) {
+                console.log('client: ' + data.line)
+                $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+                $("#ovpn_client_infinity").mCustomScrollbar("update")
+                $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+    })
+
+    socket.on(ovpn_slogs, function (data) {
+                console.log('server: ' + data.line)
+                $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+                $("#ovpn_server_infinity").mCustomScrollbar("update")
+                $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+    })
 
     // ... bye bye
     $('body').on('click', '#puck_disconnect', function() {
@@ -142,11 +234,21 @@
     webrtc.on('readyToCall', function () {
         // you can name it anything
         webrtc.joinRoom('roomy');
-});
+    })
+
+
+})
 
 
 </script>
 
 </body>
 </html>
+
+
+
+<script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
 

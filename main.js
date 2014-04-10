@@ -96,6 +96,41 @@ pollStatus(puck_status_file)
 change_status()
 
 //
+// pick up cat facts!
+//
+
+var cat_facts = []
+
+// json scrobbled from bits at from - https://user.xmission.com/~emailbox/trivia.htm
+console.log('hoovering up cat facts... look out, tabby!')
+    
+fs.readFile("/etc/puck/catfacts.json", function (err, data) {
+    if (err) {
+        console.log('cant live without cat facts! ' + err)
+        console.log('going down!')
+        process.exit(code=666)
+    }
+    else {
+        data = JSON.parse(data.toString())
+        cat_facts = data.catfacts
+    }
+})
+
+
+//
+// return a fascinating detail about our furry friends
+//
+function random_cat_fact (facts) {
+    // console.log('generating cat fact')
+    var max  = facts.length
+
+    var fact = facts[Math.floor(Math.random() * (max - 1) + 1)]
+    console.log('cat fact! ' + fact)
+    return(fact)
+}
+
+
+//
 // watch vpn logs for incoming/outgoing connections
 //
 var server_vpn_log = "server_vpn"
@@ -188,6 +223,10 @@ if (isEmpty(bwana_puck)) {
     emitter.emit('loaded')
 }
 
+
+//
+// XXX - TBD - replace with socket.io
+//
 // send a message out that things are different
 function change_status() {
 
@@ -201,9 +240,6 @@ function change_status() {
     puck_status.file_events    = file_magic
     puck_status.browser_events = browser_magic
 
-    puck_status                = JSON.stringify(puck_status)
-
-
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
     // wiping out manually once used
@@ -211,12 +247,10 @@ function change_status() {
     file_magic  = { "file_name" : "", "file_size" : "", "file_from" : ""},
     puck_events = {"new_puck":""},
 
-
-
     console.log("status: " + puck_status)
 
     // xxx - errs to user!
-    fs.writeFile(puck_status_file, puck_status, function(err) {
+    fs.writeFile(puck_status_file, JSON.stringify(puck_status), function(err) {
         if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
         else { console.log('wrote status') }
     });
@@ -276,6 +310,7 @@ function watch_logs(logfile, log_type) {
 
     tail.on("line", function(line) {
 
+
         // console.log("got line from " + logfile + ":" + line)
     
         // xxx - for client openvpn - config... which ones to choose?  Another method?
@@ -299,6 +334,9 @@ function watch_logs(logfile, log_type) {
         // console.log('moment: ' + moment_in_time + ' : ' + line)
 
         if (log_type.indexOf("Server") > -1) {
+
+            // shove raw logs to anyone who wants to listen
+            ios.emit('openvpn_server_logs', { line: line })
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_server_remote) > -1) {
@@ -357,6 +395,8 @@ function watch_logs(logfile, log_type) {
         }
         else if (log_type.indexOf("Client") > -1) {
 
+            // shove raw logs to anyone who wants to listen
+            ios.emit('openvpn_client_logs', { line: line })
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_client_up) == 0) {
@@ -502,10 +542,10 @@ function pollStatus(file) {
     console.log('here to statusfy you...')
 
     // read or create it initially
-    if (puck_status == "{}") {
+    if (puck_status == {}) {
         if (!fs.existsSync(puck_status_file)) {
             console.log('creating ' + puck_status_file)
-            fs.writeFileSync(puck_status_file, puck_status)
+            fs.writeFileSync(puck_status_file, JSON.stringify(puck_status))
         }
     }
     fs.readFile(puck_status_file, function (err, data) {
@@ -514,7 +554,7 @@ function pollStatus(file) {
         }
         else {
             console.log(data.toString())
-            puck_status = data.toString()
+            puck_status = JSON.parse(data.toString())
         }
     })
 
@@ -534,7 +574,7 @@ function pollStatus(file) {
             }
             else {
                 console.log(data.toString())
-                puck_status = data.toString()
+                puck_status = JSON.parse(data.toString())
             }
          })
     })
@@ -548,9 +588,9 @@ function pollStatus(file) {
 //
 function puckStatus(req, res, next) {
 
-    console.log('puck status check... ' + JSON.stringify(puck_status))
+    // console.log('puck status check... ' + JSON.stringify(puck_status))
 
-    res.send(200, puck_status)
+    res.send(200, JSON.stringify(puck_status))
 
 }
 
@@ -1866,7 +1906,6 @@ server.all('/url', webProxy)
 
 //
 //
-//
 // and... finally... relax and listen
 //
 //
@@ -1882,7 +1921,7 @@ var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
 console.log('-- signal master is running --')
 
 //
-// smoke signalz
+// smoke signalz below, for RTC!
 //
 
 var stunservers = [ {"url": "stun:stun.l.google.com:19302"} ],
@@ -1910,12 +1949,64 @@ function safeCb(cb) {
     }
 }
 
-io.sockets.on('connection', function (client) {
+
+//
+// for socket channel stuff - both video and log watching and chat and all that stuff
+//
+
+var ios = io.sockets.on('connection', function (client) {
+
+    console.log('connext from ' + client.handshake.address)
+
     client.resources = {
         screen: false,
         video: true,
         audio: false
-    };
+    }
+
+// listen for any chatty pucks out there
+
+    client.on('puck_chat', function(res) {
+        console.log('- cat chat -')
+        console.log(res)
+        console.log('- cat facts -')
+    })
+
+
+// slip them a friendly cat fact
+
+    client.on('puck', function(res) {
+        var cool_cat_fact = random_cat_fact(cat_facts)
+
+        console.log('- cat facts -')
+        console.log('- ' + cool_cat_fact + ' -')
+        console.log('- cat facts -')
+
+        var ip_addr = client.handshake.address
+        console.log(ip_addr)
+
+        // if connected via VPN, use remote PUCK as server
+        var cat_fact_server = ""
+        if (typeof puck_status.openvpn_client.server_remote_ip != "undefined" && puck_status.openvpn_client.server_remote_ip != "") {
+            cat_fact_server = puck_status.openvpn_client.server_remote_ip
+        }
+
+        console.log('cat fax server is: ' + cat_fact_server)
+
+        var cool_cat_data    = {}
+
+        cool_cat_data.fact   = cool_cat_fact
+        cool_cat_data.server = cat_fact_server
+
+        console.log(cat_fact_server)
+
+        client.emit( 'cat_facts', 'welcome to cat facts!')
+        client.emit( 'cat_facts', cool_cat_data)
+
+    })
+
+
+// most of the code below is from github.com:andyet/signal-master.git
 
     // pass a message to another id
     client.on('message', function (details) {
@@ -1998,5 +2089,5 @@ io.sockets.on('connection', function (client) {
         });
         client.emit('turnservers', credentials);
     }
-});
+})
 
