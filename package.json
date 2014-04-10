@@ -16,6 +16,7 @@
     "ip": "= 0.1.0",
     "moment": "latest",
     "nodemon": "latest",
+    "http-proxy": "latest",
     "node-uuid": "latest",
     "node-static": "0.6.9",
     "posix-getopt": "1.0.0",
@@ -36,12 +37,7 @@
   "devDependencies": {
     "nodeunit": "0.8.0"
   },
-  "scripts": {
-    "start": "node main.js 2>&1 | bunyan",
-    "test": "nodeunit test"
-  },
-  "author": "dan f & Markus Fix",
-  "license": "MIT"
+  "author": "dan f with help from the mighty Markus Fix",
+  "license": "???"
 } 
-
 

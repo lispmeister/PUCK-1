@@ -174,7 +174,7 @@ $(document).ready(function () {
             console.log(data.server)
 
             // connect to a different server if we get back something different
-            if (data.server != "") {
+            if (typeof data.server != "undefined" && data.server != "") {
 
                 var url = 'https://' + data.server + ':8080/'
 
@@ -235,9 +235,8 @@ $(document).ready(function () {
         // immediately ask for camera access
         autoRequestMedia: true,
         // url: 'https://192.168.0.250:8887'
-        url: '/'
-        // url: 'https://localhost:8887',
-
+        // url: '/'
+        url: 'https://localhost:7777'
     });
 
     // we have to wait until it's ready
