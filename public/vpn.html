@@ -115,6 +115,16 @@
     </div>
 
 
+    <!-- spacer n feets below -->
+
+    <div class="btn-toolbar"> <span></span></div>
+    <div class="btn-toolbar"> <span class="spacer100"></span></div>
+
+    <div class="footer" id="puck_footy">
+        <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
+    </div>
+
+
 <!-- le javascript -->
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 
@@ -140,6 +150,10 @@
 
 $(document).ready(function () {
 
+    var browser_ip = ""
+
+    get_ip('#ip_diddy')
+
     $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
     $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
 
@@ -156,34 +170,30 @@ $(document).ready(function () {
 
             $('body').append('<div>' + data + '</div>')
 
-            console.log('sending foo bak')
-            socket.emit('puck_chat', 'foo', function (data) {
-                console.log('returned... ')
-                console.log(data.fact)
-                console.log(data.server)
+            console.log(data.fact)
+            console.log(data.server)
 
-                // connect to a different server if we get back something different
-                if (data.server != "") {
-                    console.log('trying to connect to....')
+            // connect to a different server if we get back something different
+            if (data.server != "") {
 
-                    var url = 'https://' + data.server + ':8080'
+                var url = 'https://' + data.server + ':8080/'
 
-                    socket = io.connect(url)
+                console.log('trying to connect to... ' + url)
 
-                    socket.on('connect', function(){
-                        console.log('connected to ' + url)
+                socket = io.connect(url)
 
-                        socket.emit('puck_chat', 'foo', function (data) {
-                            console.log('sent missive to other server')
-                            console.log(data.fact)
-                            console.log(data.server)
-                        })
+                socket.on('connect', function(){
+                    console.log('connected to ' + url)
 
+                    socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
+                        console.log('sent missive to other server')
+                        console.log(data.fact)
+                        console.log(data.server)
                     })
 
-                }
+                })
 
-            })
+            }
 
         })
         socket.emit('puck', 'foo', function (data) {

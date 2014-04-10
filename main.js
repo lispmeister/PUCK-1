@@ -1987,8 +1987,11 @@ var ios = io.sockets.on('connection', function (client) {
 
         // if connected via VPN, use remote PUCK as server
         var cat_fact_server = ""
-        if (typeof puck_status.openvpn_client.server_remote_ip != "undefined" && puck_status.openvpn_client.server_remote_ip != "") {
-            cat_fact_server = puck_status.openvpn_client.server_remote_ip
+        console.log(puck_status)
+        console.log(puck_status.openvpn_client)
+        console.log(puck_status.openvpn_client.server_remote_ip)
+        if (typeof puck_status.openvpn_client.server != "undefined" && puck_status.openvpn_client.server != "") {
+            cat_fact_server = puck_status.openvpn_client.server
         }
 
         console.log('cat fax server is: ' + cat_fact_server)
