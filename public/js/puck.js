@@ -184,12 +184,14 @@ function hang_up() {
 
     var jqXHR_stopVPN = $.ajax({
         url: url,
+        // probably shouldn't, but...
+        // async:false,
         dataType: 'json',
     }) 
 
     jqXHR_stopVPN.done(function (data, textStatus, jqXHR) {
-        // console.log('jxq hangup wootz')
-        // console.log(data)
+        console.log('jxq hangup wootz')
+        console.log(data)
     }).fail(function(err) {
         console.log('errz on hangup' + err)
         alert('error on hangup!')
@@ -198,8 +200,11 @@ function hang_up() {
     // kill the CSS UI signs
     remove_signs_of_call()
 
+    puck_status.openvpn_client.vpn_status = "down"
+    fire_puck_status(puck_status, false)
+
     if (window.location.pathname.split( '/' )[1] != "puck.html") {
-        window.location.href = "/puck.html"
+        setTimeout(window.location.href = "/puck.html", 2000)
     }
 
 }
@@ -245,7 +250,7 @@ function puck_vpn(element, puckid, ipaddr) {
         console.log("posto facto: " + msg );
     })
     pvpn.fail(function(xhr, textStatus, errorThrown) {
-        console.log('failzor -> ' + xhr.responseText)
+        console.log('failzor -> ' + xhr)
     })
 
 //  var callback = function(result, form){
@@ -429,11 +434,12 @@ function status_or_die() {
 
     console.log(puck_status)
 
-    console.log('I hear something...')
+    console.log('I hear something... from... ' + browser_ip)
 
-    if (typeof puck_status.browser == "undefined") {
-        puck_status.browser = []
-        puck_status.browser_events[browser_ip] = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}}
+    if (typeof puck_status.browser_events == "undefined" || typeof puck_status.browser_events[browser_ip] == "undefined") {
+        console.log('stuffing browser events...')
+        puck_status.browser_events = {}
+        puck_status.browser_events[browser_ip] = { "notify_add":false, "notify_ring":false, "notify_file":false}
     }
 
     // if someone has added you, create a modest sized bit of text that tells you 
@@ -465,12 +471,18 @@ function status_or_die() {
 
     console.log('outgoing...?')
     // client... outgoing ring
-    if (puck_status.openvpn_client.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_ring) {
+    console.log(puck_status.openvpn_client.vpn_status)
+    console.log(puck_status.browser_events[browser_ip].notify_ring)
+
+    console.log('^^^^')
+
+    if (puck_status.openvpn_client.vpn_status == "up" && puck_status.browser_events[browser_ip].notify_ring != true) {
         $('#puck_video').removeClass('red').addClass('green')
         console.log('outgoing ring!')
         kill_ring()
-        window.location.href = "/vpn.html"
         puck_status.browser_events[browser_ip].notify_ring = true
+        fire_puck_status(puck_status, false)
+        window.location.href = "/vpn.html"
     }
 
     // new package delivered
@@ -483,7 +495,7 @@ function status_or_die() {
         puck_status.browser_events[browser_ip].notify_file = true
     }
 
-    fire_puck_status(puck_status)
+    fire_puck_status(puck_status, true)
 }
 
 //
@@ -579,22 +591,33 @@ function stop_server() {
 //
 // fire status to puck
 //
-function fire_puck_status(jstatus) {
+// sinc == async or sync
+//
+function fire_puck_status(jstatus, sink) {
 
     console.log('firing status off')
+    console.log(typeof jstatus)
+    jstatus = JSON.stringify(jstatus)
 
     var status_xhr = $.ajax({
         type: "POST",
         url: "/status",
-        data: jstatus
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8",
+        data: jstatus,
+        success: function(res) {
+            console.log('status off!')
+            console.log(res)
+        },
+        error: function (txtstat, e) {
+            console.log('status failzor -> ' + JSON.stringify(txtstat))
+            console.log(e)
+        }
+
     })
 
-    status_xhr.done(function(msg) {
-        console.log("posto facto: " + msg );
-    })
-    status_xhr.fail(function(xhr, textStatus, errorThrown) {
-        console.log('failzor -> ' + xhr.responseText)
-    })
+        // ?
+        // async: sink,
 
 }
 

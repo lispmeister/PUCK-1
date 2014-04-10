@@ -68,18 +68,18 @@ catch (e) {
 // yes, yes, lazy too
 
 // status and other bits
-var server_magic   = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
-    client_magic   = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
-    file_magic     = { "file_name" : "", "file_size" : "", "file_from" : ""},
-    puck_events    = {"new_puck":""},
-    browser_events = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
-    puck_status    = {}
+var server_magic  = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
+    client_magic  = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
+    file_magic    = { "file_name" : "", "file_size" : "", "file_from" : ""},
+    puck_events   = {"new_puck":""},
+    browser_magic = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
+    puck_status   = {}
 
     puck_status.events         = puck_events
     puck_status.openvpn_server = server_magic
     puck_status.openvpn_client = client_magic
     puck_status.file_events    = file_magic
-    puck_status.browser_events = browser_events
+    puck_status.browser_events = browser_magic
 
 
 var server           = "",
@@ -199,7 +199,7 @@ function change_status() {
     puck_status.openvpn_server = server_magic
     puck_status.openvpn_client = client_magic
     puck_status.file_events    = file_magic
-    puck_status.browser_events = browser_events
+    puck_status.browser_events = browser_magic
 
     puck_status                = JSON.stringify(puck_status)
 
@@ -548,7 +548,7 @@ function pollStatus(file) {
 //
 function puckStatus(req, res, next) {
 
-    // console.log('puck status check...' + puck_status)
+    console.log('puck status check... ' + JSON.stringify(puck_status))
 
     res.send(200, puck_status)
 
@@ -573,6 +573,8 @@ function postStatus (req, res, next) {
     client_magic  = req.body.openvpn_client
 
     change_status()
+
+    res.send(200, {"status" : "OK"})
 
 }
 
@@ -1876,4 +1878,125 @@ console.log('server listening at %s', puck_port)
 
 // tack on socket.io
 var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
+
+console.log('-- signal master is running --')
+
+//
+// smoke signalz
+//
+
+var stunservers = [ {"url": "stun:stun.l.google.com:19302"} ],
+    turnservers = [ /* { "url": "turn:your.turn.server.here", "secret": "turnserversharedsecret" "expiry": 86400 } */ ]
+
+var uuid = require('node-uuid'),
+    crypto = require('crypto')
+    
+function describeRoom(name) {
+    var clients = io.sockets.clients(name);
+    var result = {
+        clients: {}
+    };
+    clients.forEach(function (client) {
+        result.clients[client.id] = client.resources;
+    });
+    return result;
+}
+
+function safeCb(cb) {
+    if (typeof cb === 'function') {
+        return cb;
+    } else {
+        return function () {};
+    }
+}
+
+io.sockets.on('connection', function (client) {
+    client.resources = {
+        screen: false,
+        video: true,
+        audio: false
+    };
+
+    // pass a message to another id
+    client.on('message', function (details) {
+        var otherClient = io.sockets.sockets[details.to];
+        if (!otherClient) return;
+        details.from = client.id;
+        otherClient.emit('message', details);
+    });
+
+    client.on('shareScreen', function () {
+        client.resources.screen = true;
+    });
+
+    client.on('unshareScreen', function (type) {
+        client.resources.screen = false;
+        if (client.room) removeFeed('screen');
+    });
+
+    client.on('join', join);
+
+    function removeFeed(type) {
+        io.sockets.in(client.room).emit('remove', {
+            id: client.id,
+            type: type
+        });
+    }
+
+    function join(name, cb) {
+        // sanity check
+        if (typeof name !== 'string') return;
+        // leave any existing rooms
+        if (client.room) removeFeed();
+        safeCb(cb)(null, describeRoom(name));
+        client.join(name);
+        client.room = name;
+    }
+
+    // we don't want to pass "leave" directly because the
+    // event type string of "socket end" gets passed too.
+    client.on('disconnect', function () {
+        removeFeed();
+    });
+    client.on('leave', removeFeed);
+
+    client.on('create', function (name, cb) {
+        if (arguments.length == 2) {
+            cb = (typeof cb == 'function') ? cb : function () {};
+            name = name || uuid();
+        } else {
+            cb = name;
+            name = uuid();
+        }
+        // check if exists
+        if (io.sockets.clients(name).length) {
+            safeCb(cb)('taken');
+        } else {
+            join(name);
+            safeCb(cb)(null, name);
+        }
+    });
+
+    // tell client about stun and turn servers and generate nonces
+    if (stunservers) {
+        client.emit('stunservers', stunservers);
+    }
+    if (turnservers) {
+        // create shared secret nonces for TURN authentication
+        // the process is described in draft-uberti-behave-turn-rest
+        var credentials = [];
+        turnservers.forEach(function (server) {
+            var hmac = crypto.createHmac('sha1', server.secret);
+            // default to 86400 seconds timeout unless specified
+            var username = new Date().getTime() + (server.expiry || 86400) + "";
+            hmac.update(username);
+            credentials.push({
+                username: username,
+                credential: hmac.digest('base64'),
+                url: server.url
+            });
+        });
+        client.emit('turnservers', credentials);
+    }
+});
 

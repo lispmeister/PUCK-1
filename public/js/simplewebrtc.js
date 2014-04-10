@@ -14,6 +14,7 @@ function SimpleWebRTC(opts) {
     var options = opts || {};
     var config = this.config = {
             url: 'http://signaling.simplewebrtc.com:8888',
+            // url: 'https://localhost:8887',
             debug: false,
             localVideoEl: '',
             remoteVideosEl: '',
@@ -2277,6 +2278,9 @@ var io = ('undefined' === typeof module ? {} : module.exports);
       var xhr = io.util.request();
 
       xhr.open('GET', url, true);
+
+      console.log('webrtc GET ' + url)
+
       if (this.isXDomain()) {
         xhr.withCredentials = true;
       }
