@@ -429,6 +429,11 @@ function watch_logs(logfile, log_type) {
                     }
     
                 createEvent('internal server', {event_type: "vpn_client_connected", puck_id: bwana_puck.PUCK_ID})
+
+                // if we're doing the calling, we want to setup a proxy so our
+                // browser web requests can go into the tunnel to this vs. trying to flail at
+                // some random IP
+                proxy_love(server_remote_ip)
     
             }
             // down
@@ -1408,11 +1413,6 @@ function startVPN(req, res, next) {
 
     createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
 
-    // if we're doing the calling, we want to setup a proxy so our
-    // browser web requests can go into the tunnel vs. trying to flail at
-    // some random IP
-    proxy_love(puck2ip[puckid])
-
     var vpn_home = "/vpn.html"
 
     // prevents calling form from leaving page
@@ -1438,9 +1438,9 @@ function startVPN(req, res, next) {
 //
 //    computer-1 <-> browser-1 <-> PUCK-1 <-> Proxy-on-PUCK-1 <- ... net ... -> PUCK-2 <-> browser-2 <-> computer-2
 //
-function proxy_love(ip) {
+function proxy_love(cat_fact_server) {
 
-    console.log('proxy time => ' + ip)
+    console.log('proxy time => ' + cat_fact_server)
 
     if (puck_proxy_up) {
         console.log("the proxy is currently up, tear it down!")
@@ -1459,8 +1459,8 @@ function proxy_love(ip) {
     var httpProxy = require('http-proxy')
     
     var proxy_port  = 7777,
-        remote_host = ip
-        remote_port = puck_port
+        remote_host = cat_fact_server,
+        remote_port = puck_port;
     
     var remote_url  = "https://" + remote_host + ":" + remote_port
     
@@ -1511,9 +1511,8 @@ function proxy_love(ip) {
     proxy_server.listen(proxy_port, function() {
         console.log('proxy web server for ' + remote_host + ' @ ' + remote_port + ' created, listening locally on ' + proxy_port)
         puck_proxy_up = true
-        createEvent('internal server', {event_type: "proxy_setup", remote_ip: remote_host, remote_puck_id: ip2puck[ip]})
+        createEvent('internal server', {event_type: "proxy_setup", remote_ip: remote_host, remote_puck_id: ip2puck[cat_fact_server]})
     })
-
 
 }
 
@@ -2063,6 +2062,8 @@ function safeCb(cb) {
 // for socket channel stuff - both video and log watching and chat and all that stuff
 //
 
+var cat_fact_server = ""
+
 var ios = io.sockets.on('connection', function (client) {
 
     console.log('[+] NEW connext from ' + client.handshake.address)
@@ -2095,7 +2096,6 @@ var ios = io.sockets.on('connection', function (client) {
         console.log(ip_addr)
 
         // if connected via VPN, use remote PUCK as server
-        var cat_fact_server = ""
         console.log(puck_status)
         console.log(puck_status.openvpn_client)
         console.log(puck_status.openvpn_client.server_remote_ip)

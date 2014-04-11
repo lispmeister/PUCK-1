@@ -167,80 +167,85 @@ $(document).ready(function () {
 
     local_socket.on('connect', function(){
         console.log('[+++] - general connext note')
+
         local_socket.on('cat_facts', function (data) {
             console.log('[+++] - cat facts!')
             console.log(data)
-
             if (typeof data.fact != "undefined") {
                 $('#ip_diddy').append('<br />' + data.fact)
             }
 
             console.log(data.fact)
             console.log(data.server)
-
+    
             // connect to a different server if we get back something different
             if (typeof data.server != "undefined" && data.server != "") {
-
+        
                 var url = 'https://' + data.server + ':8080/'
-
+        
                 // url = "https://192.168.0.250:7777/"
                 // url = "https://10.146.126.1:8080/"
-
                 // xxx - need to fire up proxy before hitting this line
+        
                 url = "https://192.168.0.250:7777/"
                 console.log('trying to connect to... ' + url)
-
+        
                 remote_socket = io.connect(url)
-
+        
+                remote_socket.on('connect', function(){
+                    console.log('[+] remote - connected to ' + url)
+                })
+        
                 remote_socket.on('error', function(err){
                     console.log('remote errz ' + JSON.stringify(url))
                 })
-
-                remote_socket.on('connect', function(){
-                    console.log('[+] remote - connected to ' + url)
-                    remote_socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
-                        console.log('[@] sent missive to other server')
-                        console.log(data.fact)
-                        console.log(data.server)
-                    })
-
+        
+                remote_socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
+                    console.log('[@] + sent missive to other server')
+                    console.log(data.fact)
+                    console.log(data.server)
                 })
-
+                remote_socket.emit('puck', 'foo', function (data) {
+                    console.log('[@] + hey pucks... ')
+                    console.log(data)
+                })
+                remote_socket.on('puck_status', function (data) {
+                    console.log('[@] + cat facts... wait...no... status :(')
+                    console.log(data)
+                })
             }
-
         })
-
-        local_socket.emit('puck', 'foo', function (data) {
-            console.log('hey pucks... ')
-            console.log(data)
-        })
-
-        local_socket.on('puck_status', function (data) {
-            console.log('cat facts... wait...no... status :(')
-            console.log(data)
-        })
-
-        local_socket.on('puck_status', function (data) {
-            console.log('cat facts... wait...no... status :(')
-            console.log(data)
-        })
-
 
     })
 
+    local_socket.emit('puck', 'foo', function (data) {
+        console.log('hey pucks... ')
+        console.log(data)
+    })
 
+    local_socket.on('puck_status', function (data) {
+        console.log('cat facts... wait...no... status :(')
+        console.log(data)
+    })
+
+    local_socket.on('puck_status', function (data) {
+        console.log('cat facts... wait...no... status :(')
+        console.log(data)
+    })
+
+    // OVPN logs for client/server
     local_socket.on(ovpn_clogs, function (data) {
-                console.log('client: ' + data.line)
-                $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
-                $("#ovpn_client_infinity").mCustomScrollbar("update")
-                $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        console.log('client: ' + data.line)
+        $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+        $("#ovpn_client_infinity").mCustomScrollbar("update")
+        $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
 
     local_socket.on(ovpn_slogs, function (data) {
-                console.log('server: ' + data.line)
-                $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
-                $("#ovpn_server_infinity").mCustomScrollbar("update")
-                $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        console.log('server: ' + data.line)
+        $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+        $("#ovpn_server_infinity").mCustomScrollbar("update")
+        $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
 
     // ... bye bye
@@ -248,6 +253,7 @@ $(document).ready(function () {
         $('body').removeClass('avgrund-active');
         hang_up()
     })
+
 
     // status loop
     infinite()
