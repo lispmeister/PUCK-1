@@ -89,6 +89,11 @@ var server           = "",
     puck_status_file = "/etc/puck/status.puck";
 
 
+// proxy up?
+var puck_proxy_up = false,
+    proxy_server  = "",
+    proxy         = ""
+
 // keep an eye on the above
 pollStatus(puck_status_file)
 
@@ -1399,11 +1404,110 @@ function startVPN(req, res, next) {
 
     createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
 
+    // if we're doing the calling, we want to setup a proxy so our
+    // browser web requests can go into the tunnel vs. trying to flail at
+    // some random IP
+    proxy_love(puck2ip[puckid])
+
     var vpn_home = "/vpn.html"
 
     // prevents calling form from leaving page
-// XXX ?
     res.send(204)
+
+}
+
+
+
+// XXX - stop proxy when done!
+
+// if we're doing the calling, we want to setup a proxy so our
+// browser web requests can go into the tunnel vs. trying to flail at
+// some random IP
+//
+// normally you have something like:
+//
+//    computer-1 <-> browser-1 <-> PUCK-1 <-- .... network .... --> PUCK-2 <-> browser-2 <-> computer-2
+//
+// computer1  & 2 may well not have connectivty to the other, but the js executing
+// in the browser comes from them... but they can always talk to their own PUCK, so
+// after this it'll look like this, with the traffic appearing to come from the proxy
+//
+//    computer-1 <-> browser-1 <-> PUCK-1 <-> Proxy-on-PUCK-1 <- ... net ... -> PUCK-2 <-> browser-2 <-> computer-2
+//
+function proxy_love(ip) {
+
+    console.log('proxy time => ' + ip)
+
+    if (puck_proxy_up) {
+        console.log("the proxy is currently up, tear it down!")
+        proxy.close()
+        proxy_server.close()
+    }
+
+    //
+    // a simple web and ws proxy, courtesy of http-proxy
+    // 
+    // Currently will proxy on the local server (all interfaces) on port 7777
+    //
+    
+    var httpProxy = require('http-proxy')
+    
+    var proxy_port  = 7777,
+        remote_host = ip
+        remote_port = puck_port
+    
+    var remote_url  = "https://" + remote_host + ":" + remote_port
+    
+    console.log('\n\n[+] proxying from the local server on port ' + proxy_port + ' => ' + remote_url)
+    
+    // use the same keys as the main puck server
+    var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
+        cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
+        ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
+    
+    var credentials = {key: key, cert: cert, ca: ca};
+    
+    // all the brains are in here
+    proxy = new httpProxy.createProxyServer({
+        ssl: credentials,
+        target: {
+            host: remote_host,
+            port: remote_port
+        },
+        secure: false,
+        wss: true
+    })
+    
+    // inner stuff will fire off when get requests
+    proxy_server = https.createServer(credentials, function(req, res) {
+        console.log(req.url + ' => ' + remote_url)
+        proxy.web(req, res, { target: remote_url }, function (req,res) {
+            console.log('proxy web')
+        })
+    })
+    
+    // client responses, if interesting
+    proxy.on('proxyRes', function (res) {
+        console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
+    });
+    
+    // WebSocket stuff
+    proxy.on('upgrade', function (req, socket, head) {
+        console.log('upgrade caught')
+        proxy.ws(req, socket, head);
+    })
+    
+    // var wss = new websocket.WebSocket(url + '/socket.io/websocket/', 'cat_facts')
+    //     ssl: credentials,
+    
+    
+    // welcome to the machine
+    proxy_server.listen(proxy_port, function() {
+        console.log('proxy web server for ' + remote_host + ' @ ' + remote_port + ' created, listening locally on ' + proxy_port)
+        puck_proxy_up = true
+        createEvent('internal server', {event_type: "proxy_setup", remote_ip: remote_host, remote_puck_id: ip2puck[ip]})
+    })
+
 
 }
 

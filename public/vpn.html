@@ -128,8 +128,8 @@
 <!-- le javascript -->
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 
-<script src="/js/socket.io.js"></script>
-<script src="/js/simplewebrtc.js"></script>
+<script type="text/javascript" src="/js/socket.io.js"></script>
+<script type="text/javascript" src="/js/simplewebrtc.js"></script>
 
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
@@ -157,7 +157,8 @@ $(document).ready(function () {
     $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
     $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
 
-    var socket = io.connect(':8080/');
+    // var socket = io.connect(':8080/');
+    var socket = io.connect('https://10.93.54.6:8080/');
 
     var ovpn_slogs = 'openvpn_server_logs'
     var ovpn_clogs = 'openvpn_client_logs'
@@ -168,7 +169,9 @@ $(document).ready(function () {
             console.log('cat facts!')
             console.log(data)
 
-            $('#ip_diddy').append('<br />' + data.fact)
+            if (typeof data.fact != "undefined") {
+                $('#ip_diddy').append('<br />' + data.fact)
+            }
 
             console.log(data.fact)
             console.log(data.server)
@@ -179,6 +182,9 @@ $(document).ready(function () {
                 var url = 'https://' + data.server + ':8080/'
 
                 // url = "https://192.168.0.250:7777/"
+
+                // xxx - need to fire up proxy before hitting this line
+                url = "https://192.168.0.250:7777/"
                 console.log('trying to connect to... ' + url)
 
                 sock = io.connect(url)
@@ -238,9 +244,12 @@ $(document).ready(function () {
         remoteVideosEl: 'remoteVideos',
         // immediately ask for camera access
         autoRequestMedia: true,
-        // url: 'https://192.168.0.250:8887'
+        url: 'https://192.168.0.250:7777'
+
         // url: '/'
-        url: 'https://localhost:7777'
+        // url: 'https://192.168.0.250:8887'
+        // url: 'https://localhost:7777'
+
     });
 
     // we have to wait until it's ready
@@ -263,5 +272,4 @@ $(document).ready(function () {
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
 
-<script src="/socket.io/socket.io.js"></script>
 
