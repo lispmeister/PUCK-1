@@ -83,7 +83,7 @@
       <hr>
 
       <div class="hero-unit">
-          <p>If you don't see pictures... something is wrong!</P>
+          <p>If you don't see video... something is wrong!</P>
       </div>
 
     </div>
@@ -158,15 +158,17 @@ $(document).ready(function () {
     $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
 
     // var socket = io.connect(':8080/');
-    var socket = io.connect('https://10.93.54.6:8080/');
+    // var socket = io.connect('https://10.93.54.6:8080/');
+
+    var local_socket = io.connect(':8080/');
 
     var ovpn_slogs = 'openvpn_server_logs'
     var ovpn_clogs = 'openvpn_client_logs'
 
-    socket.on('connect', function(){
-        console.log('general connext note')
-        socket.on('cat_facts', function (data) {
-            console.log('cat facts!')
+    local_socket.on('connect', function(){
+        console.log('[+++] - general connext note')
+        local_socket.on('cat_facts', function (data) {
+            console.log('[+++] - cat facts!')
             console.log(data)
 
             if (typeof data.fact != "undefined") {
@@ -182,21 +184,22 @@ $(document).ready(function () {
                 var url = 'https://' + data.server + ':8080/'
 
                 // url = "https://192.168.0.250:7777/"
+                // url = "https://10.146.126.1:8080/"
 
                 // xxx - need to fire up proxy before hitting this line
                 url = "https://192.168.0.250:7777/"
                 console.log('trying to connect to... ' + url)
 
-                sock = io.connect(url)
+                remote_socket = io.connect(url)
 
-                sock.on('error', function(err){
-                    console.log('errz ' + JSON.stringify(url))
+                remote_socket.on('error', function(err){
+                    console.log('remote errz ' + JSON.stringify(url))
                 })
 
-                sock.on('connect', function(){
-                    console.log('connected to ' + url)
-                    sock.emit('puck_chat', {'client' : browser_ip}, function (data) {
-                        console.log('sent missive to other server')
+                remote_socket.on('connect', function(){
+                    console.log('[+] remote - connected to ' + url)
+                    remote_socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
+                        console.log('[@] sent missive to other server')
                         console.log(data.fact)
                         console.log(data.server)
                     })
@@ -206,22 +209,34 @@ $(document).ready(function () {
             }
 
         })
-        socket.emit('puck', 'foo', function (data) {
+
+        local_socket.emit('puck', 'foo', function (data) {
             console.log('hey pucks... ')
             console.log(data)
         })
 
+        local_socket.on('puck_status', function (data) {
+            console.log('cat facts... wait...no... status :(')
+            console.log(data)
+        })
+
+        local_socket.on('puck_status', function (data) {
+            console.log('cat facts... wait...no... status :(')
+            console.log(data)
+        })
+
+
     })
 
 
-    socket.on(ovpn_clogs, function (data) {
+    local_socket.on(ovpn_clogs, function (data) {
                 console.log('client: ' + data.line)
                 $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
                 $("#ovpn_client_infinity").mCustomScrollbar("update")
                 $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
 
-    socket.on(ovpn_slogs, function (data) {
+    local_socket.on(ovpn_slogs, function (data) {
                 console.log('server: ' + data.line)
                 $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
                 $("#ovpn_server_infinity").mCustomScrollbar("update")
@@ -244,9 +259,8 @@ $(document).ready(function () {
         remoteVideosEl: 'remoteVideos',
         // immediately ask for camera access
         autoRequestMedia: true,
-        url: 'https://192.168.0.250:7777'
-
-        // url: '/'
+        url: '/'
+        // url: 'https://192.168.0.250:7777'
         // url: 'https://192.168.0.250:8887'
         // url: 'https://localhost:7777'
 

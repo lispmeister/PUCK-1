@@ -81,7 +81,6 @@ var server_magic  = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration
     puck_status.file_events    = file_magic
     puck_status.browser_events = browser_magic
 
-
 var server           = "",
     puck2ip          = {},      // puck ID to IP mapping
     ip2puck          = {},      // IP mapping to puck ID
@@ -253,6 +252,11 @@ function change_status() {
     puck_events = {"new_puck":""},
 
     console.log("status: " + puck_status)
+
+    if (typeof ios == "object") {
+        ios.emit('iOS puck_status: ', JSON.stringify(puck_status))
+    }
+    else { console.log('iOS: ' + typeof ios) }
 
     // xxx - errs to user!
     fs.writeFile(puck_status_file, JSON.stringify(puck_status), function(err) {
@@ -860,14 +864,14 @@ function setTCPProxy(req, res, next) {
     proxy_remote_port = req.query.proxy_remote_port
     proxy_local_port  = req.query.proxy_local_port
 
-    var proxy = tcpProxy.createServer({
+    var tcp_proxy = tcpProxy.createServer({
         target: {
             host: proxy_remote_host,
             port: proxy_remote_port
         }
     })
 
-    proxy.listen(proxy_local_port)
+    tcp_proxy.listen(proxy_local_port)
 
     console.log('set proxy to listen on port ' + proxy_local_port)
 
@@ -1440,8 +1444,10 @@ function proxy_love(ip) {
 
     if (puck_proxy_up) {
         console.log("the proxy is currently up, tear it down!")
-        proxy.close()
-        proxy_server.close()
+        proxy._server.close()
+        puck_proxy_up = false
+        // proxy.close()
+        // proxy_server.close()
     }
 
     //
@@ -2059,7 +2065,7 @@ function safeCb(cb) {
 
 var ios = io.sockets.on('connection', function (client) {
 
-    console.log('connext from ' + client.handshake.address)
+    console.log('[+] NEW connext from ' + client.handshake.address)
 
     client.resources = {
         screen: false,
