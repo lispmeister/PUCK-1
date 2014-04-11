@@ -254,7 +254,7 @@ function change_status() {
     console.log("status: " + puck_status)
 
     if (typeof ios == "object") {
-        ios.emit('iOS puck_status: ', JSON.stringify(puck_status))
+        ios.emit('puck_status: ', JSON.stringify(puck_status))
     }
     else { console.log('iOS: ' + typeof ios) }
 
@@ -604,12 +604,15 @@ function puckStatus(req, res, next) {
 
     // console.log('puck status check... ' + JSON.stringify(puck_status))
 
+    if (typeof ios == "object") { ios.emit('puck_status: ', JSON.stringify(puck_status)) }
+    else { console.log('iOS not ready (' + typeof ios) + ')' }
+
     res.send(200, JSON.stringify(puck_status))
 
 }
 
 //
-// as MG said, what's going on?
+// as marvin said, what's going on?
 //
 function postStatus (req, res, next) {
 
@@ -1444,7 +1447,7 @@ function proxy_love(cat_fact_server) {
 
     if (puck_proxy_up) {
         console.log("the proxy is currently up, tear it down!")
-        proxy._server.close()
+        proxy_server._server.close()
         puck_proxy_up = false
         // proxy.close()
         // proxy_server.close()
