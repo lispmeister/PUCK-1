@@ -25,6 +25,7 @@ var proxy_port  = 7777,
     remote_host = process.argv[2],
     remote_port = process.argv[3]
 
+var remote_url  = "wss://" + remote_host + ":" + remote_port
 var remote_url  = "https://" + remote_host + ":" + remote_port
 
 console.log('proxying from the local server on port ' + proxy_port + ' => ' + remote_url)
@@ -44,29 +45,34 @@ var proxy = new httpProxy.createProxyServer({
         port: remote_port
     },
     secure: false,
-    wss:true
+    wss: true
 })
 
 // inner stuff will fire off when get requests
 var server = https.createServer(credentials, function(req, res) {
-    console.log('sending request to ' + remote_url)
-    proxy.web(req, res, { target: remote_url });
+    console.log(req.url + ' => ' + remote_url)
+    proxy.web(req, res, { target: remote_url }, function (req,res) {
+        console.log('proxy web')
+    })
 })
 
 // client responses, if interesting
 proxy.on('proxyRes', function (res) {
-  console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
+    console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
 });
 
 // WebSocket stuff
 proxy.on('upgrade', function (req, socket, head) {
     console.log('upgrade caught')
-    proxy.wss(req, socket, head);
+    proxy.ws(req, socket, head);
 })
+
+// var wss = new websocket.WebSocket(url + '/socket.io/websocket/', 'cat_facts')
+//     ssl: credentials,
+
 
 // welcome to the machine
 server.listen(proxy_port, function() {
     console.log('proxy web server for ' + remote_host + ' @ ' + remote_port + ' created, listening locally on ' + proxy_port)
 })
-
 

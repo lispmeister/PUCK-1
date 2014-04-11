@@ -168,7 +168,7 @@ $(document).ready(function () {
             console.log('cat facts!')
             console.log(data)
 
-            $('body').append('<div>' + data + '</div>')
+            $('#ip_diddy').append('<br />' + data.fact)
 
             console.log(data.fact)
             console.log(data.server)
@@ -178,14 +178,18 @@ $(document).ready(function () {
 
                 var url = 'https://' + data.server + ':8080/'
 
+                url = "https://192.168.0.250:7777/"
                 console.log('trying to connect to... ' + url)
 
-                socket = io.connect(url)
+                sock = io.connect(url)
 
-                socket.on('connect', function(){
+                sock.on('error', function(err){
+                    console.log('errz ' + JSON.stringify(url))
+                })
+
+                sock.on('connect', function(){
                     console.log('connected to ' + url)
-
-                    socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
+                    sock.emit('puck_chat', {'client' : browser_ip}, function (data) {
                         console.log('sent missive to other server')
                         console.log(data.fact)
                         console.log(data.server)

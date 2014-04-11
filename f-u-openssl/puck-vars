@@ -26,7 +26,8 @@ export KEY_ORG="PUCK"
 export KEY_EMAIL="puck@example.com"
 export KEY_OU="Crypto Cops"
 
-export COMMON_NAME="puckasaurus"
+# export COMMON_NAME="puckasaurus"
+export COMMON_NAME="*"
 
 # X509 Subject Field
 export KEY_NAME="PUCK"

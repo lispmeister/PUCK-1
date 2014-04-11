@@ -1778,7 +1778,6 @@ server.use(response());
 
 server.use(express.limit('1gb'))
 
-
 // server.use(express.logger());
 server.use(express.compress());
 server.use(express.methodOverride());
@@ -2003,7 +2002,7 @@ var ios = io.sockets.on('connection', function (client) {
 
         console.log(cat_fact_server)
 
-        client.emit( 'cat_facts', 'welcome to cat facts!')
+        client.emit( 'cat_facts', {"data": "welcome to cat facts!"})
         client.emit( 'cat_facts', cool_cat_data)
 
     })
