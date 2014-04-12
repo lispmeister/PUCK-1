@@ -1447,8 +1447,8 @@ function proxy_love(cat_fact_server) {
 
     if (puck_proxy_up) {
         console.log("the proxy is currently up, tear it down!")
-        proxy_server._server.close()
-        puck_proxy_up = false
+        // proxy_server._server.close()
+        // puck_proxy_up = false
         // proxy.close()
         // proxy_server.close()
     }
@@ -2031,11 +2031,14 @@ var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
 
 console.log('-- signal master is running --')
 
+
+
 //
 // smoke signalz below, for RTC!
 //
 
-var stunservers = [ {"url": "stun:stun.l.google.com:19302"} ],
+// var stunservers = [ {"url": "stun:stun.l.google.com:19302"} ],
+var stunservers = [],
     turnservers = [ /* { "url": "turn:your.turn.server.here", "secret": "turnserversharedsecret" "expiry": 86400 } */ ]
 
 var uuid = require('node-uuid'),
@@ -2065,7 +2068,10 @@ function safeCb(cb) {
 // for socket channel stuff - both video and log watching and chat and all that stuff
 //
 
-var cat_fact_server = ""
+io.set('transports',['xhr-polling']);
+
+var cat_fact_server = "",
+    puck_users      = {};
 
 var ios = io.sockets.on('connection', function (client) {
 
@@ -2182,6 +2188,46 @@ var ios = io.sockets.on('connection', function (client) {
             safeCb(cb)(null, name);
         }
     });
+
+
+/* adapted from http://psitsmike.com/2011/09/node-js-and-socket-io-chat-tutorial/ */
+
+    // when the client emits 'chat_send', this listens and executes
+    client.on('chat_send', function (data) {
+        // we tell the client to execute 'chat_receive' with 2 parameters
+        io.sockets.emit('chat_receive', client.puck_user, data);
+    });
+
+    // when the client emits 'adduser', this listens and executes
+    client.on('new_puck', function(puck_user){
+        // we store the puck_user in the socket session for this client
+        client.puck_user = puck_user;
+        // add the client's puck_user to the global list
+        puck_users[puck_user] = puck_user;
+        // echo to client they've connected
+        client.emit('chat_receive', 'SERVER', 'you have connected');
+        // echo globally (all clients) that a person has connected
+        client.broadcast.emit('chat_receive', 'SERVER', puck_user + ' has connected');
+        // update the list of users in chat, client-side
+        io.sockets.emit('new_puck', puck_user);
+    });
+
+    // when the user disconnects.. perform this
+    client.on('disconnect', function(){
+        // remove the puck_user from global puck_user list
+        delete puck_users[client.puck_user];
+        // update list of users in chat, client-side
+        io.sockets.emit('updateusers', puck_user);
+        // echo globally that this client has left
+        client.broadcast.emit('chat_receive', 'SERVER', client.puck_user + ' has disconnected');
+    });
+
+
+
+
+
+
+
 
     // tell client about stun and turn servers and generate nonces
     if (stunservers) {

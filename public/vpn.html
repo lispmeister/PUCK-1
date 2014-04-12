@@ -80,6 +80,18 @@
           <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
       </div>
 
+
+        <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+            <b>USERS</b>
+            <div id="users"></div>
+        </div>
+        <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
+            <div id="conversation"></div>
+            <input id="data" style="width:200px;" />
+            <input type="button" id="datasend" value="send" />
+        </div>
+
+
       <hr>
 
       <div class="hero-unit">
@@ -160,63 +172,89 @@ $(document).ready(function () {
     // var socket = io.connect(':8080/');
     // var socket = io.connect('https://10.93.54.6:8080/');
 
-    var local_socket = io.connect(':8080/');
+    local_socket = io.connect('https://192.168.0.250:8080/');
 
     var ovpn_slogs = 'openvpn_server_logs'
     var ovpn_clogs = 'openvpn_client_logs'
 
+
+
     local_socket.on('connect', function(){
         console.log('[+++] - general connext note')
 
+        // local_socket.on('event', function(data){ console.log('[lsock] - data') ; console.log(data)});
+        // local_socket.on('disconnect', function(){ console.log('[lsock] - d/c')});
+        // local_socket.on('error', function(){ console.log('[lsock] - sock erz')});
+
         local_socket.on('cat_facts', function (data) {
+
             console.log('[+++] - cat facts!')
             console.log(data)
+
             if (typeof data.fact != "undefined") {
                 $('#ip_diddy').append('<br />' + data.fact)
-            }
+                console.log(data.fact)
+                console.log(data.server)
 
-            console.log(data.fact)
-            console.log(data.server)
-    
+
             // connect to a different server if we get back something different
             if (typeof data.server != "undefined" && data.server != "") {
         
-                var url = 'https://' + data.server + ':8080/'
+                // var url = 'https://' + data.server + ':8080/'
         
                 // url = "https://192.168.0.250:7777/"
                 // url = "https://10.146.126.1:8080/"
                 // xxx - need to fire up proxy before hitting this line
         
-                url = ':7777'
+                var url = ':7777'
+
                 console.log('trying to connect to... ' + url)
         
                 remote_socket = io.connect(url)
-        
+
                 remote_socket.on('connect', function(){
+
                     console.log('[+] remote - connected to ' + url)
-                })
         
-                remote_socket.on('error', function(err){
-                    console.log('remote errz ' + JSON.stringify(url))
-                })
-        
-                remote_socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
-                    console.log('[@] + sent missive to other server')
-                    console.log(data.fact)
-                    console.log(data.server)
-                })
-                remote_socket.emit('puck', 'foo', function (data) {
-                    console.log('[@] + hey pucks... ')
-                    console.log(data)
-                })
-                remote_socket.on('puck_status', function (data) {
-                    console.log('[@] + cat facts... wait...no... status :(')
-                    console.log(data)
+                    remote_socket.on('cat_facts', function (data) {
+
+                        console.log('[@@@] - cat facts!')
+                        console.log(data)
+
+                        if (typeof data.fact != "undefined") {
+                            $('#ip_diddy').append('<br />' + data.fact)
+                            console.log(data.fact)
+                            console.log(data.server)
+                        }
+                    })
+
+                    remote_socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
+                        console.log('[@] + sent missive to other server')
+                        console.log(data.fact)
+                        console.log(data.server)
+                    })
+                    remote_socket.emit('puck', 'foo', function (data) {
+                        console.log('[@] + hey pucks... ')
+                        console.log(data)
+                    })
+                    remote_socket.on('puck_status', function (data) {
+                        console.log('[@] + cat facts... wait...no... status :(')
+                        console.log(data)
+                    })
+
+                    remote_socket.on('error', function(err){
+                        console.log('remote errz ' + JSON.stringify(url))
+                    })
+
+                    puck_chat(remote_socket)
+
                 })
             }
+
+            } // undefined
+
         })
 
-    })
 
     local_socket.emit('puck', 'foo', function (data) {
         console.log('hey pucks... ')
@@ -248,6 +286,10 @@ $(document).ready(function () {
         $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
 
+    })
+
+
+
     // ... bye bye
     $('body').on('click', '#puck_disconnect', function() {
         $('body').removeClass('avgrund-active');
@@ -266,10 +308,8 @@ $(document).ready(function () {
         // immediately ask for camera access
         autoRequestMedia: true,
         url: '/'
-        // url: 'https://192.168.0.250:7777'
-        // url: 'https://192.168.0.250:8887'
-        // url: 'https://localhost:7777'
 
+        // url: 'https://192.168.0.250:7777'
     });
 
     // we have to wait until it's ready
@@ -278,6 +318,41 @@ $(document).ready(function () {
         webrtc.joinRoom('roomy');
     })
 
+
+function puck_chat(sock) {
+
+    // cat chat
+
+    // listener, whenever the server emits 'chat_receive', this updates the chat body
+    sock.on('chat_receive', function (username, data) {
+        $('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+    });
+
+    // listener, whenever the server emits 'new_puck', this updates the username list
+    sock.on('new_puck', function(data) {
+        $('#users').empty();
+        $.each(data, function(key, value) {
+            $('#users').append('<div>' + key + '</div>');
+        })
+    })
+
+    // when the client clicks SEND
+    $('#datasend').click( function() {
+        var message = $('#data').val();
+        $('#data').val('');
+        // tell server to execute 'chat_send' and send along one parameter
+        sock.emit('chat_send', message);
+    });
+
+    // when the client hits ENTER on their keyboard
+    $('#data').keypress(function(e) {
+        if(e.which == 13) {
+            $(this).blur();
+            $('#datasend').focus().click();
+        }
+    });
+
+}
 
 })
 
