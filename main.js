@@ -2217,7 +2217,7 @@ var ios = io.sockets.on('connection', function (client) {
         // remove the puck_user from global puck_user list
         delete puck_users[client.puck_user];
         // update list of users in chat, client-side
-        io.sockets.emit('updateusers', puck_user);
+        io.sockets.emit('new_puck', puck_user);
         // echo globally that this client has left
         client.broadcast.emit('chat_receive', 'SERVER', client.puck_user + ' has disconnected');
     });

@@ -228,11 +228,6 @@ $(document).ready(function () {
                         }
                     })
 
-                    remote_socket.emit('puck_chat', {'client' : browser_ip}, function (data) {
-                        console.log('[@] + sent missive to other server')
-                        console.log(data.fact)
-                        console.log(data.server)
-                    })
                     remote_socket.emit('puck', 'foo', function (data) {
                         console.log('[@] + hey pucks... ')
                         console.log(data)
@@ -246,7 +241,7 @@ $(document).ready(function () {
                         console.log('remote errz ' + JSON.stringify(url))
                     })
 
-                    puck_chat(remote_socket)
+                    puck_chat(remote_socket, 'foo')
 
                 })
             }
@@ -319,9 +314,12 @@ $(document).ready(function () {
     })
 
 
-function puck_chat(sock) {
+function puck_chat(sock, user) {
 
     // cat chat
+
+    sock.emit('adduser', user);
+
 
     // listener, whenever the server emits 'chat_receive', this updates the chat body
     sock.on('chat_receive', function (username, data) {
