@@ -2100,6 +2100,10 @@ var cat_fact_server = "",
 
 var ios = io.sockets.on('connection', function (client) {
 
+
+    // pump down the volume
+    // io.set('log level', 1); 
+
     console.log('[+] NEW connext from ' + client.handshake.address)
 
     client.resources = {

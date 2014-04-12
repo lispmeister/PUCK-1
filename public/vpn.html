@@ -49,7 +49,7 @@
 
     .output a{display:inline-block; text-decoration:none; padding:3px 15px; -webkit-border-radius:15px; -moz-border-radius:15px; border-radius:15px; background:#000; margin:5px 20px 5px 0;}
 
-    .content { margin:40px; width:1000px; height:500px; padding:20px; overflow:auto; background:#ddd; -webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px;}
+    .content { margin:40px; height:500px; padding:20px; overflow:auto; background:#ddd; -webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px;}
 
     </style>
     <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
@@ -126,8 +126,10 @@
     <hr />
 
     <div class="container">
-
         <div class="row">
+
+        <div class="col-md-6 column">
+
             <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#client_collapse">
                 show/hide client logs
             </button>
@@ -139,49 +141,48 @@
                             <!-- content -->
                         </div>
                     <div class="mCSB_scrollTools">
-                    <a class="mCSB_buttonUp"></a>
-                    <div class="mCSB_draggerContainer">
-                        <div class="mCSB_dragger">
-                            <div class="mCSB_dragger_bar"></div>
+                        <a class="mCSB_buttonUp"></a>
+                        <div class="mCSB_draggerContainer">
+                            <div class="mCSB_dragger">
+                                <div class="mCSB_dragger_bar"></div>
+                            </div>
+                        <div class="mCSB_draggerRail"></div>
                         </div>
-                    <div class="mCSB_draggerRail"></div>
+                        <a class="mCSB_buttonDown"></a>
+                    </div>
                 </div>
-                <a class="mCSB_buttonDown"></a>
             </div>
+        </div>
         </div>
 
 
+        <div class="col-md-6 column">
         <div class="row">
             <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">
                 show/hide server logs
             </button>
 
-            <div id="server_collapse" class="content collapse">
-                <div id="ovpn_server_infinity" class="content">
-                    <p>VPN server logs <hr/></p>
-                </div>
-            </div>
-
-
-            <div class="content mCustomScrollbar _mCS_1">
-                <div class="mCustomScrollBox" id="mCSB_1">
-                <div id="ovpn_client_infinity" class="mCSB_container content">
-                    VPN client logs <hr/>
-                    <!-- content -->
-                </div>
-                <div class="mCSB_scrollTools">
-                    <a class="mCSB_buttonUp"></a>
-                    <div class="mCSB_draggerContainer">
-                        <div class="mCSB_dragger">
-                            <div class="mCSB_dragger_bar"></div>
+            <div id="server_collapse" class="collapse">
+                <div class="content mCustomScrollbar _mCS_1">
+                    <div class="mCustomScrollBox" id="mCSB_1">
+                        <div id="ovpn_server_infinity" class="mCSB_container content">
+                            VPN server logs <hr/>
+                            <!-- content -->
                         </div>
-                        <div class="mCSB_draggerRail"></div>
+                    <div class="mCSB_scrollTools">
+                        <a class="mCSB_buttonUp"></a>
+                        <div class="mCSB_draggerContainer">
+                            <div class="mCSB_dragger">
+                                <div class="mCSB_dragger_bar"></div>
+                            </div>
+                            <div class="mCSB_draggerRail"></div>
+                        </div>
+                        <a class="mCSB_buttonDown"></a>
                     </div>
-                    <a class="mCSB_buttonDown"></a>
                 </div>
             </div>
         </div>
-    </div>
+        </div>
 
     </div>
 
@@ -222,9 +223,39 @@
 
 <script type='text/javascript'>
 
-$(document).ready(function () {
+    var browser_ip  = ""
+    var remote_sock = ""
+    var socky_love  = false
 
-    var browser_ip = ""
+    //
+    // having troubles with initial hit
+    //
+    function put_a_sock_in_it(url) {
+
+        if (!socky_love) {
+            console.log('keep trying...')
+            try { remote_socket.disconnect() }
+            catch (e) { console.log('nice catch of D/C!'); console.log(e) }
+        }
+        else {
+            return;
+        }
+
+        remote_socket = io.connect(url, {
+            'connect timeout': 5000, // 5 seconds should be enough
+            'try multiple transports': true,
+            'reconnect': true,
+            'reconnection delay': 500,
+            'reconnection limit': 5000,
+            'max reconnection attempts': 3,
+            'sync disconnect on unload': false,
+            'auto connect': true,
+            'force new connection': true
+        })
+
+    }
+
+$(document).ready(function () {
 
     get_ip('#ip_diddy')
 
@@ -261,23 +292,24 @@ $(document).ready(function () {
             if (typeof data.server != "undefined" && data.server != "") {
         
                 // var url = 'https://' + data.server + ':8080/'
-        
                 // url = "https://192.168.0.250:7777/"
-                // url = "https://10.146.126.1:8080/"
                 // xxx - need to fire up proxy before hitting this line
         
-                var url = ':7777'
+                // var url = ':7777'
+                var url = 'https://' + data.server + ':8080/'
 
                 console.log('trying to connect to... ' + url)
         
-                remote_socket = io.connect(url)
+                PUCK_SOCK_RETRY = 5000
+
+                put_a_sock_in_it()
+
+                setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
 
                 remote_socket.on('connect', function(){
-
                     console.log('[+] remote - connected to ' + url)
         
                     remote_socket.on('cat_facts', function (data) {
-
                         console.log('[@@@] - cat facts!')
                         console.log(data)
 
@@ -298,11 +330,28 @@ $(document).ready(function () {
                     })
 
                     remote_socket.on('error', function(err){
-                        console.log('remote errz ' + JSON.stringify(url))
+                        console.log('remote errz ' + JSON.stringify(err))
                     })
 
                     cat_chat(remote_socket, 'mittens')
                 })
+
+                remote_socket.on('anything', function(data) {
+                    console.log('... something... anything.... ')
+                    console.log(data)
+                })
+
+
+                remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
+                remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
+                remote_socket.on('connecting',       function(d) { console.log ('connecting') })
+                remote_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
+                remote_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
+                remote_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
+                remote_socket.on('close',            function(d) { console.log ('close') })
+                remote_socket.on('disconnect',       function(d) { console.log ('disconnect') })
+
+
             }
             else {
                 cat_chat(local_socket, 'tabby')

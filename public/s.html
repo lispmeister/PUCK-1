@@ -1,0 +1,52 @@
+<html>
+
+<head>
+
+<script src="https://192.168.0.250:8080/socket.io/socket.io.js"></script>
+
+</head>
+
+<body>
+
+<script>
+
+var remote_socket = io.connect('https://10.131.98.6:8080/')
+
+console.log('it starts.... ')
+
+remote_socket.on('connect', function(){
+    console.log('[+] remote - connected to ' + url)
+
+    remote_socket.on('cat_facts', function (data) {
+        console.log('[@@@] - cat facts!')
+        console.log(data)
+
+        if (typeof data.fact != "undefined") {
+            $('#ip_diddy').append('<br />' + data.fact)
+            console.log(data.fact)
+            console.log(data.server)
+        }
+    })
+
+    remote_socket.emit('puck', 'foo', function (data) {
+        console.log('[@] + hey pucks... ')
+        console.log(data)
+    })
+    remote_socket.on('puck_status', function (data) {
+        console.log('[@] + cat facts... wait...no... status :(')
+        console.log(data)
+    })
+
+    remote_socket.on('error', function(err){
+        console.log('remote errz ' + JSON.stringify(err))
+    })
+
+})
+remote_socket.on('connect_failed', function(err){
+    console.log('connect err? ' + JSON.stringify(err))
+})
+
+<script>
+
+</body>
+</html>
