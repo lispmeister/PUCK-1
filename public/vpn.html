@@ -81,14 +81,22 @@
       </div>
 
 
-        <div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
-            <b>USERS</b>
-            <div id="users"></div>
-        </div>
-        <div style="float:left;width:300px;height:250px;overflow:scroll-y;padding:10px;">
-            <div id="conversation"></div>
-            <input id="data" style="width:200px;" />
-            <input type="button" id="datasend" value="send" />
+        <div class="row">
+
+            <div style="width:100px;border-right:1px solid black;padding:10px;overflow:scroll-y;">
+                <b>USERS</b> <div id="users"></div>
+            </div>
+
+            <div>
+            <div style="width:300px">
+                <div id="conversation"></div>
+                <input id="meow" style="width:200px;" />
+                <input type="button" id="datasend" value="send" />
+            </div>
+
+            <div id="cat_chat" class="cat_chat content"></div>
+            <div>
+
         </div>
 
 
@@ -115,25 +123,79 @@
 
     </div>
 
-    <div id="ovpn_client_infinity" class="content">
-        <p>VPN client logs <hr/></p>
-    </div>
-
     <hr />
 
-    <!-- content block -->
-    <div id="ovpn_server_infinity" class="content">
-        <p>VPN server logs <hr/></p>
+    <div class="container">
+
+        <div class="row">
+            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#client_collapse">
+                show/hide client logs
+            </button>
+            <div id="client_collapse" class="collapse">
+                <div class="content mCustomScrollbar _mCS_1">
+                    <div class="mCustomScrollBox" id="mCSB_1">
+                        <div id="ovpn_client_infinity" class="mCSB_container content">
+                            VPN client logs <hr/>
+                            <!-- content -->
+                        </div>
+                    <div class="mCSB_scrollTools">
+                    <a class="mCSB_buttonUp"></a>
+                    <div class="mCSB_draggerContainer">
+                        <div class="mCSB_dragger">
+                            <div class="mCSB_dragger_bar"></div>
+                        </div>
+                    <div class="mCSB_draggerRail"></div>
+                </div>
+                <a class="mCSB_buttonDown"></a>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">
+                show/hide server logs
+            </button>
+
+            <div id="server_collapse" class="content collapse">
+                <div id="ovpn_server_infinity" class="content">
+                    <p>VPN server logs <hr/></p>
+                </div>
+            </div>
+
+
+            <div class="content mCustomScrollbar _mCS_1">
+                <div class="mCustomScrollBox" id="mCSB_1">
+                <div id="ovpn_client_infinity" class="mCSB_container content">
+                    VPN client logs <hr/>
+                    <!-- content -->
+                </div>
+                <div class="mCSB_scrollTools">
+                    <a class="mCSB_buttonUp"></a>
+                    <div class="mCSB_draggerContainer">
+                        <div class="mCSB_dragger">
+                            <div class="mCSB_dragger_bar"></div>
+                        </div>
+                        <div class="mCSB_draggerRail"></div>
+                    </div>
+                    <a class="mCSB_buttonDown"></a>
+                </div>
+            </div>
+        </div>
     </div>
 
+    </div>
+
+    <div class="container">
 
     <!-- spacer n feets below -->
 
-    <div class="btn-toolbar"> <span></span></div>
-    <div class="btn-toolbar"> <span class="spacer100"></span></div>
+    <div class="row">
+        <div class="btn-toolbar"> <span></span></div>
+        <div class="btn-toolbar"> <span class="spacer100"></span></div>
 
-    <div class="footer" id="puck_footy">
-        <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
+        <div class="footer" id="puck_footy">
+            <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
+        </div>
     </div>
 
 
@@ -168,16 +230,15 @@ $(document).ready(function () {
 
     $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
     $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
+    $("#cat_chat").mCustomScrollbar({ set_height: 200, set_width: 600, scrollButtons:{ enable:true } });
 
     // var socket = io.connect(':8080/');
     // var socket = io.connect('https://10.93.54.6:8080/');
 
-    local_socket = io.connect('https://192.168.0.250:8080/');
+    local_socket = io.connect();
 
     var ovpn_slogs = 'openvpn_server_logs'
     var ovpn_clogs = 'openvpn_client_logs'
-
-
 
     local_socket.on('connect', function(){
         console.log('[+++] - general connext note')
@@ -195,7 +256,6 @@ $(document).ready(function () {
                 $('#ip_diddy').append('<br />' + data.fact)
                 console.log(data.fact)
                 console.log(data.server)
-
 
             // connect to a different server if we get back something different
             if (typeof data.server != "undefined" && data.server != "") {
@@ -241,9 +301,11 @@ $(document).ready(function () {
                         console.log('remote errz ' + JSON.stringify(url))
                     })
 
-                    puck_chat(remote_socket, 'foo')
-
+                    cat_chat(remote_socket, 'mittens')
                 })
+            }
+            else {
+                cat_chat(local_socket, 'tabby')
             }
 
             } // undefined
@@ -313,21 +375,37 @@ $(document).ready(function () {
         webrtc.joinRoom('roomy');
     })
 
+//
+// Cat chat (TM) - for moar cat fax.
+//
+function cat_chat(sock, user) {
 
-function puck_chat(sock, user) {
+    console.log('catting as : ' + user)
 
-    // cat chat
-
-    sock.emit('adduser', user);
-
+    // i is here
+    sock.emit('new_puck', user);
 
     // listener, whenever the server emits 'chat_receive', this updates the chat body
-    sock.on('chat_receive', function (username, data) {
-        $('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+    sock.on('chat_receive', function (stamp, username, data) {
+        // seem to get some odd things
+
+        console.log(stamp)
+        console.log(username)
+        console.log(data)
+
+        if (typeof username == "undefined") { username = '<unknown>'; }
+        console.log('got data! ' + data)
+        if (username != "SERVER") {
+            $('#cat_chat').prepend('<div class="cat_chat">' + stamp + ' ] <b>'+username + ':</b> ' + data + '<br></div>')
+            $('#cat_chat').mCustomScrollbar("update")
+            $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
     });
 
     // listener, whenever the server emits 'new_puck', this updates the username list
-    sock.on('new_puck', function(data) {
+    sock.on('new_puck', function(stamp, data) {
+        console.log('new user!')
+        console.log(data)
         $('#users').empty();
         $.each(data, function(key, value) {
             $('#users').append('<div>' + key + '</div>');
@@ -336,16 +414,18 @@ function puck_chat(sock, user) {
 
     // when the client clicks SEND
     $('#datasend').click( function() {
-        var message = $('#data').val();
-        $('#data').val('');
-        // tell server to execute 'chat_send' and send along one parameter
+        var message = $('#meow').val();
+        console.log('sending...' + message)
+        $('#meow').val('');
+        // pack it off to the server
         sock.emit('chat_send', message);
     });
 
-    // when the client hits ENTER on their keyboard
-    $('#data').keypress(function(e) {
+    // when hit enter
+    $('#meow').keypress(function(e) {
         if(e.which == 13) {
             $(this).blur();
+            console.log('enter...')
             $('#datasend').focus().click();
         }
     });
@@ -353,7 +433,6 @@ function puck_chat(sock, user) {
 }
 
 })
-
 
 </script>
 

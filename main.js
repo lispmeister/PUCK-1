@@ -167,7 +167,7 @@ var someday_get_https = function(url) {
         });
         res.on("end", function () { 
             console.log("... data is in...?")
-            console.log(data)
+            // console.log(data)
             deferred.resolve(data); 
         });
     })
@@ -207,7 +207,7 @@ var uber_puck = function uber_puck() {
         }
         else {
             console.log('puckarrific!')
-            console.log(res)
+            // console.log(res)
             bwana_puck = JSON.parse(res)
             createEvent(get_client_ip(req), {event_type: "create", puck_id: bwana_puck.PUCK_ID})
        }
@@ -349,10 +349,12 @@ function watch_logs(logfile, log_type) {
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_server_remote) > -1) {
-                // http://www.geekzilla.co.uk/view0CBFD9A7-621D-4B0C-9554-91FD48AADC77.htm
-                // took out the \b at the beginning & end... hopefully won't burn
-                client_remote_ip = line.match(/Peer Connection Initiated with.*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))/)[1]
+                // http://stackoverflow.com/questions/106179/regular-expression-to-match-hostname-or-ip-address
+                client_remote_ip = line.match(/((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]){3})/)[0]
+                // client_remote_ip = line.match(/ip_regexp/)[1]
                 console.log('incoming call from ' + client_remote_ip)
+                console.log(line)
+
             }
 
 
@@ -547,6 +549,33 @@ function getIP(req, res, next) {
 
     res.send(200, '{"ip" : "' + ip + '"}');
 }
+
+//
+// time stamp for cat chat
+//
+function cat_stamp() {
+    var stamp = new Date()
+    var h     = stamp.getHours()
+    var mins  = stamp.getMinutes()
+    var secs  = stamp.getSeconds()
+    var tz    = stamp.toString().match(/\(([A-Za-z\s].*)\)/)[1]
+
+    // noon... who knows!
+
+    period = "AM"
+
+    if (h > 11)       { period  = "PM" }
+
+    if (h < 10)       { h       = "0" + h    }
+    else if (h >= 12) { h       = h - 12     }
+    if (mins < 10)    { mins    = "0" + mins }
+    if (secs < 10)    { secs    = "0" + secs }
+
+    stamp = '[' + h + ':' + mins + ':' + secs + ' ' + period + ' ' + tz + ']'
+
+    return(stamp)
+}
+
 
 //
 // watch the status file for changes
@@ -1506,10 +1535,6 @@ function proxy_love(cat_fact_server) {
         proxy.ws(req, socket, head);
     })
     
-    // var wss = new websocket.WebSocket(url + '/socket.io/websocket/', 'cat_facts')
-    //     ssl: credentials,
-    
-    
     // welcome to the machine
     proxy_server.listen(proxy_port, function() {
         console.log('proxy web server for ' + remote_host + ' @ ' + remote_port + ' created, listening locally on ' + proxy_port)
@@ -2101,15 +2126,21 @@ var ios = io.sockets.on('connection', function (client) {
         console.log('- ' + cool_cat_fact + ' -')
         console.log('- cat facts -')
 
+        // if acting as server this will be the remote puck's ip
         var ip_addr = client.handshake.address
         console.log(ip_addr)
+        console.log('client data:')
+        console.log(client)
 
         // if connected via VPN, use remote PUCK as server
         console.log(puck_status)
         console.log(puck_status.openvpn_client)
-        console.log(puck_status.openvpn_client.server_remote_ip)
+
         if (typeof puck_status.openvpn_client.server != "undefined" && puck_status.openvpn_client.server != "") {
             cat_fact_server = puck_status.openvpn_client.server
+        }
+        else if (typeof puck_status.openvpn_server.server != "undefined" && puck_status.openvpn_server.server != "") {
+            cat_fact_server = puck_status.openvpn_server.server
         }
 
         console.log('cat fax server is: ' + cat_fact_server)
@@ -2121,7 +2152,6 @@ var ios = io.sockets.on('connection', function (client) {
 
         console.log(cat_fact_server)
 
-        client.emit( 'cat_facts', {"data": "welcome to cat facts!"})
         client.emit( 'cat_facts', cool_cat_data)
 
     })
@@ -2190,44 +2220,37 @@ var ios = io.sockets.on('connection', function (client) {
     });
 
 
-/* adapted from http://psitsmike.com/2011/09/node-js-and-socket-io-chat-tutorial/ */
+/* simple chat, adapted from http://psitsmike.com/2011/09/node-js-and-socket-io-chat-tutorial/ */
 
-    // when the client emits 'chat_send', this listens and executes
+    // on client send
     client.on('chat_send', function (data) {
-        // we tell the client to execute 'chat_receive' with 2 parameters
-        io.sockets.emit('chat_receive', client.puck_user, data);
+        io.sockets.emit('chat_receive', cat_stamp(), client.puck_user, data);
     });
 
-    // when the client emits 'adduser', this listens and executes
+    // when a new puck shows up
     client.on('new_puck', function(puck_user){
-        // we store the puck_user in the socket session for this client
+        var stamp = cat_stamp()
         client.puck_user = puck_user;
-        // add the client's puck_user to the global list
         puck_users[puck_user] = puck_user;
         // echo to client they've connected
-        client.emit('chat_receive', 'SERVER', 'you have connected');
-        // echo globally (all clients) that a person has connected
-        client.broadcast.emit('chat_receive', 'SERVER', puck_user + ' has connected');
-        // update the list of users in chat, client-side
-        io.sockets.emit('new_puck', puck_user);
+        client.emit('chat_receive', stamp, 'PUCK', 'you have connected');
+        // tell the world
+        client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
+        // send the latest list
+        io.sockets.emit('new_puck', stamp, puck_users);
     });
 
     // when the user disconnects.. perform this
     client.on('disconnect', function(){
-        // remove the puck_user from global puck_user list
+        var stamp = cat_stamp()
         delete puck_users[client.puck_user];
-        // update list of users in chat, client-side
-        io.sockets.emit('new_puck', puck_user);
-        // echo globally that this client has left
-        client.broadcast.emit('chat_receive', 'SERVER', client.puck_user + ' has disconnected');
+        io.sockets.emit('new_puck', stamp, puck_users);
+        client.broadcast.emit('chat_receive', stamp, 'PUCK', client.puck_user + ' has disconnected');
     });
 
 
 
-
-
-
-
+    // messaging of another type...
 
     // tell client about stun and turn servers and generate nonces
     if (stunservers) {
