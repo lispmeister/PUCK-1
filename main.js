@@ -345,7 +345,13 @@ function watch_logs(logfile, log_type) {
         if (log_type.indexOf("Server") > -1) {
 
             // shove raw logs to anyone who wants to listen
-            cat_sock.emit('openvpn_server_logs', { line: line })
+            try {
+                cat_sock.emit('openvpn_server_logs', { line: line })
+            }
+            catch (e) {
+                console.log('flushing logs pre-vpn....?')
+            }
+
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_server_remote) > -1) {
@@ -412,12 +418,12 @@ function watch_logs(logfile, log_type) {
 
             // shove raw logs to anyone who wants to listen
             // console.log(cat_sock)
-//          try {
-//              cat_sock.emit('openvpn_client_logs', { line: line })
-//          }
-//          catch (e) {
-//              console.log('flushing logs pre-vpn....?')
-//          }
+            try {
+                cat_sock.emit('openvpn_client_logs', { line: line })
+            }
+            catch (e) {
+                console.log('flushing logs pre-vpn....?')
+            }
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_client_up) == 0) {
