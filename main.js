@@ -252,12 +252,8 @@ function change_status() {
 
     console.log("status: " + puck_status)
 
-    try {
-        console.log('blasting status on iOS ' + JSON.stringify(puck_status))
-        cat_sock.emit('puck_status: ', JSON.stringify(puck_status))
-        cat_sock.broadcast.emit(JSON.stringify(puck_status))
-    }
-    catch (e) { console.log('cats arent ready yet : ' + typeof ios) }
+    cat_power('puck_status: ', JSON.stringify(puck_status))
+    cat_power('broadcast', JSON.stringify(puck_status))
 
     // xxx - errs to user!
     fs.writeFile(puck_status_file, JSON.stringify(puck_status), function(err) {
@@ -345,13 +341,7 @@ function watch_logs(logfile, log_type) {
         if (log_type.indexOf("Server") > -1) {
 
             // shove raw logs to anyone who wants to listen
-            try {
-                cat_sock.emit('openvpn_server_logs', { line: line })
-            }
-            catch (e) {
-                console.log('flushing logs pre-vpn....?')
-            }
-
+            cat_power('openvpn_server_logs', { line: line })
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_server_remote) > -1) {
@@ -417,13 +407,7 @@ function watch_logs(logfile, log_type) {
         else if (log_type.indexOf("Client") > -1) {
 
             // shove raw logs to anyone who wants to listen
-            // console.log(cat_sock)
-            try {
-                cat_sock.emit('openvpn_client_logs', { line: line })
-            }
-            catch (e) {
-                console.log('flushing logs pre-vpn....?')
-            }
+            cat_power('openvpn_client_logs', { line: line })
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_client_up) == 0) {
@@ -574,6 +558,23 @@ function getIP(req, res, next) {
 }
 
 //
+// send a note to a sockio channel ... channel broadcast == broadcast
+//
+cat_power(channel, msg) {
+
+    console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
+
+    try {
+        if (channel == "broadcast") cat_sock.broadcast.emit(msg)
+        else                        cat_sock.emit(channel, msg)
+    }
+    catch (e) {
+        console.log('channel not up yet....?')
+    }
+
+}
+
+//
 // time stamp for cat chat
 //
 function cat_stamp() {
@@ -658,7 +659,7 @@ function puckStatus(req, res, next) {
 
     if (typeof ios == "object") { 
         console.log('boosting status on iOS ' + JSON.stringify(puck_status))
-        cat_sock.emit('puck_status: ', JSON.stringify(puck_status))
+        cat_power('puck_status: ', JSON.stringify(puck_status))
     }
     else { console.log('iOS not ready (' + typeof ios) + ')' }
 
@@ -2138,8 +2139,6 @@ var cat_fact_server = "",
 var ios = io.sockets.on('connection', function (client) {
     // pump down the volume
     // io.set('log level', 1); 
-
-var clone = require('node-v8-clone').clone
 
     cat_sock = client
 
