@@ -252,8 +252,8 @@ function change_status() {
 
     console.log("status: " + puck_status)
 
-    cat_power('puck_status: ', JSON.stringify(puck_status))
-    cat_power('broadcast', JSON.stringify(puck_status))
+    cat_power('puck_status', puck_status)
+    cat_power('broadcast', puck_status)
 
     // xxx - errs to user!
     fs.writeFile(puck_status_file, JSON.stringify(puck_status), function(err) {
@@ -396,6 +396,7 @@ function watch_logs(logfile, log_type) {
                     start_s    : "n/a",
                     client     : "",
                     client_pid : "",
+                    server_ip  : "",
                     duration   : v_duration,
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
@@ -659,7 +660,7 @@ function puckStatus(req, res, next) {
 
     if (typeof ios == "object") { 
         console.log('boosting status on iOS ' + JSON.stringify(puck_status))
-        cat_power('puck_status: ', JSON.stringify(puck_status))
+        cat_power('puck_status', puck_status)
     }
     else { console.log('iOS not ready (' + typeof ios) + ')' }
 

@@ -2,7 +2,7 @@
 // after all is said and done... let the JS fur fly
 //
 
-var vpn_server = "local"
+var other_puck = "local"
 
 // poll until we get something, then stop polling
 var vault_poll     = 1000
@@ -53,7 +53,7 @@ $(document).ready(function () {
     //
     // setup user drag/click files to browser
     //
-    setInterval(drag_and_puck, vault_poll)
+    drag_and_puck()
 
     // load up filenames already in vault
     load_vault()

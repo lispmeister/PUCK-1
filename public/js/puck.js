@@ -176,6 +176,40 @@ function post(url, parameters) {
     form.submit();
 }
 
+
+//
+// when vpn status/state changes... set lights flashing, whatever
+//
+function state_vpn(state) {
+
+    if (state == "incoming") {
+        // ensure video button is enabled if a call is in progress
+        $('#puck_video').removeClass('red').addClass('green')
+        console.log('incoming ring from ' +  puck_status.openvpn_server.client)
+        incoming_ip = puck_status.openvpn_server.client
+        // ring them gongs
+        $('#incoming')[0].click()
+
+        puck_status.browser_events[browser_ip].notify_file = true
+
+        other_puck = puck_status.openvpn_server.client
+    }
+    if (state == "outgoing") {
+        $('#puck_video').removeClass('red').addClass('green')
+        console.log('outgoing ring!')
+        state_ring('true')
+        puck_status.browser_events[browser_ip].notify_ring = true
+
+        fire_puck_status(puck_status)
+
+        other_puck = puck_status.openvpn_client.server
+
+        // redirect to vpn page
+        window.location.href = "/vpn.html"
+    }
+
+}
+
 // the bells... the bells... make them stop!
 function state_ring(sound) {
 
@@ -262,7 +296,7 @@ function event_hang_up() {
     // kill the CSS UI signs
     remove_signs_of_call()
 
-    fire_puck_status(puck_status, false)
+    fire_puck_status(puck_status)
 
     console.log('waiting 2 secs to kill...?')
 
@@ -520,7 +554,8 @@ function status_loop(){
 
     socket.on('puck_status', function (data) {
         console.log('[@] + cat facts... wait...no... status :(')
-        console.log(data)
+        console.log(JSON.stringify(data))
+        console.log(typeof data)
 
         // puck_status = JSON.parse(data)
         puck_status = data
@@ -528,8 +563,12 @@ function status_loop(){
         // if something is new, do something!
         if (! _.isEqual(old_puck_status, puck_status)) {
             console.log('something new in the state of denmark!')
-            console.log(JSON.stringify(puck_status))
-            console.log('vs\n' + JSON.stringify(old_puck_status) + '\n\n')
+            console.log(puck_status)
+            console.log('vs\n')
+            console.log(old_puck_status)
+
+            console.log(typeof puck_status)
+            console.log(typeof old_puck_status)
             old_puck_status = puck_status
             status_or_die()
         }
@@ -541,7 +580,7 @@ function status_loop(){
 
     socket.on('reconnect', function(d) { 
         console.log ('reconnect') 
-        fire_puck_status(puck_status, false)
+        fire_puck_status(puck_status)
     })
 
     socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
@@ -581,6 +620,7 @@ function status_or_die() {
 
     // if someone has added you, create a modest sized bit of text that tells you 
     // and hopefully won't fuck up anything you're doing
+
     console.log('a friend...?')
     if (puck_status.events.new_puck.length && ! puck_status.browser_events[browser_ip].notify_add) {
         var remote_ip = puck_status.events.new_puck
@@ -593,36 +633,20 @@ function status_or_die() {
     }
 
     console.log('incoming...?')
+
     // server... incoming ring
     if (puck_status.openvpn_server.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_file) {
-        // ensure video button is enabled if a call is in progress
-        $('#puck_video').removeClass('red').addClass('green')
-    
-        console.log('incoming ring from ' +  puck_status.openvpn_server.client)
-        incoming_ip = puck_status.openvpn_server.client
-        // ring them gongs
-        $('#incoming')[0].click()
-
-        puck_status.browser_events[browser_ip].notify_file = true
+        state_vpn('incoming')
     }
 
     console.log('outgoing...?')
+
     // client... outgoing ring
-    console.log(puck_status.openvpn_client.vpn_status)
-    console.log(puck_status.browser_events[browser_ip].notify_ring)
-
-    console.log('^^^^')
-
     if (puck_status.openvpn_client.vpn_status == "up" && puck_status.browser_events[browser_ip].notify_ring != true) {
-        $('#puck_video').removeClass('red').addClass('green')
-        console.log('outgoing ring!')
-        state_ring('true')
-        puck_status.browser_events[browser_ip].notify_ring = true
-        fire_puck_status(puck_status, false)
-        window.location.href = "/vpn.html"
+        state_vpn('outgoing')
     }
 
-    // new package delivered
+    // did santa come?
     console.log('new toyz...?')
     if (puck_status.file_events.file_name.length && ! puck_status.browser_events[browser_ip].notify_file) {
         console.log('new file(z)!')
@@ -632,7 +656,8 @@ function status_or_die() {
         puck_status.browser_events[browser_ip].notify_file = true
     }
 
-    fire_puck_status(puck_status, true)
+    fire_puck_status(puck_status)
+
 }
 
 //
@@ -730,7 +755,7 @@ function stop_server() {
 //
 // sinc == async or sync
 //
-function fire_puck_status(jstatus, sink) {
+function fire_puck_status(jstatus) {
 
     console.log('firing status off')
     console.log(typeof jstatus)
@@ -756,41 +781,25 @@ function fire_puck_status(jstatus, sink) {
 }
 
 
-// do this once... then wait for vpn to kick off
-
-// xxx - if were on the same page and you disconnect and reconect
-// again, this will probably be confused
+// draws the drag-n-drop box... need to call it anytime
+// vpn state changes
 function drag_and_puck() {
 
-    if (already_polled && vpn_started) return -1
+    console.log('draggin n puckin')
 
-    // console.log('draggin n puckin')
-
-    if  (typeof puck_status != "undefined" &&
-         typeof puck_status.openvpn_client != "undefined" && 
-         typeof puck_status.openvpn_client['server'] != "undefined" && 
-         puck_status.openvpn_client['server'] != "") {
-
-            vpn_server = puck_status.openvpn_client.server
-            console.log('vpn server: ' + vpn_server)
-            vpn_started = true
-    }
-
-    if (!already_polled || vpn_started) {
-
-        console.log('drawin the box')
+    console.log('drawin the box')
 
         // out with the old, in with the new
-        $('.dragDropBox').remove()
+    $('.dragDropBox').remove()
 
     $('#uppity').filer({
-        changeInput: '<div class="dragDropBox"><span class="message">CLICK -or- DROP files to upload <span style="font-size:200%"><br />' + vpn_server + '</span></div>',
+        changeInput: '<div class="dragDropBox"><span class="message">CLICK -or- DROP files to upload <span style="font-size:200%"><br />' + other_puck + '</span></div>',
         appendTo   : '.dragDropBox',
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
         maxSize    : 1024,
         uploadFile: {
             // url:         'https://10.217.62.1:8080/up',
-            url:         '/up/' + vpn_server,
+            url:         '/up/' + other_puck,
             data:        {},
             beforeSend:  function(parent){parent.append('<div class="progress-bar" />');},
             success:     function(data, parent, progress){ },
@@ -807,9 +816,5 @@ function drag_and_puck() {
         onEmpty    : function(parent, appendBox){ $(appendBox).removeClass('done'); },
         onSelect   : function(e,parent,appendBox){ $(appendBox).addClass('done'); }
     })
-
-    }
-
-    already_polled = true
 
 }
