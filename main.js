@@ -560,7 +560,7 @@ function getIP(req, res, next) {
 //
 // send a note to a sockio channel ... channel broadcast == broadcast
 //
-cat_power(channel, msg) {
+function cat_power(channel, msg) {
 
     console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
