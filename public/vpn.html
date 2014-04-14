@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="rawr!">
 
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.css" rel="stylesheet">
+    <link href="/css/puck.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -94,7 +95,7 @@
                 <input type="button" id="datasend" value="send" />
             </div>
 
-            <div id="cat_chat" class="cat_chat content"></div>
+            <div id="cat_chat" class="content"></div>
             <div>
 
         </div>
@@ -203,7 +204,8 @@
 <!-- le javascript -->
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 
-<script type="text/javascript" src="/js/socket.io.js"></script>
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
 <script type="text/javascript" src="/js/simplewebrtc.js"></script>
 
 <script type="text/javascript" src='/js/bootstrap.js'></script>
@@ -225,8 +227,10 @@
 
     var browser_ip  = ""
     var remote_sock = ""
+    var local_sock  = ""
     var socky_love  = false
-
+    var my_puck     = {}
+    
     //
     // having troubles with initial hit
     //
@@ -247,7 +251,7 @@
             'reconnect': true,
             'reconnection delay': 500,
             'reconnection limit': 5000,
-            'max reconnection attempts': 3,
+            'max reconnection attempts': Infinity,
             'sync disconnect on unload': false,
             'auto connect': true,
             'force new connection': true
@@ -255,18 +259,46 @@
 
     }
 
+function candid_camera(url) {
+
+    console.log('turning on cam cam')
+
+    // smile, you're on candid....
+    var webrtc = new SimpleWebRTC({
+        // the id/element dom element that will hold "our" video
+        localVideoEl: 'localVideo',
+        // the id/element dom element that will hold remote videos
+        remoteVideosEl: 'remoteVideos',
+        // immediately ask for camera access
+        autoRequestMedia: true,
+        url : url
+    });
+
+    // we have to wait until it's ready
+    webrtc.on('readyToCall', function () {
+        // you can name it anything
+        webrtc.joinRoom('roomy');
+    })
+}
+
+
+//
+// ready, set, go
+//
 $(document).ready(function () {
 
+    // get my puck data
+    who_am_i()
+
+    // put browser's ip in footer
     get_ip('#ip_diddy')
 
     $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
     $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
     $("#cat_chat").mCustomScrollbar({ set_height: 200, set_width: 600, scrollButtons:{ enable:true } });
 
-    // var socket = io.connect(':8080/');
-    // var socket = io.connect('https://10.93.54.6:8080/');
-
-    local_socket = io.connect();
+    // local = our PUCK
+    local_socket = io.connect()
 
     var ovpn_slogs = 'openvpn_server_logs'
     var ovpn_clogs = 'openvpn_client_logs'
@@ -274,10 +306,7 @@ $(document).ready(function () {
     local_socket.on('connect', function(){
         console.log('[+++] - general connext note')
 
-        // local_socket.on('event', function(data){ console.log('[lsock] - data') ; console.log(data)});
-        // local_socket.on('disconnect', function(){ console.log('[lsock] - d/c')});
-        // local_socket.on('error', function(){ console.log('[lsock] - sock erz')});
-
+        // everyone loves cat facts!
         local_socket.on('cat_facts', function (data) {
 
             console.log('[+++] - cat facts!')
@@ -288,199 +317,182 @@ $(document).ready(function () {
                 console.log(data.fact)
                 console.log(data.server)
 
-            // connect to a different server if we get back something different
-            if (typeof data.server != "undefined" && data.server != "") {
-        
-                // var url = 'https://' + data.server + ':8080/'
-                // url = "https://192.168.0.250:7777/"
-                // xxx - need to fire up proxy before hitting this line
-        
-                // var url = ':7777'
-                var url = 'https://' + data.server + ':8080/'
+                // connect to a different server if we get back something different
+                if (typeof data.server != "undefined" && data.server != "") {
+            
+                    // var url = 'https://' + data.server + ':8080/'
+                    var url = ':7777'
+    
+                    console.log('trying to connect to... ' + url)
+            
+                    PUCK_SOCK_RETRY = 5000
+    
+                    put_a_sock_in_it(url)
+    
+                    setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
+    
+                    remote_socket.on('connect', function(){
 
-                console.log('trying to connect to... ' + url)
-        
-                PUCK_SOCK_RETRY = 5000
+                        console.log('[+] remote - connected to ' + url)
+    
+                        $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
 
-                put_a_sock_in_it()
+                        // turn it on from proxy
+                        candid_camera(':7777')
 
-                setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
-
-                remote_socket.on('connect', function(){
-                    console.log('[+] remote - connected to ' + url)
-        
-                    remote_socket.on('cat_facts', function (data) {
-                        console.log('[@@@] - cat facts!')
+                        remote_socket.on('cat_facts', function (data) {
+                            console.log('[@@@] - cat facts!')
+                            console.log(data)
+    
+                            if (typeof data.fact != "undefined") {
+                                $('#ip_diddy').append('<br />' + data.fact)
+                                console.log(data.fact)
+                                console.log(data.server)
+                            }
+                        })
+    
+                        remote_socket.emit('puck', 'foo', function (data) {
+                            console.log('[@] + hey pucks... ')
+                            console.log(data)
+                        })
+                        remote_socket.on('puck_status', function (data) {
+                            console.log('[@] + cat facts... wait...no... status :(')
+                            console.log(data)
+                        })
+    
+                        remote_socket.on('error', function(err){
+                            console.log('remote errz ' + JSON.stringify(err))
+                        })
+    
+                        //cat_chat(remote_socket, my_puck.PUCK_ID)
+                        cat_chat(remote_socket, my_puck.ip_addr)
+                    })
+    
+                    remote_socket.on('anything', function(data) {
+                        console.log('... something... anything.... ')
                         console.log(data)
-
-                        if (typeof data.fact != "undefined") {
-                            $('#ip_diddy').append('<br />' + data.fact)
-                            console.log(data.fact)
-                            console.log(data.server)
-                        }
                     })
-
-                    remote_socket.emit('puck', 'foo', function (data) {
-                        console.log('[@] + hey pucks... ')
-                        console.log(data)
-                    })
-                    remote_socket.on('puck_status', function (data) {
-                        console.log('[@] + cat facts... wait...no... status :(')
-                        console.log(data)
-                    })
-
-                    remote_socket.on('error', function(err){
-                        console.log('remote errz ' + JSON.stringify(err))
-                    })
-
-                    cat_chat(remote_socket, 'mittens')
-                })
-
-                remote_socket.on('anything', function(data) {
-                    console.log('... something... anything.... ')
-                    console.log(data)
-                })
-
-
-                remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
-                remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
-                remote_socket.on('connecting',       function(d) { console.log ('connecting') })
-                remote_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
-                remote_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
-                remote_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
-                remote_socket.on('close',            function(d) { console.log ('close') })
-                remote_socket.on('disconnect',       function(d) { console.log ('disconnect') })
-
-
-            }
-            else {
-                cat_chat(local_socket, 'tabby')
-            }
-
+    
+    
+                    remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
+                    remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
+                    remote_socket.on('connecting',       function(d) { console.log ('connecting') })
+                    remote_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
+                    remote_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
+                    remote_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
+                    remote_socket.on('close',            function(d) { console.log ('close') })
+                    remote_socket.on('disconnect',       function(d) { console.log ('disconnect') })
+    
+    
+                }
+                else {
+                    candid_camera('/')
+                    cat_chat(local_socket, my_puck.ip_addr)
+                }
+    
             } // undefined
 
         })
 
+        local_socket.emit('puck', 'foo', function (data) {
+            console.log('hey pucks... ')
+            console.log(data)
+        })
+    
+        local_socket.on('puck_status', function (data) {
+            console.log('cat facts... wait...no... status :(')
+            console.log(data)
+        })
+    
+        local_socket.on('puck_status', function (data) {
+            console.log('cat facts... wait...no... status :(')
+            console.log(data)
+        })
+    
+        // OVPN logs for client/server
+        local_socket.on(ovpn_clogs, function (data) {
+            console.log('client: ' + data.line)
+            $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+            $("#ovpn_client_infinity").mCustomScrollbar("update")
+            $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        })
+    
+        local_socket.on(ovpn_slogs, function (data) {
+            console.log('server: ' + data.line)
+            $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+            $("#ovpn_server_infinity").mCustomScrollbar("update")
+            $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        })
 
-    local_socket.emit('puck', 'foo', function (data) {
-        console.log('hey pucks... ')
-        console.log(data)
     })
-
-    local_socket.on('puck_status', function (data) {
-        console.log('cat facts... wait...no... status :(')
-        console.log(data)
-    })
-
-    local_socket.on('puck_status', function (data) {
-        console.log('cat facts... wait...no... status :(')
-        console.log(data)
-    })
-
-    // OVPN logs for client/server
-    local_socket.on(ovpn_clogs, function (data) {
-        console.log('client: ' + data.line)
-        $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
-        $("#ovpn_client_infinity").mCustomScrollbar("update")
-        $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-    })
-
-    local_socket.on(ovpn_slogs, function (data) {
-        console.log('server: ' + data.line)
-        $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
-        $("#ovpn_server_infinity").mCustomScrollbar("update")
-        $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-    })
-
-    })
-
 
 
     // ... bye bye
     $('body').on('click', '#puck_disconnect', function() {
         $('body').removeClass('avgrund-active');
-        hang_up()
+        event_hang_up()
     })
 
 
-    // status loop
-    infinite()
-
-    var webrtc = new SimpleWebRTC({
-        // the id/element dom element that will hold "our" video
-        localVideoEl: 'localVideo',
-        // the id/element dom element that will hold remote videos
-        remoteVideosEl: 'remoteVideos',
-        // immediately ask for camera access
-        autoRequestMedia: true,
-        url: '/'
-
-        // url: 'https://192.168.0.250:7777'
-    });
-
-    // we have to wait until it's ready
-    webrtc.on('readyToCall', function () {
-        // you can name it anything
-        webrtc.joinRoom('roomy');
-    })
+    // status
+    status_loop()
 
 //
 // Cat chat (TM) - for moar cat fax.
 //
-function cat_chat(sock, user) {
+    function cat_chat(sock, user) {
+    
+        console.log('catting as : ' + user)
+    
+        // i is here
+        sock.emit('new_puck', user);
+    
+        // listener, whenever the server emits 'chat_receive', this updates the chat body
+        sock.on('chat_receive', function (stamp, username, data) {
+            // seem to get some odd things
+    
+            console.log(stamp)
+            console.log(username)
+            console.log(data)
+    
 
-    console.log('catting as : ' + user)
-
-    // i is here
-    sock.emit('new_puck', user);
-
-    // listener, whenever the server emits 'chat_receive', this updates the chat body
-    sock.on('chat_receive', function (stamp, username, data) {
-        // seem to get some odd things
-
-        console.log(stamp)
-        console.log(username)
-        console.log(data)
-
-        if (typeof username == "undefined") { username = '<unknown>'; }
-        console.log('got data! ' + data)
-        if (username != "SERVER") {
-            $('#cat_chat').prepend('<div class="cat_chat">' + stamp + ' ] <b>'+username + ':</b> ' + data + '<br></div>')
-            $('#cat_chat').mCustomScrollbar("update")
-            $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        }
-    });
-
-    // listener, whenever the server emits 'new_puck', this updates the username list
-    sock.on('new_puck', function(stamp, data) {
-        console.log('new user!')
-        console.log(data)
-        $('#users').empty();
-        $.each(data, function(key, value) {
-            $('#users').append('<div>' + key + '</div>');
+            if (typeof username == "undefined") { username = '<unknown>'; }
+            console.log('got data! ' + data)
+            if (username != "PUCK") {
+                $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+                // $('#cat_chat').mCustomScrollbar("update")
+                // $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+            }
+        });
+    
+        // listener, whenever the server emits 'new_puck', this updates the username list
+        sock.on('new_puck', function(stamp, data) {
+            console.log('new user!')
+            console.log(data)
+            $('#users').empty();
+            $.each(data, function(key, value) {
+                $('#users').append('<div>' + key + '</div>');
+            })
         })
-    })
-
-    // when the client clicks SEND
-    $('#datasend').click( function() {
-        var message = $('#meow').val();
-        console.log('sending...' + message)
-        $('#meow').val('');
-        // pack it off to the server
-        sock.emit('chat_send', message);
-    });
-
-    // when hit enter
-    $('#meow').keypress(function(e) {
-        if(e.which == 13) {
-            $(this).blur();
-            console.log('enter...')
-            $('#datasend').focus().click();
-        }
-    });
-
-}
-
+    
+        // when the client clicks SEND
+        $('#datasend').click( function() {
+            var message = $('#meow').val();
+            console.log('sending...' + message)
+            $('#meow').val('');
+            // pack it off to the server
+            sock.emit('chat_send', message);
+        });
+    
+        // when hit enter
+        $('#meow').keypress(function(e) {
+            if(e.which == 13) {
+                $(this).blur();
+                console.log('enter...')
+                $('#datasend').focus().click();
+            }
+        })
+    }
 })
 
 </script>

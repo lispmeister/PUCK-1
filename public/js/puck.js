@@ -27,6 +27,11 @@ var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
+var my_puck = {}
+
+// xxx - from http://soundbible.com/1411-Telephone-Ring.html
+ring = new Audio("media/ringring.mp3") // load it up
+
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
 
@@ -45,6 +50,20 @@ function formatErrorMessage(jqXHR, exception) {
     } else {
         return ('Uncaught Error.\n' + jqXHR.responseText);
     }
+}
+
+// ping myself
+function who_am_i() {
+    $.get('/ping', function(puck) {
+        console.log('my name/id/status are: ', puck.name, puck.pid, puck.status)
+        puck_status = 'Name: ' + puck.name + '<br />Status: ' + puck.status + '<br />ID: ' + puck.pid
+        // get my own data
+        $.getJSON('/puck/' + puck.pid, function(puckinfo) {
+            console.log('my PUCK:')
+            my_puck = puckinfo
+            console.log(my_puck)
+        })
+    })
 }
 
 //
@@ -158,27 +177,70 @@ function post(url, parameters) {
 }
 
 // the bells... the bells... make them stop!
-function kill_ring() {
+function state_ring(sound) {
 
-    try {
-        ring.pause();
-        ring.currentTime = 0;
-        console.log('bells... no more?')
+    if (!sound) {
+        try {
+            ring.pause();
+            ring.currentTime = 0;
+            console.log('bells... no more?')
+        }
+        catch(e) {
+            console.log("haven't played anything yet")
+        }
     }
-    catch(e) {
-        console.log("haven't played anything yet")
+    else {
+        // ring ring - play sound
+        ring.play()
     }
+
+}
+
+//
+// calls, in or out
+//
+function event_connect(direction, puck, element) {
+
+    console.log('connexting')
+
+    //
+    // energize modals
+    //
+    // "Avgrund is Swedish for abyss"
+    $(element).avgrund({
+        height: 120,
+        openOnEvent: false,
+        width: 600,
+        holderClass: 'custom',
+        showClose: true,
+        showCloseText: 'Close',
+        enableStackAnimation: true,
+        onBlurContainer: '.container',
+        template: '<div class="row">' +
+                  '<div id="puck_ring_img" class="col-md-4"></div>' +
+                  '<a style="text-decoration: none" href="/vpn.html"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
+                  '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
+                  '</div>'
+        })
+
+    state_ring('true')
+
+    // xxx - conf file, obv....
+    var ring_img = '<img src="/img/ringring.gif">'
+    // after popup, add target
+    $('#vpn_target').on('change', '#vpn_target').append(' ' + puck)
+    $('#puck_ring_img').on('change', '#puck_ring_img').html(ring_img)
 
 }
 
 //
 // hang up the phone, return to home
 //
-function hang_up() {
+function event_hang_up() {
 
     console.log('hanging up!')
 
-    kill_ring()
+    state_ring('false')
 
     var url = "/vpn/stop"
 
@@ -200,12 +262,19 @@ function hang_up() {
     // kill the CSS UI signs
     remove_signs_of_call()
 
-    puck_status.openvpn_client.vpn_status = "down"
     fire_puck_status(puck_status, false)
 
-    if (window.location.pathname.split( '/' )[1] != "puck.html") {
-        setTimeout(window.location.href = "/puck.html", 2000)
-    }
+    console.log('waiting 2 secs to kill...?')
+
+    setTimeout(function(){
+        window.location.href = "/puck.html"
+    }, 2000)
+
+    $('body').removeClass('avgrund-active');
+
+    // if (window.location.pathname.split( '/' )[1] != "puck.html") {
+    //     setTimeout(window.location.href = "/puck.html", 2000)
+    // }
 
 }
 
@@ -247,16 +316,11 @@ function puck_vpn(element, puckid, ipaddr) {
     })
 
     pvpn.done(function(msg) {
-        console.log("posto facto: " + msg );
+        console.log("posto facto")
     })
     pvpn.fail(function(xhr, textStatus, errorThrown) {
         console.log('failzor -> ' + xhr)
     })
-
-//  var callback = function(result, form){
-//      if(!result)
-//          form.submit();
-//  }
 
 }
 
@@ -332,11 +396,11 @@ function puck_ping(all_ips, puckid, url) {
 
     $.get(ping_url)
         .success(function(data) {
-            console.log('success with ' + element_id) 
+            // console.log('success with ' + element_id) 
 
             // make the button clickable and green
             if (data.status == "OK") {
-                console.log('ok...')
+                // console.log('ok...')
                 $('#'+element_id).addClass('btn-success').removeClass('disabled')
             }
             else {
@@ -356,7 +420,7 @@ function puck_ping(all_ips, puckid, url) {
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
         })
    
-console.log('post-pingy ' + puckid + '... putting into ' + element_id)
+// console.log('post-pingy ' + puckid + '... putting into ' + element_id)
 
 }
 
@@ -384,10 +448,14 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
     console.log('jquery threw a hair ball on that one: ' + textStatus + ' - ' + errorThrown);
 }
 
+// conf file fodder
+var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
+var PUCK_RECONNECT_DELAY =  100
+
 //
-// ... snag /status all the time
+// ... snag /status
 //
-function get_status(){
+function get_status() {
 
     console.log('get STATUS')
 
@@ -398,7 +466,65 @@ function get_status(){
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
         // console.log('status wootz\n' + data)
         puck_status = JSON.parse(data)
+        console.log("INITIAL STATUS: " + JSON.stringify(puck_status))
+    }).fail(ajaxError);
 
+}
+
+
+//
+// ... snag /status all the time
+//
+function status_loop(){
+
+    console.log('status loop')
+
+    // sow the seed o' doubt
+    get_status()
+
+    // local = our PUCK
+    socket = io.connect('/', {
+        'connect timeout': PUCK_TIMEOUT,
+        // 'try multiple transports': true,
+        'reconnect': true,
+        'reconnection delay': PUCK_RECONNECT_DELAY,
+        'reconnection limit': PUCK_TIMEOUT,
+        'max reconnection attempts': Infinity,
+        // 'sync disconnect on unload': false,
+        'auto connect': true,
+        'force new connection': true
+        })
+
+    socket.on('connect', function(sock){
+        console.log('[+++] - general connext note')
+
+    // i has arrived
+    socket.emit('new_puck', my_puck.PUCK_ID);
+
+    // everyone loves cat facts!
+    // listener, whenever the server emits 'chat_receive', this updates the chat body
+    socket.on('chat_receive', function (stamp, username, data) {
+        // seem to get some odd things
+        console.log(stamp)
+        console.log(username)
+        console.log(data)
+
+        console.log('[+++] - cat facts!')
+        console.log(data)
+
+        $('#ip_diddy').append('<br />' + data.fact)
+
+    })
+    //  console.log(data.fact)
+    //  console.log(data.server)
+
+    socket.on('puck_status', function (data) {
+        console.log('[@] + cat facts... wait...no... status :(')
+        console.log(data)
+
+        // puck_status = JSON.parse(data)
+        puck_status = data
+            
         // if something is new, do something!
         if (! _.isEqual(old_puck_status, puck_status)) {
             console.log('something new in the state of denmark!')
@@ -407,15 +533,26 @@ function get_status(){
             old_puck_status = puck_status
             status_or_die()
         }
-            
-    }).fail(ajaxError);
+    })
+   
+    socket.on('error', function(err){
+        console.log('remote errz ' + JSON.stringify(err))
+    })
 
-}
+    socket.on('reconnect', function(d) { 
+        console.log ('reconnect') 
+        fire_puck_status(puck_status, false)
+    })
 
-function infinite() {
-    console.log('infinity... ' + poll)
-    get_status()
-    setTimeout(infinite, poll)
+    socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
+    socket.on('connecting',       function(d) { console.log ('connecting') })
+    socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
+    socket.on('connect_failed',   function(d) { console.log ('connect failed') })
+    socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
+    socket.on('close',            function(d) { console.log ('close') })
+    socket.on('disconnect',       function(d) { console.log ('disconnect') })
+    })
+    
 }
 
 function isEmpty(obj) {
@@ -479,7 +616,7 @@ function status_or_die() {
     if (puck_status.openvpn_client.vpn_status == "up" && puck_status.browser_events[browser_ip].notify_ring != true) {
         $('#puck_video').removeClass('red').addClass('green')
         console.log('outgoing ring!')
-        kill_ring()
+        state_ring('true')
         puck_status.browser_events[browser_ip].notify_ring = true
         fire_puck_status(puck_status, false)
         window.location.href = "/vpn.html"
@@ -613,12 +750,9 @@ function fire_puck_status(jstatus, sink) {
             console.log('status failzor -> ' + JSON.stringify(txtstat))
             console.log(e)
         }
-
     })
-
         // ?
         // async: sink,
-
 }
 
 

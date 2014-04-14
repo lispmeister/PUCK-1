@@ -9,7 +9,7 @@
 echo starting PUCK server...
 
 PUCK_HOME="/etc/puck"
-hell="/etc/puck/f-u-openssl"
+hell="$PUCK_HOME/f-u-openssl"
 
 PATH=$PATH:/usr/local/bin:/usr/local/nodey/bin
 
@@ -56,7 +56,7 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
 
     mv pucks/PUCK/* pucks/$pid
     rmdir pucks/PUCK
-    ln -s /etc/puck/pucks/$pid /etc/puck/pucks/PUCK
+    ln -s $PUCK_HOME/pucks/$pid $PUCK_HOME/pucks/PUCK
 
     # current eth0 ip addr
     ip=$(ifconfig eth0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
@@ -64,19 +64,19 @@ if [ ! -d $PUCK_HOME/pucks/PUCK -o ! -h $PUCK_HOME/pucks/PUCK ] ; then
     # need to start this before we try a REST call to it....
 
 #   NODE_PATH="/etc/puck/" node main.js &
-    NODE_PATH="/etc/puck/" node main.js &
+    NODE_PATH="$PUCK_HOME/" node main.js &
 
     # XXX - make REST pings or something every sec until an answer, but for now...
     sleep 10
 
-    ./exe/create_puck.sh $pid img/puck.png $ip "$(/etc/puck/exe/get_net.sh)" Ms.PUCK puck@example.com
+    ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
 
 else
     cp $PUCK_HOME/pucks/PUCK/puck.pid $PUCK_HOME/public/puck.pid
 
     # if not started above, do so now
 #   NODE_PATH="/etc/puck/" node main.js &
-    NODE_PATH="/etc/puck/" node main.js &
+    NODE_PATH="$PUCK_HOME/" node main.js &
 
 fi
 
@@ -92,11 +92,13 @@ base10="10.$x.$y"
 #
 mask10="255.255.255.248"
 
-cd /etc/puck
+cd $PUCK_HOME
 
 openvpn --server $base10.0 $mask10 --config S.conf &
 
-yate -c /etc/puck/yate/ -vvvvv -d -l /etc/puck/log/yate.log -Dt
+echo $base10 > $PUCK_HOME/logs/openvpn_server.ip
+
+yate -c $PUCK_HOME/yate/ -vvvvv -d -l $PUCK_HOME/log/yate.log -Dt
 
 exit 0
 

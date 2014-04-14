@@ -133,7 +133,6 @@ function random_cat_fact (facts) {
     return(fact)
 }
 
-
 //
 // watch vpn logs for incoming/outgoing connections
 //
@@ -253,10 +252,12 @@ function change_status() {
 
     console.log("status: " + puck_status)
 
-    if (typeof ios == "object") {
-        ios.emit('puck_status: ', JSON.stringify(puck_status))
+    try {
+        console.log('blasting status on iOS ' + JSON.stringify(puck_status))
+        cat_sock.emit('puck_status: ', JSON.stringify(puck_status))
+        cat_sock.broadcast.emit(JSON.stringify(puck_status))
     }
-    else { console.log('iOS: ' + typeof ios) }
+    catch (e) { console.log('cats arent ready yet : ' + typeof ios) }
 
     // xxx - errs to user!
     fs.writeFile(puck_status_file, JSON.stringify(puck_status), function(err) {
@@ -273,9 +274,10 @@ function change_status() {
 // based on http://stackoverflow.com/questions/3653065/get-local-ip-address-in-node-js
 //
 var ifaces=os.networkInterfaces();
-var my_net = {} // interfaces & ips
-var my_ips = [] // ips only
-var n      = 0
+var my_net  = {} // interfaces & ips
+var my_ips  = [] // ips only
+var my_devs = [] // dev2ip
+var n       = 0
 for (var dev in ifaces) {
     var alias = 0
     ifaces[dev].forEach(function(details){
@@ -284,7 +286,8 @@ for (var dev in ifaces) {
             my_net[details.address] = dev+(alias?':'+alias:'')
             console.log(dev+(alias?':'+alias:''),details.address)
             ++alias
-            my_ips[n] = '"' + details.address + '"'
+            my_ips[n]    = '"' + details.address + '"'
+            my_devs[dev] = details.address
 
             n = n + 1
         }
@@ -319,17 +322,14 @@ function watch_logs(logfile, log_type) {
 
     tail.on("line", function(line) {
 
-
         // console.log("got line from " + logfile + ":" + line)
     
         // xxx - for client openvpn - config... which ones to choose?  Another method?
         var magic_client_up     = "Initialization Sequence Completed",
             magic_client_up     = "/sbin/route add",
             magic_client_up     = "VPN is up",
-            magic_client_up     = "Server : "
-
+            magic_client_up     = "Server : ",
             magic_client_down   = "VPN is down",
-
             magic_server_up     = "Peer Connection Initiated",
             magic_server_down   = "ECONNREFUSED",
             magic_server_down   = "OpenVPN Server lost client",
@@ -345,7 +345,7 @@ function watch_logs(logfile, log_type) {
         if (log_type.indexOf("Server") > -1) {
 
             // shove raw logs to anyone who wants to listen
-            ios.emit('openvpn_server_logs', { line: line })
+            cat_sock.emit('openvpn_server_logs', { line: line })
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_server_remote) > -1) {
@@ -356,7 +356,6 @@ function watch_logs(logfile, log_type) {
                 console.log(line)
 
             }
-
 
             // various states of up-id-ness and down-o-sity
             if (line.indexOf(magic_server_up) > -1) {
@@ -369,13 +368,18 @@ function watch_logs(logfile, log_type) {
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
                     client     : client_remote_ip,
-                    client_pid : client_remote_ip,
+                    client_pid : ip2puck[client_remote_ip],
+                    server_ip  : cat_fact_server,
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
                     }
 
                 createEvent('internal server', {event_type: "vpn_server_connected", puck_id: bwana_puck.PUCK_ID})
+
+                // proxy even local calls to socket.io
+                proxy_love(cat_fact_server)
+
             }
             // down
             else if (line.indexOf(magic_server_down) > -1) {
@@ -407,7 +411,13 @@ function watch_logs(logfile, log_type) {
         else if (log_type.indexOf("Client") > -1) {
 
             // shove raw logs to anyone who wants to listen
-            ios.emit('openvpn_client_logs', { line: line })
+            // console.log(cat_sock)
+//          try {
+//              cat_sock.emit('openvpn_client_logs', { line: line })
+//          }
+//          catch (e) {
+//              console.log('flushing logs pre-vpn....?')
+//          }
 
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_client_up) == 0) {
@@ -417,6 +427,9 @@ function watch_logs(logfile, log_type) {
                 console.log(line)
                 console.log('ougoing call to ' + server_remote_ip)
                 console.log('\n\n')
+
+                // reset to remote
+                cat_fact_server = server_remote_ip
     
                 // if starting simply take the current stuff
                 client_magic = {
@@ -435,7 +448,8 @@ function watch_logs(logfile, log_type) {
                 // if we're doing the calling, we want to setup a proxy so our
                 // browser web requests can go into the tunnel to this vs. trying to flail at
                 // some random IP
-                proxy_love(server_remote_ip)
+                // proxy_love(server_remote_ip)
+                proxy_love(cat_fact_server)
     
             }
             // down
@@ -463,6 +477,9 @@ function watch_logs(logfile, log_type) {
                     }
     
                 createEvent('internal server', {event_type: "vpn_client_disconnected", puck_id: bwana_puck.PUCK_ID})
+
+                // reset to local
+                cat_fact_server = my_devs["tun0"]
     
             }
         }
@@ -633,7 +650,10 @@ function puckStatus(req, res, next) {
 
     // console.log('puck status check... ' + JSON.stringify(puck_status))
 
-    if (typeof ios == "object") { ios.emit('puck_status: ', JSON.stringify(puck_status)) }
+    if (typeof ios == "object") { 
+        console.log('boosting status on iOS ' + JSON.stringify(puck_status))
+        cat_sock.emit('puck_status: ', JSON.stringify(puck_status))
+    }
     else { console.log('iOS not ready (' + typeof ios) + ')' }
 
     res.send(200, JSON.stringify(puck_status))
@@ -1476,10 +1496,8 @@ function proxy_love(cat_fact_server) {
 
     if (puck_proxy_up) {
         console.log("the proxy is currently up, tear it down!")
-        // proxy_server._server.close()
-        // puck_proxy_up = false
-        // proxy.close()
-        // proxy_server.close()
+        proxy_server.close();
+        puck_proxy_up = false
     }
 
     //
@@ -1493,54 +1511,63 @@ function proxy_love(cat_fact_server) {
     var proxy_port  = 7777,
         remote_host = cat_fact_server,
         remote_port = puck_port;
-    
+
     var remote_url  = "https://" + remote_host + ":" + remote_port
     
     console.log('\n\n[+] proxying from the local server on port ' + proxy_port + ' => ' + remote_url)
     
-    // use the same keys as the main puck server
     var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
         cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
         ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
-    
+
     var credentials = {key: key, cert: cert, ca: ca};
-    
-    // all the brains are in here
-    proxy = new httpProxy.createProxyServer({
+
+    var proxy = new httpProxy.createProxyServer({
         ssl: credentials,
         target: {
             host: remote_host,
             port: remote_port
         },
-        secure: false,
-        wss: true
+        secure: false
     })
-    
-    // inner stuff will fire off when get requests
+
     proxy_server = https.createServer(credentials, function(req, res) {
-        console.log(req.url + ' => ' + remote_url)
-        proxy.web(req, res, { target: remote_url }, function (req,res) {
-            console.log('proxy web')
+        console.log('sending request along...')
+        proxy.web(req, res, { target: remote_url }, function (err) {
+            // if (err) throw err;
+            console.log('proxy hairball - ')
+            console.log(err)
+            res.writeHead(502)
+            res.end("proxy error") 
         })
     })
-    
-    // client responses, if interesting
+
     proxy.on('proxyRes', function (res) {
         console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
     });
-    
+
     // WebSocket stuff
     proxy.on('upgrade', function (req, socket, head) {
         console.log('upgrade caught')
-        proxy.ws(req, socket, head);
+        proxy.wss(req, socket, head, function (err) {
+            console.log('wss proxy hairball - ')
+            console.log(err)
+            res.writeHead(502)
+            res.end("proxy error") 
+            // socket.close();
+        })
     })
-    
-    // welcome to the machine
-    proxy_server.listen(proxy_port, function() {
-        console.log('proxy web server for ' + remote_host + ' @ ' + remote_port + ' created, listening locally on ' + proxy_port)
-        puck_proxy_up = true
-        createEvent('internal server', {event_type: "proxy_setup", remote_ip: remote_host, remote_puck_id: ip2puck[cat_fact_server]})
-    })
+
+    try {
+        proxy_server.listen(proxy_port, function() {
+            console.log('proxy web server for ' + remote_host + ' created, listening on ' + proxy_port)
+        })
+    }
+    catch (e) {
+        console.log('.... fix this... need to close proxy....')
+    }
+
+    puck_proxy_up = true
 
 }
 
@@ -1680,6 +1707,7 @@ function httpsPing(puckid, ipaddr, res, next) {
                 results[all_ips[i]] = result
                 // cache the latest
                 done = true
+                // res.send(200, result)
                 res.send(200, result)
             }
         })
@@ -1727,8 +1755,10 @@ function httpsPing(puckid, ipaddr, res, next) {
                     // cache the latest
                     puck2ip[puckid] = remote
                     ip2puck[remote] = puckid
-                    done = true
-                    res.send(200, msg)
+                    if (!done) {
+                        done = true
+                        res.send(200, msg)
+                    }
                 }
             }
 
@@ -2096,15 +2126,23 @@ function safeCb(cb) {
 io.set('transports',['xhr-polling']);
 
 var cat_fact_server = "",
-    puck_users      = {};
+    puck_users      = {},
+    cat_sock        = {}
 
 var ios = io.sockets.on('connection', function (client) {
-
-
     // pump down the volume
     // io.set('log level', 1); 
 
-    console.log('[+] NEW connext from ' + client.handshake.address)
+var clone = require('node-v8-clone').clone
+
+    cat_sock = client
+
+    console.log('we are all clones')
+
+//  client.emit('puck_status', puck_status)
+    cat_sock.emit('puck_status', puck_status)
+
+    console.log('[+] NEW connext from ' + client.handshake.address.address)
 
     client.resources = {
         screen: false,
@@ -2140,12 +2178,15 @@ var ios = io.sockets.on('connection', function (client) {
         console.log(puck_status)
         console.log(puck_status.openvpn_client)
 
-        if (typeof puck_status.openvpn_client.server != "undefined" && puck_status.openvpn_client.server != "") {
+        if (typeof puck_status.openvpn_client != "undefined" && puck_status.openvpn_client.server != "") {
             cat_fact_server = puck_status.openvpn_client.server
         }
-        else if (typeof puck_status.openvpn_server.server != "undefined" && puck_status.openvpn_server.server != "") {
+        else if (typeof puck_status.openvpn_server != "undefined" && puck_status.openvpn_server.server != "") {
             cat_fact_server = puck_status.openvpn_server.server
         }
+
+        // hardcoding tun0... hmmm....
+        if (cat_fact_server == "") cat_fact_server = my_devs["tun0"]
 
         console.log('cat fax server is: ' + cat_fact_server)
 
@@ -2156,7 +2197,7 @@ var ios = io.sockets.on('connection', function (client) {
 
         console.log(cat_fact_server)
 
-        client.emit( 'cat_facts', cool_cat_data)
+        client.emit('cat_facts', cool_cat_data)
 
     })
 
@@ -2233,15 +2274,18 @@ var ios = io.sockets.on('connection', function (client) {
 
     // when a new puck shows up
     client.on('new_puck', function(puck_user){
-        var stamp = cat_stamp()
-        client.puck_user = puck_user;
-        puck_users[puck_user] = puck_user;
-        // echo to client they've connected
-        client.emit('chat_receive', stamp, 'PUCK', 'you have connected');
-        // tell the world
-        client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
-        // send the latest list
-        io.sockets.emit('new_puck', stamp, puck_users);
+
+        if (typeof puck_user != "undefined") {
+            var stamp = cat_stamp()
+            client.puck_user = puck_user;
+            puck_users[puck_user] = puck_user;
+            // echo to client they've connected
+            client.emit('chat_receive', stamp, 'PUCK', 'you have connected');
+            // tell the world
+            client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
+            // send the latest list
+            io.sockets.emit('new_puck', stamp, puck_users);
+        }
     });
 
     // when the user disconnects.. perform this
