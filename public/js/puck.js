@@ -27,8 +27,6 @@ var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
-var my_puck = {}
-
 PUCK_SOCK_RETRY = 5000
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
@@ -191,7 +189,7 @@ function post(url, parameters) {
 //
 // when vpn status/state changes... set lights flashing, whatever
 //
-function state_vpn(state) {
+function state_vpn(state, browser_ip) {
 
     if (state == "incoming") {
         // ensure video button is enabled if a call is in progress
@@ -200,10 +198,13 @@ function state_vpn(state) {
         console.log('incoming ring from ' +  puck_status.openvpn_server.client)
         incoming_ip = puck_status.openvpn_server.client
         // ring them gongs, etc.
-        event_connect("incoming", incoming_ip)
+
+        if (!puck_status.browser_events[browser_ip].notify_ring) {
+            event_connect("incoming", incoming_ip)
+            puck_status.browser_events[browser_ip].notify_ring = true
+        }
 
         puck_current.incoming = true
-
         puck_status.browser_events[browser_ip].notify_file = true
         other_puck = puck_status.openvpn_server.client
     }
@@ -215,6 +216,11 @@ function state_vpn(state) {
         puck_status.browser_events[browser_ip].notify_ring = true
 
         fire_puck_status(puck_status)
+
+        if (!puck_status.browser_events[browser_ip].notify_ring) {
+            event_connect("outgoing", incoming_ip)
+            puck_status.browser_events[browser_ip].notify_ring = true
+        }
 
         other_puck = puck_status.openvpn_client.server
 
@@ -561,8 +567,8 @@ function socket_looping(){
         console.log('[+++] - general connext note')
 
         // everyone loves cat facts!
-        cat_chat(local_socket, my_puck.ip_addr)
-        candid_camera()
+        cat_chat(local_socket, 'local')
+        candid_camera('/')
     })
 
     local_socket.on('puck_status', function (data) {
@@ -585,15 +591,14 @@ function socket_looping(){
             old_puck_status = puck_status
             status_or_die()
 
+            // try to connect to the remote puck socket.io
             try { 
-
                 console.log('trying...')
                 console.log(data.openvpn_client)
                 if (data.openvpn_client.vpn_status == "up") {
                     var url = ':7777'
                     console.log('trying to connect to... ' + url)
                     // try remote connecting, and keep it up until javascript wears itself out
-                    candid_camera()
                     put_a_sock_in_it(url)
                     setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
                 }
@@ -656,9 +661,7 @@ function isEmpty(obj) {
 function status_or_die() {
 
     console.log('sailing on the sneeze of cheeze')
-
     console.log(puck_status)
-
     console.log('I hear something... from... ' + browser_ip)
 
     if (typeof puck_status.browser_events == "undefined" || typeof puck_status.browser_events[browser_ip] == "undefined") {
@@ -684,16 +687,15 @@ function status_or_die() {
     console.log('incoming...?')
 
     // server... incoming ring
-    if (puck_status.openvpn_server.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_ring) {
-        state_vpn('incoming')
+    if (puck_status.openvpn_server.vpn_status == "up") {
+        state_vpn('incoming', browser_ip)
     }
 
     console.log('outgoing...?')
 
     // client... outgoing ring
-    if (puck_status.openvpn_client.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_ring) {
-        puck_current.incoming = false
-        state_vpn('outgoing')
+    if (puck_status.openvpn_client.vpn_status == "up") {
+        state_vpn('outgoing', browser_ip)
     }
 
     // if nothing up now, kill any signs of a call, just to be sure
@@ -727,7 +729,7 @@ function status_or_die() {
 // 
 function remove_signs_of_call() {
 
-    // console.log('killing call signatures...')
+    console.log('killing call signatures...')
     $('.puck_vpn').text("Call").removeClass("btn-danger")
     $('#puck_video').addClass('disabled')
     $('#puck_video').removeClass('green').removeClass('pulse')
@@ -907,8 +909,12 @@ function put_a_sock_in_it(url) {
     remote_socket.socket.on('connect', function(){
 
         console.log('[+] remote - connected to ' + url)
+
+        console.log('my puck ' + JSON.stringify(my_puck))
         
-        $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
+        // if (typeof data != undefined && data.server != "undefined") {
+        //     $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
+        // }
 
         // turn it on from proxy
         candid_camera(':7777')
@@ -918,7 +924,7 @@ function put_a_sock_in_it(url) {
             console.log('[@@@] - cat facts!')
             console.log(data)
            
-            if (typeof data.fact != "undefined") {
+            if (typeof data != undefined && data.fact != "undefined") {
                 $('#ip_diddy').append('<br />' + data.fact)
                 console.log(data.fact)
                 console.log(data.server)
@@ -937,11 +943,11 @@ function put_a_sock_in_it(url) {
         })
            
         remote_socket.on('error', function(err){
-                       console.log('remote errz ' + JSON.stringify(err))
+            console.log('remote errz ' + JSON.stringify(err))
         })
            
         //cat_chat(remote_socket, my_puck.PUCK_ID)
-        cat_chat(remote_socket, my_puck.ip_addr)
+        cat_chat(remote_socket, 'remote')
     })
 
     remote_socket.on('anything', function(data) {
@@ -963,7 +969,7 @@ function put_a_sock_in_it(url) {
 
 function candid_camera(url) {
 
-    console.log('turning on cam cam')
+    console.log('turning on cam cam : ' + url)
 
     // smile, you're on candid....
     var webrtc = new SimpleWebRTC({
@@ -991,9 +997,10 @@ function candid_camera(url) {
 //
 // Cat chat guts
 //
-function cat_chat(sock, user) {
+function cat_chat(sock, where) {
 
-    if (typeof user == "undefined") user = "local"
+    if (typeof my_puck.ip_addr == "undefined") user = "local"
+    else user = my_puck.ip_addr
 
     console.log('catting as : ' + user)
 
@@ -1002,7 +1009,6 @@ function cat_chat(sock, user) {
 
     // listener, whenever the server emits 'chat_receive', this updates the chat body
     sock.on('chat_receive', function (stamp, username, data) {
-        // seem to get some odd things
 
         console.log(stamp)
         console.log(username)
@@ -1010,39 +1016,65 @@ function cat_chat(sock, user) {
 
 
         if (typeof username == "undefined") { username = '<unknown>'; }
-        console.log('got data! ' + data)
-        if (username != "PUCK") {
-            $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+            console.log('got data! ' + data)
+
+        // if (username != "PUCK") {
+        //  if (puck_current.outgoing && where != "local") {
+                console.log('channel message')
+                $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+        //  }
+        //  else {
+        //      console.log('local channel message')
+        //      $('#cat_chat_local').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+        //  }
             // $('#cat_chat').mCustomScrollbar("update")
             // $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        }
+        // }
     });
 
     // listener, whenever the server emits 'new_puck', this updates the username list
     sock.on('new_puck', function(stamp, data) {
-        console.log('new user!')
-        console.log(data)
-        $('#users').empty();
-        $.each(data, function(key, value) {
-            $('#users').append('<div>' + key + '</div>');
-        })
+        if (puck_current.outgoing && where != "local") {
+            console.log('new remote user!')
+            console.log(data)
+            $('#remote_users').empty();
+            $.each(data, function(key, value) {
+                $('#remote_chat').append('<div>' + key + '</div>');
+            })
+        }
+        else {
+            console.log('new local user!')
+            console.log(data)
+            $('#local_users').empty();
+            $.each(data, function(key, value) {
+                $('#local_chat').append('<div>' + key + '</div>');
+            })
+        }
     })
 
     // when the client clicks SEND
-    $('#datasend').click( function() {
-        var message = $('#meow').val();
-        console.log('sending...' + message)
-        $('#meow').val('');
-        // pack it off to the server
-        sock.emit('chat_send', message);
+    $('.datasend').click( function() {
+        var message = $('.meow').val();
+
+        $('.meow').val('');
+
+        if (message != "") {
+            console.log('sending...' + message)
+            // pack it off to the server
+            sock.emit('chat_send', message);
+        }
+        else {
+            console.log('not sending blanx')
+        }
+
     });
 
     // when hit enter
-    $('#meow').keypress(function(e) {
+    $('.meow').keypress(function(e) {
         if(e.which == 13) {
             $(this).blur();
-            console.log('enter...')
-            $('#datasend').focus().click();
+            console.log('user pressed enter')
+            $('.datasend').focus().click();
         }
     })
 }

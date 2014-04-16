@@ -83,8 +83,6 @@
                     </ul>
                 </li>
 
-                <li> <a href="#skull" data-toggle="tab"><span id="puck_top_skull" title="PANIC!" data-content="Aieee!  Ack!  No!  PANIC TIME!!!!!" class="glyphicon icon-skull"></span></a></li>
-
                 <li> <a href="#puck_cloud" data-toggle="tab"><span id="puck_top_cloud" title="File Vault" data-content="Files-n-secret stuffz" class="glyphicon glyphicon-cloud"></span></a></li>
 
                 <li> <a href="#messages" data-toggle="tab"><span id="puck_top_messages" title="Messages" data-content="Message center: notes, files, and events" class="glyphicon glyphicon-envelope"></span></a></li>
@@ -98,6 +96,9 @@
                 <li> <a href="#"><span class="green glyphicon icon-lightbulb-idea" id="puck_status"></span></a></li>
 
                 <li> <a href="#"><span data-content="help, videos, etc. here..." class="glyphicon icon-question-sign" id="puck_help"></span></a></li>
+
+                <li> <a href="#skull" data-toggle="tab"><span id="puck_top_skull" title="PANIC!" data-content="Aieee!  Ack!  No!  PANIC TIME!!!!!" class="glyphicon icon-skull"></span></a></li>
+
 
                 <li> <a target="_blank" href="https://github.com/zenfish/PUCK"><span id="puck_git" title="github sources" data-content="Github, sources 'n' secretz here" class="glyphicon icon-github"></span></a></li>
 
@@ -226,16 +227,23 @@
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
                     <div class="row"> 
-                        <div style="width:100px;border-right:1px solid black;padding:10px;overflow:scroll-y;">
-                            <b>USERS</b> 
-                            <div id="users"></div>
+                        <div style="width:100px; padding:10px;overflow:scroll-y;">
+                            <b>local USERS</b> <div id="local_users"></div>
+                        </div>
+                        <div style="width:100px; padding:10px;overflow:scroll-y;">
+                            <b>remote USERS</b> <div id="remote_users"></div>
                         </div>
 
                         <div>
                             <div style="width:300px">
                                 <div id="conversation"></div>
-                                <input id="meow" style="width:200px;" />
-                                <input type="button" id="datasend" value="send" />
+                                <input class="meow" id="meow_local" style="width:200px;" />
+                                <input type="button" class="datasend" id="datasend" value="remote send" />
+                            </div>
+                            <div style="width:300px">
+                                <div id="conversation"></div>
+                                <input class="meow" id="meow_remote" style="width:200px;" />
+                                <input type="button" class="datasend" id="datasend" value="remote send" />
                             </div>
 
                             <div id="cat_chat" class="content"></div>

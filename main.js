@@ -442,7 +442,6 @@ function watch_logs(logfile, log_type) {
                 // if we're doing the calling, we want to setup a proxy so our
                 // browser web requests can go into the tunnel to this vs. trying to flail at
                 // some random IP
-                // proxy_love(server_remote_ip)
                 proxy_love(cat_fact_server)
     
             }
@@ -1507,6 +1506,8 @@ function startVPN(req, res, next) {
 //
 function proxy_love(cat_fact_server) {
 
+    return
+
     console.log('proxy time => ' + cat_fact_server)
 
     if (puck_proxy_up) {
@@ -1575,7 +1576,7 @@ function proxy_love(cat_fact_server) {
 
     try {
         proxy_server.listen(proxy_port, function() {
-            console.log('proxy web server for ' + remote_host + ' created, listening on ' + proxy_port)
+            console.log('proxy web/sockets server for ' + remote_host + ' created, listening on ' + proxy_port)
         })
     }
     catch (e) {
@@ -2197,8 +2198,8 @@ var ios = io.sockets.on('connection', function (client) {
         // if acting as server this will be the remote puck's ip
         var ip_addr = client.handshake.address
         console.log(ip_addr)
-        console.log('client data:')
-        console.log(client)
+        // console.log('client data:')
+        // console.log(client)
 
         // if connected via VPN, use remote PUCK as server
         console.log(puck_status)
@@ -2296,6 +2297,7 @@ var ios = io.sockets.on('connection', function (client) {
     // on client send
     client.on('chat_send', function (data) {
         io.sockets.emit('chat_receive', cat_stamp(), client.puck_user, data);
+        // io.sockets.broadcast('chat_receive', cat_stamp(), client.puck_user, data);
     });
 
     // when a puck hangs up
@@ -2318,7 +2320,7 @@ var ios = io.sockets.on('connection', function (client) {
             client.puck_user = puck_user;
             puck_users[puck_user] = puck_user;
             // echo to client they've connected
-            client.emit('chat_receive', stamp, 'PUCK', 'you have connected');
+            client.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
             // tell the world
             client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
             // send the latest list
