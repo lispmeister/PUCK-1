@@ -143,15 +143,15 @@ div.growlUI h1, div.growlUI h2 {
 /* slightly modded from http://www.paulund.co.uk/playground/demo/css_pulse_animation/core.css */
 @-webkit-keyframes pulse_animation {
     0% { -webkit-transform: scale(1); }
-    10% { -webkit-transform: scale(1.1); }
-    20% { -webkit-transform: scale(1.2); }
-    30% { -webkit-transform: scale(1.3); }
-    40% { -webkit-transform: scale(1.4); }
-    50% { -webkit-transform: scale(1.5); }
-    60% { -webkit-transform: scale(1.4); }
-    70% { -webkit-transform: scale(1.3); }
-    80% { -webkit-transform: scale(1.2); }
-    90% { -webkit-transform: scale(1.1); }
+    10% { -webkit-transform: scale(1.05); }
+    20% { -webkit-transform: scale(1.1); }
+    30% { -webkit-transform: scale(1.15); }
+    40% { -webkit-transform: scale(1.2); }
+    50% { -webkit-transform: scale(1.25); }
+    60% { -webkit-transform: scale(1.2); }
+    70% { -webkit-transform: scale(1.15); }
+    80% { -webkit-transform: scale(1.1); }
+    90% { -webkit-transform: scale(1.05); }
    100% { -webkit-transform: scale(1); }
 }
 

@@ -195,7 +195,7 @@ function state_vpn(state) {
 
     if (state == "incoming") {
         // ensure video button is enabled if a call is in progress
-        $('#puck_video').removeClass('red').addClass('green').addClass('glow')
+        $('#puck_video').addClass('green').addClass('pulse')
 
         console.log('incoming ring from ' +  puck_status.openvpn_server.client)
         incoming_ip = puck_status.openvpn_server.client
@@ -209,10 +209,9 @@ function state_vpn(state) {
     }
 
     if (state == "outgoing") {
-        $('#puck_video').removeClass('red').addClass('green').addClass('glow')
+        $('#puck_video').addClass('green').addClass('pulse')
         console.log('outgoing ring!')
         state_ring('true')
-        alert('foo!')
         puck_status.browser_events[browser_ip].notify_ring = true
 
         fire_puck_status(puck_status)
@@ -731,7 +730,7 @@ function remove_signs_of_call() {
     // console.log('killing call signatures...')
     $('.puck_vpn').text("Call").removeClass("btn-danger")
     $('#puck_video').addClass('disabled')
-    $('#puck_video').removeClass('green').addClass('red').removeClass('glow')
+    $('#puck_video').removeClass('green').removeClass('pulse')
     $('.avgrund-popin').remove();
 
 }
