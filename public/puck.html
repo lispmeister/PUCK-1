@@ -52,24 +52,8 @@
 <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
 <!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
 
-<style>
-@font-face {
-  font-family: 'Diplomata-Regular';
-  src: url('/fonts/Diplomata-Regular.ttf');
-}
 
-.diplomat { font-family: 'Diplomata-Regular', 'Georgia', serif; }
-
-.text-rotate {
-    -webkit-transform: rotate(-45deg);
-    -moz-transform:    rotate(-45deg);
-    -o-transform:      rotate(-45deg);
-    -ms-transform:     rotate(-45deg);
-}
-</style>
-
-
-  </head>
+</head>
 
 <body>
 
@@ -99,17 +83,23 @@
                     </ul>
                 </li>
 
+                <li> <a href="#skull" data-toggle="tab"><span id="puck_top_skull" title="PANIC!" data-content="Aieee!  Ack!  No!  PANIC TIME!!!!!" class="glyphicon icon-skull"></span></a></li>
+
                 <li> <a href="#puck_cloud" data-toggle="tab"><span id="puck_top_cloud" title="File Vault" data-content="Files-n-secret stuffz" class="glyphicon glyphicon-cloud"></span></a></li>
 
                 <li> <a href="#messages" data-toggle="tab"><span id="puck_top_messages" title="Messages" data-content="Message center: notes, files, and events" class="glyphicon glyphicon-envelope"></span></a></li>
     
+                <li> <a href="#puck_vpn" data-toggle="tab"><span id="puck_video" title="VPN" data-content="All the cool stuff - calls, chat, etc" class="red glyphicon glyphicon-facetime-video"></span></a></li>
+
                 </ul>
 
             <ul class="nav nav-tabs navbar-nav navbar-right">
 
                 <li> <a href="#"><span class="green glyphicon icon-lightbulb-idea" id="puck_status"></span></a></li>
-                <li> <a href="/vpn.html"><span id="puck_video" class="red glyphicon glyphicon-facetime-video"></span></a></li>
-                <li> <a target="_blank" href="https://github.com/zenfish/PUCK"><span title="github sources" class="glyphicon icon-github"></span></a></li>
+
+                <li> <a href="#"><span data-content="help, videos, etc. here..." class="glyphicon icon-question-sign" id="puck_help"></span></a></li>
+
+                <li> <a target="_blank" href="https://github.com/zenfish/PUCK"><span id="puck_git" title="github sources" data-content="Github, sources 'n' secretz here" class="glyphicon icon-github"></span></a></li>
 
             </ul>
 
@@ -161,6 +151,10 @@
         </div> <!-- end of form/top stuff -->
 
 
+
+
+
+
         <div class="container tab-content">
 
         <!-- pucks -->
@@ -183,37 +177,30 @@
     
             <!-- profile -->
             <div class="tab-pane fade" id="skull">
-                <div class="row-fluid marketing" id="puck_panic">
+                <div class="row-fluid marketing" id="puck_panic_area">
 
                     <div class="muted">
                         <h3 style="clear:both">&iexcl;PANIC!</h3>
                     </div>
 
                     <div>
-                        <p>
-                        Pushing these buttons is not for the faint of heart.
+                        <p> Pushing these buttons is not for the faint of heart.
                         <ul>
-                            <p>
-                            <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are
-                                hammering at your door wanting its data or keys.  UI will no longer work.</li>
-                            <p>
-                                <li><strong>Restart server</strong> does just that - the PUCK server restarts.  UI will no longer
-                                work until it finishes restarting.</li>
-                            <p>
-                                <li><strong>Stop server</strong> stops the PUCK server dead.  UI will no longer work until restarted!</li>
+                            <p> <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.</li>
+                            <p> <li><strong>Stop server</strong> stops the PUCK server dead.  UI will no longer work until restarted!</li>
+                            <p> <li><strong>Restart server</strong> does just that - the PUCK server restarts.  UI will no longer work until it finishes restarting.</li>
+                            <p> <li><strong>Stop VPN client</strong> kills any VPN clients
+
                         </ul>
                     </div>
 
                     <p>
                     <div>
-
-                    <button id="puck_panic" type="button" class="btn btn-danger">PANIC</button>
-                    <button id="restart_server" type="button" class="btn btn-warning">Restart Server</button>
-                    <button id="stop_server" type="button" class="btn">Stop Server</button>
-
+                        <button id="puck_panic" type="button" class="btn btn-danger">PANIC</button>
+                        <button id="stop_server" type="button" class="btn">Stop Server</button>
+                        <button id="restart_server" type="button" class="btn btn-warning">Restart Server</button>
+                        <button id="halt_vpn_client" type="button" class="btn btn-primary">Die VPN, Die!</button>
                     </div>
-
-
                 </div>
             </div>
 
@@ -224,20 +211,94 @@
                         <h3 style="clear:both">profilasaurus</h3>
                     </div>
                     <div>
-                        Enough about you, what about me?
-
-                        <p>
-
-                        Details about your PUCK and possibly you, if you wish.
-
-                        <p>
-
-                        You'll be able to change your picture here, etc., etc.
-
-                        <p>
+                        Enough about you, what about me?<p>
+                        Details about your PUCK and possibly you, if you wish.<p>
+                        You'll be able to change your picture here, etc., etc.<p>
                     </div>
                 </div>
             </div>
+
+            <!-- vpn stuff -->
+
+            <div class="tab-pane fade" id="puck_vpn">
+                <div class="row-fluid marketing">
+
+                    <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
+
+                    <div class="row"> 
+                        <div style="width:100px;border-right:1px solid black;padding:10px;overflow:scroll-y;">
+                            <b>USERS</b> 
+                            <div id="users"></div>
+                        </div>
+
+                        <div>
+                            <div style="width:300px">
+                                <div id="conversation"></div>
+                                <input id="meow" style="width:200px;" />
+                                <input type="button" id="datasend" value="send" />
+                            </div>
+
+                            <div id="cat_chat" class="content"></div>
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="hero-unit">
+                        <p>If you don't see video... something is wrong!</P>
+                    </div>
+
+
+                    <div class="container">
+
+                        <div> <a href="#" id="outgoing_video" class="button left"></a></div>
+
+                        <video id="localVideo"></video>
+
+                        <div><a style="text-decoration: none" href="#"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></button></a></div>
+
+                        <div id="remoteVideos"></div>
+
+                        <div id="incoming_video"></div>
+
+                    </div>
+
+
+                    <hr>
+
+
+                    <div class="container">
+
+                        <div class="row">
+                            <div class="col-md-6 column">
+                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#client_collapse">show/hide client logs</button>
+                                <div id="client_collapse" class="collapse">
+                                    <div id="ovpn_client_infinity" class="mCSB_container content">
+                                        VPN client logs <hr> <!-- content -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- row -->
+
+                        <div class="row">
+                            <div class="col-md-6 column">
+                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">show/hide server logs</button>
+
+                                <div id="server_collapse" class="collapse">
+                                    <div id="ovpn_server_infinity" class="mCSB_container content">
+                                        VPN server logs <hr> <!-- content --> 
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>  <!-- row -->
+
+                    </div> <!-- container -->
+
+                </div>
+            </div> <!-- vpn stuff -->
+
 
             <!-- trust/love -->
 
@@ -250,7 +311,6 @@
                         ...
                     </div>
                 </div>
-
             </div>
 
             <div class="tab-pane fade" id="puck_trust_you">
@@ -347,7 +407,7 @@
                             Charles may initiate actions as though Dan's
                             PUCK was doing them.  This could cause long
                             chains of traffic/activity being passed
-                            along, from PUCK A -&gt; B -&gt; C ... -&gt;> N. Each
+                            along, from PUCK A -&gt; B -&gt; C ... -&gt; N. Each
                             PUCK has to trust the PUCK attempting to
                             pass through it.
                         </ul>
@@ -404,6 +464,7 @@
 
                 </div>
              </div>
+         </div> <!-- tab content -->
 
         <!-- spacer n feets below -->
 
@@ -417,10 +478,7 @@
     </div>
 
 
-</body>
-
 <!-- <% include foot %> -->
-
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
 <script type="text/javascript" src='/js/bootstrap.js'></script>
@@ -436,15 +494,18 @@
 <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
 
-<!-- my stuff uploads -->
+<!-- put a sock in it -->
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript" src="/js/jquery.filer.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+<script type="text/javascript" src="/js/simplewebrtc.js"></script>
+
+<!-- my stuff -->
 <script type="text/javascript" src='/js/puck.js'></script>
 <script type="text/javascript" src='/js/main_puck.js'></script>
 
-<!-- file uploads -->
-<script type="text/javascript" src="/js/jquery.filer.js"></script>
-
-<!-- put a sock in it -->
-<script src="/socket.io/socket.io.js"></script>
+</body>
 
 </html>
 

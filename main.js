@@ -68,12 +68,13 @@ catch (e) {
 // yes, yes, lazy too
 
 // status and other bits
-var server_magic  = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
-    client_magic  = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
-    file_magic    = { "file_name" : "", "file_size" : "", "file_from" : ""},
-    puck_events   = {"new_puck":""},
-    browser_magic = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
-    puck_status   = {}
+var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
+    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
+    file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
+    puck_events     = {"new_puck":""},
+    browser_magic   = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
+    old_puck_status = {},
+    puck_status     = {};
 
     puck_status.events         = puck_events
     puck_status.openvpn_server = server_magic
@@ -325,10 +326,12 @@ function watch_logs(logfile, log_type) {
             magic_client_up     = "/sbin/route add",
             magic_client_up     = "VPN is up",
             magic_client_up     = "Server : ",
-            magic_client_down   = "VPN is down",
-            magic_server_up     = "Peer Connection Initiated",
+            magic_client_down   = "VPN is down";
+
+        var magic_server_up     = "Peer Connection Initiated",
             magic_server_down   = "ECONNREFUSED",
-            magic_server_down   = "OpenVPN Server lost client",
+            magic_server_down1  = "OpenVPN Server lost client",
+            magic_server_down2  = "Client Disconnect",
             magic_server_remote = "Peer Connection Initiated",
 
             moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
@@ -371,14 +374,14 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
-                createEvent('internal server', {event_type: "vpn_server_connected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_server_connected", call_from: cat_fact_server, puck_id: bwana_puck.PUCK_ID})
 
                 // proxy even local calls to socket.io
                 proxy_love(cat_fact_server)
 
             }
             // down
-            else if (line.indexOf(magic_server_down) > -1) {
+            else if (line.indexOf(magic_server_down1) > -1 || line.indexOf(magic_server_down2) > -1) {
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn server down:\n\n')
                 console.log(line)
                 console.log('\n\n')
@@ -434,7 +437,7 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
     
-                createEvent('internal server', {event_type: "vpn_client_connected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, puck_id: bwana_puck.PUCK_ID})
 
                 // if we're doing the calling, we want to setup a proxy so our
                 // browser web requests can go into the tunnel to this vs. trying to flail at
@@ -568,6 +571,7 @@ function cat_power(channel, msg) {
     try {
         if (channel == "broadcast") cat_sock.broadcast.emit(msg)
         else                        cat_sock.emit(channel, msg)
+        cat_sock.broadcast(msg)
     }
     catch (e) {
         console.log('channel not up yet....?')
@@ -633,19 +637,19 @@ function pollStatus(file) {
 
     console.log("I'm watching you, punk " + puck_status_file)
 
-    fs.watchFile(puck_status_file, function (curr, prev) {
-        console.log('changezor')
+//  fs.watchFile(puck_status_file, function (curr, prev) {
+//      console.log('changezor')
         // simple conf file...
-        fs.readFile(puck_status_file, function (err, data) {
-            if (err) {
-                console.log('errz - ' + err)
-            }
-            else {
-                console.log(data.toString())
-                puck_status = JSON.parse(data.toString())
-            }
-         })
-    })
+//      fs.readFile(puck_status_file, function (err, data) {
+//          if (err) {
+//              console.log('errz - ' + err)
+//          }
+//          else {
+//              console.log(data.toString())
+//              puck_status = JSON.parse(data.toString())
+//          }
+//       })
+//  })
 
     console.log('trigger set')
 
@@ -686,7 +690,10 @@ function postStatus (req, res, next) {
     server_magic  = req.body.openvpn_server
     client_magic  = req.body.openvpn_client
 
-    change_status()
+    if (! __.isEqual(old_puck_status, puck_status)) {
+        change_status()
+        old_puck_status = puck_status
+    }
 
     res.send(200, {"status" : "OK"})
 
@@ -1699,13 +1706,14 @@ function httpsPing(puckid, ipaddr, res, next) {
         response  = "",
         responses = 0,
         errorz    = "",
-        all_done  = false
+        all_done  = false,
+        done      = false
 
     // console.log(all_ips)
 
     // use the last known good one, if it exists
     if (typeof puck2ip[puckid] != "undefined") {
-        // console.log('using CACHED! ' + puck2ip[puckid])
+        console.log('using CACHED! ' + puck2ip[puckid])
         restler.get('https://' + puck2ip[puckid] + ':' + puck_port + '/ping').on('complete', function(result) {
             if (result instanceof Error) {
                 console.log('Error:', result.message);
@@ -1723,12 +1731,19 @@ function httpsPing(puckid, ipaddr, res, next) {
 
     for (var i = 0; i < all_ips.length; i++) {
 
-        var done = false,
             results = {},
             ip      = all_ips[i]
 
         if (ip == "127.0.0.1" || (typeof puck2ip[puckid] != "undefined" && puck2ip[puckid] == ip)) {
+            console.log('skipping ' + ip)
             responses = responses + 1
+
+            if (responses == (all_ips.length) && !done) {
+                console.log('ping failure!')
+                response = {status: "ping failure", "name": 'unknown problem'}
+                res.send(408, response)
+            }
+
             continue
         }
 
@@ -1737,6 +1752,8 @@ function httpsPing(puckid, ipaddr, res, next) {
         request('https://' + all_ips[i] + ':8080/ping', function (err, resu, msg) {
 
             if (done) return
+
+            responses = responses + 1
 
             if (err) {
                 console.log('errzz...')
@@ -1753,6 +1770,7 @@ function httpsPing(puckid, ipaddr, res, next) {
                     console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
                     console.log(msg.pid + ' != ' + puckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
+                    // xxx - need to squawk, but return isnt the way... sock.io?
                     // res.send(420, response) // enhance your calm!
                 }
                 else {
@@ -1770,10 +1788,12 @@ function httpsPing(puckid, ipaddr, res, next) {
                 }
             }
 
-            if (i == (all_ips.length - 1) && !done) {
+            if (responses == (all_ips.length - 1) && !done) {
+                console.log('ping failure!')
                 response = {status: "ping failure", "name": 'unknown problem'}
-                res.send(408, response)
+                // res.send(408, response)
             }
+            else { console.log('pinging away [' + i + ']', all_ips.length, done) }
 
         })
 
@@ -2278,10 +2298,22 @@ var ios = io.sockets.on('connection', function (client) {
         io.sockets.emit('chat_receive', cat_stamp(), client.puck_user, data);
     });
 
+    // when a puck hangs up
+    client.on('puck_disconnect', function(puck_user){
+
+        if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
+            var stamp = cat_stamp()
+            delete puck_users[client.puck_user];
+            io.sockets.emit('new_puck', stamp, puck_users);
+            // client.broadcast.emit('chat_receive', stamp, 'PUCK', client.puck_user + ' has <b>hung up</b>!');
+        }
+
+    });
+
     // when a new puck shows up
     client.on('new_puck', function(puck_user){
 
-        if (typeof puck_user != "undefined") {
+        if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
             var stamp = cat_stamp()
             client.puck_user = puck_user;
             puck_users[puck_user] = puck_user;
@@ -2292,6 +2324,7 @@ var ios = io.sockets.on('connection', function (client) {
             // send the latest list
             io.sockets.emit('new_puck', stamp, puck_users);
         }
+
     });
 
     // when the user disconnects.. perform this
@@ -2299,7 +2332,7 @@ var ios = io.sockets.on('connection', function (client) {
         var stamp = cat_stamp()
         delete puck_users[client.puck_user];
         io.sockets.emit('new_puck', stamp, puck_users);
-        client.broadcast.emit('chat_receive', stamp, 'PUCK', client.puck_user + ' has disconnected');
+        // client.broadcast.emit('chat_receive', stamp, 'PUCK', client.puck_user + ' has disconnected');
     });
 
 

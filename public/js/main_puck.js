@@ -9,29 +9,34 @@ var vault_poll     = 1000
 var already_polled = false
 var vpn_started    = false
 
+var browser_ip  = ""
+var remote_sock = ""
+var socky_love  = false
+var my_puck     = {}
+
+var ovpn_slogs = 'openvpn_server_logs'
+var ovpn_clogs = 'openvpn_client_logs'
+
+// conf file fodder
+var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
+var PREGNANT_PAUSE       = 3000 // 5 seconds should be enough for anyone!
+var PUCK_RECONNECT_DELAY =  100
+
+// xxx - from http://soundbible.com/1411-Telephone-Ring.html
+ring = new Audio("media/ringring.mp3") // load it up
+
 $(document).ready(function () {
     
     var image     = ""
     // var puck_id   = ""
 
-    var tt = ['puck_top_left', 'puck_top_cog', 'puck_top_home', 'puck_top_skull',
-              'puck_top_ewe', 'puck_top_love', 'puck_top_cloud', 'puck_top_messages']
+    var tt = ['puck_top_left', 'puck_top_cog', 'puck_top_home', 'puck_top_skull', 'puck_top_ewe', 
+              'puck_top_love', 'puck_top_cloud', 'puck_top_messages', 'puck_help', 'puck_video', 'puck_git']
 
     for (var i = 0 ; i < tt.length; i++) {
         $('#' + tt[i]).popover( {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
     }
 
-    //  $('#puck_top_left').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_cog').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_home').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_skull').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_ewe').tooltip(     {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_love').tooltip(    {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_cloud').tooltip(   {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-    //  $('#puck_top_messages').tooltip({delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
-
-    status_loop()
-    
     // disable a/href pushing if disabled
     $('body').on('click', 'a.disabled', function(event) {
         event.preventDefault();
@@ -50,6 +55,11 @@ $(document).ready(function () {
     $('#restart_server').click(function (e) { restart_server() })
     $('#stop_server').click(function    (e) { stop_server() })
 
+    // log areas
+    $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
+    $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
+    $("#cat_chat").mCustomScrollbar({ set_height: 200, set_width: 600, scrollButtons:{ enable:true } });
+
     //
     // setup user drag/click files to browser
     //
@@ -66,7 +76,7 @@ $(document).ready(function () {
         e.preventDefault()
         // id.substr(9) == puck id
         // possibly a better way to get name :)
-        event_connect('outgoing', $(this).parent().parent().find('.puckname').text(), this)
+        event_connect('outgoing', $(this).parent().parent().find('.puckname').text())
 
         var vpuckid = $("#puckid").val()
         var ipaddr  = $("#ipaddr").val()
@@ -75,15 +85,6 @@ $(document).ready(function () {
         
     })
 
-    // $('body').on('submit', '.puck_vpn', function(e) { 
-    //     e.preventDefault()
-    //   var vpuckid = $("#puckid").val()
-    //  var ipaddr  = $("#ipaddr").val()
-    //  var target  = $("#name").val()
-        // put in vpn target when calling someone
-    //     puck_vpn(this, vpuckid, ipaddr)
-    // })
-    
     //
     // user clicks create, and....
     //
@@ -105,26 +106,16 @@ $(document).ready(function () {
     $('body').on('click', '#puck_disconnect', function() { 
         event_hang_up() 
     })
-
-    // "Avgrund is Swedish for abyss"
-    
-    $(function() {$('#incoming').avgrund({
-        height: 120,
-        width: 600,
-        holderClass: 'custom',
-        showClose: true,
-        showCloseText: 'Close',
-        enableStackAnimation: true,
-        onBlurContainer: '.container',
-        setEvent: 'click',
-        template: '<div class="row">' +
-                  '<div class="col-md-4"><img src="img/ringring.gif"></div>' +
-                  '<div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Call from ' + '</span></a></button></div>'  +
-                  '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
-                  '</div>'
-        })
+    $('body').on('click', '#halt_vpn_client', function() { 
+        alert('bye-bye vpn')
+        event_hang_up() 
     })
-    
+
+    // mwahaha
+    $('body').on('click', '#puck_help', function() { 
+        alert('yeah... right... you do it!')
+    })
+
     // pleased to meet me, whomever I am
     $.get('/ping', function(puck) {
         my_puck = puck
@@ -301,4 +292,11 @@ $(document).ready(function () {
     // message data
     list_events()
     
+    setTimeout(function(){socket_looping()},PREGNANT_PAUSE)
+
+    // get my puck data
+    // who_am_i()
+
 })
+
+

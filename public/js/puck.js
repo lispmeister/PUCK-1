@@ -29,8 +29,7 @@ var poll = 5000  // every 5 secs
 
 var my_puck = {}
 
-// xxx - from http://soundbible.com/1411-Telephone-Ring.html
-ring = new Audio("media/ringring.mp3") // load it up
+PUCK_SOCK_RETRY = 5000
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
@@ -88,7 +87,15 @@ function list_events() {
 
         for (var i = 0; i < data.length; i++) {
             var cat = data[i]
-            cat_herd[i] = cat
+
+            // do the in/out calls first
+            if (cat == 'vpn_client_connected' || cat == 'vpn_server_connected') {
+                populate_events(cat)
+            }
+            else {
+                cat_herd[i] = cat
+            }
+
         }
 
         // iterate over alphabetized list and suck in the data
@@ -110,14 +117,19 @@ function populate_events(cat) {
     console.log('sucking in table data for ' + cat)
 
     var url       = "/events/" + encodeURIComponent(cat)
+
+    if      (cat == 'vpn_client_connected') _cat = 'Calls made'
+    else if (cat == 'vpn_server_connected') _cat = 'Calls'
+    else                                    _cat = cat
+
     var cat_e     = cat + "_table_events"
 
-    var base_table = '<div class="row-fluid marketing">' +
-                     '<div class="spacer20"> </div>'     +
-                     '<div><h4 class="text-primary">'    + cat + '</h4></div>' +
-                     '<table class="table table-condensed table-hover table-striped" id="' + cat_e + '"></table>'    +
-                     '<ul id="' + cat + '_pager"></ul>'  +
-                     '</div>'                            +
+    var base_table = '<div class="row-fluid marketing">'                                                            +
+                     '<div class="spacer20"> </div>'                                                                +
+                     '<div><h4 class="text-primary">'    + _cat + '</h4></div>'                                     +
+                     '<table class="table table-condensed table-hover table-striped" id="' + cat_e + '"></table>'   +
+                     '<ul id="' + cat + '_pager"></ul>'                                                             +
+                     '</div>'                                                                                       +
                      '</div>'
 
     var n = 0
@@ -152,7 +164,6 @@ function populate_events(cat) {
 
 }
 
-
 // http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
 function post(url, parameters) {
     var form = $('<form></form>');
@@ -184,28 +195,37 @@ function state_vpn(state) {
 
     if (state == "incoming") {
         // ensure video button is enabled if a call is in progress
-        $('#puck_video').removeClass('red').addClass('green')
+        $('#puck_video').removeClass('red').addClass('green').addClass('glow')
+
         console.log('incoming ring from ' +  puck_status.openvpn_server.client)
         incoming_ip = puck_status.openvpn_server.client
-        // ring them gongs
-        $('#incoming')[0].click()
+        // ring them gongs, etc.
+        event_connect("incoming", incoming_ip)
+
+        puck_current.incoming = true
 
         puck_status.browser_events[browser_ip].notify_file = true
-
         other_puck = puck_status.openvpn_server.client
     }
+
     if (state == "outgoing") {
-        $('#puck_video').removeClass('red').addClass('green')
+        $('#puck_video').removeClass('red').addClass('green').addClass('glow')
         console.log('outgoing ring!')
         state_ring('true')
+        alert('foo!')
         puck_status.browser_events[browser_ip].notify_ring = true
 
         fire_puck_status(puck_status)
 
         other_puck = puck_status.openvpn_client.server
 
-        // redirect to vpn page
-        window.location.href = "/vpn.html"
+        puck_current.outgoing = true
+
+        // go to vpn page
+        $('body').removeClass('avgrund-active');
+        $('#puck_vpn').click()
+        window.location.href = "/puck.html#puck_vpn"
+        // window.location.href = "vpn.html"
     }
 
 }
@@ -233,7 +253,7 @@ function state_ring(sound) {
 //
 // calls, in or out
 //
-function event_connect(direction, puck, element) {
+function event_connect(direction, puck) {
 
     console.log('connexting')
 
@@ -241,7 +261,7 @@ function event_connect(direction, puck, element) {
     // energize modals
     //
     // "Avgrund is Swedish for abyss"
-    $(element).avgrund({
+    $('#' + direction).avgrund({
         height: 120,
         openOnEvent: false,
         width: 600,
@@ -252,7 +272,7 @@ function event_connect(direction, puck, element) {
         onBlurContainer: '.container',
         template: '<div class="row">' +
                   '<div id="puck_ring_img" class="col-md-4"></div>' +
-                  '<a style="text-decoration: none" href="/vpn.html"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
+                  '<a style="text-decoration: none" href="#puck_vpn"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
                   '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
                   '</div>'
         })
@@ -261,8 +281,15 @@ function event_connect(direction, puck, element) {
 
     // xxx - conf file, obv....
     var ring_img = '<img src="/img/ringring.gif">'
-    // after popup, add target
-    $('#vpn_target').on('change', '#vpn_target').append(' ' + puck)
+
+    // after things popup, add caller/callee
+    if (direction == "incoming") {
+        $('#vpn_target').on('change', '#vpn_target').html('Call from ' + puck)
+    }
+    else {
+        $('#vpn_target').on('change', '#vpn_target').append(' ' + puck)
+    }
+
     $('#puck_ring_img').on('change', '#puck_ring_img').html(ring_img)
 
 }
@@ -275,6 +302,9 @@ function event_hang_up() {
     console.log('hanging up!')
 
     state_ring('false')
+
+    // i has gone
+    local_socket.emit('remove_puck', my_puck.PUCK_ID);
 
     var url = "/vpn/stop"
 
@@ -428,12 +458,14 @@ function puck_ping(all_ips, puckid, url) {
     // element_id='puck_' + id + '_ip_addr'
     var element_id='puck_vpn_' + puckid
 
-    $.get(ping_url)
-        .success(function(data) {
-            // console.log('success with ' + element_id) 
+    $.ajax({url: ping_url, cache: false, 
+        success: function(data) {
+            console.log('success with ' + element_id) 
+            console.log(data)
 
             // make the button clickable and green
             if (data.status == "OK") {
+                console.log('success with ' + element_id) 
                 // console.log('ok...')
                 $('#'+element_id).addClass('btn-success').removeClass('disabled')
             }
@@ -442,16 +474,17 @@ function puck_ping(all_ips, puckid, url) {
                 $('#'+element_id).removeClass('btn-success').addClass('disabled')
             }
 
-        })
-        .error(function(error){
+        },
+        error: function(error){
             console.log( "ping error for " + ping_url)
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
             console.log(error)
-        })
-        .fail(function(error) { 
+        },
+        fail: function(error) {
             console.log( "ping failure for " + ping_url)
             console.log(error)
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
+        }
         })
    
 // console.log('post-pingy ' + puckid + '... putting into ' + element_id)
@@ -482,10 +515,6 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
     console.log('jquery threw a hair ball on that one: ' + textStatus + ' - ' + errorThrown);
 }
 
-// conf file fodder
-var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
-var PUCK_RECONNECT_DELAY =  100
-
 //
 // ... snag /status
 //
@@ -507,53 +536,38 @@ function get_status() {
 
 
 //
-// ... snag /status all the time
+// ... snag all the various socket chatter
 //
-function status_loop(){
+function socket_looping(){
 
     console.log('status loop')
 
-    // sow the seed o' doubt
-    get_status()
-
-    // local = our PUCK
-    socket = io.connect('/', {
+    // local == our PUCK
+    local_socket = io.connect('/', {
         'connect timeout': PUCK_TIMEOUT,
         // 'try multiple transports': true,
         'reconnect': true,
         'reconnection delay': PUCK_RECONNECT_DELAY,
         'reconnection limit': PUCK_TIMEOUT,
         'max reconnection attempts': Infinity,
-        // 'sync disconnect on unload': false,
+        'sync disconnect on unload': false,
         'auto connect': true,
         'force new connection': true
         })
 
-    socket.on('connect', function(sock){
+    // sow the seed o' doubt
+    get_status()
+
+    local_socket.socket.on('connect', function(sock){
         console.log('[+++] - general connext note')
 
-    // i has arrived
-    socket.emit('new_puck', my_puck.PUCK_ID);
-
-    // everyone loves cat facts!
-    // listener, whenever the server emits 'chat_receive', this updates the chat body
-    socket.on('chat_receive', function (stamp, username, data) {
-        // seem to get some odd things
-        console.log(stamp)
-        console.log(username)
-        console.log(data)
-
-        console.log('[+++] - cat facts!')
-        console.log(data)
-
-        $('#ip_diddy').append('<br />' + data.fact)
-
+        // everyone loves cat facts!
+        cat_chat(local_socket, my_puck.ip_addr)
+        candid_camera()
     })
-    //  console.log(data.fact)
-    //  console.log(data.server)
 
-    socket.on('puck_status', function (data) {
-        console.log('[@] + cat facts... wait...no... status :(')
+    local_socket.on('puck_status', function (data) {
+        console.log('[@] + cat facts... wait...no... status :!:')
         console.log(JSON.stringify(data))
         console.log(typeof data)
 
@@ -571,27 +585,63 @@ function status_loop(){
             console.log(typeof old_puck_status)
             old_puck_status = puck_status
             status_or_die()
+
+            try { 
+
+                console.log('trying...')
+                console.log(data.openvpn_client)
+                if (data.openvpn_client.vpn_status == "up") {
+                    var url = ':7777'
+                    console.log('trying to connect to... ' + url)
+                    // try remote connecting, and keep it up until javascript wears itself out
+                    candid_camera()
+                    put_a_sock_in_it(url)
+                    setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
+                }
+            }
+            catch (e) { console.log('vpn aint ready') }
+
+
+        }
+        else {
+            console.log('same ol, same ol')
         }
     })
    
-    socket.on('error', function(err){
+    local_socket.on('error', function(err){
         console.log('remote errz ' + JSON.stringify(err))
     })
 
-    socket.on('reconnect', function(d) { 
+    local_socket.on('reconnect', function(d) { 
         console.log ('reconnect') 
         fire_puck_status(puck_status)
     })
 
-    socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
-    socket.on('connecting',       function(d) { console.log ('connecting') })
-    socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
-    socket.on('connect_failed',   function(d) { console.log ('connect failed') })
-    socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
-    socket.on('close',            function(d) { console.log ('close') })
-    socket.on('disconnect',       function(d) { console.log ('disconnect') })
+    local_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
+    local_socket.on('connecting',       function(d) { console.log ('connecting') })
+    local_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
+    local_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
+    local_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
+    local_socket.on('close',            function(d) { console.log ('close') })
+    local_socket.on('disconnect',       function(d) { console.log ('disconnect') })
+
+
+    // OVPN logs for client/server
+    local_socket.on(ovpn_clogs, function (data) {
+        console.log('client: ' + data.line)
+        $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+        $("#ovpn_client_infinity").mCustomScrollbar("update")
+        $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
     
+    local_socket.on(ovpn_slogs, function (data) {
+        console.log('server: ' + data.line)
+        $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
+        $("#ovpn_server_infinity").mCustomScrollbar("update")
+        $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+    })
+
+
 }
 
 function isEmpty(obj) {
@@ -635,16 +685,29 @@ function status_or_die() {
     console.log('incoming...?')
 
     // server... incoming ring
-    if (puck_status.openvpn_server.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_file) {
+    if (puck_status.openvpn_server.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_ring) {
         state_vpn('incoming')
     }
 
     console.log('outgoing...?')
 
     // client... outgoing ring
-    if (puck_status.openvpn_client.vpn_status == "up" && puck_status.browser_events[browser_ip].notify_ring != true) {
+    if (puck_status.openvpn_client.vpn_status == "up" && ! puck_status.browser_events[browser_ip].notify_ring) {
+        puck_current.incoming = false
         state_vpn('outgoing')
     }
+
+    // if nothing up now, kill any signs of a call, just to be sure
+    if (puck_status.openvpn_client.vpn_status != "up" && puck_status.openvpn_server.vpn_status != "up") {
+        other_puck = "local"
+        // xxx - one for out, one for in?
+        puck_status.browser_events[browser_ip].notify_ring = false
+        remove_signs_of_call()
+        $('body').removeClass('avgrund-active');
+    }
+
+    if (puck_status.openvpn_client.vpn_status != "up") puck_current.outgoing = false
+    if (puck_status.openvpn_server.vpn_status != "up") puck_current.incoming = false
 
     // did santa come?
     console.log('new toyz...?')
@@ -668,7 +731,7 @@ function remove_signs_of_call() {
     // console.log('killing call signatures...')
     $('.puck_vpn').text("Call").removeClass("btn-danger")
     $('#puck_video').addClass('disabled')
-    $('#puck_video').removeClass('green').addClass('red')
+    $('#puck_video').removeClass('green').addClass('red').removeClass('glow')
     $('.avgrund-popin').remove();
 
 }
@@ -817,4 +880,170 @@ function drag_and_puck() {
         onSelect   : function(e,parent,appendBox){ $(appendBox).addClass('done'); }
     })
 
+}
+
+
+//
+// try to go put a sock on the other PUCK
+//
+function put_a_sock_in_it(url) {
+
+    console.log('keep trying...')
+    try { remote_socket.disconnect() }
+    catch (e) { console.log('nice catch of D/C!'); console.log(e) }
+
+    remote_socket = io.connect(url, {
+        'connect timeout': 5000, // 5 seconds should be enough
+        'try multiple transports': true,
+        'reconnect': true,
+        'reconnection delay': 500,
+        'reconnection limit': 5000,
+        'max reconnection attempts': Infinity,
+        'sync disconnect on unload': false,
+        'auto connect': true,
+        'force new connection': true
+    })
+
+
+    remote_socket.socket.on('connect', function(){
+
+        console.log('[+] remote - connected to ' + url)
+        
+        $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
+
+        // turn it on from proxy
+        candid_camera(':7777')
+
+        remote_socket.on('cat_facts', function (data) {
+
+            console.log('[@@@] - cat facts!')
+            console.log(data)
+           
+            if (typeof data.fact != "undefined") {
+                $('#ip_diddy').append('<br />' + data.fact)
+                console.log(data.fact)
+                console.log(data.server)
+            }
+        })
+           
+        remote_socket.emit('puck', 'foo', function (data) {
+            console.log('[@] + hey pucks... ')
+            console.log(data)
+        })
+
+        remote_socket.on('puck_status', function (data) {
+            console.log('[@] + cat facts... wait...no... remote status!')
+            status_or_die()
+            console.log(data)
+        })
+           
+        remote_socket.on('error', function(err){
+                       console.log('remote errz ' + JSON.stringify(err))
+        })
+           
+        //cat_chat(remote_socket, my_puck.PUCK_ID)
+        cat_chat(remote_socket, my_puck.ip_addr)
+    })
+
+    remote_socket.on('anything', function(data) {
+        console.log('... something... anything.... ')
+        console.log(data)
+    })
+           
+           
+    remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
+    remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
+    remote_socket.on('connecting',       function(d) { console.log ('connecting') })
+    remote_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
+    remote_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
+    remote_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
+    remote_socket.on('close',            function(d) { console.log ('close') })
+    remote_socket.on('disconnect',       function(d) { console.log ('disconnect') })
+
+}
+
+function candid_camera(url) {
+
+    console.log('turning on cam cam')
+
+    // smile, you're on candid....
+    var webrtc = new SimpleWebRTC({
+        // the id/element dom element that will hold "our" video
+        localVideoEl: 'localVideo',
+        // the id/element dom element that will hold remote videos
+        remoteVideosEl: 'remoteVideos',
+        // immediately ask for camera access
+        autoRequestMedia: true,
+        url : url
+    });
+
+    // we have to wait until it's ready
+    webrtc.on('readyToCall', function () {
+        // you can name it anything
+        webrtc.joinRoom('roomy');
+    })
+}
+
+
+//
+// Cat chat (TM) - for moar cat fax.
+//
+
+//
+// Cat chat guts
+//
+function cat_chat(sock, user) {
+
+    if (typeof user == "undefined") user = "local"
+
+    console.log('catting as : ' + user)
+
+    // i is here
+    sock.emit('new_puck', user);
+
+    // listener, whenever the server emits 'chat_receive', this updates the chat body
+    sock.on('chat_receive', function (stamp, username, data) {
+        // seem to get some odd things
+
+        console.log(stamp)
+        console.log(username)
+        console.log(data)
+
+
+        if (typeof username == "undefined") { username = '<unknown>'; }
+        console.log('got data! ' + data)
+        if (username != "PUCK") {
+            $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+            // $('#cat_chat').mCustomScrollbar("update")
+            // $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
+    });
+
+    // listener, whenever the server emits 'new_puck', this updates the username list
+    sock.on('new_puck', function(stamp, data) {
+        console.log('new user!')
+        console.log(data)
+        $('#users').empty();
+        $.each(data, function(key, value) {
+            $('#users').append('<div>' + key + '</div>');
+        })
+    })
+
+    // when the client clicks SEND
+    $('#datasend').click( function() {
+        var message = $('#meow').val();
+        console.log('sending...' + message)
+        $('#meow').val('');
+        // pack it off to the server
+        sock.emit('chat_send', message);
+    });
+
+    // when hit enter
+    $('#meow').keypress(function(e) {
+        if(e.which == 13) {
+            $(this).blur();
+            console.log('enter...')
+            $('#datasend').focus().click();
+        }
+    })
 }
