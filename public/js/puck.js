@@ -569,6 +569,7 @@ function socket_looping(){
         // everyone loves cat facts!
         cat_chat(local_socket, 'local')
         candid_camera('/')
+
     })
 
     local_socket.on('puck_status', function (data) {
@@ -967,25 +968,24 @@ function put_a_sock_in_it(url) {
 
 }
 
+//
+// magic time, courtesy of simplewebrtc
+//
 function candid_camera(url) {
 
     console.log('turning on cam cam : ' + url)
 
     // smile, you're on candid....
     var webrtc = new SimpleWebRTC({
-        // the id/element dom element that will hold "our" video
-        localVideoEl: 'localVideo',
-        // the id/element dom element that will hold remote videos
-        remoteVideosEl: 'remoteVideos',
-        // immediately ask for camera access
-        autoRequestMedia: true,
+        localVideoEl: 'localVideo',     // the id/element dom element that will hold "our" puck video
+        remoteVideosEl: 'remoteVideos', // the id/element dom element that will hold remote puck videos
+        autoRequestMedia: true,         // immediately ask for camera access
         url : url
     });
 
     // we have to wait until it's ready
     webrtc.on('readyToCall', function () {
-        // you can name it anything
-        webrtc.joinRoom('roomy');
+        webrtc.joinRoom('roomy');       // you can name it anything
     })
 }
 
@@ -993,9 +993,7 @@ function candid_camera(url) {
 //
 // Cat chat (TM) - for moar cat fax.
 //
-
-//
-// Cat chat guts
+// Cat chat guts on display
 //
 function cat_chat(sock, where) {
 
@@ -1010,71 +1008,44 @@ function cat_chat(sock, where) {
     // listener, whenever the server emits 'chat_receive', this updates the chat body
     sock.on('chat_receive', function (stamp, username, data) {
 
-        console.log(stamp)
-        console.log(username)
-        console.log(data)
-
-
         if (typeof username == "undefined") { username = '<unknown>'; }
-            console.log('got data! ' + data)
 
-        // if (username != "PUCK") {
-        //  if (puck_current.outgoing && where != "local") {
-                console.log('channel message')
-                $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
-        //  }
-        //  else {
-        //      console.log('local channel message')
-        //      $('#cat_chat_local').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
-        //  }
-            // $('#cat_chat').mCustomScrollbar("update")
-            // $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        // }
+        console.log('cat chat => ' + data)
+        $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+
     });
 
-    // listener, whenever the server emits 'new_puck', this updates the username list
-    sock.on('new_puck', function(stamp, data) {
-        if (puck_current.outgoing && where != "local") {
-            console.log('new remote user!')
-            console.log(data)
-            $('#remote_users').empty();
-            $.each(data, function(key, value) {
-                $('#remote_chat').append('<div>' + key + '</div>');
-            })
-        }
-        else {
-            console.log('new local user!')
-            console.log(data)
-            $('#local_users').empty();
-            $.each(data, function(key, value) {
-                $('#local_chat').append('<div>' + key + '</div>');
-            })
-        }
-    })
-
-    // when the client clicks SEND
-    $('.datasend').click( function() {
-        var message = $('.meow').val();
-
-        $('.meow').val('');
-
+    // click send
+    $('#datasend').click( function() {
+        var message = $('#meow').val();
+        $('#meow').val('');
         if (message != "") {
             console.log('sending...' + message)
-            // pack it off to the server
-            sock.emit('chat_send', message);
+
+            // pack it off to the server... try remote first, then....
+            try       { 
+                remote_socket.emit('chat_send', message); 
+                console.log('[remote] + ' + message)
+            }
+            catch (e) { 
+                console.log('[local] + ' + message)
+                sock.emit('chat_send', message);
+            }
+
         }
         else {
             console.log('not sending blanx')
         }
-
     });
 
     // when hit enter
-    $('.meow').keypress(function(e) {
+    $('#meow').keypress(function(e) {
         if(e.which == 13) {
             $(this).blur();
-            console.log('user pressed enter')
-            $('.datasend').focus().click();
+            console.log('hit enter')
+            $('#datasend').focus().click();
+            $('#meow').focus()
         }
     })
+
 }

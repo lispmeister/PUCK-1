@@ -28,7 +28,7 @@
 
 .output a{display:inline-block; text-decoration:none; padding:3px 15px; -webkit-border-radius:15px; -moz-border-radius:15px; border-radius:15px; background:#000; margin:5px 20px 5px 0;} 
 
-.content { margin:40px; height:500px; padding:20px; overflow:auto; background:#ddd; -webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px;}
+.content { margin:10px; height:500px; padding:20px; overflow:auto; background:#eee; -webkit-border-radius:3px; -moz-border-radius:3px; border-radius:3px;}
 
 
 /* misc */
@@ -145,11 +145,11 @@ div.growlUI h1, div.growlUI h2 {
     0% { -webkit-transform: scale(1); }
     10% { -webkit-transform: scale(1.05); }
     20% { -webkit-transform: scale(1.1); }
-    30% { -webkit-transform: scale(1.15); }
-    40% { -webkit-transform: scale(1.2); }
-    50% { -webkit-transform: scale(1.25); }
-    60% { -webkit-transform: scale(1.2); }
-    70% { -webkit-transform: scale(1.15); }
+    30% { -webkit-transform: scale(1.25); }
+    40% { -webkit-transform: scale(1.35); }
+    50% { -webkit-transform: scale(1.45); }
+    60% { -webkit-transform: scale(1.35); }
+    70% { -webkit-transform: scale(1.25); }
     80% { -webkit-transform: scale(1.1); }
     90% { -webkit-transform: scale(1.05); }
    100% { -webkit-transform: scale(1); }

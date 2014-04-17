@@ -107,7 +107,7 @@
         </nav>
 
 
-        <div class="container">
+        <div class="container-fluid">
 
             <!-- for incoming/outgoing calls -->
 
@@ -148,15 +148,10 @@
                 </div>
             </form>
 
-        </div> 
         </div> <!-- end of form/top stuff -->
 
 
-
-
-
-
-        <div class="container tab-content">
+        <div class="container-fluid tab-content">
 
         <!-- pucks -->
             <div class="tab-pane fade in active" id="home">
@@ -222,64 +217,55 @@
             <!-- vpn stuff -->
 
             <div class="tab-pane fade" id="puck_vpn">
-                <div class="row-fluid marketing">
+
+                <div class="row">
 
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
-                    <div class="row"> 
-                        <div style="width:100px; padding:10px;overflow:scroll-y;">
-                            <b>local USERS</b> <div id="local_users"></div>
-                        </div>
-                        <div style="width:100px; padding:10px;overflow:scroll-y;">
-                            <b>remote USERS</b> <div id="remote_users"></div>
+                    <div class="col-md-4" style="clear:both">
+
+                        <h4> remote </h4>
+                        <span>If you don't see video... something is wrong!</span>
+                        <div style="width:300px" id="remoteVideos"></div>
+
+                        <div><a style="text-decoration: none" href="#"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></button></a></div>
+
+                    </div>
+
+
+                    <div class="col-md-2"></div>
+                    <div class="col-md-4">
+
+                        <div style="padding:10px">
+                            <b>Cat Chat!</b> <span class="muted small">instant messaging, PUCK style</span><br />
                         </div>
 
                         <div>
                             <div style="width:300px">
                                 <div id="conversation"></div>
-                                <input class="meow" id="meow_local" style="width:200px;" />
-                                <input type="button" class="datasend" id="datasend" value="remote send" />
+                                <input class="meow" id="meow" style="width:200px;" />
+                                <input type="button" class="datasend" id="datasend" value="send" />
                             </div>
-                            <div style="width:300px">
-                                <div id="conversation"></div>
-                                <input class="meow" id="meow_remote" style="width:200px;" />
-                                <input type="button" class="datasend" id="datasend" value="remote send" />
-                            </div>
-
                             <div id="cat_chat" class="content"></div>
                         </div>
 
                     </div>
+                </div>
+                <div class="row">
 
                     <hr>
 
-                    <div class="hero-unit">
-                        <p>If you don't see video... something is wrong!</P>
+                    <div class="row" style="clear:both">
+                        <div class="col-md-4">
+                            <video width=480 id="localVideo"></video>
+                        </div>
                     </div>
 
 
-                    <div class="container">
-
-                        <div> <a href="#" id="outgoing_video" class="button left"></a></div>
-
-                        <video id="localVideo"></video>
-
-                        <div><a style="text-decoration: none" href="#"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></button></a></div>
-
-                        <div id="remoteVideos"></div>
-
-                        <div id="incoming_video"></div>
-
-                    </div>
-
-
-                    <hr>
-
-
-                    <div class="container">
+                    <div class="container-fluid">
 
                         <div class="row">
-                            <div class="col-md-6 column">
+                            <div class="col-md-6">
                                 <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#client_collapse">show/hide client logs</button>
                                 <div id="client_collapse" class="collapse">
                                     
@@ -291,7 +277,7 @@
                         </div> <!-- row -->
 
                         <div class="row">
-                            <div class="col-md-6 column">
+                            <div class="col-md-6">
                                 <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">show/hide server logs</button>
 
                                 <div id="server_collapse" class="collapse">

@@ -473,6 +473,7 @@ function watch_logs(logfile, log_type) {
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
+                proxy_love(cat_fact_server)
     
             }
         }
@@ -1505,8 +1506,6 @@ function startVPN(req, res, next) {
 //    computer-1 <-> browser-1 <-> PUCK-1 <-> Proxy-on-PUCK-1 <- ... net ... -> PUCK-2 <-> browser-2 <-> computer-2
 //
 function proxy_love(cat_fact_server) {
-
-    return
 
     console.log('proxy time => ' + cat_fact_server)
 
