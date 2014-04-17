@@ -1716,7 +1716,7 @@ function httpsPing(puckid, ipaddr, res, next) {
         
         var ip = all_ips[i]
 
-        if (ip == "127.0.0.1") { console.log('skipping ' + ip) }
+        if (ip == "127.0.0.1") { console.log('skipping ' + ip); continue; }
 
         console.log('pinging  ' + ip);
 
