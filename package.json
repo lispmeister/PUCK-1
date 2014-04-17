@@ -6,8 +6,10 @@
   "dependencies": {
     "asn1": "latest",
     "assert-plus": "0.1.2",
+    "async": "latest",
     "bunyan": "0.21.1",
     "cors": "latest",
+    "cors-anywhere": "latest",
     "ctype": "latest",
     "ejs": "latest",
     "express": "3.1.0",

@@ -31,4 +31,4 @@ openssl ca -keyfile ca.key -cert ca.crt -batch -days 3650 -out puck.crt -in puck
 openssl req -nodes -batch -new -newkey rsa:512 -keyout vpn_client.key -out vpn_client.csr -config stupid.cnf
 openssl ca -cert ca.crt -batch -keyfile ca.key -days 365 -out vpn_client.crt -in vpn_client.csr -config stupid.cnf
 
-
+chmod -R 755 /etc/puck/f-u-openssl/keys

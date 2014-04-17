@@ -1702,69 +1702,27 @@ function httpsPing(puckid, ipaddr, res, next) {
     console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
 
     var all_ips = ipaddr.split(','),
-        n       = all_ips.length,
-        response  = "",
-        responses = 0,
-        errorz    = "",
-        all_done  = false,
-        done      = false
+        done = false;
+    
+    var async = require('async')
 
-    // console.log(all_ips)
-
-    // use the last known good one, if it exists
-    if (typeof puck2ip[puckid] != "undefined") {
-        console.log('using CACHED! ' + puck2ip[puckid])
-        restler.get('https://' + puck2ip[puckid] + ':' + puck_port + '/ping').on('complete', function(result) {
-            if (result instanceof Error) {
-                console.log('Error:', result.message);
-            } 
-            else {
-                console.log('(cached) ' + JSON.stringify(result))
-                results[all_ips[i]] = result
-                // cache the latest
-                done = true
-                // res.send(200, result)
-                res.send(200, result)
-            }
-        })
-    }
-
-    for (var i = 0; i < all_ips.length; i++) {
-
-            results = {},
-            ip      = all_ips[i]
-
-        if (ip == "127.0.0.1" || (typeof puck2ip[puckid] != "undefined" && puck2ip[puckid] == ip)) {
+    async.each(all_ips, function(ip, callback) {
+        if (ip == "127.0.0.1") {
             console.log('skipping ' + ip)
-            responses = responses + 1
-
-            if (responses == (all_ips.length) && !done) {
-                console.log('ping failure!')
-                response = {status: "ping failure", "name": 'unknown problem'}
-                res.send(408, response)
-            }
-
-            continue
+            return
         }
+        console.log('pinging  ' + ip);
 
-        // console.log('pinging ' + ip)
+        var url = 'https://' + ip + ':' + puck_port + '/ping'
 
-        request('https://' + all_ips[i] + ':8080/ping', function (err, resu, msg) {
+        restler.get(url).on('complete', function(msg) {
 
-            if (done) return
+            if (msg instanceof Error) {
+                console.log(url + ' => Error:', msg.message);
+            } 
 
-            responses = responses + 1
-
-            if (err) {
-                console.log('errzz...')
-                console.log(err)
-            }
             else {
-                console.log('ping werx?  ' + msg)
-
-                msg = JSON.parse(msg)
-
-                var remote = resu.request.host
+                console.log('ping werx?  ' + JSON.stringify(msg))
 
                 if (msg.pid != puckid) {
                     console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
@@ -1774,30 +1732,31 @@ function httpsPing(puckid, ipaddr, res, next) {
                     // res.send(420, response) // enhance your calm!
                 }
                 else {
-
-                    console.log('worked - caching ' + remote)
-                    // console.log(msg)
-                    results[all_ips[i]] = msg
-                    // cache the latest
-                    puck2ip[puckid] = remote
-                    ip2puck[remote] = puckid
-                    if (!done) {
-                        done = true
-                        res.send(200, msg)
-                    }
+                    err = {}
+                    err[ip] = msg
+                    callback(err)
                 }
             }
-
-            if (responses == (all_ips.length - 1) && !done) {
-                console.log('ping failure!')
-                response = {status: "ping failure", "name": 'unknown problem'}
-                // res.send(408, response)
-            }
-            else { console.log('pinging away [' + i + ']', all_ips.length, done) }
-
         })
-
+    }),
+    // trick async to die on the first success, not failure...
+    // perhaps there's a better way. No... not perhaps :)
+    function(err){
+        if(err && !done) {
+                console.log('worked!')
+                console.log(msg)
+                results[ip] = msg
+                puck2ip[puckid] = ip
+                ip2puck[ip] = puckid
+                done = true
+                res.send(200, msg)
+        }
     }
+
+    console.log('no response, ping failure!')
+    response = {status: "ping failure", "name": 'unknown problem'}
+    res.send(408, response)
+
 }
 
 function formCreate(req, res, next) {
