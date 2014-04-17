@@ -1701,63 +1701,80 @@ function httpsPing(puckid, ipaddr, res, next) {
 
     console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
 
-    var all_ips = ipaddr.split(','),
-        done = false;
+    var all_ips   = ipaddr.split(','),
+        done      = false,
+        responses = 0;
     
     var async = require('async')
 
-    async.each(all_ips, function(ip, callback) {
-        if (ip == "127.0.0.1") {
-            console.log('skipping ' + ip)
-            return
-        }
+    var err = {}
+
+//  cache results, do that first
+//  if (defined puck2ip[ip]) 
+
+    for (var i = 0; i < all_ips.length; i++) {
+        
+        var ip = all_ips[i]
+
+        if (ip == "127.0.0.1") { console.log('skipping ' + ip) }
+
         console.log('pinging  ' + ip);
 
         var url = 'https://' + ip + ':' + puck_port + '/ping'
 
-        restler.get(url).on('complete', function(msg) {
+        var request = https.get(url, function(resp) {
+            console.log('trying.... ' + url)
+            resp.setEncoding('utf8');
+            resp.on("data", function(d) {
 
-            if (msg instanceof Error) {
-                console.log(url + ' => Error:', msg.message);
-            } 
+                console.log('data!')
+                console.log(d)
 
-            else {
-                console.log('ping werx?  ' + JSON.stringify(msg))
+                d = JSON.parse(d)
 
-                if (msg.pid != puckid) {
-                    console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
-                    console.log(msg.pid + ' != ' + puckid)
-                    response = {status: "mismatch", "name": 'mismatched PID'}
-                    // xxx - need to squawk, but return isnt the way... sock.io?
-                    // res.send(420, response) // enhance your calm!
+                console.log(d.pid)
+
+                responses++
+
+                if (d.pid != puckid) {
+                        console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
+                        console.log(d.pid + ' != ' + puckid)
+                        response = {status: "mismatch", "name": 'mismatched PID'}
+                        // xxx - need to squawk, but return isnt the way... sock.io?
+                        // res.send(420, response) // enhance your calm!
                 }
                 else {
-                    err = {}
-                    err[ip] = msg
-                    callback(err)
+                        done = true
+                        console.log('worked!')
+                        console.log(d)
+                        puck2ip[puckid] = ip
+                        ip2puck[ip] = puckid
+                        res.send(200, d)
                 }
-            }
-        })
-    }),
-    // trick async to die on the first success, not failure...
-    // perhaps there's a better way. No... not perhaps :)
-    function(err){
-        if(err && !done) {
-                console.log('worked!')
-                console.log(msg)
-                results[ip] = msg
-                puck2ip[puckid] = ip
-                ip2puck[ip] = puckid
-                done = true
-                res.send(200, msg)
-        }
-    }
 
-    console.log('no response, ping failure!')
-    response = {status: "ping failure", "name": 'unknown problem'}
-    res.send(408, response)
+                if (responses == all_ips.length) {
+                    console.log('no response, ping failure!')
+                    response = {status: "ping failure", "name": 'unknown problem'}
+                    res.send(408, response)
+                }
+            })
+    })
+    .on('error', function(e) {
+        responses++
+        console.log("Got error: " + e.message);
+        if (responses == all_ips.length) {
+            console.log('no response, ping failure!')
+            response = {status: "ping failure", "name": 'unknown problem'}
+            res.send(408, response)
+        }
+    })
+
+    }
+    
 
 }
+        // if(err && !done) {
+        // if (!done && responses == all_ips.length()) {
 
 function formCreate(req, res, next) {
 
