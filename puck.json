@@ -3,6 +3,11 @@
     "home"     : "/etc/puck",
     "keystore" : "/etc/puck/pucks",
     "bin"      : "/etc/puck/exe"
-    }
+    },
+"crypto": {
+    "keysize"  : "1024",
+    "life_puck": "365",
+    "life_vpn" : "30"
+}
 }
 

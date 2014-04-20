@@ -16,15 +16,15 @@ fi
 
 pid=$1
 
-puck_area="/etc/puck/pucks/"
-keyfile="$puck_area/$pid/ta.key"
+keystore="/etc/puck/pucks/"
+keyfile="$keystore/$pid/ta.key"
 
 if [ -f $keyfile ] ; then
     echo "Not going to overwrite existing key ($keyfile)"
     exit 2
 fi
 
-mkdir $puck_area/$pid 2> /dev/null
+mkdir $keystore/$pid 2> /dev/null
 
 echo creating tls-auth key... can\'t seem to change it, fixed at 2048 bits
 

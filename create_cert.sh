@@ -21,11 +21,13 @@ if [ "X$2" = "X" ]; then
     exit 1
 fi
 
+# should set...
+# KEY_SIZE=512
+. /etc/puck/config.sh
+
 org="$1"
 
 mode="$2"
-
-keystore="/etc/puck/pucks"
 
 # key files
 key="$keystore/$org/puck.key"    # private key
@@ -52,28 +54,11 @@ mkdir $keystore/$org 2> /dev/null
 
 echo creating client cert... could take awhile....
 
-KEY_SIZE=4096
-KEY_SIZE=512
-
-bits_o_128=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
-
-C="AQ"               # country
-ST="White"           # state 
-L="Pucktown"         # city
-O="Puckasaurus Rex"  # organization
-CN="$bits_o_128.example.com"      # hmm....
-days="-days 999"     # 999 days from now
-
-magic="-subj /C=$C/ST=$ST/L=$L/O=$L/CN=$CN"
-
 # finally!
 openssl req -x509 $magic -nodes $days -key $CAkey -newkey rsa:$KEY_SIZE -keyout $key -out $crt
 
-
 openssl req $magic -nodes -new -keyout $key -out $csr
 openssl ca $magic -nodes -out $crt -in $csr
-
-
 
 if [ $? != 0 ] ; then
     echo "certificate creation failed"

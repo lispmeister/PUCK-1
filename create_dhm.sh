@@ -7,15 +7,10 @@
 # This can take a very, very long time on the Pi
 #
 
-if [ "X$1" = "X" ]; then
-    echo "Usage: $0 key-size-in-bits"
-    exit 1
-fi
+. /etc/puck/config.sh
 
-KEY_SIZE=$1
-
-keyfile="/etc/puck/pucks/PUCK/dh$KEY_SIZE.params"
-vpn_keyfile="/etc/puck/pucks/PUCK/dh.params"
+keyfile="$keystore/PUCK/dh$KEY_SIZE.params"
+vpn_keyfile="$keystore/PUCK/dh.params"
 
 if [ -f $keyfile -o -f $vpn_keyfile ] ; then
     echo "Not going to overwrite existing DH key with same name ($keyfile or $vpn_keyfile)"

@@ -1705,8 +1705,6 @@ function httpsPing(puckid, ipaddr, res, next) {
         done      = false,
         responses = 0;
     
-    var async = require('async')
-
     var err = {}
 
 //  cache results, do that first
@@ -1745,10 +1743,12 @@ function httpsPing(puckid, ipaddr, res, next) {
                 }
                 else {
                         done = true
-                        console.log('worked!')
+                        console.log(i)
+                        console.log(all_ips)
+                        console.log('worked! ' + all_ips[i])
                         console.log(d)
-                        puck2ip[puckid] = ip
-                        ip2puck[ip] = puckid
+                        puck2ip[puckid] = all_ips[i]
+                        ip2puck[all_ips[i]] = puckid
                         res.send(200, d)
                 }
 

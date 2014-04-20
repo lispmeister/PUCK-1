@@ -4,15 +4,11 @@
 #
 # Usage: $0 puck-id picture IP-addr 'ints-n-ips-in-json' owner email [puck-ip]
 #
-puck_host="localhost"
-puck_port="8080"
-puck_home="/etc/puck"
-keystores="/etc/puck/pucks"
-client_keys="/etc/puck/vpn_client"
-tmp="$puck_home/tmp"
-results="$tmp/_puck_create_results.$$"
-new_puck="$tmp/_new_puck.$$"
 
+. /etc/puck/config.sh
+
+results="$PUCK_TMP/_puck_create_results.$$"
+new_puck="$PUCK_TMP/_new_puck.$$"
 tmp_files="$results $new_puck"
 
 invalid="InvalidContent"
@@ -63,26 +59,26 @@ email=$6
 # create the tls-auth key for openvpn
 
 # XXXXX - this needs to come from server...
-$puck_home/create_tlsauth.sh $puck_id
+$PUCK_HOME/create_tlsauth.sh $puck_id
 
 # not all awks are equal... sigh... substring broken on raspbian
 # don't even say that mawk does things "differently"... then don't
 # call it awk, you fuckers.  Pissed at time lost.
 
 # clumsy way to get the content into json form
-v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puckroot.crt)
-v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.crt)
-v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/ta.key)
+v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$puck_id/puckroot.crt)
+v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$puck_id/puck.crt)
+v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$puck_id/ta.key)
 
 # dont give our secret key to remotes ;)
 v_key="{}"
 if [ "$puck_ip" = "@" ] ; then
-    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/puck.key)
+    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$puck_id/puck.key)
 fi
 
 v_dh="{}"
-if [ -f $keystores/$puck_id/dh.params ] ; then
-    v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystores/$puck_id/dh.params)
+if [ -f $keystore/$puck_id/dh.params ] ; then
+    v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$puck_id/dh.params)
 fi
 
 # XXX hardcoding port/proto for a bit

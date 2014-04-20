@@ -5,13 +5,8 @@
 #
 #  Usage: $0 target
 #
-#
-puck_host="https://localhost"
-puck_port="8080"
-puck_url="$puck_host:$puck_port/puck"
-puck_home="/etc/puck"
-tmp="$puck_home/tmp"
-results="$tmp/_puck_create_results.$$"
+
+results="$PUCK_TMP/_puck_create_results.$$"
 
 app_dir=`pwd`
 bin_dir="$app_dir/exe"
@@ -29,10 +24,10 @@ fi
 pid="$1"
 ip=$2
 
-ca="       --ca  $puck_home/pucks/$pid/puckroot.crt"
-key="     --key  $puck_home/pucks/$pid/puck.key"
-cert="   --cert  $puck_home/pucks/$pid/puck.crt"
-tls="--tls-auth  $puck_home/pucks/$pid/ta.key"
+ca="       --ca  $keystore/$pid/puckroot.crt"
+key="     --key  $keystore/$pid/puck.key"
+cert="   --cert  $keystore/$pid/puck.crt"
+tls="--tls-auth  $keystore/$pid/ta.key"
 # dh="       --dh  $puck_home/pucks/$pid/dh_param"
 
 # cd $HOME
