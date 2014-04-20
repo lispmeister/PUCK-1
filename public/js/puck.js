@@ -1049,3 +1049,121 @@ function cat_chat(sock, where) {
     })
 
 }
+
+//
+// print out an indented list from an object
+//
+function owalk( name, obj, str, depth ) { 
+    var name  = name  || 0
+    var depth = depth || 0
+    var str   = str   || ''
+
+    var index = true
+
+    if (obj.toString() != "[object Object]") {
+        index = false
+    }
+
+    str = str + '<ul css="li { margin-left:' + depth * 50 + 'px}">'
+    str = str + '\n<lh><strong>' + name + '</strong>\n'
+
+    for( var i in obj ) {
+        var padding = 0
+        if( typeof obj[i] === 'object' ) {
+            padding = Array(depth * 4 ).join(' ')
+            owalk(i, obj[i], str, ++depth)
+            depth--
+            str = str + '</ul>'
+
+        } else {
+            padding = Array(depth * 4 ).join(' ')
+            // console.log( Array(depth * 4 ).join(' ') + i + ' : ' + obj[i] )
+
+            if (index) 
+                var s = i + ' : ' + obj[i]
+            else
+                var s = obj[i]
+
+//          console.log('S: ' + index + ' ' + s)
+
+            str = str + '\n' + padding + '<li css="li { margin-left:' + depth * 50 + 'px}">' + s + '\n'
+        }
+    }
+
+    console.log(str)
+
+    return(str)
+
+}
+
+// owalk("puck", x)
+
+//
+// basic puck stuff... 3 things, basics, vpn server, and vpn client stuff
+//
+function print_puck(puckid, puckinfo, elements) {
+
+    var vpn = {
+        port       : puckinfo.vpn.port,
+        protocol   : puckinfo.vpn.protocol,
+        ca         : puckinfo.vpn.ca.join('\n'),
+        key        : puckinfo.vpn.key.join('\n'),
+        cert       : puckinfo.vpn.cert.join('\n'),
+        tlsauth    : puckinfo.vpn.tlsauth.join('\n'),
+        dh         : puckinfo.vpn.dh.join('\n')
+    }
+
+    var vpn_client = {
+        port       : puckinfo.vpn_client.port,
+        protocol   : puckinfo.vpn_client.protocol,
+        ca         : puckinfo.vpn_client.ca.join('\n'),
+        key        : puckinfo.vpn_client.key.join('\n'),
+        cert       : puckinfo.vpn_client.cert.join('\n')
+    }
+
+    var puck = {
+        puckid     : puckid,
+        name       : name,
+        owner      : puckinfo.owner.name,
+        email      : puckinfo.owner.email,
+        image      : puckinfo.image,
+        ip         : puckinfo.ip_addr,
+        vpn_ip     : puckinfo.vpn_ip,
+        all_ips    : puckinfo.all_ips.join(', ')
+       }
+
+    var vpn_template = '<div><h4>VPN</h4></div>' + 
+                   '<strong>port</strong>: {{port}} <br />' +
+                   '<strong>protocol</strong>: {{protocol}} <br />' +
+                   '<strong>ca</strong>: {{ca}} <br />' +
+                   '<strong>key</strong>: {{key}} <br />' +
+                   '<strong>cert</strong>: {{cert}} <br />' +
+                   '<strong>tlsauth</strong>: {{tls_auth}} <br />' +
+                   '<strong>DH</strong>: {{dh}} <br />'
+
+    var vpn_client_template = '<div><h4>VPN Client</h4></div>' + 
+                   '<strong>port</strong>: {{port}} <br />' +
+                   '<strong>protocol</strong>: {{protocol}} <br />' +
+                   '<strong>ca</strong>: {{ca}} <br />' +
+                   '<strong>key</strong>: {{key}} <br />' +
+                   '<strong>cert</strong>: {{cert}} <br />'
+
+    var template = '<div><h4>ID: <span id="puckid">{{puckid}}</span></h4> <br />' +
+                   '<strong>PUCK\'s name</strong>: {{user}} <br />' +
+                   '<strong>Owner</strong>: {{user}} <br />' +
+                   '<strong>Email</strong>: {{email}} <br />' +
+                   '<strong>ip address</strong>: {{ip}} <br />' +
+                   '<strong>vpn ip address</strong>: {{vpn_ip}} <br />' +
+                   '<strong>all ips known</strong>: {{all_ips}} <br />' +
+                   '<div style="width: 200px"><img style="max-width:100%" src="{{image}}"></div>'
+
+    var v_html   = Mustache.to_html(vpn_template, vpn)
+    var v_c_html = Mustache.to_html(vpn_client_template, vpn_client)
+    var p_html   = Mustache.to_html(template, puck)
+
+    $(elements[0]).html(p_html)
+    $(elements[1]).html(v_html)
+    $(elements[2]).html(v_c_html);
+
+}
+

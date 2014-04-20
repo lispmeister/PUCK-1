@@ -284,6 +284,7 @@ $(document).ready(function () {
                     } // else ... pucks other than this one
                     else {
                         my_puck = puckinfo
+                        print_puck(puckinfo.PUCK_ID, puckinfo, ['#puck_basics', '#puck_vpn_basics', '#puck_vpn_client_basics'])
                     }
                 })
             })
@@ -299,5 +300,4 @@ $(document).ready(function () {
     // who_am_i()
 
 })
-
 

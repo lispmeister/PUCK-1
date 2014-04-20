@@ -3,7 +3,7 @@
   <head>
 
 <meta charset="utf-8">
-<title>PUCKasaurus Rex!</title>
+<title>Detailed PUCKasaurus</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="rawr!">
 
@@ -19,6 +19,15 @@
 <!-- trivial bits here -->
 <link href="/css/puck.css" rel="stylesheet">
 
+<!-- form to add files -->
+<link href="/css/jquery.filer.css" rel="stylesheet">
+
+<!-- a few more icons -->
+<link href="/css/whhg.css" rel="stylesheet">
+
+<!-- nav menus -->
+<link href="/css/yamm.css" rel="stylesheet">
+
 <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -30,29 +39,123 @@
 <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
 <!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
 
-  </head>
 
-  <body>
+</head>
+
+<body>
 
     <div class="container">
 
-        <div class="masthead">
-            <ul class="nav nav-pills pull-right">
-                <li> <a style="text-decoration: none" href="/vpn.html"> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></button></a></li>
-                <li class="muted"><a target="_blank" href="https://github.com/zenfish/PUCK">Github</a></li>
-                <li class="muted"><a href="/logs.html">Logs</a></li>
-                <li class="muted"><a href="#">Help</a></li>
-            </ul>
-            <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
-        </div>
+        <nav class="navbar navbar-default zenlarge" role="navigation">
 
-      <hr>
+            <ul class="nav nav-tabs navbar-nav navbar-left">
+
+                <li class="active"><a href="#home" data-toggle="tab"><span id="puck_top_home" title="home" data-content="Click your heels three times..." class="glyphicon glyphicon-home"></span></a></li>
+
+                <li> <a href="#puck_vpn" data-toggle="tab"><span id="puck_video" title="VPN" data-content="All the cool stuff - calls, chat, etc" class="glyphicon glyphicon-facetime-video"></span></a></li>
+
+                </ul>
+
+            <ul class="nav nav-tabs navbar-nav navbar-right">
+
+                <li> <a href="#"><span class="green glyphicon icon-lightbulb-idea" id="puck_status"></span></a></li>
+
+                <li> <a href="#"><span data-content="help, videos, etc. here..." class="glyphicon icon-question-sign" id="puck_help"></span></a></li>
+
+                <li> <a href="#skull" data-toggle="tab"><span id="puck_top_skull" title="PANIC!" data-content="Aieee!  Ack!  No!  PANIC TIME!!!!!" class="glyphicon icon-skull"></span></a></li>
+
+
+                <li> <a target="_blank" href="https://github.com/zenfish/PUCK"><span id="puck_git" title="github sources" data-content="Github, sources 'n' secretz here" class="glyphicon icon-github"></span></a></li>
+
+            </ul>
+
+        </nav>
+
+
+        <div class="container-fluid">
+
+            <!-- for incoming/outgoing calls -->
+
+            <a href="#" id="incoming" class="button left"></a>
+            <a href="#" id="outgoing" class="button left"></a>
+
+        </div> <!-- end of form/top stuff -->
+
+
+        <div class="container-fluid tab-content">
+
+        <!-- pucks -->
+
+            <div class="tab-pane fade in active" id="home"> </div>
+    
+            <!-- profile -->
+            <div class="tab-pane fade" id="skull">
+                <div class="row-fluid marketing" id="puck_panic_area">
+
+                    <div class="muted">
+                        <h3 style="clear:both">&iexcl;PANIC!</h3>
+                    </div>
+
+                    <div>
+                        <p> Pushing these buttons is not for the faint of heart.
+                        <ul>
+                            <p> <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.</li>
+                            <p> <li><strong>Stop server</strong> stops the PUCK server dead.  UI will no longer work until restarted!</li>
+                            <p> <li><strong>Restart server</strong> does just that - the PUCK server restarts.  UI will no longer work until it finishes restarting.</li>
+                            <p> <li><strong>Stop VPN client</strong> kills any VPN clients
+
+                        </ul>
+                    </div>
+
+                    <p>
+                    <div>
+                        <button id="puck_panic" type="button" class="btn btn-danger">PANIC</button>
+                        <button id="stop_server" type="button" class="btn">Stop Server</button>
+                        <button id="restart_server" type="button" class="btn btn-warning">Restart Server</button>
+                        <button id="halt_vpn_client" type="button" class="btn btn-primary">Die VPN, Die!</button>
+                    </div>
+                </div>
+            </div>
+
 
         <div class="container">
 
-        <!-- make it so -->
-          <div id="puck_details">
-          </div>
+            <div class="panel-group" id="puck_accordion">
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_base_details">PUCK details </a>
+                    </h4>
+                </div>
+                <div id="puck_base_details" class="panel-collapse collapse in">
+                    <div id="puck_basics" class="panel-body"> </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_details">PUCK VPN details </a>
+                    </h4>
+                </div>
+                <div id="puck_vpn_details" class="panel-collapse collapse">
+                    <div id="puck_vpn_basics" class="panel-body"> </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_client_details">PUCK VPN client details </a>
+                    </h4>
+                </div>
+                <div id="puck_vpn_client_details" class="panel-collapse collapse">
+                    <div id="puck_vpn_client_basics" class="panel-body"> </div>
+                </div>
+            </div>
+
+        </div>
 
         <!-- make it so -->
         <form action='/form' method="POST">
@@ -67,15 +170,43 @@
             </div>
         </fieldset>
         </form>
-
         </div>
 
-    <!-- le javascript -->
-    <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
-    <script type="text/javascript" src="/js/jquery-ui.1.9.2.min.js"></script>
-    <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
-    <script type="text/javascript" src="/js/bootstrap.js"></script>
-    <script type="text/javascript" src="/js/moustache.js"></script>
+        <!-- spacer n feets below -->
+
+        <div class="btn-toolbar"> <span></span></div>
+        <div class="btn-toolbar"> <span class="spacer100"></span></div>
+
+        <div class="footer" id="puck_footy">
+            <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
+        </div>
+
+
+<script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
+<script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
+<script type="text/javascript" src='/js/bootstrap.js'></script>
+<script type="text/javascript" src='/js/moustache.js'></script>
+<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
+<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
+<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
+<script type="text/javascript" src="/js/underscore-min.js"></script>
+
+<script type="text/javascript" src='/js/spin.js'></script>
+<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
+<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
+<script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
+<script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
+
+<!-- put a sock in it -->
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+
+<script type="text/javascript" src="/js/jquery.filer.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+<script type="text/javascript" src="/js/simplewebrtc.js"></script>
+
+<!-- my stuff -->
+<script type="text/javascript" src='/js/puck.js'></script>
+<script type="text/javascript" src='/js/main_puck.js'></script>
 
     <!-- make the known pucks appear in the correct section -->
     <script type='text/javascript'>
@@ -110,7 +241,15 @@
        window.location = '/puck.html'
        }
 
+
+
+
+
        $(document).ready(function () {
+
+         $('#puck_accordion').collapse({
+            toggle: false
+         })
 
          // perhaps look for a better way :)
          var query = location.search.substr(1);
@@ -137,28 +276,13 @@
 
             console.log(puckinfo)
 
-            var puck = {
-               user           : puckinfo.owner.name,
-               email          : puckinfo.owner.email,
-               puckid         : puckid,
-               image          : puckinfo.image
-               }
-
-            var template = 
-                  '<strong>user</strong>: {{user}} <br />' +
-                  '<strong>email</strong>: {{email}} <br />' +
-                  '<div style="width: 200px"><img style="max-width:100%" src="{{image}}"></div>' +
-                  '<div><h4>PUCK <span id="puckid">{{puckid}}</span></h3> <br />'
-
-            var html = Mustache.to_html(template, puck);
-
-            $('#puck_details').html(html);
+            print_puck(puckid, puckinfo, ['#puck_basics', '#puck_vpn_basics', '#puck_vpn_client_basics'])
 
          })
+
      })
 
     </script>
 
   </body>
 </html>
-

@@ -202,15 +202,50 @@
 
             <!-- profile -->
             <div class="tab-pane fade" id="ewe">
-                <div class="row-fluid marketing" id="puck_profile">
-                    <div class="muted">
-                        <h3 style="clear:both">profilasaurus</h3>
+                <div class="muted">
+                    <h3 style="clear:both">profilasaurus</h3>
+                </div>
+                <div>
+                    Enough about you, what about me?<p>
+                    Details about your PUCK and possibly you, if you wish.<p>
+                    You'll be able to change your picture here, etc., etc.<p>
+                </div>
+
+                <div class="panel-group" id="puck_accordion">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_base_details">PUCK details </a>
+                            </h4>
+                        </div>
+                        <div id="puck_base_details" class="panel-collapse collapse in">
+                            <div id="puck_basics" class="panel-body"> </div>
+                        </div>
                     </div>
-                    <div>
-                        Enough about you, what about me?<p>
-                        Details about your PUCK and possibly you, if you wish.<p>
-                        You'll be able to change your picture here, etc., etc.<p>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_details">PUCK VPN details </a>
+                            </h4>
+                        </div>
+                        <div id="puck_vpn_details" class="panel-collapse collapse">
+                            <div id="puck_vpn_basics" class="panel-body"> </div>
+                        </div>
                     </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_client_details">PUCK VPN client details</a>
+                            </h4>
+                        </div>
+                        <div id="puck_vpn_client_details" class="panel-collapse collapse">
+                            <div id="puck_vpn_client_basics" class="panel-body"> </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

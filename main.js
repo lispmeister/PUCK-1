@@ -1823,7 +1823,26 @@ function formCreate(req, res, next) {
     
                 data = JSON.parse(data)
                 console.log('remote puck info in...!')
-    
+
+                // if the IP we get the add from isn't in the ips the other puck
+                // says it has... add it in; they may be coming from a NAT or
+                // something weird
+                console.log('looking 2 see if your current ip is in your pool')
+
+                // if you're coming from a NAT or someplace weird...
+                var found = false
+                for (var i = 0; i < data.all_ips.length; i++) {
+                    if (data.all_ips[i] == ip_addr) {
+                        console.log('remote ip found in puck data')
+                        found = true
+                        break
+                    }
+                }
+                if (! found) {
+                    console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
+                    data.all_ips[all_client_ips.length] = ip_addr
+                }
+
                 // console.log(data);
     
                 create_puck_key_store(data)
