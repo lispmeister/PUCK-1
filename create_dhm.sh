@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 #
 # Generate DHM keys. Will create a symlink for the PUCK's

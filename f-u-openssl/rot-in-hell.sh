@@ -16,9 +16,9 @@ cd /etc/puck/f-u-openssl
 
 ./clean-all
 
-rm ca.* puck.* vpn_client.*
+rm -f ca.* puck.* vpn_client.*
 
-echo $KEY_SIZE
+echo Key size will be $KEY_SIZE bits
 
 # create CA
 openssl req -batch -days $KEY_LIFE -nodes -new -newkey rsa:$KEY_SIZE -x509 -keyout ca.key -out ca.crt -config stupid.cnf

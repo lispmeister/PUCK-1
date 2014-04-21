@@ -8,10 +8,7 @@
 #       may you rot in hell
 #
 
-port="80"
-proto="udp"
-
-vpn_home="/etc/puck/pucks/vpn_client"
+. /etc/puck/config.sh
 
 if [ "X$1" = "X" ]; then
     echo Usage: $0 name
@@ -20,9 +17,7 @@ else
     clientname="$1"
 fi
 
-keysize=1024
-duration=30 # in days
-
+vpn_home="/etc/puck/pucks/vpn_client"
 vtarget="$vpn_home/$clientname"
 
 cd /etc/puck/f-u-openssl
@@ -33,8 +28,8 @@ cd /etc/puck/f-u-openssl
 
 echo $vtarget
 
-openssl req -nodes -batch -new -newkey rsa:$keysize -keyout "$vtarget.key" -out "$vtarget.csr" -config stupid.cnf
-openssl ca -cert ca.crt -batch -keyfile ca.key -days $duration -out "$vtarget.crt" -in "$vtarget.csr" -config stupid.cnf
+openssl req -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout "$vtarget.key" -out "$vtarget.csr" -config stupid.cnf
+openssl ca -cert ca.crt -batch -keyfile ca.key -days $puck_vpn_life_tmp -out "$vtarget.crt" -in "$vtarget.csr" -config stupid.cnf
 
 cd $vpn_home
 
@@ -50,17 +45,16 @@ remote=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n 
 #
 dev tun
 
-proto $proto
-port  $port
+proto $puck_proto
+port  $puck_port
 $remote
 
 # seems recommended...?!?
 # link-mtu 1500
 tun-mtu  1500
 
-# cipher AES-256-CBC
-cipher AES-128-CBC
-auth SHA1
+cipher $puck_cipher
+auth $puck_auth
 
 resolv-retry infinite
 

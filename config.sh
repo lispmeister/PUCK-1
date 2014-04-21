@@ -13,42 +13,50 @@ PATH=$PATH:/usr/local/bin:/usr/local/nodey/bin
 #
 # crypto
 #
-KEY_SIZE=1024
-KEY_LIFE=365
+export KEY_SIZE=1024
+export KEY_LIFE=365
 
-bits_o_128=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
+export bits_o_128=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
 
-# vpn_life_puck=365
-# vpn_life_tmp=30
+export vpn_life_puck=365
+export vpn_life_tmp=30
 
 # file/dir locations
-PUCK_HOME="/etc/puck"
-PUCK_LOGS="$PUCK_HOME/logs"
-PUCK_TMP="$PUCK_HOME/tmp"
+export PUCK_HOME="/etc/puck"
+export PUCK_LOGS="$PUCK_HOME/logs"
+export PUCK_TMP="$PUCK_HOME/tmp"
 
-hell="$PUCK_HOME/f-u-openssl"
+export hell="$PUCK_HOME/f-u-openssl"
 
-keystore="$PUCK_HOME/pucks"
-puck_keystore="$keystore/PUCK"
+export keystore="$PUCK_HOME/pucks"
+export puck_keystore="$keystore/PUCK"
 
-puck_proto="https"
-puck_host="localhost"
-puck_port="8080"
+export puck_proto="https"
+export puck_host="localhost"
+export puck_port="8080"
 
-puck_url="$puck_proto://$puck_host:$puck_port"
+export puck_cipher="AES-128-CBC"
+# puck_cipher="AES-256-CBC" # ???
+export puck_auth="SHA1"
 
+export puck_url="$puck_proto://$puck_host:$puck_port"
 
-client_keys="/etc/puck/vpn_client"
-
+export client_keys="/etc/puck/vpn_client"
 
 # for Certs
-C="AQ"               # country
-ST="White"           # state 
-L="Pucktown"         # city
-O="Puckasaurus Rex"  # organization
-CN="$bits_o_128.example.com"      # hmm....
-days="-days $KEY_LIFE"     # 999 days from now
+export KEY_COUNTRY="AQ"             # country
+export KEY_PROVINCE="White"         # state 
+export KEY_CITY="Pucktown"          # city
+export KEY_ORG="Puckasaurus Rex"    # organization
+export KEY_OU="silly little arms"   # org unit
+export KEY_EMAIL="puck@example.com" # org unit
+# COMMON_NAME="$bits_o_128.example.com"      # hmm....
+export COMMON_NAME="*"
+export KEY_NAME="PUCK"              # X509 Subject Field
+export KEY_CN="$COMMON_NAME"
+
+export days="-days $KEY_LIFE"       # 999 days from now
 
 # putting it all together
-magic="-subj /C=$C/ST=$ST/L=$L/O=$L/CN=$CN"
+export magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 

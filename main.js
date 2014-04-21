@@ -742,15 +742,11 @@ function authenticate(req, res, next) {
 function create_puck_key_store(puck) {
 
     console.log('PUUUUUUCKKKKKK!')
-    console.log(puck)
+    // console.log(puck)
 
     if (typeof puck != 'object') {
         puck = JSON.parse(puck)
     }
-
-    console.log('typeof : ' + typeof puck)
-
-    console.log(puck)
 
     var ca   = puck.vpn_client.ca.join('\n')
     var key  = puck.vpn_client.key.join('\n')
@@ -853,7 +849,6 @@ function createPuck(req, res, next) {
             // if it's from a remote system, wake up local UI and tell user
             //
             if (typeof my_net[client_ip] == "undefined") {
-                console.log(req)
                 console.log('create appears to be coming from remote: ' + client_ip)
                 puck_events = { new_puck : client_ip }
                 create_puck_key_store(puck.value)
