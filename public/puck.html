@@ -260,11 +260,15 @@
                     <div class="col-md-4" style="clear:both">
 
                         <h4> remote </h4>
-                        <span>If you don't see video... something is wrong!</span>
+                        <span>If connected to another PUCK and you don't see video... something is wrong!</span>
+
+<!--
                         <div style="width:300px" id="remoteVideos"></div>
 
                         <div><a style="text-decoration: none" href="#"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></button></a></div>
 
+
+-->
                     </div>
 
 
@@ -290,11 +294,17 @@
 
                     <hr>
 
+    <!--
                     <div class="row" style="clear:both">
                         <div class="col-md-4">
                             <video width=480 id="localVideo"></video>
                         </div>
                     </div>
+    -->
+
+                <button id="setup-meeting">Setup Meeting</button>
+
+
 
 
                     <div class="container-fluid">
@@ -534,6 +544,50 @@
 <!-- my stuff -->
 <script type="text/javascript" src='/js/puck.js'></script>
 <script type="text/javascript" src='/js/main_puck.js'></script>
+
+<script src="https://www.webrtc-experiment.com/meeting/meeting.js"></script>
+
+
+<script>
+
+$(document).ready(function () {
+
+var meeting = new Meeting('meeting-unique-id');
+
+// on getting local or remote streams
+meeting.onaddstream = function(e) {
+    // e.type == 'local' ---- it is local media stream
+    // e.type == 'remote' --- it is remote media stream
+    document.body.appendChild(e.video);
+};
+
+// custom signaling channel
+// you can use each and every signaling channel
+// any websocket, socket.io, or XHR implementation
+// any SIP server
+// anything! etc.
+meeting.openSignalingChannel = function(callback) {
+    return io.connect().on('message', callback);
+};
+
+meeting.check('puck');
+
+document.getElementById('setup-meeting').onclick = function() {
+    meeting.setup('puck');
+};
+
+// if someone leaves; just remove video
+meeting.onuserleft = function(userid) {
+    var video = document.getElementById(userid);
+    if(video) video.parentNode.removeChild(video);
+};
+
+// to leave a meeting room
+// meeting.leave();
+
+})
+</script>
+
 
 </body>
 

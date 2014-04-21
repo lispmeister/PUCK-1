@@ -185,6 +185,46 @@ function post(url, parameters) {
     form.submit();
 }
 
+//
+// pause/resume webrtc audio
+//
+function state_audio(state) {
+
+    console.log('audio will be... ' + state)
+    if (state == 'mute') {
+        my_webrtc.pauseVideo
+    }
+    else if (state == 'unmute') {
+        my_webrtc.pauseVideo
+    }
+    else {
+        console.log('... well... you... blew it; unknown state: ' + state)
+    }
+}
+
+//
+// pause/resume video
+//
+function state_video(state) {
+
+    console.log('video will be... ' + state)
+
+    if (state == 'pause') {
+        console.log('... pausing vid...')
+        my_webrtc.pauseVideo
+    }
+    else if (state == 'resume') {
+        console.log('... carry on...')
+        my_webrtc.pauseVideo
+    }
+    else {
+        console.log('... well... you... blew it; unknown state: ' + state)
+    }
+
+console.log('... well... video?')
+
+}
+
 
 //
 // when vpn status/state changes... set lights flashing, whatever
@@ -568,7 +608,13 @@ function socket_looping(){
 
         // everyone loves cat facts!
         cat_chat(local_socket, 'local')
+
         candid_camera('/')
+
+        // pause for thought... dont want the puck spying on you ;)
+        // will turn it back on when needed (e.g. another puck joins)
+        //state_video('pause')
+        //state_audio('mute')
 
     })
 
@@ -613,7 +659,7 @@ function socket_looping(){
     })
    
     local_socket.on('error', function(err){
-        console.log('remote errz ' + JSON.stringify(err))
+        console.log('local errz ' + JSON.stringify(err))
     })
 
     local_socket.on('reconnect', function(d) { 
@@ -696,6 +742,8 @@ function status_or_die() {
     // client... outgoing ring
     if (puck_status.openvpn_client.vpn_status == "up") {
         state_vpn('outgoing', browser_ip)
+        // cat facts!
+        candid_camera('/')
     }
 
     // if nothing up now, kill any signs of a call, just to be sure
@@ -972,10 +1020,12 @@ function put_a_sock_in_it(url) {
 //
 function candid_camera(url) {
 
+
+    return
     console.log('turning on cam cam : ' + url)
 
     // smile, you're on candid....
-    var webrtc = new SimpleWebRTC({
+    my_webrtc = new SimpleWebRTC({
         localVideoEl: 'localVideo',     // the id/element dom element that will hold "our" puck video
         remoteVideosEl: 'remoteVideos', // the id/element dom element that will hold remote puck videos
         autoRequestMedia: true,         // immediately ask for camera access
@@ -983,8 +1033,8 @@ function candid_camera(url) {
     });
 
     // we have to wait until it's ready
-    webrtc.on('readyToCall', function () {
-        webrtc.joinRoom('roomy');       // you can name it anything
+    my_webrtc.on('readyToCall', function () {
+        my_webrtc.joinRoom('roomy');       // you can name it anything
     })
 }
 
