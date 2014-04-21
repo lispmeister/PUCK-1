@@ -606,7 +606,6 @@ function socket_looping(){
             }
             catch (e) { console.log('vpn aint ready') }
 
-
         }
         else {
             console.log('same ol, same ol')
@@ -775,7 +774,7 @@ function load_vault() {
 
 function panic_button() {
 
-console.log('panic... not implemented yet... start really panicing!')
+    console.log('panic... not implemented yet... start really panicing!')
 
 }
 
@@ -1101,7 +1100,12 @@ function owalk( name, obj, str, depth ) {
 //
 // basic puck stuff... 3 things, basics, vpn server, and vpn client stuff
 //
-function print_puck(puckid, puckinfo, elements) {
+function print_puck(ipuck, puckinfo, elements) {
+
+    console.log('printing puck')
+    console.log(ipuck)
+    console.log(puckinfo)
+    console.log(elements)
 
     var vpn = {
         port       : puckinfo.vpn.port,
@@ -1122,7 +1126,7 @@ function print_puck(puckid, puckinfo, elements) {
     }
 
     var puck = {
-        puckid     : puckid,
+        puckid     : ipuck,
         name       : name,
         owner      : puckinfo.owner.name,
         email      : puckinfo.owner.email,
@@ -1166,4 +1170,3 @@ function print_puck(puckid, puckinfo, elements) {
     $(elements[2]).html(v_c_html);
 
 }
-

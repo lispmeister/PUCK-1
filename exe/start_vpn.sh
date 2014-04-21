@@ -6,6 +6,8 @@
 #  Usage: $0 target
 #
 
+. /etc/puck/config.sh
+
 results="$PUCK_TMP/_puck_create_results.$$"
 
 app_dir=`pwd`
