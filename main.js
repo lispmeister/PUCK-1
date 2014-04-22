@@ -148,7 +148,7 @@ watch_logs(client_vpn_log, "OpenVPN Client")
 //
 // function someday_get_https(url) {
 
-var someday_get_https = function(url) {
+function someday_get_https (url) {
 
     console.log('someday... I will get get_https ' + url)
 
@@ -156,21 +156,29 @@ var someday_get_https = function(url) {
 
     var deferred = Q.defer();
 
-    https.get(url, function (res) {
-        if (res.statusCode !== 200) {
-            deferred.reject("HTTPs erz " + res.statusCode + " for " + url);
-            return;
-        }
-        res.on("error", deferred.reject);
-        res.on("data", function (chunk) {
-            data += chunk;
-        });
-        res.on("end", function () { 
-            console.log("... data is in...?")
-            // console.log(data)
-            deferred.resolve(data); 
-        });
-    })
+        https.get(url, function (res) {
+
+            console.log('fucking ' + res)
+
+            if (res.statusCode !== 200) {
+                deferred.reject("HTTPs erz " + res.statusCode + " for " + url);
+            }
+            res.on("data", function (chunk) {
+                data += chunk;
+            })
+
+            res.on("end", function () { 
+                console.log("... data is in...?")
+                // console.log(data)
+                deferred.resolve(data); 
+            })
+        })
+        .on("error", function(e) {
+            console.log('tomorrow never errz!')
+            // deferred.reject
+            // deferred.promise.fail(console.log);
+            deferred.reject('erzoid: ' + e)
+        })
 
     return deferred.promise;
 
@@ -196,9 +204,8 @@ var uber_puck = function uber_puck() {
 
     console.log("it's time...!")
 
-    someday_get_https('https://localhost:' + puck_port + '/puck/' + puck_id).then(onFulfilled, onRejected)
-
-    function onFulfilled(res) {
+    Q.nfcall(someday_get_https, 'https://localhost:' + puck_port + '/puck/' + puck_id).then(function(res) {
+        // success
         console.log('finally got server response...')
 
         if (res.indexOf("was not found") != -1) {
@@ -211,13 +218,13 @@ var uber_puck = function uber_puck() {
             bwana_puck = JSON.parse(res)
             createEvent(get_client_ip(req), {event_type: "create", puck_id: bwana_puck.PUCK_ID})
        }
-    }
 
-    function onRejected(err) {
+    }, function(err) {
+        // error
         console.log('Error: ', err);
         console.log("well... try again?")
         trytryagain(options, callback);
-    }
+    })
 }
 // set the mousetrap
 emitter.on('loaded', uber_puck);
@@ -663,7 +670,7 @@ function puckStatus(req, res, next) {
     // console.log('puck status check... ' + JSON.stringify(puck_status))
 
     if (typeof ios == "object") { 
-        console.log('boosting status on iOS ' + JSON.stringify(puck_status))
+        // console.log('boosting status on iOS ' + JSON.stringify(puck_status))
         cat_power('puck_status', puck_status)
     }
     else { console.log('iOS not ready (' + typeof ios) + ')' }
@@ -1532,6 +1539,38 @@ function proxy_love(cat_fact_server) {
 
     var credentials = {key: key, cert: cert, ca: ca};
 
+    // god I hate idiotic web folks who don't understand what security 
+    // means and try to inflict it on the world.  No wonder everyone hates
+    // security folks
+
+    // moar hoops, fun fun
+    var express_proxy = express()
+
+    var whitelist = ['https://localhost:7777', 'https://192.168.0.250:7777', 'https://192.168.0.250:8080', remote_url]
+
+    var corsOptions = {
+        origin: function(origin, callback){
+            var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+            callback(null, originIsWhitelisted);
+            },
+        credentials: true
+        }
+
+    // express_proxy.use(cors({ origin: remote_host }));
+    // express_proxy.use(cors({ origin: "192.168.0.250"}));
+    express_proxy.use(cors(corsOptions))
+
+    server.use(cors());
+    server.use(response());
+    server.use(express.logger());
+    server.use(express.compress());
+    server.use(express.methodOverride());
+    server.use(express.json());
+    server.use(express.urlencoded());
+    server.use(express.multipart());
+    server.use(express.methodOverride());
+
+
     var proxy = new httpProxy.createProxyServer({
         ssl: credentials,
         target: {
@@ -1541,7 +1580,7 @@ function proxy_love(cat_fact_server) {
         secure: false
     })
 
-    proxy_server = https.createServer(credentials, function(req, res) {
+    proxy_server = https.createServer(credentials, express_proxy, function(req, res) {
         console.log('sending request along...')
         proxy.web(req, res, { target: remote_url }, function (err) {
             // if (err) throw err;
@@ -1687,14 +1726,71 @@ function formDelete(req, res, next) {
 }
 
 
+function sping_get(url, all_ips, puckid, n) {
+
+    var request = https.get(url, function(resp) {
+        console.log('trying.... ' + url)
+        resp.setEncoding('utf8');
+        resp.on("data", function(d) {
+
+            console.log('data!')
+            console.log(d)
+
+            d = JSON.parse(d)
+
+            console.log(d.pid)
+
+            if (d.pid != puckid) {
+                    console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
+                    console.log(d.pid + ' != ' + puckid)
+                    response = {status: "mismatch", "name": 'mismatched PID'}
+                    // xxx - need to squawk, but return isnt the way... sock.io?
+                    // res.send(420, response) // enhance your calm!
+            }
+            else {
+                    ping_done = true
+                    console.log('sping worked! ' + all_ips[n])
+                    console.log(d)
+                    puck2ip[puckid] = all_ips[n]
+                    ip2puck[all_ips[n]] = puckid
+                    return(d)
+            }
+
+        })
+
+        if (n == all_ips.length && !ping_done) {
+            console.log('no response, ping failure!')
+            response = {status: "ping failure", "name": 'unknown problem'}
+            res.send(408, response)
+        }
+
+    })
+    .on('error', function(e) {
+        console.log("Got error: " + e.message);
+        if (responses == all_ips.length) {
+            console.log('no response, ping failure!')
+            response = {status: "ping failure", "name": 'unknown problem'}
+            res.send(408, response)
+        }
+    })
+
+
+
+}
+
 //
 // https ping a remote puck... it can have multiple
 // IP addrs, so ping them all at once and take the
 // first answer that matches their IP/PID
 //
+
+var ping_done = false
+
 function httpsPing(puckid, ipaddr, res, next) {
 
     console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
+
+    ping_done = false
 
     var all_ips   = ipaddr.split(','),
         done      = false,
@@ -1707,6 +1803,8 @@ function httpsPing(puckid, ipaddr, res, next) {
 
     for (var i = 0; i < all_ips.length; i++) {
         
+        responses++
+
         var ip = all_ips[i]
 
         if (ip == "127.0.0.1") { console.log('skipping ' + ip); continue; }
@@ -1715,57 +1813,38 @@ function httpsPing(puckid, ipaddr, res, next) {
 
         var url = 'https://' + ip + ':' + puck_port + '/ping'
 
-        var request = https.get(url, function(resp) {
-            console.log('trying.... ' + url)
-            resp.setEncoding('utf8');
-            resp.on("data", function(d) {
+//      var res = sping_get(url, all_ips, puckid, i)
 
-                console.log('data!')
-                console.log(d)
+        Q.nfcall(someday_get_https, url).then(function(data) {
+            console.log('+++ someday has come!')
+            console.log(data)
+            data = JSON.parse(data)
 
-                d = JSON.parse(d)
+            if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
+                ping_done = true
+                console.log('sucksess...')
+                res.send(200, data)
+            }
 
-                console.log(d.pid)
+            if ((responses+1) == all_ips.length && !ping_done) {
+                console.log('no response, ping failure!')
+                response = {status: "ping failure", "name": 'unknown problem'}
+                res.send(408, response)
+            }
+        },
+        function(err) {
+            console.log('+++ someday has come... in a bad way')
+            console.log(err)
+            err = JSON.parse(err)
 
-                responses++
-
-                if (d.pid != puckid) {
-                        console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
-                        console.log(d.pid + ' != ' + puckid)
-                        response = {status: "mismatch", "name": 'mismatched PID'}
-                        // xxx - need to squawk, but return isnt the way... sock.io?
-                        // res.send(420, response) // enhance your calm!
-                }
-                else {
-                        done = true
-                        console.log(i)
-                        console.log(all_ips)
-                        console.log('worked! ' + all_ips[i])
-                        console.log(d)
-                        puck2ip[puckid] = all_ips[i]
-                        ip2puck[all_ips[i]] = puckid
-                        res.send(200, d)
-                }
-
-                if (responses == all_ips.length) {
-                    console.log('no response, ping failure!')
-                    response = {status: "ping failure", "name": 'unknown problem'}
-                    res.send(408, response)
-                }
-            })
-    })
-    .on('error', function(e) {
-        responses++
-        console.log("Got error: " + e.message);
-        if (responses == all_ips.length) {
-            console.log('no response, ping failure!')
-            response = {status: "ping failure", "name": 'unknown problem'}
-            res.send(408, response)
-        }
-    })
+            if ((responses+1) == all_ips.length && !ping_done) {
+                console.log('no response, ping failure!')
+                response = {status: "ping failure", "name": 'unknown problem'}
+                res.send(408, response)
+            }
+        })
 
     }
-    
 
 }
         // if(err && !done) {
@@ -1783,7 +1862,7 @@ function formCreate(req, res, next) {
     console.log('ping get_https ' + url)
 
     // is it a puck?
-    someday_get_https(url).then(function(data) {
+    Q.nfcall(someday_get_https, url).then(function(data) {
 
         console.log('... trying... hard')
 
@@ -1814,7 +1893,7 @@ function formCreate(req, res, next) {
             });
     
             // if ping is successful, rustle up and write appropriate data
-            someday_get_https(url).then(function(data) {
+            Q.nfcall(someday_get_https, url).then(function(data) {
     
                 data = JSON.parse(data)
                 console.log('remote puck info in...!')
@@ -1881,13 +1960,13 @@ function formCreate(req, res, next) {
                     remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
                     // res.send(200, {"status": "zoomer"});
                 }
-            })
-            .fail(function(err) {
+            },
+            function(err) {
                 console.log('create Error... no puck data back? ', err);
             })
         }
-    })
-    .fail(function(err) {
+    },
+    function(err) {
         console.log('create Error... no ping? ', err);
     })
 
@@ -2141,17 +2220,16 @@ function safeCb(cb) {
 // for socket channel stuff - both video and log watching and chat and all that stuff
 //
 
-io.set('transports',['xhr-polling']);
+io.set('transports',['xhr-polling'])
+io.set("polling duration", 10)
+io.set('log level', 1);                 // pump down the volume
 
 var cat_fact_server = "",
     puck_users      = {},
     cat_sock        = {},
     all_cats        = []
 
-
 var ios = io.sockets.on('connection', function (client) {
-    // pump down the volume
-    // io.set('log level', 1); 
 
     cat_sock = client
 

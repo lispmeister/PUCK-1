@@ -301,7 +301,10 @@ $(document).ready(function () {
     
     // setInterval(function(){socket_looping()},PREGNANT_PAUSE)
     socket_looping()
-    setTimeout(function(){socket_looping()},PREGNANT_PAUSE)
+    setTimeout(socket_looping,PREGNANT_PAUSE)
+
+    // sow the seed o' doubt
+    setInterval(get_status,PREGNANT_PAUSE)
 
     // get my puck data
     // who_am_i()

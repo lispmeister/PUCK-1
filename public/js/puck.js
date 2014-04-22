@@ -630,9 +630,6 @@ function socket_looping(){
         'force new connection': true
         })
 
-    // sow the seed o' doubt
-    get_status()
-
     local_socket.socket.on('connect', function(sock){
         // console.log('[+++] - general connext note')
 
@@ -658,7 +655,6 @@ function socket_looping(){
                 // alert("ps loaded and executed")
                 not_loaded = false
             })
-
         }
 
         // puck_status = JSON.parse(data)
@@ -685,7 +681,8 @@ function socket_looping(){
                     console.log('trying to connect to... ' + url)
                     // try remote connecting, and keep it up until javascript wears itself out
                     put_a_sock_in_it(url)
-                    setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
+                    setInterval(put_a_sock_in_it, PUCK_SOCK_RETRY, url)
+                    // try_try_again = setInterval('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
                 }
             }
             catch (e) { console.log('vpn aint ready') }
@@ -908,6 +905,16 @@ function fire_puck_status(jstatus) {
 
     console.log('firing status off')
     console.log(typeof jstatus)
+
+// xxxxxxxxx
+// xxxxxxxxx
+// xxxxxxxxx
+// xxxxxxxxx
+// xxxxxxxxx
+// xxxxxxxxx
+// xxxxxxxxx
+    return
+
     jstatus = JSON.stringify(jstatus)
 
     var status_xhr = $.ajax({
@@ -975,8 +982,22 @@ function drag_and_puck() {
 function put_a_sock_in_it(url) {
 
     console.log('keep trying...')
-    try { remote_socket.disconnect() }
-    catch (e) { console.log('nice catch of D/C!'); console.log(e) }
+
+    try { 
+        if (remote_socket.socket.connected) {
+            console.log('looks good')
+            return
+        }
+    }
+    catch (e) {
+        console.log('nice catch of bad sock')
+        console.log(e)
+    }
+
+    //if (puck_current.outgoing)
+    //    return
+    // try { remote_socket.disconnect() }
+    // catch (e) { console.log('nice catch of D/C!'); console.log(e) }
 
     remote_socket = io.connect(url, {
         'connect timeout': 5000, // 5 seconds should be enough
@@ -992,9 +1013,7 @@ function put_a_sock_in_it(url) {
 
     remote_socket.socket.on('connect', function(){
 
-        console.log('[+] remote - connected to ' + url)
-
-        console.log('my puck ' + JSON.stringify(my_puck))
+        console.log('[+++] remote - connected to ' + url)
 
         // if (typeof data != undefined && data.server != "undefined") {
         //     $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
@@ -1039,7 +1058,6 @@ function put_a_sock_in_it(url) {
         console.log('... something... anything.... ')
         console.log(data)
     })
-
 
     remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
     remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
@@ -1436,13 +1454,18 @@ var peer = {}
 
 function candide(url) {
 
-    if (url == "/") {
-        console.log('local connect')
-        peer = new PeerConnection(local_socket);
+    try {
+        if (url == "/") {
+            console.log('local connect')
+            peer = new PeerConnection(local_socket);
+        }
+        else {
+            console.log('remote connect')
+            peer = new PeerConnection(remote_socket);
+        }
     }
-    else {
-        console.log('remote connect')
-        peer = new PeerConnection(remote_socket);
+    catch (e) {
+        console.log('hmm... candide started a bit early...' + e)
     }
 
     peer.onUserFound = function(userid) {
