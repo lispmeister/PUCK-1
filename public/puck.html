@@ -268,6 +268,12 @@
 
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
+                    <div id="videos-container">... videos....</div>
+                    <div><strong id="unique-token">#123456789</strong></<div>
+                    <table id="rooms-list" style="width: 100%;"></table>
+                    <div id="videos-container"></div>
+
+
                     <div id="puck_vid_notes">... notes....</div>
                     <div id="puck_users">... users....</div>
 
@@ -277,29 +283,14 @@
                         <span>If connected to another PUCK and you don't see video... something is wrong!</span>
 
 
-                        <div style="width:300px" id="remoteVideos"></div>
+                        <div style="width:300px" id="remote_videos"></div>
 
-                    </span>
                     <input type="text" id="your-name" placeholder="your-name">
-                    <button id="start-broadcasting" class="setup">Start Transmitting Yourself!</button>
-                </section>
+                    <button id="start-broadcasting" class="setup">Engage Transmissions</button>
                 
-                <!-- list of all available conferencing rooms -->
-                <table id="rooms-list" style="width: 100%;"></table>
-                
-                <!-- local/remote videos container -->
-                <div id="videos-container"></div>
-            </section>
-
-
-
-
 <!--
                         <div style="width:300px" id="remoteVideos"></div>
-
                         <div><a style="text-decoration: none" href="#"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></button></a></div>
-
-
 -->
                     </div>
 
@@ -328,7 +319,7 @@
 
                     <div class="row" style="clear:both">
                         <div class="col-md-4">
-                            <div id="localVideo"></div>
+                            <div id="local_video"></div>
                         </div>
                     </div>
 
@@ -545,31 +536,30 @@
 
     </div>
 
-
-<!-- <% include foot %> -->
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
+
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
-<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
-<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
-<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
 <script type="text/javascript" src="/js/underscore-min.js"></script>
 
 <script type="text/javascript" src='/js/spin.js'></script>
-<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
-<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
-<script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
 
 <!-- put a sock in it -->
 <script type="text/javascript" src="/socket.io/socket.io.js"></script>
 
+<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
+<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
+<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
+<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
+<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
+<script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
 <script type="text/javascript" src="/js/jquery.filer.js"></script>
 <script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
 
 <!-- the amazing rtc stuff -->
-<script type="text/javascript" src="/js/PeerConnection.js">
+<!-- <script type="text/javascript" src="/js/PeerConnection.js"> -->
 
 <script type="text/javascript" src="/js/puck.js"></script>
 <script type="text/javascript" src="/js/main_puck.js"></script>

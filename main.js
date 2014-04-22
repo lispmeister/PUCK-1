@@ -2145,7 +2145,9 @@ io.set('transports',['xhr-polling']);
 
 var cat_fact_server = "",
     puck_users      = {},
-    cat_sock        = {}
+    cat_sock        = {},
+    all_cats        = []
+
 
 var ios = io.sockets.on('connection', function (client) {
     // pump down the volume
@@ -2302,18 +2304,25 @@ var ios = io.sockets.on('connection', function (client) {
     });
 
     // when a new puck shows up
+
     client.on('new_puck', function(puck_user){
 
         if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
             var stamp = cat_stamp()
             client.puck_user = puck_user;
             puck_users[puck_user] = puck_user;
+
             // echo to client they've connected
-            client.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
+
+            if (typeof all_cats[puck_user] == "undefined") {
+                client.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
+                // send the latest list
+                io.sockets.emit('new_puck', stamp, puck_users);
+                all_cats[puck_user] = puck_user
+            }
+
             // tell the world
-            client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
-            // send the latest list
-            io.sockets.emit('new_puck', stamp, puck_users);
+            //client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
         }
 
     });

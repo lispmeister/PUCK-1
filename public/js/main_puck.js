@@ -28,10 +28,8 @@ var puck_meeting = {}
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
 ring = new Audio("media/ringring.mp3") // load it up
 
-// $(document).ready(function () {
+$(document).ready(function () {
 
-if ('foo' == 'bar') {
-    
     var image     = ""
     // var puck_id   = ""
 
@@ -301,11 +299,10 @@ if ('foo' == 'bar') {
     // message data
     list_events()
     
-    setTimeout(function(){socket_looping()},PREGNANT_PAUSE)
+    setInterval(function(){socket_looping()},PREGNANT_PAUSE)
 
     // get my puck data
     // who_am_i()
 
-}
-//})
+})
 

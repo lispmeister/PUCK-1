@@ -4,6 +4,8 @@
 // draw pucks, delete pucks, start vpns... various things
 //
 
+var not_loaded = true
+
 // track all puck IDs...
 all_puck_ids   = []
 
@@ -27,7 +29,9 @@ var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
-PUCK_SOCK_RETRY = 5000
+var PUCK_SOCK_RETRY   = 5000
+
+var LOCAL_VIDEO_WIDTH = 480
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
@@ -75,7 +79,7 @@ function list_events() {
     var jqXHR_list = $.ajax({
         url: url,
         dataType: 'json'
-    }) 
+    })
 
     jqXHR_list.done(function (data, textStatus, jqXHR) {
         console.log('jxq list events wootz')
@@ -194,12 +198,14 @@ function state_cam(state, location) {
     else                     var loc = ':7777'
 
     if (state == 'up') {
-        candid_camera(loc)
+        // candid_camera(loc)
+        candide(loc)
         state_audio('unmute')
         state_video('resume')
     }
     else if (state == 'down') {
-        candid_camera(loc)
+        // candid_camera(loc)
+        candide(loc)
         state_audio('mute')
         state_video('pause')
     }
@@ -382,7 +388,7 @@ function event_hang_up() {
         // probably shouldn't, but...
         // async:false,
         dataType: 'json',
-    }) 
+    })
 
     jqXHR_stopVPN.done(function (data, textStatus, jqXHR) {
         console.log('jxq hangup wootz')
@@ -419,7 +425,7 @@ function get_ip(element) {
     var jqXHR_getIP = $.ajax({
         url: url,
         dataType: 'json',
-    }) 
+    })
 
     jqXHR_getIP.done(function (data, textStatus, jqXHR) {
         console.log('jxq getIP wootz')
@@ -481,7 +487,7 @@ function puck_create(element, ip_addr) {
     post_data.ip_addr     = ip_addr
     post_data.puck_action = "CREATE"
     post_data = JSON.stringify(post_data)
-    
+
     $.ajax({
         type: "POST",
         url: "/form",
@@ -527,14 +533,14 @@ function puck_ping(all_ips, puckid, url) {
     // element_id='puck_' + id + '_ip_addr'
     var element_id='puck_vpn_' + puckid
 
-    $.ajax({url: ping_url, cache: false, 
+    $.ajax({url: ping_url, cache: false,
         success: function(data) {
-            console.log('success with ' + element_id) 
+            console.log('success with ' + element_id)
             console.log(data)
 
             // make the button clickable and green
             if (data.status == "OK") {
-                console.log('success with ' + element_id) 
+                console.log('success with ' + element_id)
                 // console.log('ok...')
                 $('#'+element_id).addClass('btn-success').removeClass('disabled')
             }
@@ -555,7 +561,7 @@ function puck_ping(all_ips, puckid, url) {
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
         }
         })
-   
+
 // console.log('post-pingy ' + puckid + '... putting into ' + element_id)
 
 }
@@ -628,10 +634,17 @@ function socket_looping(){
     get_status()
 
     local_socket.socket.on('connect', function(sock){
-        console.log('[+++] - general connext note')
+        // console.log('[+++] - general connext note')
 
         // everyone loves cat facts!
         cat_chat(local_socket, 'local')
+
+//      setTimeout(function(){
+//         console.log('... cam... er... a?')
+//         candid_camera('/')
+//          candide('/')
+//      }, 10000)
+
 
     })
 
@@ -640,9 +653,17 @@ function socket_looping(){
         console.log(JSON.stringify(data))
         console.log(typeof data)
 
+        if (not_loaded) {
+            $.getScript("/js/PeerConnection.js", function(){
+                // alert("ps loaded and executed")
+                not_loaded = false
+            })
+
+        }
+
         // puck_status = JSON.parse(data)
         puck_status = data
-            
+
         // if something is new, do something!
         if (! _.isEqual(old_puck_status, puck_status)) {
             console.log('something new in the state of denmark!')
@@ -656,7 +677,7 @@ function socket_looping(){
             status_or_die()
 
             // try to connect to the remote puck socket.io
-            try { 
+            try {
                 console.log('trying...')
                 console.log(data.openvpn_client)
                 if (data.openvpn_client.vpn_status == "up") {
@@ -674,13 +695,13 @@ function socket_looping(){
             console.log('same ol, same ol')
         }
     })
-   
+
     local_socket.on('error', function(err){
         console.log('local errz ' + JSON.stringify(err))
     })
 
-    local_socket.on('reconnect', function(d) { 
-        console.log ('reconnect') 
+    local_socket.on('reconnect', function(d) {
+        console.log ('reconnect')
         fire_puck_status(puck_status)
     })
 
@@ -695,19 +716,18 @@ function socket_looping(){
 
     // OVPN logs for client/server
     local_socket.on(ovpn_clogs, function (data) {
-        console.log('client: ' + data.line)
+        // console.log('client: ' + data.line)
         $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
         $("#ovpn_client_infinity").mCustomScrollbar("update")
         $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
-    
+
     local_socket.on(ovpn_slogs, function (data) {
-        console.log('server: ' + data.line)
+        // console.log('server: ' + data.line)
         $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
         $("#ovpn_server_infinity").mCustomScrollbar("update")
         $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
     })
-
 
 }
 
@@ -733,7 +753,7 @@ function status_or_die() {
         puck_status.browser_events[browser_ip] = { "notify_add":false, "notify_ring":false, "notify_file":false}
     }
 
-    // if someone has added you, create a modest sized bit of text that tells you 
+    // if someone has added you, create a modest sized bit of text that tells you
     // and hopefully won't fuck up anything you're doing
 
     console.log('a friend...?')
@@ -791,7 +811,7 @@ function status_or_die() {
 
 //
 // when disconnected, kill all the UI signs we put up
-// 
+//
 function remove_signs_of_call() {
 
     console.log('killing call signatures...')
@@ -803,7 +823,7 @@ function remove_signs_of_call() {
 }
 
 //
-// drag filenames from what's stored 
+// drag filenames from what's stored
 //
 
 function load_vault() {
@@ -813,7 +833,7 @@ function load_vault() {
     var jqXHR_files = $.ajax({
         url: '/down',
         dataType: 'json'
-    }) 
+    })
 
     var table_rowz = []
 
@@ -850,7 +870,7 @@ function restart_server() {
     var jqXHR_restart_server = $.ajax({
         url: url,
         dataType: 'json',
-    }) 
+    })
 
     jqXHR_restart_server.done(function (data, textStatus, jqXHR) {
         console.log('jxq restart server wootz... of course...if the server were really restarting...')
@@ -868,7 +888,7 @@ function stop_server() {
     var jqXHR_stopVPN = $.ajax({
         url: url,
         dataType: 'json',
-    }) 
+    })
 
     jqXHR_stopVPN.done(function (data, textStatus, jqXHR) {
         console.log('jxq stop server wootz... of course...if the server were really dead...')
@@ -975,7 +995,7 @@ function put_a_sock_in_it(url) {
         console.log('[+] remote - connected to ' + url)
 
         console.log('my puck ' + JSON.stringify(my_puck))
-        
+
         // if (typeof data != undefined && data.server != "undefined") {
         //     $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
         // }
@@ -984,7 +1004,7 @@ function put_a_sock_in_it(url) {
 
             console.log('[@@@] - cat facts!')
             console.log(data)
-           
+
             if (typeof data != undefined && data.fact != "undefined") {
                 $('#ip_diddy').append('<br />' + data.fact)
                 console.log(data.fact)
@@ -994,7 +1014,7 @@ function put_a_sock_in_it(url) {
             state_cam(true, 'remote')
 
         })
-           
+
         remote_socket.emit('puck', 'foo', function (data) {
             console.log('[@] + hey pucks... ')
             console.log(data)
@@ -1005,11 +1025,11 @@ function put_a_sock_in_it(url) {
             status_or_die()
             console.log(data)
         })
-           
+
         remote_socket.on('error', function(err){
             console.log('remote errz ' + JSON.stringify(err))
         })
-           
+
         //cat_chat(remote_socket, my_puck.PUCK_ID)
         cat_chat(remote_socket, 'remote')
 
@@ -1019,8 +1039,8 @@ function put_a_sock_in_it(url) {
         console.log('... something... anything.... ')
         console.log(data)
     })
-           
-           
+
+
     remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
     remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
     remote_socket.on('connecting',       function(d) { console.log ('connecting') })
@@ -1033,9 +1053,53 @@ function put_a_sock_in_it(url) {
 }
 
 //
-// magic time, courtesy of simplewebrtc
+// magic time, courtesy of rtc.. many of the RTC functions below
+// taken from the marvelous https://github.com/muaz-khan demos;
 //
-rtc_peer = {}
+
+rtc_peer       = {}
+local_connect  = false
+remote_connect = false
+
+function getUserMedia(callback) {
+
+    var hints = {
+        audio: true,
+        video:{
+            optional: [],
+            mandatory: {
+                minWidth: 1280,
+                minHeight: 720,
+                maxWidth: 1920,
+                maxHeight: 1080,
+                minAspectRatio: 1.77
+                // minWidth: 640,
+                // minHeight: 380,
+                // maxWidth: 1024,
+                // maxHeight: 1024,
+                // minAspectRatio: 1.77
+            }
+        }
+    }
+
+    navigator.getUserMedia(hints,function(stream) {
+
+        var video      = document.createElement('video')
+        video.src      = URL.createObjectURL(stream);
+        video.controls = true
+        video.muted    = true
+
+        rtc_peer.onStreamAdded({
+            mediaElement: video,
+            userid: 'self',
+            stream: stream
+        })
+
+        callback(stream)
+
+    })
+
+}
 
 function candid_camera(url) {
 
@@ -1046,44 +1110,119 @@ function candid_camera(url) {
 
         console.log('... local')
 
-        rtc_peer = new PeerConnection(url)
+        // rtc_peer = new PeerConnection(url)
+        rtc_peer = new PeerConnection(local_socket)
 
-        // on connect....
+        // on connect... actually paint up the vid
         rtc_peer.onStreamAdded = function(e) {
             console.log('local on!')
-            $('#local_video').append(e.mediaElement)
-            $('#puck_vid_notes').append('local ')
+            if (!local_connect) {
+                var video = e.mediaElement;
+                video.setAttribute('width', LOCAL_VIDEO_WIDTH)
+                $('#local_video').append(video)
+
+                video.play();
+                rotateVideo(video);
+                scaleVideos();
+
+                $('#puck_vid_notes').append('local ')
+
+                local_connect = true
+            }
         }
+
+        // tear down
+        rtc_peer.onStreamEnded = function(e) {
+            var video = e.mediaElement;
+            if (video) {
+                video.style.opacity = 0;
+                rotateVideo(video)
+                setTimeout(function() {
+                    $('#local_video').html()
+                    scaleVideos()
+                }, 1000)
+            }
+        }
+
+        // hey, who are you?
+        rtc_peer.onUserFound = function(userid) {
+            console.log('++++ onUser: ' + userid)
+        }
+
+        // next two straight from demos RE: above
+        function rotateVideo(video) {
+            video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(0deg)';
+            setTimeout(function() {
+                video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(360deg)';
+            }, 1000);
+        }
+
+        function scaleVideos() {
+            var videos = document.querySelectorAll('video'),
+                length = videos.length, video;
+
+            var minus = 130;
+            var windowHeight = 700;
+            var windowWidth = 600;
+            var windowAspectRatio = windowWidth / windowHeight;
+            var videoAspectRatio = 4 / 3;
+            var blockAspectRatio;
+            var tempVideoWidth = 0;
+            var maxVideoWidth = 0;
+
+            for (var i = length; i > 0; i--) {
+                blockAspectRatio = i * videoAspectRatio / Math.ceil(length / i);
+                if (blockAspectRatio <= windowAspectRatio) {
+                    tempVideoWidth = videoAspectRatio * windowHeight / Math.ceil(length / i);
+                } else {
+                    tempVideoWidth = windowWidth / i;
+                }
+                if (tempVideoWidth > maxVideoWidth)
+                    maxVideoWidth = tempVideoWidth;
+            }
+            for (var i = 0; i < length; i++) {
+                video = videos[i];
+                if (video)
+                    video.width = maxVideoWidth - minus;
+            }
+        }
+
+        // go with grace
+        window.onresize = scaleVideos;
+
+        // if someone leaves, nuke vid
+        rtc_peer.onuserleft = function (userid) {
+            $('#puck_vid_notes').append('i diez ' + userid)
+            local_connect = false
+        }
+
+        // connect if not already connected
+        if (! local_connect) getUserMedia(function(stream) {
+            rtc_peer.addStream(stream);
+            rtc_peer.startBroadcasting();
+            local_connect = true
+        })
+
 
     }
     else {
 
         console.log('... remotely')
-        var rtc_peer = new PeerConnection(url)
+        var rtc_peer = new PeerConnection(remote_socket)
 
         rtc_peer.onStreamAdded = function(e) {
             console.log('remote on!')
             $('#local_video').html()
             $('#remote_video').append(e.mediaElement)
             $('#puck_vid_notes').append('remote ')
+            remote_connect = true
+        }
+        // if someone leaves, nuke vid
+        rtc_peer.onuserleft = function (userid) {
+            $('#puck_vid_notes').append('userleft ' + userid)
         }
 
     }
-
-    rtc_peer.onaddstream = function (e) {
-
-        $('#puck_vid_notes').append('addstream ')
-        $('#remote_videos').append(e.video)
-        $('#puck_users').append(room.roomid)
-
-    }
-
-    // if someone leaves, nuke vid
-    rtc_peer.onuserleft = function (userid) {
-        $('#puck_vid_notes').append('userleft ' + userid)
-    }
-
-//  rtc_peer.meet('puck')
 
 }
 
@@ -1093,12 +1232,16 @@ function candid_camera(url) {
 //
 // Cat chat guts on display
 //
+var all_cats = []
 function cat_chat(sock, where) {
 
     if (typeof my_puck.ip_addr == "undefined") user = "local"
     else user = my_puck.ip_addr
 
-    console.log('catting as : ' + user)
+    if (typeof all_cats[user] == "undefined") {
+        console.log('catting as : ' + user)
+        all_cats[user] = user
+    }
 
     // i is here
     sock.emit('new_puck', user);
@@ -1121,11 +1264,11 @@ function cat_chat(sock, where) {
             console.log('sending...' + message)
 
             // pack it off to the server... try remote first, then....
-            try       { 
-                remote_socket.emit('chat_send', message); 
+            try       {
+                remote_socket.emit('chat_send', message);
                 console.log('[remote] + ' + message)
             }
-            catch (e) { 
+            catch (e) {
                 console.log('[local] + ' + message)
                 sock.emit('chat_send', message);
             }
@@ -1151,7 +1294,7 @@ function cat_chat(sock, where) {
 //
 // print out an indented list from an object
 //
-function owalk( name, obj, str, depth ) { 
+function owalk( name, obj, str, depth ) {
     var name  = name  || 0
     var depth = depth || 0
     var str   = str   || ''
@@ -1177,7 +1320,7 @@ function owalk( name, obj, str, depth ) {
             padding = Array(depth * 4 ).join(' ')
             // console.log( Array(depth * 4 ).join(' ') + i + ' : ' + obj[i] )
 
-            if (index) 
+            if (index)
                 var s = i + ' : ' + obj[i]
             else
                 var s = obj[i]
@@ -1235,7 +1378,7 @@ function print_puck(ipuck, puckinfo, elements) {
         all_ips    : puckinfo.all_ips.join(', ')
        }
 
-    var vpn_template = '<div><h4>VPN</h4></div>' + 
+    var vpn_template = '<div><h4>VPN</h4></div>' +
                    '<strong>port</strong>: {{port}} <br />' +
                    '<strong>protocol</strong>: {{protocol}} <br />' +
                    '<strong>ca</strong>: {{ca}} <br />' +
@@ -1244,7 +1387,7 @@ function print_puck(ipuck, puckinfo, elements) {
                    '<strong>tlsauth</strong>: {{tls_auth}} <br />' +
                    '<strong>DH</strong>: {{dh}} <br />'
 
-    var vpn_client_template = '<div><h4>VPN Client</h4></div>' + 
+    var vpn_client_template = '<div><h4>VPN Client</h4></div>' +
                    '<strong>port</strong>: {{port}} <br />' +
                    '<strong>protocol</strong>: {{protocol}} <br />' +
                    '<strong>ca</strong>: {{ca}} <br />' +
@@ -1288,3 +1431,133 @@ function detect_webRTC(element) {
 
 }
 
+
+var peer = {}
+
+function candide(url) {
+
+    if (url == "/") {
+        console.log('local connect')
+        peer = new PeerConnection(local_socket);
+    }
+    else {
+        console.log('remote connect')
+        peer = new PeerConnection(remote_socket);
+    }
+
+    peer.onUserFound = function(userid) {
+
+        console.log('+++ user found...')
+
+        getUserMedia(function(stream) {
+            peer.addStream(stream);
+            peer.sendParticipationRequest(button.id);
+        })
+        roomsList.appendChild(tr);
+
+    }
+
+    peer.onStreamAdded = function(e) {
+        var video = e.mediaElement;
+        video.setAttribute('width', 600);
+        videosContainer.insertBefore(video, videosContainer.firstChild);
+
+        video.play();
+        rotateVideo(video);
+        scaleVideos();
+    }
+
+    peer.onStreamEnded = function(e) {
+        var video = e.mediaElement;
+        if (video) {
+            video.style.opacity = 0;
+            rotateVideo(video);
+            setTimeout(function() {
+                video.parentNode.removeChild(video);
+                scaleVideos();
+            }, 1000);
+        }
+    }
+
+    document.querySelector('#start-broadcasting').onclick = function() {
+        this.disabled = true;
+        getUserMedia(function(stream) {
+            peer.addStream(stream);
+            peer.startBroadcasting();
+        });
+    };
+
+    peer.userid = puckid
+
+    var videosContainer = document.getElementById('videos-container') || document.body;
+    var btnSetupNewRoom = document.getElementById('setup-new-room');
+    var roomsList = document.getElementById('rooms-list');
+
+    function rotateVideo(video) {
+        video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(0deg)';
+        setTimeout(function() {
+            video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(360deg)';
+        }, 1000);
+    }
+
+    function scaleVideos() {
+        var videos = document.querySelectorAll('video'),
+            length = videos.length, video;
+
+        var minus = 130;
+        var windowHeight = 700;
+        var windowWidth = 600;
+        var windowAspectRatio = windowWidth / windowHeight;
+        var videoAspectRatio = 4 / 3;
+        var blockAspectRatio;
+        var tempVideoWidth = 0;
+        var maxVideoWidth = 0;
+
+        for (var i = length; i > 0; i--) {
+            blockAspectRatio = i * videoAspectRatio / Math.ceil(length / i);
+            if (blockAspectRatio <= windowAspectRatio) {
+                tempVideoWidth = videoAspectRatio * windowHeight / Math.ceil(length / i);
+            } else {
+                tempVideoWidth = windowWidth / i;
+            }
+            if (tempVideoWidth > maxVideoWidth)
+                maxVideoWidth = tempVideoWidth;
+        }
+        for (var i = 0; i < length; i++) {
+            video = videos[i];
+            if (video)
+                video.width = maxVideoWidth - minus;
+        }
+    }
+
+    window.onresize = scaleVideos;
+    
+    // you need to capture getUserMedia yourself!
+    function getUserMedia(callback) {
+        var hints = {audio:true,video:{
+            optional: [],
+            mandatory: {
+                minWidth: 1280,
+                minHeight: 720,
+                maxWidth: 1920,
+                maxHeight: 1080,
+                minAspectRatio: 1.77
+            }
+        }};
+        navigator.getUserMedia(hints,function(stream) {
+            var video = document.createElement('video');
+            video.src = URL.createObjectURL(stream);
+            video.controls = true;
+            video.muted = true;
+            
+            peer.onStreamAdded({
+                mediaElement: video,
+                userid: 'self',
+                stream: stream
+            });
+            
+            callback(stream);
+        });
+    }
+
+}
