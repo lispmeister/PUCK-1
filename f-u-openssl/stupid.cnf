@@ -70,7 +70,9 @@ countryName             = match
 stateOrProvinceName     = match
 organizationName        = match
 organizationalUnitName  = optional
-commonName              = optional
+# commonName              = optional
+# commonName              = match
+commonName              = supplied
 name                    = optional
 emailAddress            = optional
 
@@ -83,7 +85,8 @@ stateOrProvinceName     = optional
 localityName            = optional
 organizationName        = optional
 organizationalUnitName  = optional
-commonName              = optional
+# commonName              = match
+commonName              = supplied
 name                    = optional
 emailAddress            = optional
 
@@ -128,19 +131,16 @@ localityName_default        = $ENV::KEY_CITY
 #1.organizationName        = Second Organization Name (eg, company)
 #1.organizationName_default    = World Wide Web Pty Ltd
 
-commonName_max            = 64
-
-name                = Name
-name_max            = 64
-
+commonName_max                 = 64
+name                           = Name
+name_max                       = 64
 emailAddress                   = Email Address
 emailAddress_default           = $ENV::KEY_EMAIL
 emailAddress_max               = 40
-
-# JY -- added for batch mode
 organizationalUnitName_default = $ENV::KEY_OU
-# commonName_default             = $ENV::KEY_CN
-commonName_default             = optional
+commonName_default             = $ENV::KEY_CN
+# commonName_default             = optional
+# commonName_default             = "*"
 name_default                   = $ENV::KEY_NAME
 
 # SET-ex3            = SET extension number 3
