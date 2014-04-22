@@ -197,13 +197,13 @@ function state_cam(state, location) {
     // use proxy to other PUCK
     else                     var loc = ':7777'
 
-    if (state == 'up') {
+    if (state == true) {
         // candid_camera(loc)
         candide(loc)
         state_audio('unmute')
         state_video('resume')
     }
-    else if (state == 'down') {
+    else if (state == false) {
         // candid_camera(loc)
         candide(loc)
         state_audio('mute')
@@ -1479,13 +1479,13 @@ function candide(url) {
         }
     }
 
-    document.querySelector('#start-broadcasting').onclick = function() {
-        this.disabled = true;
+    $('#start-broadcasting').click(function (e) { 
+        console.log('--> user clicked go')
         getUserMedia(function(stream) {
             peer.addStream(stream);
             peer.startBroadcasting();
-        });
-    };
+        })
+    })
 
     peer.userid = puckid
 

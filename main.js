@@ -2258,12 +2258,16 @@ var ios = io.sockets.on('connection', function (client) {
         client.room = name;
     }
 
-    // we don't want to pass "leave" directly because the
-    // event type string of "socket end" gets passed too.
-    client.on('disconnect', function () {
-        removeFeed();
+    client.on('disconnect', function(){
+        var stamp = cat_stamp()
+        delete puck_users[client.puck_user];
+        io.sockets.emit('new_puck', stamp, puck_users);
+        // client.broadcast.emit('chat_receive', stamp, 'PUCK', client.puck_user + ' has disconnected');
     });
-    client.on('leave', removeFeed);
+
+    client.on('leave', function () {
+        removeFeed()
+    })
 
     client.on('create', function (name, cb) {
         if (arguments.length == 2) {
@@ -2293,7 +2297,6 @@ var ios = io.sockets.on('connection', function (client) {
 
     // when a puck hangs up
     client.on('puck_disconnect', function(puck_user){
-
         if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
             var stamp = cat_stamp()
             delete puck_users[client.puck_user];
@@ -2306,7 +2309,6 @@ var ios = io.sockets.on('connection', function (client) {
     // when a new puck shows up
 
     client.on('new_puck', function(puck_user){
-
         if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
             var stamp = cat_stamp()
             client.puck_user = puck_user;
@@ -2326,16 +2328,6 @@ var ios = io.sockets.on('connection', function (client) {
         }
 
     });
-
-    // when the user disconnects.. perform this
-    client.on('disconnect', function(){
-        var stamp = cat_stamp()
-        delete puck_users[client.puck_user];
-        io.sockets.emit('new_puck', stamp, puck_users);
-        // client.broadcast.emit('chat_receive', stamp, 'PUCK', client.puck_user + ' has disconnected');
-    });
-
-
 
     // messaging of another type...
 
