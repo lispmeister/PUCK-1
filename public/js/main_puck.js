@@ -22,10 +22,15 @@ var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
 var PREGNANT_PAUSE       = 3000 // 5 seconds should be enough for anyone!
 var PUCK_RECONNECT_DELAY =  100
 
+// for web rtc
+var puck_meeting = {}
+
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
 ring = new Audio("media/ringring.mp3") // load it up
 
-$(document).ready(function () {
+// $(document).ready(function () {
+
+if ('foo' == 'bar') {
     
     var image     = ""
     // var puck_id   = ""
@@ -39,8 +44,8 @@ $(document).ready(function () {
 
     // disable a/href pushing if disabled
     $('body').on('click', 'a.disabled', function(event) {
-        event.preventDefault();
-    });
+        event.preventDefault()
+    })
     
     // enable tabs
     $('.ul nav-tabs a').click(function (e) { e.preventDefault(); $(this).tab('show') })
@@ -56,9 +61,9 @@ $(document).ready(function () {
     $('#stop_server').click(function    (e) { stop_server() })
 
     // log areas
-    $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
-    $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
-    $("#cat_chat").mCustomScrollbar({ set_height: 200, set_width: 600, scrollButtons:{ enable:true } });
+    $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } })
+    $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } })
+    $("#cat_chat").mCustomScrollbar({ set_height: 200, set_width: 600, scrollButtons:{ enable:true } })
 
     //
     // setup user drag/click files to browser
@@ -91,7 +96,7 @@ $(document).ready(function () {
     // build suspense....
     $('body').on('click', '#puck_button_create', function(event) { 
         console.log('hijax create')
-        event.preventDefault();
+        event.preventDefault()
     
         var ip_addr = $("#ip_addr").val()
     
@@ -290,7 +295,9 @@ $(document).ready(function () {
             })
         })
     })
-    
+
+    // detect_webRTC('puck_rtc_health_check')
+
     // message data
     list_events()
     
@@ -299,5 +306,6 @@ $(document).ready(function () {
     // get my puck data
     // who_am_i()
 
-})
+}
+//})
 

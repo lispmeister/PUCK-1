@@ -185,17 +185,44 @@ function post(url, parameters) {
     form.submit();
 }
 
+function state_cam(state, location) {
+
+    console.log('cam will be... ' + state + ' @ ' + location)
+
+    if (location == 'local') var loc = '/'
+    // use proxy to other PUCK
+    else                     var loc = ':7777'
+
+    if (state == 'up') {
+        candid_camera(loc)
+        state_audio('unmute')
+        state_video('resume')
+    }
+    else if (state == 'down') {
+        candid_camera(loc)
+        state_audio('mute')
+        state_video('pause')
+    }
+    else {
+        console.log('... well... you... blew it; unknown state: ' + state)
+    }
+
+}
+
 //
 // pause/resume webrtc audio
 //
 function state_audio(state) {
 
     console.log('audio will be... ' + state)
+
     if (state == 'mute') {
-        my_webrtc.pauseVideo
+        console.log('... muting audio...')
+        // my_webrtc.pauseVideo
     }
     else if (state == 'unmute') {
-        my_webrtc.pauseVideo
+        console.log('... audio on...')
+        // my_webrtc.pauseVideo
     }
     else {
         console.log('... well... you... blew it; unknown state: ' + state)
@@ -211,20 +238,17 @@ function state_video(state) {
 
     if (state == 'pause') {
         console.log('... pausing vid...')
-        my_webrtc.pauseVideo
+        // my_webrtc.pauseVideo
     }
     else if (state == 'resume') {
         console.log('... carry on...')
-        my_webrtc.pauseVideo
+        // my_webrtc.pauseVideo
     }
     else {
         console.log('... well... you... blew it; unknown state: ' + state)
     }
 
-console.log('... well... video?')
-
 }
-
 
 //
 // when vpn status/state changes... set lights flashing, whatever
@@ -545,7 +569,7 @@ function truncate(string){
      return string.substring(0,MAX_STRING - 3)+'...';
   else
      return string;
-};
+}
 
 
 //
@@ -608,13 +632,6 @@ function socket_looping(){
 
         // everyone loves cat facts!
         cat_chat(local_socket, 'local')
-
-        candid_camera('/')
-
-        // pause for thought... dont want the puck spying on you ;)
-        // will turn it back on when needed (e.g. another puck joins)
-        //state_video('pause')
-        //state_audio('mute')
 
     })
 
@@ -743,7 +760,7 @@ function status_or_die() {
     if (puck_status.openvpn_client.vpn_status == "up") {
         state_vpn('outgoing', browser_ip)
         // cat facts!
-        candid_camera('/')
+        state_cam(true, 'local')
     }
 
     // if nothing up now, kill any signs of a call, just to be sure
@@ -953,7 +970,6 @@ function put_a_sock_in_it(url) {
         'force new connection': true
     })
 
-
     remote_socket.socket.on('connect', function(){
 
         console.log('[+] remote - connected to ' + url)
@@ -963,9 +979,6 @@ function put_a_sock_in_it(url) {
         // if (typeof data != undefined && data.server != "undefined") {
         //     $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
         // }
-
-        // turn it on from proxy
-        candid_camera(':7777')
 
         remote_socket.on('cat_facts', function (data) {
 
@@ -977,6 +990,9 @@ function put_a_sock_in_it(url) {
                 console.log(data.fact)
                 console.log(data.server)
             }
+
+            state_cam(true, 'remote')
+
         })
            
         remote_socket.emit('puck', 'foo', function (data) {
@@ -996,6 +1012,7 @@ function put_a_sock_in_it(url) {
            
         //cat_chat(remote_socket, my_puck.PUCK_ID)
         cat_chat(remote_socket, 'remote')
+
     })
 
     remote_socket.on('anything', function(data) {
@@ -1018,24 +1035,56 @@ function put_a_sock_in_it(url) {
 //
 // magic time, courtesy of simplewebrtc
 //
+rtc_peer = {}
+
 function candid_camera(url) {
 
-
-    return
     console.log('turning on cam cam : ' + url)
 
-    // smile, you're on candid....
-    my_webrtc = new SimpleWebRTC({
-        localVideoEl: 'localVideo',     // the id/element dom element that will hold "our" puck video
-        remoteVideosEl: 'remoteVideos', // the id/element dom element that will hold remote puck videos
-        autoRequestMedia: true,         // immediately ask for camera access
-        url : url
-    });
+    // local
+    if (url == '/') {
 
-    // we have to wait until it's ready
-    my_webrtc.on('readyToCall', function () {
-        my_webrtc.joinRoom('roomy');       // you can name it anything
-    })
+        console.log('... local')
+
+        rtc_peer = new PeerConnection(url)
+
+        // on connect....
+        rtc_peer.onStreamAdded = function(e) {
+            console.log('local on!')
+            $('#local_video').append(e.mediaElement)
+            $('#puck_vid_notes').append('local ')
+        }
+
+    }
+    else {
+
+        console.log('... remotely')
+        var rtc_peer = new PeerConnection(url)
+
+        rtc_peer.onStreamAdded = function(e) {
+            console.log('remote on!')
+            $('#local_video').html()
+            $('#remote_video').append(e.mediaElement)
+            $('#puck_vid_notes').append('remote ')
+        }
+
+    }
+
+    rtc_peer.onaddstream = function (e) {
+
+        $('#puck_vid_notes').append('addstream ')
+        $('#remote_videos').append(e.video)
+        $('#puck_users').append(room.roomid)
+
+    }
+
+    // if someone leaves, nuke vid
+    rtc_peer.onuserleft = function (userid) {
+        $('#puck_vid_notes').append('userleft ' + userid)
+    }
+
+//  rtc_peer.meet('puck')
+
 }
 
 
@@ -1217,6 +1266,25 @@ function print_puck(ipuck, puckinfo, elements) {
 
     $(elements[0]).html(p_html)
     $(elements[1]).html(v_html)
-    $(elements[2]).html(v_c_html);
+    $(elements[2]).html(v_c_html)
 
 }
+
+// mostly from https://www.webrtc-experiment.com/DetectRTC/
+//
+// can you walk and talk the ... walking talk
+//
+function detect_webRTC(element) {
+
+    // ~ two per row
+    $('#' + element).append('' +
+                '<tr><td>Microphone    </td><td>'     + DetectRTC.hasMicrophone               + '</td>' +
+                    '<td>Webcam        </td><td>'     + DetectRTC.hasWebcam                   + '</td></tr>' +
+                '<tr><td>Screen Capture</td><td>'     + DetectRTC.isScreenCapturingSupported  + '</td>' +
+                    '<td>WebRTC</td><td>'             + DetectRTC.isWebRTCSupported           + '</td></tr>' +
+                '<tr><td>WebAudio API</td><td>'       + DetectRTC.isAudioContextSupported     + '</td>' +
+                '    <td>SCTP Data Channels</td><td>' + DetectRTC.isSctpDataChannelsSupported + '</td></tr>' +
+                '<tr><td>RTP Data Channels</td><td>'  + DetectRTC.isRtpDataChannelsSupported  + '</td></tr>')
+
+}
+

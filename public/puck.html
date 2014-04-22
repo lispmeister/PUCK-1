@@ -5,7 +5,7 @@
 <!-- A special thanks to the fine folks who did:
 
     jquery
-    bootstrap & glyphicons
+    bootstrap + glyphicons
     node.js
 
     And all the billions of libs and lines of code that I built
@@ -202,51 +202,62 @@
 
             <!-- profile -->
             <div class="tab-pane fade" id="ewe">
-                <div class="muted">
-                    <h3 style="clear:both">profilasaurus</h3>
-                </div>
-                <div>
-                    Enough about you, what about me?<p>
-                    Details about your PUCK and possibly you, if you wish.<p>
-                    You'll be able to change your picture here, etc., etc.<p>
-                </div>
+
+                <div class="container"> <div class="row">
+                    <div class="col-xs-4">
+                            <h3 style="clear:both">profilasaurus</h3>
+                            Enough about you, what about me?<p>
+                            Details about your PUCK and possibly you, if you wish.<p>
+                            You'll be able to change your picture here, etc., etc.<p>
+                    </div>
+                    <div class="col-xs-2"> </div>
+
+                    <div class="col-xs-4">
+                        <h3>Browser WebRTC Health</h3>
+                        <table id="puck_rtc_health_check" class="table table-condensed table-hover table-striped">
+                        <tr> <th> Feature </th> <th> Support? </th> <th> Feature </th> <th> Support? </th> </tr>
+                        </table>
+                    </div>
+
+                </div> </div>
 
                 <div class="panel-group" id="puck_accordion">
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_base_details">PUCK details </a>
-                            </h4>
-                        </div>
-                        <div id="puck_base_details" class="panel-collapse collapse in">
-                            <div id="puck_basics" class="panel-body"> </div>
-                        </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_base_details">PUCK details </a>
+                        </h4>
                     </div>
+                    <div id="puck_base_details" class="panel-collapse collapse in">
+                        <div id="puck_basics" class="panel-body"> </div>
+                    </div>
+                </div>
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_details">PUCK VPN details </a>
-                            </h4>
-                        </div>
-                        <div id="puck_vpn_details" class="panel-collapse collapse">
-                            <div id="puck_vpn_basics" class="panel-body"> </div>
-                        </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_details">PUCK VPN details </a>
+                        </h4>
                     </div>
+                    <div id="puck_vpn_details" class="panel-collapse collapse">
+                        <div id="puck_vpn_basics" class="panel-body"> </div>
+                    </div>
+                </div>
 
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_client_details">PUCK VPN client details</a>
-                            </h4>
-                        </div>
-                        <div id="puck_vpn_client_details" class="panel-collapse collapse">
-                            <div id="puck_vpn_client_basics" class="panel-body"> </div>
-                        </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_client_details">PUCK VPN client details</a>
+                        </h4>
                     </div>
+                    <div id="puck_vpn_client_details" class="panel-collapse collapse">
+                        <div id="puck_vpn_client_basics" class="panel-body"> </div>
+                    </div>
+                </div>
 
                 </div>
+
             </div>
 
             <!-- vpn stuff -->
@@ -257,10 +268,31 @@
 
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
+                    <div id="puck_vid_notes">... notes....</div>
+                    <div id="puck_users">... users....</div>
+
                     <div class="col-md-4" style="clear:both">
 
                         <h4> remote </h4>
                         <span>If connected to another PUCK and you don't see video... something is wrong!</span>
+
+
+                        <div style="width:300px" id="remoteVideos"></div>
+
+                    </span>
+                    <input type="text" id="your-name" placeholder="your-name">
+                    <button id="start-broadcasting" class="setup">Start Transmitting Yourself!</button>
+                </section>
+                
+                <!-- list of all available conferencing rooms -->
+                <table id="rooms-list" style="width: 100%;"></table>
+                
+                <!-- local/remote videos container -->
+                <div id="videos-container"></div>
+            </section>
+
+
+
 
 <!--
                         <div style="width:300px" id="remoteVideos"></div>
@@ -294,18 +326,14 @@
 
                     <hr>
 
-    <!--
                     <div class="row" style="clear:both">
                         <div class="col-md-4">
-                            <video width=480 id="localVideo"></video>
+                            <div id="localVideo"></div>
                         </div>
                     </div>
-    -->
-
-                <button id="setup-meeting">Setup Meeting</button>
 
 
-
+                    <button id="setup-meeting">Setup Meeting</button>
 
                     <div class="container-fluid">
 
@@ -539,55 +567,12 @@
 
 <script type="text/javascript" src="/js/jquery.filer.js"></script>
 <script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
-<script type="text/javascript" src="/js/simplewebrtc.js"></script>
 
-<!-- my stuff -->
-<script type="text/javascript" src='/js/puck.js'></script>
-<script type="text/javascript" src='/js/main_puck.js'></script>
+<!-- the amazing rtc stuff -->
+<script type="text/javascript" src="/js/PeerConnection.js">
 
-<script src="https://www.webrtc-experiment.com/meeting/meeting.js"></script>
-
-
-<script>
-
-$(document).ready(function () {
-
-var meeting = new Meeting('meeting-unique-id');
-
-// on getting local or remote streams
-meeting.onaddstream = function(e) {
-    // e.type == 'local' ---- it is local media stream
-    // e.type == 'remote' --- it is remote media stream
-    document.body.appendChild(e.video);
-};
-
-// custom signaling channel
-// you can use each and every signaling channel
-// any websocket, socket.io, or XHR implementation
-// any SIP server
-// anything! etc.
-meeting.openSignalingChannel = function(callback) {
-    return io.connect().on('message', callback);
-};
-
-meeting.check('puck');
-
-document.getElementById('setup-meeting').onclick = function() {
-    meeting.setup('puck');
-};
-
-// if someone leaves; just remove video
-meeting.onuserleft = function(userid) {
-    var video = document.getElementById(userid);
-    if(video) video.parentNode.removeChild(video);
-};
-
-// to leave a meeting room
-// meeting.leave();
-
-})
-</script>
-
+<script type="text/javascript" src="/js/puck.js"></script>
+<script type="text/javascript" src="/js/main_puck.js"></script>
 
 </body>
 
