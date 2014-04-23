@@ -529,39 +529,33 @@ function puck_ping(all_ips, puckid, url) {
     var ping_id  = ''
 
     // if we're alive, this will get put in
-    var vpn_form = 'vpn_form_' + puckid
+    var vpn_form   = 'vpn_form_' + puckid
+    var element_id = 'puck_vpn_' + puckid
 
-    // element_id='puck_' + id + '_ip_addr'
-    var element_id='puck_vpn_' + puckid
+    var jqXHR_get_ping = $.ajax({
+        url: ping_url, 
+        cache: false
+    })
 
-    $.ajax({url: ping_url, cache: false,
-        success: function(data) {
+    jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
+        var ret = data
+        console.log("pingzor " + JSON.stringify(ret))
+
+        // make the button clickable and green
+        if (data.status == "OK") {
             console.log('success with ' + element_id)
-            console.log(data)
-
-            // make the button clickable and green
-            if (data.status == "OK") {
-                console.log('success with ' + element_id)
-                // console.log('ok...')
-                $('#'+element_id).addClass('btn-success').removeClass('disabled')
-            }
-            else {
-                console.log('not ok...')
-                $('#'+element_id).removeClass('btn-success').addClass('disabled')
-            }
-
-        },
-        error: function(error){
+            // console.log('ok...')
+            $('#'+element_id).addClass('btn-success').removeClass('disabled')
+        }
+        else {
+            console.log('not ok...')
+            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+        }
+    }).fail(function(err) {
             console.log( "ping error for " + ping_url)
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
             console.log(error)
-        },
-        fail: function(error) {
-            console.log( "ping failure for " + ping_url)
-            console.log(error)
-            $('#'+element_id).removeClass('btn-success').addClass('disabled')
-        }
-        })
+   })
 
 // console.log('post-pingy ' + puckid + '... putting into ' + element_id)
 

@@ -204,12 +204,14 @@
             <div class="tab-pane fade" id="ewe">
 
                 <div class="container"> <div class="row">
+
                     <div class="col-xs-4">
                             <h3 style="clear:both">profilasaurus</h3>
                             Enough about you, what about me?<p>
                             Details about your PUCK and possibly you, if you wish.<p>
                             You'll be able to change your picture here, etc., etc.<p>
                     </div>
+
                     <div class="col-xs-2"> </div>
 
                     <div class="col-xs-4">
@@ -218,47 +220,46 @@
                         <tr> <th> Feature </th> <th> Support? </th> <th> Feature </th> <th> Support? </th> </tr>
                         </table>
                     </div>
-
-                </div> </div>
+                </div> 
 
                 <div class="panel-group" id="puck_accordion">
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_base_details">PUCK details </a>
-                        </h4>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_base_details">PUCK details </a>
+                            </h4>
+                        </div>
+                        <div id="puck_base_details" class="panel-collapse collapse in">
+                            <div id="puck_basics" class="panel-body"> </div>
+                        </div>
                     </div>
-                    <div id="puck_base_details" class="panel-collapse collapse in">
-                        <div id="puck_basics" class="panel-body"> </div>
-                    </div>
-                </div>
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_details">PUCK VPN details </a>
-                        </h4>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_details">PUCK VPN details </a>
+                            </h4>
+                        </div>
+                        <div id="puck_vpn_details" class="panel-collapse collapse">
+                            <div id="puck_vpn_basics" class="panel-body"> </div>
+                        </div>
                     </div>
-                    <div id="puck_vpn_details" class="panel-collapse collapse">
-                        <div id="puck_vpn_basics" class="panel-body"> </div>
-                    </div>
-                </div>
 
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h4 class="panel-title">
-                            <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_client_details">PUCK VPN client details</a>
-                        </h4>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#puck_accordion" href="#puck_vpn_client_details">PUCK VPN client details</a>
+                            </h4>
+                        </div>
+                        <div id="puck_vpn_client_details" class="panel-collapse collapse">
+                            <div id="puck_vpn_client_basics" class="panel-body"> </div>
+                        </div>
                     </div>
-                    <div id="puck_vpn_client_details" class="panel-collapse collapse">
-                        <div id="puck_vpn_client_basics" class="panel-body"> </div>
-                    </div>
-                </div>
 
+                </div>  <!-- PUCK accordian -->
                 </div>
-
-            </div>
+            </div>  <!-- ewes -->
 
             <!-- vpn stuff -->
 
@@ -269,33 +270,27 @@
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
                     <div id="videos-container">... videos....</div>
-                    <div><strong id="unique-token">#123456789</strong></<div>
+
+                    <div><strong id="unique-token">#123456789</strong></div>
+
                     <table id="rooms-list" style="width: 100%;"></table>
+
                     <div id="videos-container"></div>
-
-
                     <div id="puck_vid_notes">... notes....</div>
                     <div id="puck_users">... users....</div>
 
-                    <div class="col-md-4" style="clear:both">
+                    <span>If connected to another PUCK and you don't see video... something is wrong!</span>
+                    <button id="start-broadcasting" class="setup">Engage Transmissions</button>
 
+                    <!-- <div class="col-md-4" style="clear:both">
                         <h4> remote </h4>
                         <span>If connected to another PUCK and you don't see video... something is wrong!</span>
-
-
                         <div style="width:300px" id="remote_videos"></div>
-
                     <input type="text" id="your-name" placeholder="your-name">
-                    <button id="start-broadcasting" class="setup">Engage Transmissions</button>
+                    <button id="start-broadcasting" class="setup">Engage Transmissions</button> -->
                 
-<!--
-                        <div style="width:300px" id="remoteVideos"></div>
-                        <div><a style="text-decoration: none" href="#"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></button></a></div>
--->
-                    </div>
-
-
                     <div class="col-md-2"></div>
+
                     <div class="col-md-4">
 
                         <div style="padding:10px">
@@ -311,8 +306,10 @@
                             <div id="cat_chat" class="content"></div>
                         </div>
 
-                    </div>
-                </div>
+                    </div> <!-- col-md-4 -->
+
+                </div> <!-- row -->
+
                 <div class="row">
 
                     <hr>
@@ -340,6 +337,7 @@
                             </div>
                         </div> <!-- row -->
 
+
                         <div class="row">
                             <div class="col-md-6">
                                 <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">show/hide server logs</button>
@@ -352,12 +350,9 @@
 
                             </div>
                         </div>  <!-- row -->
-
                     </div> <!-- container -->
-
-                </div>
+                </div>  <!-- row -->
             </div> <!-- vpn stuff -->
-
 
             <!-- trust/love -->
 

@@ -1205,7 +1205,8 @@ function echoReply(req, res, next) {
         var response = {status: "OK", "name": bwana_puck.name, "pid": puck_id}
     }
 
-    res.send(200, response)
+    // res.send(200, response)
+    res.send(response)
 
 }
 
@@ -1806,13 +1807,13 @@ function httpsPing(puckid, ipaddr, res, next) {
 //  cache results, do that first
 //  if (defined puck2ip[ip]) 
 
-    for (var i = 0; i < all_ips.length; i++) {
-        
+    // for (var i = 0; i < all_ips.length; i++) {
+
+    all_ips.forEach(function(ip, i) {
+
         responses++
 
-        var ip = all_ips[i]
-
-        if (ip == "127.0.0.1") { console.log('skipping ' + ip); continue; }
+        if (ip == "127.0.0.1") { console.log('skipping ' + ip); return; }
 
         console.log('pinging  ' + ip);
 
@@ -1820,38 +1821,50 @@ function httpsPing(puckid, ipaddr, res, next) {
 
 //      var res = sping_get(url, all_ips, puckid, i)
 
-        // Q.nfcall(someday_get_https, url).then(function(data) {
-        sekure_get(url, function(data) {
-    
-            console.log('+++ someday has come!')
-            console.log(data)
-            data = JSON.parse(data)
+        var req = https.get(url, function(response) {
 
-            if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
-                ping_done = true
-                console.log('sucksess...')
-                res.send(200, data)
-            }
+            console.log('ping res....')
 
-            if ((responses+1) == all_ips.length && !ping_done) {
-                console.log('no response, ping failure!')
-                response = {status: "ping failure", "name": 'unknown problem'}
-                res.send(408, response)
-            }
-        },
-        function(err) {
+            var data = ''
+            response.on('data', function(chunk) {
+                data += chunk
+            })
+            response.on('end', function() {
+                console.log('+++ someday has come!')
+                console.log(data)
+                data = JSON.parse(data)
+
+                if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
+                    ping_done = true
+                    console.log('sucksess...')
+
+                    puck2ip[puckid] = all_ips[i]
+                    ip2puck[all_ips[i]] = puckid
+                    res.send(200, data)
+                }
+
+                if ((responses+1) == all_ips.length && !ping_done) {
+                    ping_done = true
+                    console.log('no response, ping failure!')
+                    response = {status: "ping failure", "name": 'unknown problem'}
+                    res.send(408, response)
+                }
+            })
+        })
+        .on('error', function(e) {
             console.log('+++ someday has come... in a bad way')
-            console.log(err)
-            err = JSON.parse(err)
+            console.log(e)
 
-            if ((responses+1) == all_ips.length && !ping_done) {
+            console.log(responses + ' v.s. ' + all_ips.length)
+            if (responses == all_ips.length && !ping_done) {
+                ping_done = true
                 console.log('no response, ping failure!')
                 response = {status: "ping failure", "name": 'unknown problem'}
-                res.send(408, response)
+                res.send(408, e)
             }
         })
 
-    }
+    })
 
 }
 
@@ -1906,7 +1919,6 @@ function formCreate(req, res, next) {
             data += chunk
         })
         response.on('end', function() {
-
             console.log(url + ' nabbed => ' + data)
             console.log('... trying... hard')
             console.log(data)
