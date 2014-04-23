@@ -578,7 +578,7 @@ function getIP(req, res, next) {
 //
 function cat_power(channel, msg) {
 
-    console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
+    // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
     try {
         if (channel == "broadcast") cat_sock.broadcast.emit(msg)
@@ -1740,11 +1740,9 @@ function sping_get(url, all_ips, puckid, n) {
         resp.on("data", function(d) {
 
             console.log('data!')
-            console.log(d)
+            // console.log(d)
 
             d = JSON.parse(d)
-
-            console.log(d.pid)
 
             if (d.pid != puckid) {
                     console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
@@ -1755,8 +1753,7 @@ function sping_get(url, all_ips, puckid, n) {
             }
             else {
                     ping_done = true
-                    console.log('sping worked! ' + all_ips[n])
-                    console.log(d)
+                    console.log('sping worked - ' + all_ips[n])
                     puck2ip[puckid] = all_ips[n]
                     ip2puck[all_ips[n]] = puckid
                     return(d)
