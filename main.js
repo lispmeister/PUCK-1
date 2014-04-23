@@ -150,18 +150,20 @@ watch_logs(client_vpn_log, "OpenVPN Client")
 
 function someday_get_https (url) {
 
-    console.log('someday... I will get get_https ' + url)
+    console.log('someday... I will get_https ' + url)
 
     data = ""
 
-    var deferred = Q.defer();
+    // var deferred = Q.defer();
 
         https.get(url, function (res) {
 
             console.log('fucking ' + res)
 
             if (res.statusCode !== 200) {
-                deferred.reject("HTTPs erz " + res.statusCode + " for " + url);
+                // deferred.reject("HTTPs erz " + res.statusCode + " for " + url);
+                console.log("HTTPs erz " + res.statusCode + " for " + url)
+                return('err: res.statusCode')
             }
             res.on("data", function (chunk) {
                 data += chunk;
@@ -169,18 +171,20 @@ function someday_get_https (url) {
 
             res.on("end", function () { 
                 console.log("... data is in...?")
-                // console.log(data)
-                deferred.resolve(data); 
+                console.log(data)
+                // deferred.resolve(data); 
+                return(data); 
             })
         })
         .on("error", function(e) {
             console.log('tomorrow never errz!')
             // deferred.reject
             // deferred.promise.fail(console.log);
-            deferred.reject('erzoid: ' + e)
+            // return('erzoid: ' + e)
+            return(e)
+            // deferred.reject('erzoid: ' + e)
         })
-
-    return deferred.promise;
+//  return deferred.promise;
 
 }
 
@@ -204,7 +208,8 @@ var uber_puck = function uber_puck() {
 
     console.log("it's time...!")
 
-    Q.nfcall(someday_get_https, 'https://localhost:' + puck_port + '/puck/' + puck_id).then(function(res) {
+    // Q.nfcall(someday_get_https, 'https://localhost:' + puck_port + '/puck/' + puck_id).then(function(res) {
+    sekure_get('https://localhost:' + puck_port + '/puck/' + puck_id, function(data) {
         // success
         console.log('finally got server response...')
 
@@ -1815,7 +1820,9 @@ function httpsPing(puckid, ipaddr, res, next) {
 
 //      var res = sping_get(url, all_ips, puckid, i)
 
-        Q.nfcall(someday_get_https, url).then(function(data) {
+        // Q.nfcall(someday_get_https, url).then(function(data) {
+        sekure_get(url, function(data) {
+    
             console.log('+++ someday has come!')
             console.log(data)
             data = JSON.parse(data)
@@ -1847,8 +1854,37 @@ function httpsPing(puckid, ipaddr, res, next) {
     }
 
 }
-        // if(err && !done) {
-        // if (!done && responses == all_ips.length()) {
+
+function sekure_get(url){
+
+//  Q.nfcall(https.get,url).then(function(res) {
+//      console.log(url + ' nabbed => ' + res)
+//      return(res)
+//  }, 
+//  function(err) {
+//      console.log('errz snatchin ' + url)
+//      return(err)
+//  })
+
+    console.log('snag ' + url)
+
+    var req = https.get(url, function(response) {
+        var res_data = ''
+        response.on('data', function(chunk) {
+            res_data += chunk
+        })
+        response.on('end', function() {
+            console.log(url + ' nabbed => ' + res_data)
+            return(res_data)
+        })
+    })
+    req.on('error', function(e) {
+        console.log("Got error: " + e.message)
+        console.log('errz snatchin ' + url + ' ... ' + e.message)
+        return(e)
+    })
+
+}
 
 function formCreate(req, res, next) {
 
@@ -1862,112 +1898,129 @@ function formCreate(req, res, next) {
     console.log('ping get_https ' + url)
 
     // is it a puck?
-    Q.nfcall(someday_get_https, url).then(function(data) {
+    // Q.nfcall(someday_get_https, url).then(function(data) {
 
-        console.log('... trying... hard')
+    var req = https.get(url, function(response) {
+        var data = ''
+        response.on('data', function(chunk) {
+            data += chunk
+        })
+        response.on('end', function() {
 
-        console.log(data)
-
-        if (data.indexOf("was not found") != -1) {
-            console.log('no woman no ping: ' + data)
-        }
-
-        else {
-            console.log('ping sez yes')
+            console.log(url + ' nabbed => ' + data)
+            console.log('... trying... hard')
             console.log(data)
+
+            if (data.indexOf("was not found") != -1) {
+                console.log('no woman no ping: ' + data)
+            }
+
+            else {
+                console.log('ping sez yes')
+                console.log(data)
     
-            console.log('starting... writing...')
-            // make the puck's dir... should not exist!
-    
-            data = JSON.parse(data)
-            // now get remote information
-            url = 'https://' + ip_addr + ':' + puck_port + '/puck/' + data.pid
-    
-            var puck_dir = config.PUCK.keystore + '/' + data.pid
-    
-            fs.mkdir(puck_dir, function(err){
-                if(err) {
-                    // xxx - user error, bail
-                    console.log(err);
-                }
-            });
-    
-            // if ping is successful, rustle up and write appropriate data
-            Q.nfcall(someday_get_https, url).then(function(data) {
+                console.log('starting... writing...')
+                // make the puck's dir... should not exist!
     
                 data = JSON.parse(data)
-                console.log('remote puck info in...!')
-
-                // if the IP we get the add from isn't in the ips the other puck
-                // says it has... add it in; they may be coming from a NAT or
-                // something weird
-                console.log('looking 2 see if your current ip is in your pool')
-
-                // if you're coming from a NAT or someplace weird...
-                var found = false
-                for (var i = 0; i < data.all_ips.length; i++) {
-                    if (data.all_ips[i] == ip_addr) {
-                        console.log('remote ip found in puck data')
-                        found = true
-                        break
+                // now get remote information
+                url = 'https://' + ip_addr + ':' + puck_port + '/puck/' + data.pid
+    
+                var puck_dir = config.PUCK.keystore + '/' + data.pid
+    
+                fs.mkdir(puck_dir, function(err){
+                    if(err) {
+                        // xxx - user error, bail
+                        console.log(err);
                     }
-                }
-                if (! found) {
-                    console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
-                    data.all_ips[all_client_ips.length] = ip_addr
-                }
+                });
+    
+                // if ping is successful, rustle up and write appropriate data
+                var req = https.get(url, function(response) {
+                    var data = ''
+                    response.on('data', function(chunk) {
+                        data += chunk
+                    })
+                    response.on('end', function() {
+        
+                        data = JSON.parse(data)
+                        console.log('remote puck info in...!')
 
-                // console.log(data);
-    
-                create_puck_key_store(data)
-    
-                var puck_fs_home = __dirname
-    
-                //
-                // execute a shell script with appropriate args to create a puck.
-                // ... of course... maybe should be done in node/js anyway...
-                // have to ponder the ponderables....
-                //
-                // Apparently the word ponder comes from the 14th century, coming from the
-                // word heavy or weighty in the physical sense... which makes a certain
-                // amount of sense... funny how we continually grasp for physical analogues (!)
-                // to our philosophical or digital concepts.
-                //
-                // ... back to the program, dog!
-                //
-                var util  = require('util')
-                var spawn = require('child_process').spawn
-    
-                console.log("executing create_puck.sh")
-    
-                // this simply takes the pwd and finds the exe area...
-                var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email])
-                console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email)
-    
-                // now slice and dice output, errors, etc.
-                pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
-                pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
-                pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
-    
-                if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
-                    console.log("posting our puck data to the puck we just added....")
-                    console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr)
-                    var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr])
-    
-                    // output, errors, etc.
-                    remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
-                    remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
-                    remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
-                    // res.send(200, {"status": "zoomer"});
-                }
-            },
-            function(err) {
-                console.log('create Error... no puck data back? ', err);
-            })
-        }
-    },
-    function(err) {
-        console.log('create Error... no ping? ', err);
+                        // if the IP we get the add from isn't in the ips the other puck
+                        // says it has... add it in; they may be coming from a NAT or
+                        // something weird
+                        console.log('looking 2 see if your current ip is in your pool')
+
+                        // if you're coming from a NAT or someplace weird...
+                        var found = false
+                        for (var i = 0; i < data.all_ips.length; i++) {
+                            if (data.all_ips[i] == ip_addr) {
+                                console.log('remote ip found in puck data')
+                                found = true
+                                break
+                            }
+                        }
+                        if (! found) {
+                            console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
+                            data.all_ips[all_client_ips.length] = ip_addr
+                        }
+
+                        // console.log(data);
+        
+                        create_puck_key_store(data)
+        
+                        var puck_fs_home = __dirname
+        
+                        //
+                        // execute a shell script with appropriate args to create a puck.
+                        // ... of course... maybe should be done in node/js anyway...
+                        // have to ponder the ponderables....
+                        //
+                        // Apparently the word ponder comes from the 14th century, coming from the
+                        // word heavy or weighty in the physical sense... which makes a certain
+                        // amount of sense... funny how we continually grasp for physical analogues (!)
+                        // to our philosophical or digital concepts.
+                        //
+                        // ... back to the program, dog!
+                        //
+                        var util  = require('util')
+                        var spawn = require('child_process').spawn
+            
+                        console.log("executing create_puck.sh")
+            
+                        // this simply takes the pwd and finds the exe area...
+                        var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email])
+                        console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email)
+            
+                        // now slice and dice output, errors, etc.
+                        pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
+                        pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
+                        pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
+            
+                        if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
+                            console.log("posting our puck data to the puck we just added....")
+                            console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr)
+                            var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr])
+            
+                            // output, errors, etc.
+                            remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
+                            remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
+                            remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
+                            // res.send(200, {"status": "zoomer"});
+                        }
+                    })
+                    req.on('error', function(e) {
+                        console.log('create Error... no puck data back? ', e.message)
+                    })
+                })
+            }
+        })
+        req.on('error', function(e) {
+            console.log("Got error: " + e.message)
+            console.log('errz snatchin ' + url + ' ... ' + e.message)
+            return(e)
+        })
+
     })
 
 }

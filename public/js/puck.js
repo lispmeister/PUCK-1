@@ -488,14 +488,15 @@ function puck_create(element, ip_addr) {
     post_data.puck_action = "CREATE"
     post_data = JSON.stringify(post_data)
 
+    console.log(post_data)
+
     $.ajax({
         type: "POST",
         url: "/form",
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', },
         data: post_data,
         success: function(data, status) {
+            console.log(data)
             console.log('suck... sess.... ')
             // yes... I suck
             setTimeout(go_puck_or_go_home, 2000)
@@ -905,16 +906,6 @@ function fire_puck_status(jstatus) {
 
     console.log('firing status off')
     console.log(typeof jstatus)
-
-// xxxxxxxxx
-// xxxxxxxxx
-// xxxxxxxxx
-// xxxxxxxxx
-// xxxxxxxxx
-// xxxxxxxxx
-// xxxxxxxxx
-    return
-
     jstatus = JSON.stringify(jstatus)
 
     var status_xhr = $.ajax({
