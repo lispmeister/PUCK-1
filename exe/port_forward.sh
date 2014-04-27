@@ -7,7 +7,7 @@
 #
 #
 
-if [ $# -ne 3 ] ; then
+if [ $# -ne 4 ] ; then
    echo "Usage: $0 interface1 interface2 port protocol"
    exit 1
 fi

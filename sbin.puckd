@@ -90,7 +90,7 @@ cd $PUCK_HOME
 
 openvpn --server $base10.0 $mask10 --config S.conf &
 
-echo $base10 > $PUCK_HOME/logs/openvpn_server.ip
+echo "$base10.1" > $PUCK_HOME/public/openvpn_server.ip
 
 yate -c $PUCK_HOME/yate/ -vvvvv -d -l $PUCK_HOME/log/yate.log -Dt
 

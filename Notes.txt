@@ -1,4 +1,6 @@
 
+CURRENT ASSUMPTION: if PUCK-1 can ip-connect to PUCK-2, user-1 can ip-connect to PUCK-2 as well
+
 # Installed node from:
 # 
 #    http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
@@ -17,3 +19,16 @@ rm /tmp/node-v0.10.24-linux-arm-pi.tar.gz
 
 echo export PATH=$PATH:/usr/local/puck_stuff/node-v0.10.24-linux-arm-pi/bin >> ~/.bash_profile
 
+
+# used this branch of node-http-proxy
+
+https://github.com/nodejitsu/node-http-proxy/tree/caronte
+
+# someone said:
+#
+# npm -g install /path/to/node-http-proxy-caronte
+
+# In my case, the install linkage was broken, so I had to run sudo npm link http-proxy
+
+
++ websocket npm

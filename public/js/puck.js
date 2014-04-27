@@ -30,8 +30,10 @@ var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
 var PUCK_SOCK_RETRY   = 5000
-
 var LOCAL_VIDEO_WIDTH = 480
+
+local_sock_flag  = false
+remote_sock_flag = false
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
@@ -199,13 +201,13 @@ function state_cam(state, location) {
 
     if (state == true) {
         // candid_camera(loc)
-        candide(loc)
+        candid_camera(loc)
         state_audio('unmute')
         state_video('resume')
     }
     else if (state == false) {
         // candid_camera(loc)
-        candide(loc)
+        candid_camera(loc)
         state_audio('mute')
         state_video('pause')
     }
@@ -379,7 +381,7 @@ function event_hang_up() {
     state_ring('false')
 
     // i has gone
-    local_socket.emit('remove_puck', my_puck.PUCK_ID);
+    // local_socket.emit('remove_puck', my_puck.PUCK_ID);
 
     var url = "/vpn/stop"
 
@@ -552,10 +554,14 @@ function puck_ping(all_ips, puckid, url) {
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
         }
     }).fail(function(err) {
+            console.log( "ping fail for " + ping_url)
+            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            console.log(err)
+    }).error(function(err) {
             console.log( "ping error for " + ping_url)
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
-            console.log(error)
-   })
+            console.log(err)
+    })
 
 // console.log('post-pingy ' + puckid + '... putting into ' + element_id)
 
@@ -608,36 +614,33 @@ function get_status() {
 //
 // ... snag all the various socket chatter
 //
+
+function check_sock () {
+    if (sock.socket.connected) {
+        $('#socket_wrench').addClass("green")
+        console.log('green!')
+    }
+    else {
+        $('#socket_wrench').removeClass("green")
+        console.log('not green')
+    }
+}
+
+
 function socket_looping(){
 
     console.log('status loop')
 
-    // local == our PUCK
-    local_socket = io.connect('/', {
-        'connect timeout': PUCK_TIMEOUT,
-        // 'try multiple transports': true,
-        'reconnect': true,
-        'reconnection delay': PUCK_RECONNECT_DELAY,
-        'reconnection limit': PUCK_TIMEOUT,
-        'max reconnection attempts': Infinity,
-        'sync disconnect on unload': false,
-        'auto connect': true,
-        'force new connection': true
-        })
+    local_socket = put_a_sock_in_it('/')
+    local_sock_thing = setInterval(function () {
+        console.log('trying to stuff the sock...');
+        local_socket = put_a_sock_in_it('/')
+    }, PUCK_SOCK_RETRY);
 
     local_socket.socket.on('connect', function(sock){
         // console.log('[+++] - general connext note')
-
         // everyone loves cat facts!
         cat_chat(local_socket, 'local')
-
-//      setTimeout(function(){
-//         console.log('... cam... er... a?')
-//         candid_camera('/')
-//          candide('/')
-//      }, 10000)
-
-
     })
 
     local_socket.on('puck_status', function (data) {
@@ -672,11 +675,17 @@ function socket_looping(){
                 console.log('trying...')
                 console.log(data.openvpn_client)
                 if (data.openvpn_client.vpn_status == "up") {
-                    var url = ':7777'
-                    console.log('trying to connect to... ' + url)
+                    var sock_url = ':7777'
+                    console.log('trying to connect to... ' + sock_url)
+
                     // try remote connecting, and keep it up until javascript wears itself out
-                    put_a_sock_in_it(url)
-                    setInterval(put_a_sock_in_it, PUCK_SOCK_RETRY, url)
+                    remote_sock = put_a_sock_in_it(sock_url)
+                    remote_sock_thing = setInterval(function () {
+                        console.log('trying to remotely stuff the sock...');
+                        remote_socket = put_a_sock_in_it(sock_url)
+                    }, PUCK_SOCK_RETRY);
+
+                    // setInterval(put_a_sock_in_it, PUCK_SOCK_RETRY, url)
                     // try_try_again = setInterval('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
                 }
             }
@@ -962,20 +971,30 @@ function drag_and_puck() {
 
 
 //
-// try to go put a sock on the other PUCK
+// try to get socket.io running
 //
-function put_a_sock_in_it(url) {
+function put_a_sock_in_it(sock_url) {
 
-    console.log('keep trying...')
+    var sock = {}
+
+    console.log('trying to do a socket connect to ' + sock_url)
 
     try { 
-        if (remote_socket.socket.connected) {
-            console.log('looks good')
-            return
+        if (sock_url == '/') {
+            if (local_socket.socket.connected) {
+                console.log('already connected locally')
+                return(sock)
+            }
         }
+        else {
+            if (remote_socket.socket.connected) {
+                console.log('already connected remotely')
+                return(sock)
+            }
+       }
     }
     catch (e) {
-        console.log('nice catch of bad sock')
+        console.log('Aaarrrrrghyle.... caught bad sock')
         console.log(e)
     }
 
@@ -984,21 +1003,36 @@ function put_a_sock_in_it(url) {
     // try { remote_socket.disconnect() }
     // catch (e) { console.log('nice catch of D/C!'); console.log(e) }
 
-    remote_socket = io.connect(url, {
-        'connect timeout': 5000, // 5 seconds should be enough
-        'try multiple transports': true,
+    sock = io.connect(sock_url, {
+        'connect timeout': PUCK_TIMEOUT,
+        // 'try multiple transports': true,  // xxx?
         'reconnect': true,
-        'reconnection delay': 500,
-        'reconnection limit': 5000,
+        'reconnection delay': PUCK_RECONNECT_DELAY,
+        'reconnection limit': PUCK_TIMEOUT,
         'max reconnection attempts': Infinity,
         'sync disconnect on unload': false,
         'auto connect': true,
         'force new connection': true
     })
 
+    console.log('got a sock, hope its not used...')
+    console.log(sock.socket.connected)
+
+    if (sock_url == '/') { local_sock_flag = true  }
+    else                 { remote_sock_flag = true }
+
+    return(sock)
+
+}
+
+//
+// gather up the remote resource stuff, listen to 411
+//
+function remote() {
+
     remote_socket.socket.on('connect', function(){
 
-        console.log('[+++] remote - connected to ' + url)
+        console.log('[+++] remote - connected')
 
         // if (typeof data != undefined && data.server != "undefined") {
         //     $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
@@ -1014,9 +1048,7 @@ function put_a_sock_in_it(url) {
                 console.log(data.fact)
                 console.log(data.server)
             }
-
             state_cam(true, 'remote')
-
         })
 
         remote_socket.emit('puck', 'foo', function (data) {
@@ -1104,150 +1136,27 @@ function getUserMedia(callback) {
 
 }
 
-function candid_camera(url) {
-
-    console.log('turning on cam cam : ' + url)
-
-    // local
-    if (url == '/') {
-
-        console.log('... local')
-
-        // rtc_peer = new PeerConnection(url)
-        rtc_peer = new PeerConnection(local_socket)
-
-        // on connect... actually paint up the vid
-        rtc_peer.onStreamAdded = function(e) {
-            console.log('local on!')
-            if (!local_connect) {
-                var video = e.mediaElement;
-                video.setAttribute('width', LOCAL_VIDEO_WIDTH)
-                $('#local_video').append(video)
-
-                video.play();
-                rotateVideo(video);
-                scaleVideos();
-
-                $('#puck_vid_notes').append('local ')
-
-                local_connect = true
-            }
-        }
-
-        // tear down
-        rtc_peer.onStreamEnded = function(e) {
-            var video = e.mediaElement;
-            if (video) {
-                video.style.opacity = 0;
-                rotateVideo(video)
-                setTimeout(function() {
-                    $('#local_video').html()
-                    scaleVideos()
-                }, 1000)
-            }
-        }
-
-        // hey, who are you?
-        rtc_peer.onUserFound = function(userid) {
-            console.log('++++ onUser: ' + userid)
-        }
-
-        // next two straight from demos RE: above
-        function rotateVideo(video) {
-            video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(0deg)';
-            setTimeout(function() {
-                video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(360deg)';
-            }, 1000);
-        }
-
-        function scaleVideos() {
-            var videos = document.querySelectorAll('video'),
-                length = videos.length, video;
-
-            var minus = 130;
-            var windowHeight = 700;
-            var windowWidth = 600;
-            var windowAspectRatio = windowWidth / windowHeight;
-            var videoAspectRatio = 4 / 3;
-            var blockAspectRatio;
-            var tempVideoWidth = 0;
-            var maxVideoWidth = 0;
-
-            for (var i = length; i > 0; i--) {
-                blockAspectRatio = i * videoAspectRatio / Math.ceil(length / i);
-                if (blockAspectRatio <= windowAspectRatio) {
-                    tempVideoWidth = videoAspectRatio * windowHeight / Math.ceil(length / i);
-                } else {
-                    tempVideoWidth = windowWidth / i;
-                }
-                if (tempVideoWidth > maxVideoWidth)
-                    maxVideoWidth = tempVideoWidth;
-            }
-            for (var i = 0; i < length; i++) {
-                video = videos[i];
-                if (video)
-                    video.width = maxVideoWidth - minus;
-            }
-        }
-
-        // go with grace
-        window.onresize = scaleVideos;
-
-        // if someone leaves, nuke vid
-        rtc_peer.onuserleft = function (userid) {
-            $('#puck_vid_notes').append('i diez ' + userid)
-            local_connect = false
-        }
-
-        // connect if not already connected
-        if (! local_connect) getUserMedia(function(stream) {
-            rtc_peer.addStream(stream);
-            rtc_peer.startBroadcasting();
-            local_connect = true
-        })
-
-
-    }
-    else {
-
-        console.log('... remotely')
-        var rtc_peer = new PeerConnection(remote_socket)
-
-        rtc_peer.onStreamAdded = function(e) {
-            console.log('remote on!')
-            $('#local_video').html()
-            $('#remote_video').append(e.mediaElement)
-            $('#puck_vid_notes').append('remote ')
-            remote_connect = true
-        }
-        // if someone leaves, nuke vid
-        rtc_peer.onuserleft = function (userid) {
-            $('#puck_vid_notes').append('userleft ' + userid)
-        }
-
-    }
-
-}
-
-
 //
 // Cat chat (TM) - for moar cat fax.
 //
 // Cat chat guts on display
 //
 var all_cats = []
+var cat_user = ""
 function cat_chat(sock, where) {
 
-    if (typeof my_puck.ip_addr == "undefined") user = "local"
-    else user = my_puck.ip_addr
-
-    if (typeof all_cats[user] == "undefined") {
-        console.log('catting as : ' + user)
-        all_cats[user] = user
-    }
+    if (typeof my_puck.ip_addr == "undefined") cat_user = "local"
+    else                                       cat_user = my_puck.ip_addr
 
     // i is here
-    sock.emit('new_puck', user);
+    if (typeof all_cats[cat_user] == "undefined") {
+        console.log('catting as : ' + cat_user)
+        all_cats[cat_user] = cat_user
+        sock.emit('new_puck', cat_user);
+    }
+    else {
+        console.log(cat_user + ' was already registered...')
+    }
 
     // listener, whenever the server emits 'chat_receive', this updates the chat body
     sock.on('chat_receive', function (stamp, username, data) {
@@ -1255,6 +1164,7 @@ function cat_chat(sock, where) {
         if (typeof username == "undefined") { username = '<unknown>'; }
 
         console.log('cat chat => ' + data)
+
         $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
 
     });
@@ -1437,7 +1347,12 @@ function detect_webRTC(element) {
 
 var peer = {}
 
-function candide(url) {
+//
+// the web RTC stuff
+//
+//  xxx - cite
+//
+function candid_camera(url) {
 
     try {
         if (url == "/") {

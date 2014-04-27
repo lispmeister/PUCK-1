@@ -301,7 +301,7 @@ $(document).ready(function () {
     
     // setInterval(function(){socket_looping()},PREGNANT_PAUSE)
     socket_looping()
-    setTimeout(socket_looping,PREGNANT_PAUSE)
+    // setTimeout(socket_looping,PREGNANT_PAUSE)
 
     // sow the seed o' doubt
     setInterval(get_status,PREGNANT_PAUSE)
