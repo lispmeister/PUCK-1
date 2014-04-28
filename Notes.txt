@@ -1,4 +1,13 @@
 
+So currently ran this on llew's system
+
+    ./fw.sh up 10.0.0.71  5555 192.168.0.250 12034 tcp
+
+
+
+
+
+
 CURRENT ASSUMPTION: if PUCK-1 can ip-connect to PUCK-2, user-1 can ip-connect to PUCK-2 as well
 
 # Installed node from:

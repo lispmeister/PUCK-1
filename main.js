@@ -321,7 +321,7 @@ for (var dev in ifaces) {
 
 // set to local VPN int
 cat_fact_server = my_devs["tun0"]
-proxy_love(cat_fact_server)
+// proxy_love(cat_fact_server)
     
 // write the IP addr to a file
 fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
@@ -415,7 +415,7 @@ function watch_logs(logfile, log_type) {
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, puck_id: bwana_puck.PUCK_ID})
 
                 // proxy even local calls to socket.io
-                proxy_love(cat_fact_server)
+                // proxy_love(cat_fact_server)
 
             }
             // down
@@ -480,7 +480,7 @@ function watch_logs(logfile, log_type) {
                 // if we're doing the calling, we want to setup a proxy so our
                 // browser web requests can go into the tunnel to this vs. trying to flail at
                 // some random IP
-                proxy_love(cat_fact_server)
+                // proxy_love(cat_fact_server)
     
             }
             // down
@@ -511,7 +511,7 @@ function watch_logs(logfile, log_type) {
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
-                proxy_love(cat_fact_server)
+                // proxy_love(cat_fact_server)
     
                 // write the IP addr to a file
                 fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
@@ -618,7 +618,7 @@ function cat_power(channel, msg) {
         cat_sock.broadcast(msg)
     }
     catch (e) {
-        console.log('channel not up yet....?')
+        // console.log('channel not up yet....?')
     }
 
 }

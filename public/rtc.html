@@ -6,33 +6,28 @@
 
 <html lang="en">
     <head>
-        <title>MultiRTC! ® Muaz Khan</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         
         <!-- ui-stylesheet -->
-        <link href="style.css" rel="stylesheet">
-        <link href="scrol-bars.css" rel="stylesheet">
+        <link href="/css/rtc_style.css" rel="stylesheet">
+        <link href="/css/rtc_scroll.css" rel="stylesheet">
         
     </head>
     <body>
         <div class="settings">
             <button id="settings">Settings</button>
         </div>
-        <div class="self-url">
-            <label>Copy & Share with friends:</label>
-            <a id="self-url" href="#" target="_blank"></a>
-        </div>
 	
         <h1>
-            <img src="images/logo.png"><br />
+            <img src="images/rtc_logo.png"><br />
         </h1>
 		
         <div class="users-list">
             <div class="numbers-of-users">0</div>
-            <img src="images/users.png">
+            <img src="images/rtc_users.png">
         </div>
 		
         <div class="main-input-box">
@@ -190,7 +185,7 @@
         <div class="main">
             <div class="new-message">
                 <div class="user-info">
-                    <img src="images/user.png">
+                    <img src="images/rtc_user.png">
                 </div>
 				
                 <div class="user-activity">
@@ -203,19 +198,19 @@
         </div>
         
 
-
         <script type="text/javascript" src='/js/firebase.js''></script>
 
-        <!-- RTC -->
         <script type="text/javascript" src="/js/RTCMultiConnection-v1.7.js"> </script>
+
+        <!-- RTC -->
         <script type="text/javascript" src="/js/linkify.js"> </script>
         <script type="text/javascript" src='/js/screenshot.js'></script>
         <script type="text/javascript" src='/js/RecordRTC.js'></script>
-        <script type="text/javascript" src="/js/ui.main.js"> </script>
-        <script type="text/javascript" src="/js/ui.peer-connection.js"> </script>
-        <script type="text/javascript" src="/js/ui.share-files.js"> </script>
-        <script type="text/javascript" src="/js/ui.users-list.js"> </script>
-        <script type="text/javascript" src="/js/ui.settings.js"> </script>
+        <script type="text/javascript" src="/js/rtc_ui.main.js"> </script>
+        <script type="text/javascript" src="/js/rtc_ui.peer-connection.js"> </script>
+        <script type="text/javascript" src="/js/rtc_ui.share-files.js"> </script>
+        <script type="text/javascript" src="/js/rtc_ui.users-list.js"> </script>
+        <script type="text/javascript" src="/js/rtc_ui.settings.js"> </script>
 
     </body>
 </html>

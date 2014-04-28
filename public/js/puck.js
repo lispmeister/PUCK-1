@@ -201,13 +201,11 @@ function state_cam(state, location) {
 
     if (state == true) {
         // candid_camera(loc)
-        candid_camera(loc)
         state_audio('unmute')
         state_video('resume')
     }
     else if (state == false) {
         // candid_camera(loc)
-        candid_camera(loc)
         state_audio('mute')
         state_video('pause')
     }
@@ -605,7 +603,7 @@ function get_status() {
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
         // console.log('status wootz\n' + data)
         puck_status = JSON.parse(data)
-        console.log("INITIAL STATUS: " + JSON.stringify(puck_status))
+        // console.log("INITIAL STATUS: " + JSON.stringify(puck_status))
     }).fail(ajaxError);
 
 }
@@ -637,16 +635,9 @@ function socket_looping(){
         local_socket = put_a_sock_in_it('/')
     }, PUCK_SOCK_RETRY);
 
-    local_socket.socket.on('connect', function(sock){
-        // console.log('[+++] - general connext note')
-        // everyone loves cat facts!
-        cat_chat(local_socket, 'local')
-    })
-
     local_socket.on('puck_status', function (data) {
         console.log('[@] + cat facts... wait...no... status :!:')
         console.log(JSON.stringify(data))
-        console.log(typeof data)
 
         if (not_loaded) {
             $.getScript("/js/PeerConnection.js", function(){
@@ -661,36 +652,8 @@ function socket_looping(){
         // if something is new, do something!
         if (! _.isEqual(old_puck_status, puck_status)) {
             console.log('something new in the state of denmark!')
-            console.log(puck_status)
-            console.log('vs\n')
-            console.log(old_puck_status)
-
-            console.log(typeof puck_status)
-            console.log(typeof old_puck_status)
             old_puck_status = puck_status
             status_or_die()
-
-            // try to connect to the remote puck socket.io
-            try {
-                console.log('trying...')
-                console.log(data.openvpn_client)
-                if (data.openvpn_client.vpn_status == "up") {
-                    var sock_url = ':7777'
-                    console.log('trying to connect to... ' + sock_url)
-
-                    // try remote connecting, and keep it up until javascript wears itself out
-                    remote_sock = put_a_sock_in_it(sock_url)
-                    remote_sock_thing = setInterval(function () {
-                        console.log('trying to remotely stuff the sock...');
-                        remote_socket = put_a_sock_in_it(sock_url)
-                    }, PUCK_SOCK_RETRY);
-
-                    // setInterval(put_a_sock_in_it, PUCK_SOCK_RETRY, url)
-                    // try_try_again = setInterval('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
-                }
-            }
-            catch (e) { console.log('vpn aint ready') }
-
         }
         else {
             console.log('same ol, same ol')
@@ -820,6 +783,7 @@ function remove_signs_of_call() {
     $('#puck_video').addClass('disabled')
     $('#puck_video').removeClass('green').removeClass('pulse')
     $('.avgrund-popin').remove();
+    // $('.btn-danger').text("connected")
 
 }
 
@@ -1026,68 +990,6 @@ function put_a_sock_in_it(sock_url) {
 }
 
 //
-// gather up the remote resource stuff, listen to 411
-//
-function remote() {
-
-    remote_socket.socket.on('connect', function(){
-
-        console.log('[+++] remote - connected')
-
-        // if (typeof data != undefined && data.server != "undefined") {
-        //     $('#conversation').append('<div class="muted small"><i>connected to ' + data.server + '</i></div>')
-        // }
-
-        remote_socket.on('cat_facts', function (data) {
-
-            console.log('[@@@] - cat facts!')
-            console.log(data)
-
-            if (typeof data != undefined && data.fact != "undefined") {
-                $('#ip_diddy').append('<br />' + data.fact)
-                console.log(data.fact)
-                console.log(data.server)
-            }
-            state_cam(true, 'remote')
-        })
-
-        remote_socket.emit('puck', 'foo', function (data) {
-            console.log('[@] + hey pucks... ')
-            console.log(data)
-        })
-
-        remote_socket.on('puck_status', function (data) {
-            console.log('[@] + cat facts... wait...no... remote status!')
-            status_or_die()
-            console.log(data)
-        })
-
-        remote_socket.on('error', function(err){
-            console.log('remote errz ' + JSON.stringify(err))
-        })
-
-        //cat_chat(remote_socket, my_puck.PUCK_ID)
-        cat_chat(remote_socket, 'remote')
-
-    })
-
-    remote_socket.on('anything', function(data) {
-        console.log('... something... anything.... ')
-        console.log(data)
-    })
-
-    remote_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
-    remote_socket.on('reconnect',        function(d) { console.log ('reconnect') })
-    remote_socket.on('connecting',       function(d) { console.log ('connecting') })
-    remote_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
-    remote_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
-    remote_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
-    remote_socket.on('close',            function(d) { console.log ('close') })
-    remote_socket.on('disconnect',       function(d) { console.log ('disconnect') })
-
-}
-
-//
 // magic time, courtesy of rtc.. many of the RTC functions below
 // taken from the marvelous https://github.com/muaz-khan demos;
 //
@@ -1132,74 +1034,6 @@ function getUserMedia(callback) {
 
         callback(stream)
 
-    })
-
-}
-
-//
-// Cat chat (TM) - for moar cat fax.
-//
-// Cat chat guts on display
-//
-var all_cats = []
-var cat_user = ""
-function cat_chat(sock, where) {
-
-    if (typeof my_puck.ip_addr == "undefined") cat_user = "local"
-    else                                       cat_user = my_puck.ip_addr
-
-    // i is here
-    if (typeof all_cats[cat_user] == "undefined") {
-        console.log('catting as : ' + cat_user)
-        all_cats[cat_user] = cat_user
-        sock.emit('new_puck', cat_user);
-    }
-    else {
-        console.log(cat_user + ' was already registered...')
-    }
-
-    // listener, whenever the server emits 'chat_receive', this updates the chat body
-    sock.on('chat_receive', function (stamp, username, data) {
-
-        if (typeof username == "undefined") { username = '<unknown>'; }
-
-        console.log('cat chat => ' + data)
-
-        $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
-
-    });
-
-    // click send
-    $('#datasend').click( function() {
-        var message = $('#meow').val();
-        $('#meow').val('');
-        if (message != "") {
-            console.log('sending...' + message)
-
-            // pack it off to the server... try remote first, then....
-            try       {
-                remote_socket.emit('chat_send', message);
-                console.log('[remote] + ' + message)
-            }
-            catch (e) {
-                console.log('[local] + ' + message)
-                sock.emit('chat_send', message);
-            }
-
-        }
-        else {
-            console.log('not sending blanx')
-        }
-    });
-
-    // when hit enter
-    $('#meow').keypress(function(e) {
-        if(e.which == 13) {
-            $(this).blur();
-            console.log('hit enter')
-            $('#datasend').focus().click();
-            $('#meow').focus()
-        }
     })
 
 }
@@ -1344,143 +1178,3 @@ function detect_webRTC(element) {
 
 }
 
-
-var peer = {}
-
-//
-// the web RTC stuff
-//
-//  xxx - cite
-//
-function candid_camera(url) {
-
-    try {
-        if (url == "/") {
-            console.log('local connect')
-            peer = new PeerConnection(local_socket);
-        }
-        else {
-            console.log('remote connect')
-            peer = new PeerConnection(remote_socket);
-        }
-    }
-    catch (e) {
-        console.log('hmm... candide started a bit early...' + e)
-    }
-
-    peer.onUserFound = function(userid) {
-
-        console.log('+++ user found...')
-
-        getUserMedia(function(stream) {
-            peer.addStream(stream);
-            peer.sendParticipationRequest(button.id);
-        })
-        roomsList.appendChild(tr);
-
-    }
-
-    peer.onStreamAdded = function(e) {
-        var video = e.mediaElement;
-        video.setAttribute('width', 600);
-        videosContainer.insertBefore(video, videosContainer.firstChild);
-
-        video.play();
-        rotateVideo(video);
-        scaleVideos();
-    }
-
-    peer.onStreamEnded = function(e) {
-        var video = e.mediaElement;
-        if (video) {
-            video.style.opacity = 0;
-            rotateVideo(video);
-            setTimeout(function() {
-                video.parentNode.removeChild(video);
-                scaleVideos();
-            }, 1000);
-        }
-    }
-
-    $('#start-broadcasting').click(function (e) { 
-        console.log('--> user clicked go')
-        getUserMedia(function(stream) {
-            peer.addStream(stream);
-            peer.startBroadcasting();
-        })
-    })
-
-    peer.userid = puckid
-
-    var videosContainer = document.getElementById('videos-container') || document.body;
-    var btnSetupNewRoom = document.getElementById('setup-new-room');
-    var roomsList = document.getElementById('rooms-list');
-
-    function rotateVideo(video) {
-        video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(0deg)';
-        setTimeout(function() {
-            video.style[navigator.mozGetUserMedia ? 'transform' : '-webkit-transform'] = 'rotate(360deg)';
-        }, 1000);
-    }
-
-    function scaleVideos() {
-        var videos = document.querySelectorAll('video'),
-            length = videos.length, video;
-
-        var minus = 130;
-        var windowHeight = 700;
-        var windowWidth = 600;
-        var windowAspectRatio = windowWidth / windowHeight;
-        var videoAspectRatio = 4 / 3;
-        var blockAspectRatio;
-        var tempVideoWidth = 0;
-        var maxVideoWidth = 0;
-
-        for (var i = length; i > 0; i--) {
-            blockAspectRatio = i * videoAspectRatio / Math.ceil(length / i);
-            if (blockAspectRatio <= windowAspectRatio) {
-                tempVideoWidth = videoAspectRatio * windowHeight / Math.ceil(length / i);
-            } else {
-                tempVideoWidth = windowWidth / i;
-            }
-            if (tempVideoWidth > maxVideoWidth)
-                maxVideoWidth = tempVideoWidth;
-        }
-        for (var i = 0; i < length; i++) {
-            video = videos[i];
-            if (video)
-                video.width = maxVideoWidth - minus;
-        }
-    }
-
-    window.onresize = scaleVideos;
-    
-    // you need to capture getUserMedia yourself!
-    function getUserMedia(callback) {
-        var hints = {audio:true,video:{
-            optional: [],
-            mandatory: {
-                minWidth: 1280,
-                minHeight: 720,
-                maxWidth: 1920,
-                maxHeight: 1080,
-                minAspectRatio: 1.77
-            }
-        }};
-        navigator.getUserMedia(hints,function(stream) {
-            var video = document.createElement('video');
-            video.src = URL.createObjectURL(stream);
-            video.controls = true;
-            video.muted = true;
-            
-            peer.onStreamAdded({
-                mediaElement: video,
-                userid: 'self',
-                stream: stream
-            });
-            
-            callback(stream);
-        });
-    }
-
-}

@@ -1,6 +1,17 @@
+var fs = require('fs')
+var https = require('https')
 
-// HTTP server
-var app = require('http').createServer(function(request, response) {
+
+    var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
+        cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
+        ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt");
+
+    var credentials = {key: key, cert: cert, ca: ca};
+
+// HTTPs server
+// var app = require('http').createServer(function(request, response) {
+
+var app = https.createServer(credentials, function(request, response) {
     request.addListener('end', function() {
         file.serve(request, response);
     }).resume();
@@ -18,6 +29,9 @@ new WebSocketServer({
 var CHANNELS = { };
 
 function onRequest(socket) {
+
+    console.log('onReq: ' + socket.origin)
+
     var origin = socket.origin + socket.resource;
 
     var websocket = socket.accept(null, origin);
@@ -34,6 +48,9 @@ function onRequest(socket) {
 }
 
 function onMessage(message, websocket) {
+
+    console.log('message: ' + JSON.stringify(message))
+
     if (message.checkPresence)
         checkPresence(message, websocket);
     else if (message.open)
@@ -43,6 +60,9 @@ function onMessage(message, websocket) {
 }
 
 function onOpen(message, websocket) {
+
+    console.log('onOpen: ' + message.channel)
+
     var channel = CHANNELS[message.channel];
 
     if (channel)
@@ -70,6 +90,9 @@ function sendMessage(message, websocket) {
 }
 
 function checkPresence(message, websocket) {
+
+    console.log('anyone... out there?')
+
     websocket.sendUTF(JSON.stringify({
         isChannelPresent: !!CHANNELS[message.channel]
     }));
@@ -101,3 +124,4 @@ function truncateChannels(websocket) {
 app.listen(12034);
 
 console.log('signaler up @ https://xxx:12034/');
+

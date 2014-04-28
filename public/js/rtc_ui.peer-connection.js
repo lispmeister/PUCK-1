@@ -99,7 +99,7 @@ rtcMultiConnection.onNewSession = function(session) {
     addNewMessage({
         header: session.extra.username,
         message: 'Making handshake with room owner....!',
-        userinfo: '<img src="images/action-needed.png">',
+        userinfo: '<img src="images/rtc_action-needed.png">',
         color: session.extra.color
     });
 };
@@ -109,7 +109,7 @@ rtcMultiConnection.onRequest = function(request) {
     addNewMessage({
         header: 'New Participant',
         message: 'A participant found. Accepting request of ' + request.extra.username + ' ( ' + request.userid + ' )...',
-        userinfo: '<img src="images/action-needed.png">',
+        userinfo: '<img src="images/rtc_action-needed.png">',
         color: request.extra.color
     });
 };
@@ -125,7 +125,7 @@ rtcMultiConnection.onCustomMessage = function(message) {
         addNewMessage({
             header: message.extra.username,
             message: msg,
-            userinfo: '<img src="images/action-needed.png">',
+            userinfo: '<img src="images/rtc_action-needed.png">',
             color: message.extra.color,
             callback: function(div) {
                 div.querySelector('#preview').onclick = function() {
@@ -168,7 +168,7 @@ rtcMultiConnection.onCustomMessage = function(message) {
         addNewMessage({
             header: message.extra.username,
             message: message.extra.username + ' enabled microphone. <button id="listen">Listen</button> ---- <button id="share-your-mic">Share Your Mic</button>',
-            userinfo: '<img src="images/action-needed.png">',
+            userinfo: '<img src="images/rtc_action-needed.png">',
             color: message.extra.color,
             callback: function(div) {
                 div.querySelector('#listen').onclick = function() {

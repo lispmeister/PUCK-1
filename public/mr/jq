@@ -1,0 +1,9 @@
+    <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
+    <script> 
+        $(document).ready(function () {
+            var page_url   = window.location.pathname.split( '/' )
+            var extra_bits = page_url[urlbits.length -1]
+            console.log('page is... ' + extra_bits)
+        })
+    </script>
+

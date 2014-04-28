@@ -23,7 +23,7 @@ function addNewMessage(args) {
 
     var userinfoDIV = document.createElement('div');
     userinfoDIV.className = 'user-info';
-    userinfoDIV.innerHTML = args.userinfo || '<img src="images/user.png">';
+    userinfoDIV.innerHTML = args.userinfo || '<img src="images/rtc_rtc_user.png">';
 
     userinfoDIV.style.background = args.color || rtcMultiConnection.extra.color || getRandomColor();
 
@@ -49,7 +49,6 @@ function addNewMessage(args) {
         args.callback(newMessageDIV);
     }
 
-    document.querySelector('#message-sound').play();
 }
 
 main.querySelector('input').onkeyup = function(e) {
@@ -71,7 +70,7 @@ main.querySelector('button').onclick = function() {
     addNewMessage({
         header: username,
         message: 'Searching for existing rooms...',
-        userinfo: '<img src="images/action-needed.png">'
+        userinfo: '<img src="images/rtc_action-needed.png">'
     });
 
     var roomid = rtcMultiConnection.channel;
@@ -83,7 +82,7 @@ main.querySelector('button').onclick = function() {
             addNewMessage({
                 header: username,
                 message: 'No room found. Creating new room...<br /><br />You can share following link with your friends:<br /><a href="' + location.href + '">' + location.href + '</a>',
-                userinfo: '<img src="images/action-needed.png">'
+                userinfo: '<img src="images/rtc_action-needed.png">'
             });
 
             rtcMultiConnection.open();
@@ -91,7 +90,7 @@ main.querySelector('button').onclick = function() {
             addNewMessage({
                 header: username,
                 message: 'Room found. Joining the room...',
-                userinfo: '<img src="images/action-needed.png">'
+                userinfo: '<img src="images/rtc_action-needed.png">'
             });
             rtcMultiConnection.join(roomid);
         }
