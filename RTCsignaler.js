@@ -9,6 +9,10 @@ var _static = require('node-static');
 var file = new _static.Server('./public');
 
 var http = require('http').createServer(function (request, response) {
+    // host: '192.168.0.250:12034',
+    var ip_addr = request.headers.host.split(':')[0]
+    console.log('request *to* ' + ip_addr)
+
     request.addListener('end', function () {
         if (request.url.search(/.png|.gif|.js|.css/g) == -1) {
             file.serveFile('/index.html', 402, {}, request, response);

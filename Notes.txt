@@ -4,6 +4,7 @@ So currently ran this on llew's system
     ./fw.sh up 10.0.0.71  5555 192.168.0.250 12034 tcp
 
 
+Also - meld in signal server
 
 
 

@@ -15,21 +15,25 @@ var Tail       = require('tail').Tail,
     response   = require('response-time'),
     rest       = require('rest'),
     restler    = require("restler"),
-    util       = require('util'),
     __         = require('underscore'),   // note; not one, two _'s, just for node
     puck       = require('./modules');
 
-// sue me
-var sleep = require('sleep');
-
-var puck_port = 8080
 
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
 console.log(config);
 
 console.log(config.PUCK)
-console.log(config.PUCK.keystore)
+
+// shortcuts
+var puck_home         = config.PUCK.home
+var puck_keystore     = puck_home + config.PUCK.keystore
+var puck_bin          = puck_home + config.PUCK.bin
+var puck_logs         = puck_home + config.PUCK.logs
+var puck_public       = puck_home + config.PUCK.pub
+
+var puck_port         = config.PUCK.puck_port
+var puck_port_forward = config.PUCK.puck_port_forward
 
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
@@ -51,7 +55,7 @@ var decoder       = new StringDecoder('utf8');
 
 // global PUCK ID for this server's PUCK
 try {
-    puck_id = fs.readFileSync("/etc/puck/pucks/PUCK/puck.pid")
+    puck_id = fs.readFileSync(puck_keystore + '/PUCK/puck.pid')
     puck_id = decoder.write(puck_id);
     puck_id = puck_id.replace(/\n/, '');
 } 
@@ -82,12 +86,13 @@ var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","durati
     puck_status.file_events    = file_magic
     puck_status.browser_events = browser_magic
 
+
 var server           = "",
     puck2ip          = {},      // puck ID to IP mapping
     ip2puck          = {},      // IP mapping to puck ID
     bwana_puck       = {},
-    puck_status_file = "/etc/puck/status.puck",
-    puck_remote_vpn  = "/etc/puck/public/openvpn_server.ip";
+    puck_status_file = puck_home   + '/status.puck',
+    puck_remote_vpn  = puck_public + '/openvpn_server.ip';
 
 // proxy up?
 var puck_proxy_up = false,
@@ -109,7 +114,7 @@ var cat_facts = []
 // json scrobbled from bits at from - https://user.xmission.com/~emailbox/trivia.htm
 console.log('hoovering up cat facts... look out, tabby!')
     
-fs.readFile("/etc/puck/catfacts.json", function (err, data) {
+fs.readFile(puck_home + "/catfacts.json", function (err, data) {
     if (err) {
         console.log('cant live without cat facts! ' + err)
         console.log('going down!')
@@ -137,11 +142,9 @@ function random_cat_fact (facts) {
 //
 // watch vpn logs for incoming/outgoing connections
 //
-var server_vpn_log = "server_vpn"
-var client_vpn_log = "client_vpn"
-// xxxx - wonder if this shouldn't be done via REST
-watch_logs(server_vpn_log, "OpenVPN Server")
-watch_logs(client_vpn_log, "OpenVPN Client")
+// xxxx - should have a rest call for this...?
+watch_logs("server_vpn", "OpenVPN Server")
+watch_logs("client_vpn", "OpenVPN Client")
 
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
@@ -335,6 +338,8 @@ fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
 //
 function watch_logs(logfile, log_type) {
 
+    logfile = puck_logs + "/" + logfile + ".log"
+
     // create if doesn't exist...?
     if (!fs.existsSync(logfile)) {
         console.log('creating ' + logfile)
@@ -345,12 +350,6 @@ function watch_logs(logfile, log_type) {
     }
 
     console.log('watching logs from ' + log_type)
-
-    // status in public, logs in logs
-//  var logfile_status = "/etc/puck/public/" + logfile + ".json",
-//      status_data    = ""
-
-    logfile = "/etc/puck/logs/" + logfile + ".log"
 
     var tail = new Tail(logfile)
 
@@ -1255,7 +1254,7 @@ function echoStatus(req, res, next) {
  */
 function stopVPN(req, res, next) {
     var exec    = require('child_process').exec;
-    var command = '/etc/puck/exe/stop_vpn.sh';
+    var command = puck_bin + '/stop_vpn.sh';
 
     console.log('stop VPN!')
     var child = exec(command,
@@ -1330,7 +1329,7 @@ function downloadStuff (req, res, next) {
 
     console.log('in DL stuff')
 
-    var uploadz = "/etc/puck/public/uploads"
+    var uploadz = puck_public + "/uploads"
 
     var files = fs.readdirSync(uploadz)
 
@@ -1386,7 +1385,7 @@ function uploadSchtuff(req, res, next) {
 
         var target_size = req.files.uppity[i].size
         var target_file = req.files.uppity[i].name
-        var target_path = __dirname + "/public/uploads/" + target_file
+        var target_path = public_puck + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
 
         console.log('trying ' + tmpfile + ' -> ' + target_path)
@@ -1466,6 +1465,31 @@ function uploadSchtuff(req, res, next) {
 
 }
 
+//
+// execute a command in the background, log stuff
+//
+function puck_spawn(command, argz) {
+
+    console.log('a spawn o puck emerges... ' + command + ' ' + argz.join['  '])
+
+    var cmd = puck_bin + command
+
+    var spawn = require('child_process').spawn,
+          out = fs.open(puck_logs + '/' + command + '.std.log', 'a'),
+          err = fs.open(puck_logs + '/' + command + '.err.log', 'a')
+
+    // output, errors, etc.
+    var child = spawn(cmd, argz, {
+        detached: true,
+        stdio: [ 'ignore', out, err ]
+    });
+
+    child.unref();
+
+    console.log(command + ' spawned')
+
+}
+
  /**
  * Start the local OpenVPN client via an external bash script
  */
@@ -1475,6 +1499,8 @@ function startVPN(req, res, next) {
     console.log(req.body)
 
     var home  = "/puck.html"
+
+    var ip_addr = req.body.ip_addr
 
     // bail if we don't get ID
     if (typeof req.body.puckid === 'undefined' || req.body.puckid == "") {
@@ -1489,8 +1515,6 @@ function startVPN(req, res, next) {
 
     console.log(puckid, ipaddr)
 
-    var vpn   = '/etc/puck/exe/start_vpn.sh'
-
     // this means you're trying to do it despite ping not working
     if (typeof puck2ip[puckid] == 'undefined') {
         console.log("hmmm... trying to VPN when ping couldn't reach it... good luck!")
@@ -1501,21 +1525,11 @@ function startVPN(req, res, next) {
         console.log("using pinged IP addr to VPN: " + puck2ip[puckid])
         args = [puckid, puck2ip[puckid]]
     }
+
+    var cmd   = puck_bin + '/start_vpn.sh'
     
-    cmd = vpn
-
-    var spawn = require('child_process').spawn,
-          out = fs.open('/etc/puck/tmp/std.log', 'a'),
-          err = fs.open('/etc/puck/tmp/err.log', 'a');
-
-    var child = spawn(cmd, args, {
-        detached: true,
-        stdio: [ 'ignore', out, err ]
-    });
-
-    child.unref();
-
-    console.log('post execution')
+    // fire up vpn
+    puck_spawn(cmd, args)
 
     createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
 
@@ -1525,12 +1539,33 @@ function startVPN(req, res, next) {
         else { console.log('wrote remote vpn server IP') }
     });
 
-    // prevents calling form from leaving page
+
+    // finis
     res.send(204)
 
 }
 
+//
+// forward or unforward a port to go to your VPN to facilitate web RTC/sockets/etc
+//
+function port_forwarding(direction, port, remote_ip, remote_port, proto) {
 
+    console.log('forwarding portz...') 
+    console.log(direction, port, remote_ip, remote_port, proto)
+
+    // what's our IP addr?
+    // looks like host: '192.168.0.250:12034',
+    var ip_addr_server = request.headers.host.split(':')[0]
+
+    console.log('request from ' + ip_addr_server)
+
+    var cmd = puck_bin + '/forward_port.sh'
+
+    var args  = [direction, ip_addr_server, port, remote_ip, remote_port, proto]
+
+    puck_spawn(cmd, args)
+
+}
 
 // XXX - stop proxy when done!
 
@@ -1665,10 +1700,6 @@ function putPuck(req, res, next) {
 }
 
 
-//
-// ... zen added
-//
-
 function back_to_home (res) {
     console.log('on my way home')
     var home = "/puck.html"
@@ -1730,26 +1761,10 @@ function formDelete(req, res, next) {
     // ... of course... maybe should be done in node/js anyway...
     // have to ponder some imponderables....
     //
-    var util  = require('util')
-    var spawn = require('child_process').spawn
-
     // this simply takes the pwd and finds the exe area... really 
     // want to use a reasonable puck home here!
-    console.log('/etc/exe/delete_puck.sh', [puckid])
-    var pucky = spawn('/etc/puck/exe/delete_puck.sh', [puckid])
+    puck_spawn('delete_puck.sh', [puckid])
 
-    // now slice and dice output, errors, etc.
-    pucky.stdout.on('data', function (data) {
-        console.log('delete_puck.sh stdout: ' + data);
-    });
-
-    pucky.stderr.on('data', function (data) {
-        console.log('delete_puck.sh stderr: ' + data);
-    });
-
-    pucky.on('exit', function (code) {
-        console.log('delete_puck.sh process exited with code ' + code);
-    });
 
 }
 
@@ -1884,7 +1899,7 @@ function httpsPing(puckid, ipaddr, res, next) {
                 response = {status: "ping failure", "name": 'unknown problem'}
                 // synchronicity... II... shouting above the din of my rice crispies
                 try { res.send(408, e) }
-                catch (e) { }
+                catch (e) { console.log('caught ' + e) }
             }
         })
 
@@ -1988,30 +2003,18 @@ function formCreate(req, res, next) {
                         //
                         // ... back to the program, dog!
                         //
-                        var util  = require('util')
-                        var spawn = require('child_process').spawn
-            
                         console.log("executing create_puck.sh")
-            
+
                         // this simply takes the pwd and finds the exe area...
-                        var pucky = spawn('/etc/puck/exe/create_puck.sh', [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email])
-                        console.log('remote puck add - /etc/puck/exe/create_puck.sh', data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email)
-            
-                        // now slice and dice output, errors, etc.
-                        pucky.stdout.on('data', function (data) { console.log('_ local stdout: ' + data); });
-                        pucky.stderr.on('data', function (data) { console.log('_ local stderr: ' + data); });
-                        pucky.on('exit', function (code) { console.log('_ create_puck.sh process exited with code ' + code); });
+                        var cmd  = '/create_puck.sh'
+                        var argz = [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
+                        puck_spawn(cmd, argz)
             
                         if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
                             console.log("posting our puck data to the puck we just added....")
-                            console.log('/etc/puck/exe/create_puck.sh [' + puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr)
-                            var remote_pucky = spawn('/etc/puck/exe/create_puck.sh', [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr])
-            
-                            // output, errors, etc.
-                            remote_pucky.stdout.on('data', function (data) { console.log('# remote stdout: ' + data); });
-                            remote_pucky.stderr.on('data', function (data) { console.log('# remote stderr: ' + data); });
-                            remote_pucky.on('exit',        function (code) { console.log('remote create_puck.sh process exited with code ' + code) })
-                            // res.send(200, {"status": "zoomer"});
+                            argz = [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr]
+
+                            puck_spawn(cmd, argz)
                         }
                     })
                     req.on('error', function(e) {
@@ -2212,7 +2215,7 @@ server.use(express.methodOverride());
 server.use(server.router);
 
 // if all else fails
-server.use(express.static(__dirname + '/public'));
+server.use(express.static(puck_public));
 
 //
 // routes

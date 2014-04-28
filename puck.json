@@ -1,13 +1,20 @@
 {
-"PUCK" : {
-    "home"     : "/etc/puck",
-    "keystore" : "/etc/puck/pucks",
-    "bin"      : "/etc/puck/exe"
-    },
-"crypto": {
-    "keysize"  : "1024",
-    "life_puck": "365",
-    "life_vpn" : "30"
-}
-}
+    "PUCK" : {
+        "home"              : "/etc/puck",
+        "keystore"          : "/pucks",
+        "bin"               : "/exe",
+        "pub"               : "/public",
+        "tmp"               : "/tmp",
+        "logs"              : "/logs",
+        "puck_port"         : "8080",
+        "puck_port_signal"  : "12034",
+        "puck_port_forward" : "8081"
+        },
+    
+    "crypto": {
+        "keysize"  : "1024",
+        "life_puck": "365",
+        "life_vpn" : "30"
+    }
 
+}
