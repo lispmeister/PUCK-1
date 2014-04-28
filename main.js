@@ -209,7 +209,6 @@ var uber_puck = function uber_puck() {
     console.log("it's time...!")
 
     // Q.nfcall(someday_get_https, 'https://localhost:' + puck_port + '/puck/' + puck_id).then(function(res)
-    // sekure_get('https://localhost:' + puck_port + '/puck/' + puck_id, function(data)
 
     var url = 'https://localhost:' + puck_port + '/puck/' + puck_id
 
@@ -1883,41 +1882,12 @@ function httpsPing(puckid, ipaddr, res, next) {
                 ping_done = true
                 console.log('no response, ping failure!')
                 response = {status: "ping failure", "name": 'unknown problem'}
-                res.send(408, e)
+                // synchronicity... II... shouting above the din of my rice crispies
+                try { res.send(408, e) }
+                catch (e) { }
             }
         })
 
-    })
-
-}
-
-function sekure_get(url){
-
-//  Q.nfcall(https.get,url).then(function(res) {
-//      console.log(url + ' nabbed => ' + res)
-//      return(res)
-//  }, 
-//  function(err) {
-//      console.log('errz snatchin ' + url)
-//      return(err)
-//  })
-
-    console.log('snag ' + url)
-
-    var req = https.get(url, function(response) {
-        var res_data = ''
-        response.on('data', function(chunk) {
-            res_data += chunk
-        })
-        response.on('end', function() {
-            console.log(url + ' nabbed => ' + res_data)
-            return(res_data)
-        })
-    })
-    req.on('error', function(e) {
-        console.log("Got error: " + e.message)
-        console.log('errz snatchin ' + url + ' ... ' + e.message)
-        return(e)
     })
 
 }
@@ -2353,7 +2323,6 @@ server.get('/down', downloadStuff)
 // get a url from wherever the puck is
 server.all('/url', webProxy)
 
-
 //
 //
 // and... finally... relax and listen
@@ -2379,7 +2348,6 @@ var uuid = require('node-uuid'),
 // tack on socket.io
 var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
 
-
 // recommended settings, as per https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
 // except disabling flashsocket
 io.enable('browser client minification');  // send minified client
@@ -2399,9 +2367,6 @@ var cat_fact_server = "",
     puck_users      = {},
     cat_sock        = {},
     all_cats        = []
-
-
-
 
 //
 // for socket channel stuff - both video and log watching and chat and all that stuff
