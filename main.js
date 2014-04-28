@@ -16,8 +16,8 @@ var Tail       = require('tail').Tail,
     rest       = require('rest'),
     restler    = require("restler"),
     __         = require('underscore'),   // note; not one, two _'s, just for node
-    puck       = require('./modules');
-
+    puck       = require('./modules')
+    uuid       = require('node-uuid');
 
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
@@ -34,6 +34,7 @@ var puck_public       = puck_home + config.PUCK.pub
 
 var puck_port         = config.PUCK.puck_port
 var puck_port_forward = config.PUCK.puck_port_forward
+var puck_port_signal  =  config.PUCK.puck_port_signal
 
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
@@ -1548,22 +1549,42 @@ function startVPN(req, res, next) {
 //
 // forward or unforward a port to go to your VPN to facilitate web RTC/sockets/etc
 //
-function port_forwarding(direction, port, remote_ip, remote_port, proto) {
+function port_forwarding(req, res, next) {
+
+    // (direction, port, remote_ip, remote_port, proto) {
 
     console.log('forwarding portz...') 
     console.log(direction, port, remote_ip, remote_port, proto)
+
+    if (typeof req.query.direction   == "undefined" ||
+        typeof req.query.port        == "undefined" ||
+        typeof req.query.remote_ip   == "undefined" ||
+        typeof req.query.remote_port == "undefined" ||
+        typeof req.query.remote_ip   == "undefined" ||
+        typeof req.query.proto       == "undefined") {
+            console.log('port forwarding requires direction, port, remote_ip, remote_port, and proto all to be set')
+            next({error: "port forwarding requires direction, port, remote_ip, remote_port, and proto all to be set"})
+    }
+
+    direction   = req.query.direction
+    port        = req.query.port
+    ip_remote   = req.query.remote_ip
+    remote_port = req.query.remote_port
+    proto       = req.query.proto
 
     // what's our IP addr?
     // looks like host: '192.168.0.250:12034',
     var ip_addr_server = request.headers.host.split(':')[0]
 
-    console.log('request from ' + ip_addr_server)
+    console.log('request to ' + ip_addr_server)
 
     var cmd = puck_bin + '/forward_port.sh'
 
     var args  = [direction, ip_addr_server, port, remote_ip, remote_port, proto]
 
     puck_spawn(cmd, args)
+
+    res.send(200, {"status" : "OK"})
 
 }
 
@@ -2088,35 +2109,61 @@ function serverRestart(req, res, next) {
 }
 
 //
-// setup signal socket server - from https://github.com/muaz-khan/WebRTC-Experiment
+// setup signal socket server - from https://github.com/muaz-khan/WebRTC-Experiment   (http version)
+//
+// XXXX
+// XXXX
+// XXXX
+//
+// THIS IS NOT ENCRYPTED!  This is meant to be run over a VPN
+//
+// In production/whatever, BLOCK THE PORT FROM THE WORLD
+// if it's even running - ONLY expose it to the VPN.
+//
+// XXXX
+// XXXX
+// XXXX
 //
 function SSSUp (_server) {
 
     console.log('Socket Signal Server!')
 
+    var _static = require('node-static');
+    var file = new _static.Server('./public');
+    
+    var http = require('http').createServer(function (request, response) {
+        // host: '192.168.0.250:12034',
+        var ip_addr = request.headers.host.split(':')[0]
+        console.log('request *to* ' + ip_addr)
+    
+        request.addListener('end', function () {
+            if (request.url.search(/.png|.gif|.js|.css/g) == -1) {
+                file.serveFile('/index.html', 402, {}, request, response);
+            } else file.serve(request, response);
+        }).resume();
+    }).listen(puck_port_signal);
+    
+    var CHANNELS = {};
+    
     var WebSocketServer = require('websocket').server;
-
+    
     new WebSocketServer({
-        httpServer: _server,
+        httpServer: http,
         autoAcceptConnections: false
     }).on('request', onRequest);
-    
-    // shared stuff
-    
-    var CHANNELS = { };
     
     function onRequest(socket) {
         var origin = socket.origin + socket.resource;
     
         var websocket = socket.accept(null, origin);
     
-        websocket.on('message', function(message) {
+        websocket.on('message', function (message) {
             if (message.type === 'utf8') {
                 onMessage(JSON.parse(message.utf8Data), websocket);
             }
         });
     
-        websocket.on('close', function() {
+        websocket.on('close', function () {
             truncateChannels(websocket);
         });
     }
@@ -2151,15 +2198,14 @@ function SSSUp (_server) {
             if (channel[i] && channel[i] != websocket) {
                 try {
                     channel[i].sendUTF(message.data);
-                } catch(e) {
-                }
+                } catch (e) {}
             }
         }
     }
     
     function checkPresence(message, websocket) {
         websocket.sendUTF(JSON.stringify({
-            isChannelPresent: !!CHANNELS[message.channel]
+            isChannelPresent: !! CHANNELS[message.channel]
         }));
     }
     
@@ -2185,6 +2231,252 @@ function SSSUp (_server) {
                 delete CHANNELS[channel];
         }
     }
+    
+    console.log('\n++++\n')
+    console.log('\tlistening both websocket and HTTPs at port ' + puck_port_signal);
+    console.log('\n++++\n')
+
+}
+
+//
+// socket stuff stuffed in here
+//
+function do_sock_stuff () {
+    
+    //
+    // sockets time
+    //
+    
+    // tack on socket.io
+    var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
+    
+    // recommended settings, as per https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
+    // except disabling flashsocket
+    io.enable('browser client minification');  // send minified client
+    io.enable('browser client etag');          // apply etag caching logic based on version number
+    io.enable('browser client gzip');          // gzip the file
+    io.set('log level', 1);                    // reduce logging
+    
+    io.set('transports', [
+          //  'websocket'
+          // ,'flashsocket'     // xxx ?
+          // ,'htmlfile'
+          ,'xhr-polling'
+          ,'jsonp-polling'
+    ])
+    
+    var cat_fact_server = "",
+        puck_users      = {},
+        cat_sock        = {},
+        all_cats        = []
+    
+    //
+    // for socket channel stuff - both video and log watching and chat and all that stuff
+    //
+    
+    var cat_fact_server = "",
+        puck_users      = {},
+        cat_sock        = {},
+        all_cats        = []
+    
+    
+    var ios = io.sockets.on('connection', function (sock_puppet) {
+    
+        cat_sock = sock_puppet
+    
+        sock_puppet.emit('puck_status', puck_status)
+    
+        console.log('[+] NEW connext from ' + sock_puppet.handshake.address.address)
+    
+        sock_puppet.resources = {
+            screen: false,
+            video: true,
+            audio: true
+        }
+    
+    // listen for any chatty pucks out there
+    
+        sock_puppet.on('puck_chat', function(res) {
+            console.log('- cat chat -')
+            console.log(res)
+            console.log('- cat facts -')
+        })
+    
+    
+    // slip them a friendly cat fact
+    
+        sock_puppet.on('puck', function(res) {
+            var cool_cat_fact = random_cat_fact(cat_facts)
+    
+            console.log('- cat facts -')
+            console.log('- ' + cool_cat_fact + ' -')
+            console.log('- cat facts -')
+    
+            // if acting as server this will be the remote puck's ip
+            var ip_addr = sock_puppet.handshake.address
+            console.log(ip_addr)
+            // console.log('client data:')
+            // console.log(client)
+    
+            // if connected via VPN, use remote PUCK as server
+            console.log(puck_status)
+            console.log(puck_status.openvpn_client)
+    
+            if (typeof puck_status.openvpn_client != "undefined" && puck_status.openvpn_client.server != "") {
+                cat_fact_server = puck_status.openvpn_client.server
+            }
+            else if (typeof puck_status.openvpn_server != "undefined" && puck_status.openvpn_server.server != "") {
+                cat_fact_server = puck_status.openvpn_server.server
+            }
+    
+            // hardcoding tun0... hmmm....
+            if (cat_fact_server == "") cat_fact_server = my_devs["tun0"]
+    
+            console.log('cat fax server is: ' + cat_fact_server)
+    
+            var cool_cat_data    = {}
+    
+            cool_cat_data.fact   = cool_cat_fact
+            cool_cat_data.server = cat_fact_server
+    
+            console.log(cat_fact_server)
+    
+            sock_puppet.emit('cat_facts', cool_cat_data)
+    
+        })
+    
+    
+    // most of the code below is from github.com:andyet/signal-master.git
+    
+        // pass a message to another id
+        sock_puppet.on('message', function (details) {
+            var otherClient = io.sockets.sockets[details.to];
+            if (!otherClient) return;
+            details.from = sock_puppet.id;
+            otherClient.emit('message', details);
+        });
+    
+        sock_puppet.on('shareScreen', function () {
+            sock_puppet.resources.screen = true;
+        });
+    
+        sock_puppet.on('unshareScreen', function (type) {
+            sock_puppet.resources.screen = false;
+            if (sock_puppet.room) removeFeed('screen');
+        });
+    
+        sock_puppet.on('join', join);
+    
+        function removeFeed(type) {
+            io.sockets.in(sock_puppet.room).emit('remove', {
+                id: sock_puppet.id,
+                type: type
+            });
+        }
+    
+        function join(name, cb) {
+            // sanity check
+            if (typeof name !== 'string') return;
+            // leave any existing rooms
+            if (sock_puppet.room) removeFeed();
+            safeCb(cb)(null, describeRoom(name));
+            sock_puppet.join(name);
+            sock_puppet.room = name;
+        }
+    
+        sock_puppet.on('disconnect', function(){
+            var stamp = cat_stamp()
+            delete puck_users[sock_puppet.puck_user];
+            io.emit('new_puck', stamp, puck_users);
+            // sock_puppet.broadcast.emit('chat_receive', stamp, 'PUCK', sock_puppet.puck_user + ' has disconnected');
+        });
+    
+        sock_puppet.on('leave', function () {
+            removeFeed()
+        })
+    
+        sock_puppet.on('create', function (name, cb) {
+            if (arguments.length == 2) {
+                cb = (typeof cb == 'function') ? cb : function () {};
+                name = name || uuid();
+            } else {
+                cb = name;
+                name = uuid();
+            }
+            // check if exists
+            if (io.sockets.clients(name).length) {
+                safeCb(cb)('taken');
+            } else {
+                join(name);
+                safeCb(cb)(null, name);
+            }
+        });
+    
+    
+    /* simple chat, adapted from http://psitsmike.com/2011/09/node-js-and-socket-io-chat-tutorial/ */
+    
+        // on client send
+        sock_puppet.on('chat_send', function (data) {
+            io.sockets.emit('chat_receive', cat_stamp(), sock_puppet.puck_user, data);
+            // io.sockets.broadcast('chat_receive', cat_stamp(), client.puck_user, data);
+        });
+    
+        // when a puck hangs up
+        sock_puppet.on('puck_disconnect', function(puck_user){
+            if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
+                var stamp = cat_stamp()
+                delete puck_users[sock_puppet.puck_user];
+                io.sockets.emit('new_puck', stamp, puck_users);
+                // sock_puppet.broadcast.emit('chat_receive', stamp, 'PUCK', sock_puppet.puck_user + ' has <b>hung up</b>!');
+            }
+    
+        });
+    
+        // when a new puck shows up
+    
+        sock_puppet.on('new_puck', function(puck_user){
+            if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
+                var stamp = cat_stamp()
+                sock_puppet.puck_user = puck_user;
+                puck_users[puck_user] = puck_user;
+    
+                // echo to client they've connected
+    
+                if (typeof all_cats[puck_user] == "undefined") {
+                    // sock_puppet.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
+                    sock_puppet.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
+                    // send the latest list
+                    io.sockets.emit('new_puck', stamp, puck_users);
+                    all_cats[puck_user] = puck_user
+                }
+    
+                // tell the world
+                //client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
+            }
+    
+        });
+    
+    })
+    
+    function describeRoom(name) {
+        var clients = io.sockets.clients(name);
+        var result = {
+            clients: {}
+        };
+        clients.forEach(function (client) {
+            result.clients[client.id] = client.resources;
+        });
+        return result;
+    }
+    
+    function safeCb(cb) {
+        if (typeof cb === 'function') {
+            return cb;
+        } else {
+            return function () {};
+        }
+    }
+
 }
 
 ///--- Server
@@ -2333,6 +2625,7 @@ server.all('/url', webProxy)
 //
 var pucky = https.createServer(credentials, server)
 
+// socket signal server
 SSSUp(pucky)
 
 pucky.listen(puck_port)
@@ -2340,242 +2633,6 @@ pucky.listen(puck_port)
 console.log('server listening at %s', puck_port)
 
 
-
-var uuid = require('node-uuid'),
-    crypto = require('crypto')
-
-//
-// sockets time
-//
-
-// tack on socket.io
-var io = require('socket.io').listen(pucky, {key:key,cert:cert,ca:ca})
-
-// recommended settings, as per https://github.com/LearnBoost/Socket.IO/wiki/Configuring-Socket.IO
-// except disabling flashsocket
-io.enable('browser client minification');  // send minified client
-io.enable('browser client etag');          // apply etag caching logic based on version number
-io.enable('browser client gzip');          // gzip the file
-io.set('log level', 1);                    // reduce logging
-
-io.set('transports', [
-      //  'websocket'
-      // ,'flashsocket'     // xxx ?
-      // ,'htmlfile'
-      ,'xhr-polling'
-      ,'jsonp-polling'
-])
-
-var cat_fact_server = "",
-    puck_users      = {},
-    cat_sock        = {},
-    all_cats        = []
-
-//
-// for socket channel stuff - both video and log watching and chat and all that stuff
-//
-
-var cat_fact_server = "",
-    puck_users      = {},
-    cat_sock        = {},
-    all_cats        = []
-
-
-// var ios = io.on('connection', function (client) {
-var ios = io.sockets.on('connection', function (sock_puppet) {
-
-    cat_sock = sock_puppet
-
-    sock_puppet.emit('puck_status', puck_status)
-
-    console.log('[+] NEW connext from ' + sock_puppet.handshake.address.address)
-
-    sock_puppet.resources = {
-        screen: false,
-        video: true,
-        audio: true
-    }
-
-// listen for any chatty pucks out there
-
-    sock_puppet.on('puck_chat', function(res) {
-        console.log('- cat chat -')
-        console.log(res)
-        console.log('- cat facts -')
-    })
-
-
-// slip them a friendly cat fact
-
-    sock_puppet.on('puck', function(res) {
-        var cool_cat_fact = random_cat_fact(cat_facts)
-
-        console.log('- cat facts -')
-        console.log('- ' + cool_cat_fact + ' -')
-        console.log('- cat facts -')
-
-        // if acting as server this will be the remote puck's ip
-        var ip_addr = sock_puppet.handshake.address
-        console.log(ip_addr)
-        // console.log('client data:')
-        // console.log(client)
-
-        // if connected via VPN, use remote PUCK as server
-        console.log(puck_status)
-        console.log(puck_status.openvpn_client)
-
-        if (typeof puck_status.openvpn_client != "undefined" && puck_status.openvpn_client.server != "") {
-            cat_fact_server = puck_status.openvpn_client.server
-        }
-        else if (typeof puck_status.openvpn_server != "undefined" && puck_status.openvpn_server.server != "") {
-            cat_fact_server = puck_status.openvpn_server.server
-        }
-
-        // hardcoding tun0... hmmm....
-        if (cat_fact_server == "") cat_fact_server = my_devs["tun0"]
-
-        console.log('cat fax server is: ' + cat_fact_server)
-
-        var cool_cat_data    = {}
-
-        cool_cat_data.fact   = cool_cat_fact
-        cool_cat_data.server = cat_fact_server
-
-        console.log(cat_fact_server)
-
-        sock_puppet.emit('cat_facts', cool_cat_data)
-
-    })
-
-
-// most of the code below is from github.com:andyet/signal-master.git
-
-    // pass a message to another id
-    sock_puppet.on('message', function (details) {
-        var otherClient = io.sockets.sockets[details.to];
-        if (!otherClient) return;
-        details.from = sock_puppet.id;
-        otherClient.emit('message', details);
-    });
-
-    sock_puppet.on('shareScreen', function () {
-        sock_puppet.resources.screen = true;
-    });
-
-    sock_puppet.on('unshareScreen', function (type) {
-        sock_puppet.resources.screen = false;
-        if (sock_puppet.room) removeFeed('screen');
-    });
-
-    sock_puppet.on('join', join);
-
-    function removeFeed(type) {
-        io.sockets.in(sock_puppet.room).emit('remove', {
-            id: sock_puppet.id,
-            type: type
-        });
-    }
-
-    function join(name, cb) {
-        // sanity check
-        if (typeof name !== 'string') return;
-        // leave any existing rooms
-        if (sock_puppet.room) removeFeed();
-        safeCb(cb)(null, describeRoom(name));
-        sock_puppet.join(name);
-        sock_puppet.room = name;
-    }
-
-    sock_puppet.on('disconnect', function(){
-        var stamp = cat_stamp()
-        delete puck_users[sock_puppet.puck_user];
-        io.emit('new_puck', stamp, puck_users);
-        // sock_puppet.broadcast.emit('chat_receive', stamp, 'PUCK', sock_puppet.puck_user + ' has disconnected');
-    });
-
-    sock_puppet.on('leave', function () {
-        removeFeed()
-    })
-
-    sock_puppet.on('create', function (name, cb) {
-        if (arguments.length == 2) {
-            cb = (typeof cb == 'function') ? cb : function () {};
-            name = name || uuid();
-        } else {
-            cb = name;
-            name = uuid();
-        }
-        // check if exists
-        if (io.sockets.clients(name).length) {
-            safeCb(cb)('taken');
-        } else {
-            join(name);
-            safeCb(cb)(null, name);
-        }
-    });
-
-
-/* simple chat, adapted from http://psitsmike.com/2011/09/node-js-and-socket-io-chat-tutorial/ */
-
-    // on client send
-    sock_puppet.on('chat_send', function (data) {
-        io.sockets.emit('chat_receive', cat_stamp(), sock_puppet.puck_user, data);
-        // io.sockets.broadcast('chat_receive', cat_stamp(), client.puck_user, data);
-    });
-
-    // when a puck hangs up
-    sock_puppet.on('puck_disconnect', function(puck_user){
-        if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
-            var stamp = cat_stamp()
-            delete puck_users[sock_puppet.puck_user];
-            io.sockets.emit('new_puck', stamp, puck_users);
-            // sock_puppet.broadcast.emit('chat_receive', stamp, 'PUCK', sock_puppet.puck_user + ' has <b>hung up</b>!');
-        }
-
-    });
-
-    // when a new puck shows up
-
-    sock_puppet.on('new_puck', function(puck_user){
-        if (typeof puck_user != "undefined" && puck_user != "" && puck_user != null) {
-            var stamp = cat_stamp()
-            sock_puppet.puck_user = puck_user;
-            puck_users[puck_user] = puck_user;
-
-            // echo to client they've connected
-
-            if (typeof all_cats[puck_user] == "undefined") {
-                // sock_puppet.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
-                sock_puppet.emit('chat_receive', stamp, 'PUCK', puck_user + ' have connected');
-                // send the latest list
-                io.sockets.emit('new_puck', stamp, puck_users);
-                all_cats[puck_user] = puck_user
-            }
-
-            // tell the world
-            //client.broadcast.emit('chat_receive', stamp, 'PUCK', puck_user + ' has connected');
-        }
-
-    });
-
-})
-
-function describeRoom(name) {
-    var clients = io.sockets.clients(name);
-    var result = {
-        clients: {}
-    };
-    clients.forEach(function (client) {
-        result.clients[client.id] = client.resources;
-    });
-    return result;
-}
-
-function safeCb(cb) {
-    if (typeof cb === 'function') {
-        return cb;
-    } else {
-        return function () {};
-    }
-}
+// fire up web sockets
+do_sock_stuff()
 
