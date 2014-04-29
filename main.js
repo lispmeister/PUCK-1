@@ -1751,7 +1751,7 @@ var ping_done = false
 
 function httpsPing(puckid, ipaddr, res, next) {
 
-    console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
+    // console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
 
     ping_done = false
 
@@ -1770,32 +1770,35 @@ function httpsPing(puckid, ipaddr, res, next) {
 
         // skip loopback
         if (ip == "127.0.0.1") { 
-            console.log('skipping ' + ip); 
+            // console.log('skipping ' + ip); 
             responses++
             return; 
         }
 
-        console.log('pinging  ' + ip);
+        // console.log('pinging  ' + ip);
 
         var url = 'https://' + ip + ':' + puck_port + '/ping'
 
         var req = https.get(url, function(response) {
-
-            console.log('ping res....')
 
             var data = ''
             response.on('data', function(chunk) {
                 data += chunk
             })
             response.on('end', function() {
-                console.log('+++ someday has come for ' + ip)
+                console.log('+++ someday has come for ' + ip + ' ... ping worked')
                 // console.log(data)
                 data = JSON.parse(data)
 
-                if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
-                    ping_done = true
-                    console.log('sucksess...')
+                if (data.pid != puckid) {
+                    console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
+                    console.log(data.pid + ' != ' + puckid)
+                    response = {status: "mismatch", "name": 'mismatched PID'}
+                    // res.send(420, response) // enhance your calm!
+                }
 
+                else if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
+                    ping_done = true
                     puck2ip[puckid] = all_ips[i]
                     ip2puck[all_ips[i]] = puckid
                     res.send(200, data)
@@ -1816,7 +1819,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             responses++
 
             if (responses == all_ips.length && !ping_done) {
-                console.log('+++ someday has come... in a bad way for ' + ip)
+                console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
                 ping_done = true
                 response = {status: "ping failure", "error": e}
                 // synchronicity... II... shouting above the din of my rice crispies
@@ -2153,10 +2156,10 @@ function do_sock_stuff () {
     
     io.set('transports', [
           //  'websocket'
-          // ,'flashsocket'     // xxx ?
+          'flashsocket',    // xxx ?
           // ,'htmlfile'
-          ,'xhr-polling'
-          ,'jsonp-polling'
+          'xhr-polling',
+          'jsonp-polling'
     ])
     
     var cat_fact_server = "",
@@ -2528,5 +2531,8 @@ console.log('server listening at %s', puck_port)
 
 
 // fire up web sockets
-// do_sock_stuff()
+do_sock_stuff()
+
+// var io = require('engine.io').attach(_insecure_pucky)
+
 

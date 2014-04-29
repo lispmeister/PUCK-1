@@ -630,10 +630,6 @@ function socket_looping(){
     console.log('status loop')
 
     local_socket = put_a_sock_in_it('/')
-    local_sock_thing = setInterval(function () {
-        console.log('trying to stuff the sock...');
-        local_socket = put_a_sock_in_it('/')
-    }, PUCK_SOCK_RETRY);
 
     local_socket.on('puck_status', function (data) {
         console.log('[@] + cat facts... wait...no... status :!:')

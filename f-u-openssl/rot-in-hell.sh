@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #
 #   A haiku to openssl:
@@ -7,6 +7,12 @@
 #       a black crane over the lake
 #       may you rot in hell
 #
+echo "A haiku to openssl:"
+echo
+echo "  openssl"
+echo "  a black crane over the lake"
+echo "  may you rot in hell"
+echo
 
 cd /etc/puck/f-u-openssl
 
