@@ -709,7 +709,7 @@ function puckStatus(req, res, next) {
         // console.log('boosting status on iOS ' + JSON.stringify(puck_status))
         cat_power('puck_status', puck_status)
     }
-    else { console.log('iOS not ready') }
+    else { console.log('iOS not ready (' + typeof ios) + ')' }
 
     res.send(200, JSON.stringify(puck_status))
 
@@ -1471,36 +1471,21 @@ function uploadSchtuff(req, res, next) {
 //
 function puck_spawn(command, argz) {
 
-    cmd = command.split('/')[command.split('/').length -1]
+    console.log('a spawn o puck emerges... ' + command + ' ' + argz.join['  '])
 
-    console.log('a spawn o puck emerges... ' + ' (' + cmd + ')' + command + argz.join(' '))
+    var cmd = puck_bin + command
 
-    // output, errors, etc. get stashed
+    var spawn = require('child_process').spawn,
+          out = fs.open(puck_logs + '/' + command + '.std.log', 'a'),
+          err = fs.open(puck_logs + '/' + command + '.err.log', 'a')
 
-    try {
+    // output, errors, etc.
+    var child = spawn(cmd, argz, {
+        detached: true,
+        stdio: [ 'ignore', out, err ]
+    });
 
-        var out = fs.openSync(puck_logs + '/' + cmd + '.std.log', 'a+')
-        var err = fs.openSync(puck_logs + '/' + cmd + '.std.log', 'a+')
-
-        response.on("data", function(chunk) {
-            fs.write(fd, chunk,  0, chunk.length, null, function(err, written, buffer) {
-                console.log('spawny-spawn [' + cmd + ']' + chunk)
-                if (err) {
-                    console.log('Error writing data: ')
-                    console.log(err);
-                }
-            });
-        })
-        
-        response.on("end", function() {
-            fs.closeSync(fd);
-            process.exit(0);
-        })
-
-    }
-    catch (e) {
-        console.log('Error opening log files with ' + cmd + ' => ' + e.message)
-    }
+    child.unref();
 
     console.log(command + ' spawned')
 
@@ -1799,7 +1784,7 @@ function formDelete(req, res, next) {
     //
     // this simply takes the pwd and finds the exe area... really 
     // want to use a reasonable puck home here!
-    puck_spawn(puck_bin + '/delete_puck.sh', [puckid])
+    puck_spawn('delete_puck.sh', [puckid])
 
 
 }
@@ -2042,7 +2027,7 @@ function formCreate(req, res, next) {
                         console.log("executing create_puck.sh")
 
                         // this simply takes the pwd and finds the exe area...
-                        var cmd  = puck_bin + '/create_puck.sh'
+                        var cmd  = '/create_puck.sh'
                         var argz = [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
                         puck_spawn(cmd, argz)
             
@@ -2112,7 +2097,7 @@ function serverRestart(req, res, next) {
     // var command = 'touch /etc/puck/main.js';
 
     var cmd  = "/etc/init.d/puck"
-    var args = ["restart"]
+    var args = "restart"
 
     puck_spawn(cmd, args)
 

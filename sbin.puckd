@@ -19,6 +19,10 @@ echo '{"events":{"new_puck":""},"openvpn_server":{"vpn_status":"down","start":"n
 echo > $PUCK_LOGS/client_vpn.log
 echo > $PUCK_LOGS/server_vpn.log
 
+# wipe out command logs
+rm -f $PUCK_LOGS/*.err
+rm -f $PUCK_LOGS/*.out
+
 # if no dir or symlink
 if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
     cd $hell

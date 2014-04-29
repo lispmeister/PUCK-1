@@ -95,12 +95,25 @@
 
                 <li> <a href="#"><span class="green glyphicon icon-lightbulb-idea" id="puck_status"></span></a></li>
 
-                <li> <a href="#socket_wrench" data-toggle="tab"><span id="socket_wrench" title="Socket Status" data-content="Green good, red bad...." class="glyphicon icon-wrench"></span></a></li>
 
                 <li> <a href="#"><span data-content="help, videos, etc. here..." class="glyphicon icon-question-sign" id="puck_help"></span></a></li>
 
-                <li> <a href="#skull" data-toggle="tab"><span id="puck_top_skull" title="PANIC!" data-content="Aieee!  Ack!  No!  PANIC TIME!!!!!" class="glyphicon icon-skull"></span></a></li>
+                
 
+                <li class="dropdown">
+
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="puck_top_skull" title="Don't" data-content="PANIC!" class="glyphicon icon-skull"></span><b class="caret"></b></a>
+
+                    <ul class="dropdown-menu" id="skull_menu">
+                        
+                        <li style="width:100%"> <button id="stop_server"     style="width:125px; text-align:center;" type="button" class="btn btn-info    btn-hover">Stop Server</button></a></li>
+                        <li style="width:100%"> <button id="restart_server"  style="width:125px; text-align:center;" type="button" class="btn btn-warning btn-hover">Restart Server</button></a></li>
+                        <li style="width:100%"> <button id="halt_vpn_client" style="width:125px; text-align:center;" type="button" class="btn btn-primary btn-hover">Die VPN, Die!</button></a></li>
+                        <li style="width:100%"> <button id="puck_panic"      style="width:125px; text-align:center;" type="button" class="btn btn-danger  btn-hover">PANIC</button></a></li>
+                        <li style="width:100%"> <a tabindex="-1" href="#skull" data-toggle="tab" style="width:125px; text-align:center;">Click2explain</a></li>
+
+                    </ul>
+                </li>
 
                 <li> <a target="_blank" href="https://github.com/zenfish/PUCK"><span id="puck_git" title="github sources" data-content="Github, sources 'n' secretz here" class="glyphicon icon-github"></span></a></li>
 
@@ -182,6 +195,9 @@
                     </div>
 
                     <div>
+
+                    You just clicked....?
+
                         <p> Pushing these buttons is not for the faint of heart.
                         <ul>
                             <p> <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.</li>
@@ -193,11 +209,12 @@
                     </div>
 
                     <p>
+
                     <div>
-                        <button id="puck_panic" type="button" class="btn btn-danger">PANIC</button>
-                        <button id="stop_server" type="button" class="btn">Stop Server</button>
-                        <button id="restart_server" type="button" class="btn btn-warning">Restart Server</button>
+                        <button id="stop_server"     type="button" class="btn btn-info">Stop Server</button>
+                        <button id="restart_server"  type="button" class="btn btn-warning">Restart Server</button>
                         <button id="halt_vpn_client" type="button" class="btn btn-primary">Die VPN, Die!</button>
+                        <button id="puck_panic"      type="button" class="btn btn-danger">PANIC</button>
                     </div>
                 </div>
             </div>
