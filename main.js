@@ -1475,34 +1475,29 @@ function puck_spawn(command, argz) {
 
     console.log('a spawn o puck emerges... ' + ' (' + cmd + ')' + command + argz.join(' '))
 
-    // output, errors, etc. get stashed
+    var spawn   = require('child_process').spawn
 
     try {
-
-        var out = fs.openSync(puck_logs + '/' + cmd + '.std.log', 'a+')
-        var err = fs.openSync(puck_logs + '/' + cmd + '.std.log', 'a+')
-
-        response.on("data", function(chunk) {
-            fs.write(fd, chunk,  0, chunk.length, null, function(err, written, buffer) {
-                console.log('spawny-spawn [' + cmd + ']' + chunk)
-                if (err) {
-                    console.log('Error writing data: ')
-                    console.log(err);
-                }
-            });
-        })
-        
-        response.on("end", function() {
-            fs.closeSync(fd);
-            process.exit(0);
-        })
-
+        out = fs.openSync(puck_logs + '/' + cmd + '.out.log', 'a+')
+        err = fs.openSync(puck_logs + '/' + cmd + '.err.log', 'a+')
     }
     catch (e) {
-        console.log('Error opening log files with ' + cmd + ' => ' + e.message)
+        console.log("log open error with " + command + ' => ' + e.message)
     }
 
-    console.log(command + ' spawned')
+    try {
+        // toss in bg; output, errors, etc. get stashed
+        var spawn_o = spawn(command, argz, {
+            detached: true,
+            stdio: [ 'ignore', out, err ]
+        })
+        spawn_o.unref();
+        // spawn_o.stdout.pipe(fs.createWriteStream(puck_logs + '/' + cmd + '.std.log', 'a+'))
+        // spawn_o.stderr.pipe(fs.createWriteStream(puck_logs + '/' + cmd + '.err.log', 'a+'))
+    }
+    catch (e) {
+        console.log("exec error with " + command + ' => ' + e.message)
+    }
 
 }
 
@@ -1564,9 +1559,17 @@ function startVPN(req, res, next) {
 //
 // forward or unforward a port to go to your VPN to facilitate web RTC/sockets/etc
 //
+// if we're doing the calling, we want to set it up so that browser web requests 
+// can go into the tunnel vs. trying to flail at some random IP
+//
+// normally you have something like:
+//
+//    computer-1 <-> browser-1 <-> PUCK-1 <-- .... network .... --> PUCK-2 <-> browser-2 <-> computer-2
+//
+// computer1  & 2 may well not have connectivty to the other, but the js executing
+// in the browser comes from them... but they can always talk to their own PUCK.
+//
 function port_forwarding(req, res, next) {
-
-    // (direction, port, remote_ip, remote_port, proto) {
 
     console.log('forwarding portz...') 
     console.log(direction, port, remote_ip, remote_port, proto)
@@ -1577,8 +1580,9 @@ function port_forwarding(req, res, next) {
         typeof req.query.remote_port == "undefined" ||
         typeof req.query.remote_ip   == "undefined" ||
         typeof req.query.proto       == "undefined") {
-            console.log('port forwarding requires direction, port, remote_ip, remote_port, and proto all to be set')
-            next({error: "port forwarding requires direction, port, remote_ip, remote_port, and proto all to be set"})
+            var err = 'port forwarding requires direction, port, remote_ip, remote_port, and proto all to be set'
+            console.log(err)
+            next({error: err})
     }
 
     direction   = req.query.direction
@@ -1602,123 +1606,6 @@ function port_forwarding(req, res, next) {
     res.send(200, {"status" : "OK"})
 
 }
-
-// XXX - stop proxy when done!
-
-// if we're doing the calling, we want to setup a proxy so our
-// browser web requests can go into the tunnel vs. trying to flail at
-// some random IP
-//
-// normally you have something like:
-//
-//    computer-1 <-> browser-1 <-> PUCK-1 <-- .... network .... --> PUCK-2 <-> browser-2 <-> computer-2
-//
-// computer1  & 2 may well not have connectivty to the other, but the js executing
-// in the browser comes from them... but they can always talk to their own PUCK, so
-// after this it'll look like this, with the traffic appearing to come from the proxy
-//
-//    computer-1 <-> browser-1 <-> PUCK-1 <-> Proxy-on-PUCK-1 <- ... net ... -> PUCK-2 <-> browser-2 <-> computer-2
-//
-function proxy_love(cat_fact_server) {
-
-    if (cat_fact_server == "") cat_fact_server = my_devs["tun0"]
-
-    console.log('proxy time => ' + cat_fact_server)
-
-    if (puck_proxy_up) {
-        console.log("the proxy is currently up, tear it down!")
-        proxy_server.close();
-        puck_proxy_up = false
-    }
-
-    //
-    // a simple web and ws proxy, courtesy of http-proxy
-    // 
-    // Currently will proxy on the local server (all interfaces) on port 7777
-    //
-    
-    var httpProxy = require('http-proxy')
-    
-    var proxy_port  = 7777,
-        remote_host = cat_fact_server,
-        remote_port = puck_port;
-
-    var remote_url  = "https://" + remote_host + ":" + remote_port
-    
-    console.log('\n\n[+] proxying from the local server on port ' + proxy_port + ' => ' + remote_url)
-    
-    var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
-        cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
-        ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
-
-    var credentials = {key: key, cert: cert, ca: ca};
-
-    // god I hate idiotic web folks who don't understand what security 
-    // means and try to inflict it on the world.  No wonder everyone hates
-    // security folks
-
-    // moar hoops, fun fun
-    var whitelist = ['https://localhost:7777', 'https://192.168.0.250:7777', 'https://192.168.0.250:8080', remote_url]
-
-    var corsOptions = {
-        origin: function(origin, callback){
-            var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
-            callback(null, originIsWhitelisted);
-            },
-        credentials: true
-        }
-
-    var proxy = new httpProxy.createProxyServer({
-        ssl: credentials,
-        target: {
-            host: remote_host,
-            port: remote_port
-        },
-        secure: false
-    })
-
-    proxy_server = https.createServer(credentials, function(req, res) {
-
-        console.log('sending request along...')
-
-        proxy.web(req, res, { target: remote_url }, function (err) {
-            // if (err) throw err;
-            console.log('proxy hairball - ')
-            console.log(err)
-            res.writeHead(502)
-            res.end("proxy error") 
-        })
-    })
-
-    proxy.on('proxyRes', function (res) {
-        console.log('RAW Response from the target', JSON.stringify(res.headers, true, 2));
-    });
-
-    // WebSocket stuff
-    proxy.on('upgrade', function (req, socket, head) {
-        console.log('upgrade caught')
-        proxy.wss(req, socket, head, function (err) {
-            console.log('wss proxy hairball - ')
-            console.log(err)
-            res.writeHead(502)
-            res.end("proxy error") 
-            // socket.close();
-        })
-    })
-
-    try {
-        proxy_server.listen(proxy_port, function() {
-            console.log('proxy web/sockets server for ' + remote_host + ' created, listening on ' + proxy_port)
-        })
-    }
-    catch (e) {
-        console.log('.... fix this... need to close proxy....')
-    }
-
-    puck_proxy_up = true
-
-}
-
 
 /**
  * Replaces a Puck completely
@@ -1901,8 +1788,8 @@ function httpsPing(puckid, ipaddr, res, next) {
                 data += chunk
             })
             response.on('end', function() {
-                console.log('+++ someday has come!')
-                console.log(data)
+                console.log('+++ someday has come for ' + ip)
+                // console.log(data)
                 data = JSON.parse(data)
 
                 if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
@@ -1917,22 +1804,21 @@ function httpsPing(puckid, ipaddr, res, next) {
 
                 if ((responses+1) == all_ips.length && !ping_done) {
                     ping_done = true
-                    console.log('no response, ping failure!')
-                    response = {status: "ping failure", "name": 'unknown problem'}
+                    console.log('ran out of pings for ' + ip)
+                    response = {status: "no answer"}
                     res.send(408, response)
                 }
             })
         })
         .on('error', function(e) {
-            console.log('+++ someday has come... in a bad way')
-            console.log(e)
+            // console.log(e)
+            // console.log(responses + ' v.s. ' + all_ips.length)
             responses++
-            console.log(responses + ' v.s. ' + all_ips.length)
 
             if (responses == all_ips.length && !ping_done) {
+                console.log('+++ someday has come... in a bad way for ' + ip)
                 ping_done = true
-                console.log('no response, ping failure!')
-                response = {status: "ping failure", "name": 'unknown problem'}
+                response = {status: "ping failure", "error": e}
                 // synchronicity... II... shouting above the din of my rice crispies
                 try { res.send(408, e) }
                 catch (e) { console.log('caught ' + e) }
@@ -2147,9 +2033,7 @@ function SSSUp (_server) {
         console.log('request *to* ' + ip_addr)
     
         request.addListener('end', function () {
-            if (request.url.search(/.png|.gif|.js|.css/g) == -1) {
-                file.serveFile('/index.html', 402, {}, request, response);
-            } else file.serve(request, response);
+            file.serve(request, response)
         }).resume();
     }).listen(puck_port_signal);
     
@@ -2644,5 +2528,5 @@ console.log('server listening at %s', puck_port)
 
 
 // fire up web sockets
-do_sock_stuff()
+// do_sock_stuff()
 
