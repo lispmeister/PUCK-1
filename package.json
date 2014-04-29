@@ -31,6 +31,7 @@
     "simplewebrtc": "= 0.6.0",
     "sleep": "latest",
     "socket.io": "latest",
+    "sockjs": "latest",
     "tail": "latest",
     "tcp-proxy": "latest",
     "underscore": "latest",
