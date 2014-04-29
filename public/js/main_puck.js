@@ -299,15 +299,10 @@ $(document).ready(function () {
     // message data
     list_events()
     
-    // setInterval(function(){socket_looping()},PREGNANT_PAUSE)
     socket_looping()
-    // setTimeout(socket_looping,PREGNANT_PAUSE)
 
     // sow the seed o' doubt
     setInterval(get_status,PREGNANT_PAUSE)
-
-    // get my puck data
-    // who_am_i()
 
 })
 

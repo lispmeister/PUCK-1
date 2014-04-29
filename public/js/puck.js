@@ -4,8 +4,6 @@
 // draw pucks, delete pucks, start vpns... various things
 //
 
-var not_loaded = true
-
 // track all puck IDs...
 all_puck_ids   = []
 
@@ -34,6 +32,9 @@ var LOCAL_VIDEO_WIDTH = 480
 
 local_sock_flag  = false
 remote_sock_flag = false
+
+var sock = null
+
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
@@ -379,7 +380,6 @@ function event_hang_up() {
     state_ring('false')
 
     // i has gone
-    // local_socket.emit('remove_puck', my_puck.PUCK_ID);
 
     var url = "/vpn/stop"
 
@@ -609,85 +609,53 @@ function get_status() {
 }
 
 
-//
-// ... snag all the various socket chatter
-//
-
-function check_sock () {
-    if (sock.socket.connected) {
-        $('#socket_wrench').addClass("green")
-        console.log('green!')
-    }
-    else {
-        $('#socket_wrench').removeClass("green")
-        console.log('not green')
-    }
-}
-
-
 function socket_looping(){
 
     console.log('status loop')
 
     local_socket = put_a_sock_in_it('/')
 
-    local_socket.on('puck_status', function (data) {
+    local_socket.onopen = function()  {
+        print('[*] open... sez a me', local_socket.protocol);
+    }
+
+    local_socket.onmessage = function(puck_message) {
         console.log('[@] + cat facts... wait...no... status :!:')
-        console.log(JSON.stringify(data))
+        console.log(JSON.stringify(puck_message))
 
-        if (not_loaded) {
-            $.getScript("/js/PeerConnection.js", function(){
-                // alert("ps loaded and executed")
-                not_loaded = false
-            })
+        if (puck_message.type == "status") {
+            console.log('processing status message')
+
+            puck_status = puck_message.status
+
+            // if something is new, do something!
+            if (! _.isEqual(old_puck_status, puck_status)) {
+                console.log('something new in the state of denmark!')
+                old_puck_status = puck_status
+                status_or_die()
+            }
+            else {
+                console.log('same ol, same ol')
+            }
         }
-
-        // puck_status = JSON.parse(data)
-        puck_status = data
-
-        // if something is new, do something!
-        if (! _.isEqual(old_puck_status, puck_status)) {
-            console.log('something new in the state of denmark!')
-            old_puck_status = puck_status
-            status_or_die()
+        // OVPN logs for client/server
+        else if (puck_message.type == "ovpn_server") {
+            console.log('ovpn server logz')
+            // console.log('server: ' + data.line)
+            $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
+            $("#ovpn_server_infinity").mCustomScrollbar("update")
+            $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
+        else if (puck_message.type == "ovpn_server") {
+            console.log('ovpn client logz')
+            $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
+            $("#ovpn_client_infinity").mCustomScrollbar("update")
+            $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
         }
         else {
-            console.log('same ol, same ol')
+           console.log('UNRECOGNIZED message type')
         }
-    })
-
-    local_socket.on('error', function(err){
-        console.log('local errz ' + JSON.stringify(err))
-    })
-
-    local_socket.on('reconnect', function(d) {
-        console.log ('reconnect')
-        fire_puck_status(puck_status)
-    })
-
-    local_socket.on('error',            function(d) { console.log ('error') ; console.log(d) })
-    local_socket.on('connecting',       function(d) { console.log ('connecting') })
-    local_socket.on('reconnecting',     function(d) { console.log ('reconnecting') })
-    local_socket.on('connect_failed',   function(d) { console.log ('connect failed') })
-    local_socket.on('reconnect_failed', function(d) { console.log ('reconnect failed') })
-    local_socket.on('close',            function(d) { console.log ('close') })
-    local_socket.on('disconnect',       function(d) { console.log ('disconnect') })
-
-
-    // OVPN logs for client/server
-    local_socket.on(ovpn_clogs, function (data) {
-        // console.log('client: ' + data.line)
-        $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
-        $("#ovpn_client_infinity").mCustomScrollbar("update")
-        $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-    })
-
-    local_socket.on(ovpn_slogs, function (data) {
-        // console.log('server: ' + data.line)
-        $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + data.line + "</div>")
-        $("#ovpn_server_infinity").mCustomScrollbar("update")
-        $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-    })
+    }
 
 }
 
@@ -931,52 +899,36 @@ function drag_and_puck() {
 
 
 //
-// try to get socket.io running
+// try to get web sockets going
 //
 function put_a_sock_in_it(sock_url) {
 
-    var sock = {}
-
     console.log('trying to do a socket connect to ' + sock_url)
 
-    try { 
-        if (sock_url == '/') {
-            if (local_socket.socket.connected) {
-                console.log('already connected locally')
-                return(sock)
-            }
-        }
-        else {
-            if (remote_socket.socket.connected) {
-                console.log('already connected remotely')
-                return(sock)
-            }
-       }
-    }
-    catch (e) {
-        console.log('Aaarrrrrghyle.... caught bad sock')
-        console.log(e)
-    }
+    var recInterval = null;
+    var socket = null;
 
-    //if (puck_current.outgoing)
-    //    return
-    // try { remote_socket.disconnect() }
-    // catch (e) { console.log('nice catch of D/C!'); console.log(e) }
+    var sock = function() {    
+        socket = new SockJS(protocol + serverDomain + '/echo', null, {
+            'protocols_whitelist': ['websocket', 'xdr-streaming', 'xhr-streaming', 
+                                'iframe-eventsource', 'iframe-htmlfile', 
+                                'xdr-polling', 'xhr-polling', 'iframe-xhr-polling',
+                                'jsonp-polling']
+        });
 
-    sock = io.connect(sock_url, {
-        'connect timeout': PUCK_TIMEOUT,
-        // 'try multiple transports': true,  // xxx?
-        'reconnect': true,
-        'reconnection delay': PUCK_RECONNECT_DELAY,
-        'reconnection limit': PUCK_TIMEOUT,
-        'max reconnection attempts': Infinity,
-        'sync disconnect on unload': false,
-        'auto connect': true,
-        'force new connection': true
-    })
+        socket.onopen = function () {
+            clearInterval(recInterval);
+        };  
+
+        socket.onclose = function () {    
+            recInterval = setInterval(function () {
+                new_conn();
+            }, PUCK_RECONNECT_DELAY);
+        };
+    };
+
 
     console.log('got a sock, hope its not used...')
-    console.log(sock.socket.connected)
 
     if (sock_url == '/') { local_sock_flag = true  }
     else                 { remote_sock_flag = true }
