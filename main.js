@@ -474,17 +474,21 @@ function watch_logs(logfile, log_type) {
                 remote_port = puck_port
                 proto       = "tcp"
 
-                request('/forward?direction=' + direction   +
-                            '&local_port='    + port        +
-                            '&remote_ip='     + remote_ip   +
-                            '&remote_port='   + remote_port +
-                            '&proto='         + proto,
+                var url = '/forward?direction=' + direction   +
+                          '&local_port='        + port        +
+                          '&remote_ip='         + remote_ip   +
+                          '&remote_port='       + remote_port +
+                          '&proto='             + proto
+
+                console.log('forward url => ' + url)
+                request(url,
                     function (error, response, body) {
                          if (!error && response.statusCode == 200) {
                             console.log(body)
                          }
                          else {
                             console.log('ummm... efforts to redirect port... failzor?')
+                            console.log(error)
                             console.log(body)
                          }
                     })

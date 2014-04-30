@@ -8,7 +8,7 @@
         "logs"              : "/logs",
         "puck_port"         : "8080",
         "puck_port_signal"  : "12034",
-        "puck_port_forward" : "9090"
+        "puck_port_forward" : "5555"
         },
     
     "crypto": {
