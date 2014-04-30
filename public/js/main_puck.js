@@ -22,6 +22,8 @@ var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
 var PREGNANT_PAUSE       = 3000 // 5 seconds should be enough for anyone!
 var PUCK_RECONNECT_DELAY =  100
 
+var SIGNALING_SERVER = 'wss://192.168.0.250:12034'
+
 // for web rtc
 var puck_meeting = {}
 

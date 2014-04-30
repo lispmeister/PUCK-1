@@ -223,7 +223,7 @@ function fireClickEvent(element) {
     element.dispatchEvent(evt);
 }
 
-getElement('#self-url').innerHTML = getElement('#self-url').href = location.href;
+// getElement('#self-url').innerHTML = getElement('#self-url').href = location.href;
 
 function bytesToSize(bytes) {
     var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
