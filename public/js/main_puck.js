@@ -306,5 +306,14 @@ $(document).ready(function () {
     // sow the seed o' doubt
     setInterval(get_status,PREGNANT_PAUSE)
 
+    // hack attack, look out... this had better be temporary, lol
+    var hack_rl = 'http://' + location.hostname + ':5555/rtc.html'
+    $("#rtc_hack").attr("href", hack_rl)
+
+    $('#rtc_hack').click(function(){
+        window.open(hack_rl, 'insecure')
+        return false;
+    })
+
 })
 

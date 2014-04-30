@@ -2042,7 +2042,7 @@ function serverRestart(req, res, next) {
 // In production/whatever, BLOCK THE PORT FROM THE WORLD
 // if it's even running - ONLY expose it to the VPN or local
 //
-function SSSUp (_server) {
+function SSSUp () {
 
     console.log('Socket Signal Server!')
 
@@ -2050,14 +2050,33 @@ function SSSUp (_server) {
     
     var WebSocketServer = require('websocket').server;
 
-    var sig_puck = https.createServer(credentials, server)
+    // something breaks w certs... this is only used over openvpn, but... blech.
+    var http = require('http')
 
-    sig_puck.listen(puck_port_signal, function() {
-        console.log('[+] server listening at %s', puck_port_signal)
+//  var sig_pucky = https.createServer(credentials, function (request, response) {
+
+    var connect = require('connect');
+
+    sig_pucky = connect().use(connect.static(puck_public)).listen(puck_port_signal, function() {
+        console.log('[+] http connect server listening at %s', puck_port_signal)
     })
 
+
+//  var sig_pucky = http.createServer(function (request, response) {
+//      request.addListener('end', function() {
+//          console.log('do nothing, file request')
+//          response.writeHead(200, {
+//              'Content-Type': 'text/plain'
+//          });
+//          response.end('puck http web server');
+//
+//      }).resume();
+//  }).listen(puck_port_signal, function() {
+//      console.log('[+] http server listening at %s', puck_port_signal)
+//  })
+
     new WebSocketServer({
-        httpServer: sig_puck,
+        httpServer: sig_pucky,
         autoAcceptConnections: false
     }).on('request', onRequest);
     
@@ -2337,7 +2356,7 @@ server.all('/url', webProxy)
 var pucky = https.createServer(credentials, server)
 
 // socket signal server
-// SSSUp(pucky)
+SSSUp()
 
 // sockjs to the rescue
 var sockjs = require('sockjs')

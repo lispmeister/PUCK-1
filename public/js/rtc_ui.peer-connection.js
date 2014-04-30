@@ -15,7 +15,9 @@ rtcMultiConnection.sdpConstraints.mandatory = {
 // https://github.com/muaz-khan/WebRTC-Experiment/tree/master/websocket-over-nodejs
 // var SIGNALING_SERVER = 'wss://wsnodejs.nodejitsu.com:443';
 // var SIGNALING_SERVER = 'wss://10.1.80.1:12034';
-var SIGNALING_SERVER = 'wss://192.168.0.250:5555';
+// var SIGNALING_SERVER = 'wss://192.168.0.250:5555';
+// var SIGNALING_SERVER = 'ws://192.168.0.250:5555';
+var SIGNALING_SERVER = 'ws://' + location.hostname + ':5555';
 
 rtcMultiConnection.openSignalingChannel = function(config) {
     config.channel = config.channel || this.channel;
@@ -61,7 +63,7 @@ rtcMultiConnection.onopen = function(e) {
     addNewMessage({
         header: e.extra.username,
         message: 'Data connection is opened between you and ' + e.extra.username + '.',
-        userinfo: getUserinfo(rtcMultiConnection.blobURLs[rtcMultiConnection.userid], 'images/info.png'),
+        userinfo: getUserinfo(rtcMultiConnection.blobURLs[rtcMultiConnection.userid], 'images/rtc_info.png'),
         color: e.extra.color
     });
 
@@ -242,7 +244,7 @@ rtcMultiConnection.onclose = rtcMultiConnection.onleave = function(event) {
     addNewMessage({
         header: event.extra.username,
         message: event.extra.username + ' left the room.',
-        userinfo: getUserinfo(rtcMultiConnection.blobURLs[event.userid], 'images/info.png'),
+        userinfo: getUserinfo(rtcMultiConnection.blobURLs[event.userid], 'images/rtc_info.png'),
         color: event.extra.color
     });
 };

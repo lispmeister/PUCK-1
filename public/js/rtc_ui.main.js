@@ -145,7 +145,7 @@ getElement('.main-input-box textarea').onkeyup = function(e) {
     addNewMessage({
         header: rtcMultiConnection.extra.username,
         message: 'Your Message:<br /><br />' + linkify(this.value),
-        userinfo: getUserinfo(rtcMultiConnection.blobURLs[rtcMultiConnection.userid], 'images/chat-message.png'),
+        userinfo: getUserinfo(rtcMultiConnection.blobURLs[rtcMultiConnection.userid], 'images/rtc_chat-message.png'),
         color: rtcMultiConnection.extra.color
     });
 
