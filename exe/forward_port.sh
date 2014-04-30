@@ -63,7 +63,7 @@ echo "1" > /proc/sys/net/ipv4/ip_forward
 all_ips=ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && !match($1, "^tun")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) printf("%s ", all[i]) ; print ""}'| sed 's/,]$/]/'
 
 if [ $direction = "up" ] ; then
-    for ip in all_ips; do
+    for ip in $all_ips; do
         echo "forwarding $proto traffic from $ip : $local_port => $remote_ip : $remote_port"
         echo iptables -t nat -A PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
         echo iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
@@ -71,7 +71,7 @@ if [ $direction = "up" ] ; then
         iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
     done
 else
-    for ip in all_ips; do
+    for ip in $all_ips; do
         echo "disabling forwarding of $proto traffic from $ip : $local_port => $remote_ip : $remote_port"
         echo iptables -t nat -D PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
         echo iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
