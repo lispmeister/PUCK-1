@@ -2049,9 +2049,15 @@ function SSSUp (_server) {
     var CHANNELS = {};
     
     var WebSocketServer = require('websocket').server;
-    
+
+    var sig_puck = https.createServer(credentials, server)
+
+    sig_puck.listen(puck_port_signal, function() {
+        console.log('[+] server listening at %s', puck_port_signal)
+    })
+
     new WebSocketServer({
-        httpServer: server,
+        httpServer: sig_puck,
         autoAcceptConnections: false
     }).on('request', onRequest);
     
@@ -2072,7 +2078,7 @@ function SSSUp (_server) {
     }
     
     function onMessage(message, websocket) {
-        console.log('on message: ' + message)
+        console.log('on message: ' + JSON.stringify(message))
         if (message.checkPresence)
             checkPresence(message, websocket);
         else if (message.open)
@@ -2082,7 +2088,7 @@ function SSSUp (_server) {
     }
     
     function onOpen(message, websocket) {
-        console.log('on open: ' + message)
+        console.log('on open: ' + JSON.stringify(message))
         var channel = CHANNELS[message.channel];
     
         if (channel)
@@ -2092,7 +2098,7 @@ function SSSUp (_server) {
     }
     
     function sendMessage(message, websocket) {
-        console.log('send message: ' + message)
+        console.log('send message: ' + JSON.stringify(message))
         message.data = JSON.stringify(message.data);
         var channel = CHANNELS[message.channel];
         if (!channel) {
@@ -2138,10 +2144,6 @@ function SSSUp (_server) {
         }
     }
     
-    console.log('\n++++\n')
-    console.log('\tlistening both websocket and HTTPs at port ' + puck_port_signal);
-    console.log('\n++++\n')
-
 }
 
 //
@@ -2342,9 +2344,9 @@ var sockjs = require('sockjs')
 var ios = sockjs.createServer()
 ios.installHandlers(server, {prefix: '/pux'})
 
-pucky.listen(puck_port)
-
-console.log('server listening at %s', puck_port)
+pucky.listen(puck_port, function() {
+    console.log('[+] server listening at %s', puck_port)
+})
 
 // fire up web sockets
 do_sock_stuff()
