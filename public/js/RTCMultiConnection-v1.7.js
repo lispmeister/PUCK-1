@@ -113,7 +113,7 @@
             prepareSignalingChannel(function () {
                 // connect with signaling channel
                 initRTCMultiSession(function () {
-                    log('Signaling channel is ready.');
+                    console.log('Signaling channel is ready.');
                 });
             });
 
@@ -218,12 +218,12 @@
 
         function joinSession(session) {
             if (!rtcMultiSession) {
-                log('Signaling channel is not ready. Connecting...');
+                console.log('Signaling channel is not ready. Connecting...');
                 // verify to see if "openSignalingChannel" exists!
                 prepareSignalingChannel(function () {
                     // connect with signaling channel
                     initRTCMultiSession(function () {
-                        log('Signaling channel is connected. Joining the session again...');
+                        console.log('Signaling channel is connected. Joining the session again...');
                         setTimeout(function () {
                             joinSession(session);
                         }, 1000);
@@ -234,11 +234,12 @@
 
             // connection.join('sessionid');
             if (typeof session == 'string') {
+                console.log("session: " + session)
                 if (connection.stats.sessions[session]) {
                     session = connection.stats.sessions[session];
                 } else
                     return setTimeout(function () {
-                        log('Session-Descriptions not found. Rechecking..');
+                        console.log('Session-Descriptions not found. Rechecking..');
                         joinSession(session);
                     }, 1000);
             }
@@ -653,7 +654,7 @@
                     if (!connection.candidates.relay && candidate.candidate.indexOf('relay') != -1) return;
                     if (!connection.candidates.reflexive && candidate.candidate.indexOf('srflx') != -1) return;
 
-                    log(candidate.candidate);
+                    console.log(candidate.candidate);
 
                     socket && socket.send({
                         userid: connection.userid,
@@ -728,7 +729,7 @@
                 },
 
                 oniceconnectionstatechange: function (event) {
-                    log('oniceconnectionstatechange', toStr(event));
+                    console.log('oniceconnectionstatechange', toStr(event));
                     if (connection.peers[_config.userid] && connection.peers[_config.userid].oniceconnectionstatechange) {
                         connection.peers[_config.userid].oniceconnectionstatechange(event);
                     }
@@ -761,7 +762,7 @@
                 },
 
                 onsignalingstatechange: function (event) {
-                    log('onsignalingstatechange', toStr(event));
+                    console.log('onsignalingstatechange', toStr(event));
                 },
 
                 attachStreams: connection.attachStreams,
@@ -801,7 +802,7 @@
                         });
                     } else
                         setTimeout(function () {
-                            log('waiting for remote video to play: ' + numberOfTimes);
+                            console.log('waiting for remote video to play: ' + numberOfTimes);
                             waitUntilRemoteStreamStartsFlowing(mediaElement, session, numberOfTimes);
                         }, 1000);
                 }
@@ -967,7 +968,7 @@
                         });
                     },
                     onCustomMessage: function (message) {
-                        log('Received "private" message from', this.userid,
+                        console.log('Received "private" message from', this.userid,
                             typeof message == 'string' ? message : toStr(message));
                     },
                     drop: function (dontSendMessage) {
@@ -1075,7 +1076,7 @@
                             }
                         }
 
-                        log('ReDialing...');
+                        console.log('ReDialing...');
 
                         socket.send({
                             userid: connection.userid,
@@ -1234,7 +1235,7 @@
                 }
 
                 if (response.isVolumeChanged) {
-                    log('Volume of stream: ' + response.streamid + ' has changed to: ' + response.volume);
+                    console.log('Volume of stream: ' + response.streamid + ' has changed to: ' + response.volume);
                     if (connection.streams[response.streamid]) {
                         var mediaElement = connection.streams[response.streamid].mediaElement;
                         if (mediaElement) mediaElement.volume = response.volume;
@@ -1387,7 +1388,7 @@
                 // remote video failed either out of ICE gathering process or ICE connectivity check-up
                 // or IceAgent was unable to locate valid candidates/ports.
                 if (response.failedToReceiveRemoteVideo) {
-                    log('Remote peer hasn\'t received stream: ' + response.streamid + '. Renegotiating...');
+                    console.log('Remote peer hasn\'t received stream: ' + response.streamid + '. Renegotiating...');
                     if (connection.peers[response.userid]) {
                         connection.peers[response.userid].renegotiate();
                     }
@@ -1439,7 +1440,7 @@
             };
 
             function sdpInvoker(sdp, labels) {
-                log(sdp.type, sdp.sdp);
+                console.log(sdp.type, sdp.sdp);
 
                 if (sdp.type == 'answer') {
                     peer.setRemoteDescription(sdp);
@@ -2152,7 +2153,7 @@
                 return this;
             },
             getLocalDescription: function (type) {
-                log('peer type is', type);
+                console.log('peer type is', type);
 
                 if (type == 'answer') {
                     this.setRemoteDescription(this.offerDescription);
@@ -2234,7 +2235,7 @@
                 this.connection.onaddstream = function (e) {
                     self.onaddstream(e.stream, self.session);
 
-                    log('onaddstream', toStr(e.stream));
+                    console.log('onaddstream', toStr(e.stream));
                 };
 
                 this.connection.onremovestream = function (e) {
@@ -2304,7 +2305,7 @@
                     this.constraints.mandatory.OfferToReceiveAudio = true;
                 }
 
-                log('sdp-constraints', toStr(this.constraints.mandatory));
+                console.log('sdp-constraints', toStr(this.constraints.mandatory));
 
                 this.optionalArgument = {
                     optional: this.optionalArgument.optional || [{
@@ -2326,7 +2327,7 @@
                     });
                 }
 
-                log('optional-argument', toStr(this.optionalArgument.optional));
+                console.log('optional-argument', toStr(this.optionalArgument.optional));
 
                 if (typeof this.iceServers != 'undefined') {
                     this.iceServers = {
@@ -2334,7 +2335,7 @@
                     };
                 } else this.iceServers = null;
 
-                log('ice-servers', toStr(this.iceServers.iceServers));
+                console.log('ice-servers', toStr(this.iceServers.iceServers));
             },
             onSdpError: function (e) {
                 var message = toStr(e);
@@ -2350,7 +2351,7 @@
             setRemoteDescription: function (sessionDescription) {
                 if (!sessionDescription) throw 'Remote session description should NOT be NULL.';
 
-                log('setting remote description', sessionDescription.type, sessionDescription.sdp);
+                console.log('setting remote description', sessionDescription.type, sessionDescription.sdp);
                 this.connection.setRemoteDescription(
                     new RTCSessionDescription(sessionDescription)
                 );
@@ -2370,7 +2371,7 @@
                 }
             },
             onIceSuccess: function () {
-                log('ice success', toStr(arguments));
+                console.log('ice success', toStr(arguments));
             },
             onIceFailure: function () {
                 warn('ice failure', toStr(arguments));
@@ -2388,7 +2389,7 @@
                     dataChannelDict.reliable = false; // Deprecated!
                 }
 
-                log('dataChannelDict', toStr(dataChannelDict));
+                console.log('dataChannelDict', toStr(dataChannelDict));
 
                 if (isFirefox) {
                     this.connection.onconnection = function () {
@@ -2458,7 +2459,7 @@
             attachMediaStreams: function () {
                 var streams = this.attachStreams;
                 for (var i = 0; i < streams.length; i++) {
-                    log('attaching stream:', streams[i].streamid);
+                    console.log('attaching stream:', streams[i].streamid);
                     this.connection.addStream(streams[i]);
                 }
                 this.getStreamInfo();
@@ -2478,7 +2479,7 @@
             recreateOffer: function (renegotiate, callback) {
                 // if(isFirefox) this.create(this.type, this);
 
-                log('recreating offer');
+                console.log('recreating offer');
 
                 this.type = 'offer';
                 this.renegotiate = true;
@@ -2498,7 +2499,7 @@
             recreateAnswer: function (sdp, session, callback) {
                 // if(isFirefox) this.create(this.type, this);
 
-                log('recreating answer');
+                console.log('recreating answer');
 
                 this.type = 'answer';
                 this.renegotiate = true;
@@ -2591,7 +2592,7 @@
         if (mediaConstraints.optional)
             hints.video.optional[0] = merge({}, mediaConstraints.optional);
 
-        log('media hints:', toStr(hints));
+        console.log('media hints:', toStr(hints));
 
         // easy way to match 
         var idInstance = JSON.stringify(hints);
@@ -3060,7 +3061,7 @@
     function toStr(obj) {
         return JSON.stringify(obj, function (key, value) {
             if (value && value.sdp) {
-                log(value.sdp.type, '\t', value.sdp.sdp);
+                console.log(value.sdp.type, '\t', value.sdp.sdp);
                 return '';
             } else return value;
         }, '\t');
@@ -3131,7 +3132,7 @@
             if (session.type == 'local' && root.type != 'local') return;
         }
 
-        log(enabled ? 'mute' : 'unmute', 'session', session);
+        console.log(enabled ? 'mute' : 'unmute', 'session', session);
 
         // enable/disable audio/video tracks
 
@@ -3255,11 +3256,11 @@
             var sourceBuffer, mediaSource = new MediaSource();
             mediaSource.addEventListener(prefix + 'sourceopen', function () {
                 sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
-                log('MediaSource readyState: <', this.readyState, '>');
+                console.log('MediaSource readyState: <', this.readyState, '>');
             }, false);
 
             mediaSource.addEventListener(prefix + 'sourceended', function () {
-                log('MediaSource readyState: <', this.readyState, '>');
+                console.log('MediaSource readyState: <', this.readyState, '>');
             }, false);
 
             function startStreaming(blob) {
@@ -3268,7 +3269,7 @@
                     startIndex = 0,
                     plus = 3000;
 
-                log('one chunk size: <', plus, '>');
+                console.log('one chunk size: <', plus, '>');
 
                 function inner_streamer() {
                     reader = new window.FileReader();
@@ -3303,7 +3304,7 @@
                 self.receiver = mediaSource.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
                 self.mediaSource = mediaSource;
 
-                log('MediaSource readyState: <', this.readyState, '>');
+                console.log('MediaSource readyState: <', this.readyState, '>');
             }, false);
 
 
@@ -3335,12 +3336,12 @@
     function setDefaults(connection) {
         // www.RTCMultiConnection.org/docs/onmessage/
         connection.onmessage = function (e) {
-            log('onmessage', toStr(e));
+            console.log('onmessage', toStr(e));
         };
 
         // www.RTCMultiConnection.org/docs/onopen/
         connection.onopen = function (e) {
-            log('Data connection is opened between you and', e.userid);
+            console.log('Data connection is opened between you and', e.userid);
         };
 
         // www.RTCMultiConnection.org/docs/onerror/
@@ -3419,7 +3420,7 @@
 
         // www.RTCMultiConnection.org/docs/onmute/
         connection.onmute = function (e) {
-            log('onmute', e);
+            console.log('onmute', e);
             if (e.isVideo && e.mediaElement) {
                 e.mediaElement.pause();
                 e.mediaElement.setAttribute('poster', e.snapshot || 'https://www.webrtc-experiment.com/images/muted.png');
@@ -3431,7 +3432,7 @@
 
         // www.RTCMultiConnection.org/docs/onunmute/
         connection.onunmute = function (e) {
-            log('onunmute', e);
+            console.log('onunmute', e);
             if (e.isVideo && e.mediaElement) {
                 e.mediaElement.play();
                 e.mediaElement.removeAttribute('poster');
@@ -3443,7 +3444,7 @@
 
         // www.RTCMultiConnection.org/docs/onleave/
         connection.onleave = function (e) {
-            log('onleave', toStr(e));
+            console.log('onleave', toStr(e));
         };
 
         connection.token = function () {
@@ -3545,7 +3546,6 @@
 
         var iceServers = [];
 
-/*
         if (isFirefox) {
             iceServers.push({
                 url: 'stun:23.21.150.121'
@@ -3597,7 +3597,6 @@
                 username: 'webrtc'
             });
         }
-*/
         connection.iceServers = iceServers;
 
         // www.RTCMultiConnection.org/docs/preferSCTP/
@@ -3932,12 +3931,12 @@
 
         // www.RTCMultiConnection.org/docs/onCustomMessage/
         connection.onCustomMessage = function (message) {
-            log('Custom message', message);
+            console.log('Custom message', message);
         };
 
         // www.RTCMultiConnection.org/docs/ondrop/
         connection.ondrop = function (droppedBy) {
-            log('Media connection is dropped by ' + droppedBy);
+            console.log('Media connection is dropped by ' + droppedBy);
         };
 
         // www.RTCMultiConnection.org/docs/drop/
@@ -4039,7 +4038,7 @@
 
         // www.RTCMultiConnection.org/docs/onMediaFile/
         connection.onMediaFile = function (e) {
-            log('onMediaFile', e);
+            console.log('onMediaFile', e);
             connection.body.appendChild(e.mediaElement);
         };
 
@@ -4118,7 +4117,7 @@
 
         // www.RTCMultiConnection.org/docs/onhold/
         connection.onhold = function (track) {
-            log('onhold', track);
+            console.log('onhold', track);
 
             if (track.kind != 'audio') {
                 track.mediaElement.pause();
@@ -4138,7 +4137,7 @@
 
         // www.RTCMultiConnection.org/docs/onunhold/
         connection.onunhold = function (track) {
-            log('onunhold', track);
+            console.log('onunhold', track);
 
             if (track.kind != 'audio') {
                 track.mediaElement.play();

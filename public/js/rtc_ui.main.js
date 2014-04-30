@@ -200,6 +200,7 @@ $(document).ready(function () {
 
     var websocket = new WebSocket(SIGNALING_SERVER);
     websocket.onmessage = function(event) {
+        console.log('[m] websocket.onmessage')
         var data = JSON.parse(event.data);
         if (data.isChannelPresent == false) {
             addNewMessage({
@@ -219,6 +220,7 @@ $(document).ready(function () {
         }
     };
     websocket.onopen = function() {
+        console.log('[o] websocket.onopen')
         websocket.send(JSON.stringify({
             checkPresence: true,
             channel: roomid

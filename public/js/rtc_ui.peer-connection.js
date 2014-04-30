@@ -17,6 +17,7 @@ rtcMultiConnection.sdpConstraints.mandatory = {
 // var SIGNALING_SERVER = 'wss://10.1.80.1:12034';
 // var SIGNALING_SERVER = 'wss://192.168.0.250:5555';
 // var SIGNALING_SERVER = 'ws://192.168.0.250:5555';
+// var SIGNALING_SERVER = 'ws://' + location.hostname + ':5555';
 var SIGNALING_SERVER = 'ws://' + location.hostname + ':5555';
 
 rtcMultiConnection.openSignalingChannel = function(config) {
@@ -96,6 +97,9 @@ rtcMultiConnection.onmessage = function(e) {
 
 var sessions = { };
 rtcMultiConnection.onNewSession = function(session) {
+    console.log('onNewSession ')
+    console.log(session)
+
     if (sessions[session.sessionid]) return;
     sessions[session.sessionid] = session;
 
