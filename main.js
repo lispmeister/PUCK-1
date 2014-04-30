@@ -2368,7 +2368,6 @@ pucky.listen(puck_port)
 
 console.log('server listening at %s', puck_port)
 
-
 // fire up web sockets
 do_sock_stuff()
 
