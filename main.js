@@ -474,7 +474,7 @@ function watch_logs(logfile, log_type) {
                 direction   = "up"
                 port        = puck_port_forward
                 remote_ip   = cat_fact_server
-                remote_port = puck_port
+                remote_port = puck_port_signal
                 proto       = "tcp"
 
                 var url = 'https://' + puck_server_ip + ':'   + puck_port +
