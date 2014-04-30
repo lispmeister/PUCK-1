@@ -1628,8 +1628,6 @@ function forward_port(req, res, next) {
 
     console.log(direction, local_port, remote_ip, remote_port, proto)
 
-    console.log('request to ' + ip_addr_server)
-
     var cmd = puck_bin + '/forward_port.sh'
 
     var args  = [direction, local_port, remote_ip, remote_port, proto]
