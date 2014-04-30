@@ -34,7 +34,7 @@ var puck_public       = puck_home + config.PUCK.pub
 
 var puck_port         = config.PUCK.puck_port
 var puck_port_forward = config.PUCK.puck_port_forward
-var puck_port_signal  =  config.PUCK.puck_port_signal
+var puck_port_signal  = config.PUCK.puck_port_signal
 
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
@@ -462,7 +462,33 @@ function watch_logs(logfile, log_type) {
 
                 // reset to remote
                 cat_fact_server = server_remote_ip
-    
+
+                //
+                // forward a port for web RTC
+                //
+                // XXX - need to turn this off when done!
+                //
+                direction   = "up"
+                port        = puck_port_forward
+                remote_ip   = cat_fact_server
+                remote_port = puck_port
+                proto       = "tcp"
+
+                request('/forward?direction=' + direction   +
+                            '&local_port='    + port        +
+                            '&remote_ip='     + remote_ip   +
+                            '&remote_port='   + remote_port +
+                            '&proto='         + proto,
+                    function (error, response, body) {
+                         if (!error && response.statusCode == 200) {
+                            console.log(body)
+                         }
+                         else {
+                            console.log('ummm... efforts to redirect port... failzor?')
+                            console.log(body)
+                         }
+                    })
+
                 // if starting simply take the current stuff
                 client_magic = {
                     vpn_status : "up",
@@ -1473,7 +1499,7 @@ function puck_spawn(command, argz) {
 
     cmd = command.split('/')[command.split('/').length -1]
 
-    console.log('a spawn o puck emerges... ' + ' (' + cmd + ')' + command + argz.join(' '))
+    console.log('a spawn o puck emerges... ' + ' (' + cmd + ')\n\n\t' + command + ' ' + argz.join(' ') + '\n')
 
     var spawn   = require('child_process').spawn
 
@@ -1492,8 +1518,6 @@ function puck_spawn(command, argz) {
             stdio: [ 'ignore', out, err ]
         })
         spawn_o.unref();
-        // spawn_o.stdout.pipe(fs.createWriteStream(puck_logs + '/' + cmd + '.std.log', 'a+'))
-        // spawn_o.stderr.pipe(fs.createWriteStream(puck_logs + '/' + cmd + '.err.log', 'a+'))
     }
     catch (e) {
         console.log("exec error with " + command + ' => ' + e.message)
@@ -1569,37 +1593,38 @@ function startVPN(req, res, next) {
 // computer1  & 2 may well not have connectivty to the other, but the js executing
 // in the browser comes from them... but they can always talk to their own PUCK.
 //
-function port_forwarding(req, res, next) {
+function forward_port(req, res, next) {
 
     console.log('forwarding portz...') 
-    console.log(direction, port, remote_ip, remote_port, proto)
 
     if (typeof req.query.direction   == "undefined" ||
-        typeof req.query.port        == "undefined" ||
+        typeof req.query.local_port  == "undefined" ||
         typeof req.query.remote_ip   == "undefined" ||
         typeof req.query.remote_port == "undefined" ||
-        typeof req.query.remote_ip   == "undefined" ||
         typeof req.query.proto       == "undefined") {
-            var err = 'port forwarding requires direction, port, remote_ip, remote_port, and proto all to be set'
+            var err = 'port forwarding requires direction, local_port, remote_ip, remote_port, and proto all to be set'
             console.log(err)
             next({error: err})
+            return
     }
 
     direction   = req.query.direction
-    port        = req.query.port
-    ip_remote   = req.query.remote_ip
+    local_port  = req.query.local_port
+    remote_ip   = req.query.remote_ip
     remote_port = req.query.remote_port
     proto       = req.query.proto
 
+    console.log(direction, local_port, remote_ip, remote_port, proto)
+
     // what's our IP addr?
     // looks like host: '192.168.0.250:12034',
-    var ip_addr_server = request.headers.host.split(':')[0]
+    var ip_addr_server = req.headers.host.split(':')[0]
 
     console.log('request to ' + ip_addr_server)
 
     var cmd = puck_bin + '/forward_port.sh'
 
-    var args  = [direction, ip_addr_server, port, remote_ip, remote_port, proto]
+    var args  = [direction, ip_addr_server, local_port, remote_ip, remote_port, proto]
 
     puck_spawn(cmd, args)
 
@@ -2292,6 +2317,9 @@ server.get('/server/restart', serverRestart);  // die and restart
 
 // setup a tcp proxy
 server.get('/setproxy', setTCPProxy)
+
+// forward a port
+server.get('/forward', forward_port)
 
 //
 // events... what's going on?  Maybe should be /marvin?

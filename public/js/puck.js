@@ -909,11 +909,12 @@ function put_a_sock_in_it(sock_url) {
     var socket = null;
 
     var sock = function() {    
-        socket = new SockJS(protocol + serverDomain + '/echo', null, {
-            'protocols_whitelist': ['websocket', 'xdr-streaming', 'xhr-streaming', 
-                                'iframe-eventsource', 'iframe-htmlfile', 
-                                'xdr-polling', 'xhr-polling', 'iframe-xhr-polling',
-                                'jsonp-polling']
+        socket = new SockJS(protocol + serverDomain + '/pux', null, {
+            'protocols_whitelist': [
+                'websocket',          'xdr-streaming',      'xhr-streaming', 
+                'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
+                'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
+                ]
         });
 
         socket.onopen = function () {
