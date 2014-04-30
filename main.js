@@ -477,10 +477,6 @@ function watch_logs(logfile, log_type) {
                 remote_port = puck_port
                 proto       = "tcp"
 
-
-var ip_addr_server = req.headers.host.split(':')[0]
-
-
                 var url = 'https://' + puck_server_ip + ':'   + puck_port +
                           '/forward?direction=' + direction   +
                           '&local_port='        + port        +
