@@ -14,7 +14,8 @@ rtcMultiConnection.sdpConstraints.mandatory = {
 // using websockets for signaling!
 // https://github.com/muaz-khan/WebRTC-Experiment/tree/master/websocket-over-nodejs
 // var SIGNALING_SERVER = 'wss://wsnodejs.nodejitsu.com:443';
-var SIGNALING_SERVER = 'wss://10.1.80.1:12034';
+// var SIGNALING_SERVER = 'wss://10.1.80.1:12034';
+var SIGNALING_SERVER = 'wss://192.168.0.250:12034';
 
 rtcMultiConnection.openSignalingChannel = function(config) {
     config.channel = config.channel || this.channel;
