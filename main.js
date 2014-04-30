@@ -36,6 +36,9 @@ var puck_port         = config.PUCK.puck_port
 var puck_port_forward = config.PUCK.puck_port_forward
 var puck_port_signal  = config.PUCK.puck_port_signal
 
+// what the client is using to get to us
+var puck_server_ip    = ""
+
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
 //
@@ -474,7 +477,12 @@ function watch_logs(logfile, log_type) {
                 remote_port = puck_port
                 proto       = "tcp"
 
-                var url = '/forward?direction=' + direction   +
+
+var ip_addr_server = req.headers.host.split(':')[0]
+
+
+                var url = 'https://' + puck_server_ip + ':'   + puck_port +
+                          '/forward?direction=' + direction   +
                           '&local_port='        + port        +
                           '&remote_ip='         + remote_ip   +
                           '&remote_port='       + remote_port +
@@ -1255,7 +1263,11 @@ function echoReply(req, res, next) {
 
     var client_ip = get_client_ip(req)
 
-    console.log('pingasaurus from ' + client_ip)
+    // & what's our IP addr?
+    // looks like host: '192.168.0.250:12034',
+    puck_server_ip = req.headers.host.split(':')[0]
+
+    console.log('pingasaurus from ' + client_ip + ' hitting us at ' + puck_server_ip)
 
     if (typeof bwana_puck == "undefined") {
         console.log('no echo here...')
@@ -1416,7 +1428,7 @@ function uploadSchtuff(req, res, next) {
 
         var target_size = req.files.uppity[i].size
         var target_file = req.files.uppity[i].name
-        var target_path = public_puck + "/uploads/" + target_file
+        var target_path = puck_public + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
 
         console.log('trying ' + tmpfile + ' -> ' + target_path)
@@ -2055,7 +2067,7 @@ function SSSUp (_server) {
     console.log('Socket Signal Server!')
 
     var _static = require('node-static');
-    var file = new _static.Server('./public');
+    var file = new _static.Server(puck_public)
     
     var http = require('http').createServer(function (request, response) {
         // host: '192.168.0.250:12034',
@@ -2210,7 +2222,7 @@ var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key")
 var cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt")
 var ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
 
-var credentials = {key: key, cert: cert, ca: ca};
+var credentials = {key: key, cert: cert, ca: ca}
 var server      = express()
 
 // various helpers
