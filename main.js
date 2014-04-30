@@ -2337,7 +2337,7 @@ server.all('/url', webProxy)
 var pucky = https.createServer(credentials, server)
 
 // socket signal server
-SSSUp(pucky)
+// SSSUp(pucky)
 
 // sockjs to the rescue
 var sockjs = require('sockjs')
