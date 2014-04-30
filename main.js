@@ -1782,7 +1782,7 @@ var ping_done = false
 
 function httpsPing(puckid, ipaddr, res, next) {
 
-    console.log("++++pinging... " + puckid + ' / ' + ipaddr)
+    // console.log("++++pinging... " + puckid + ' / ' + ipaddr)
 
     ping_done = false
 

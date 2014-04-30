@@ -1,7 +1,10 @@
-<!--
-// Muaz Khan         - www.MuazKhan.com
-// MIT License       - www.WebRTC-Experiment.com/licence
-// Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
+<!-- slightly modified version from:
+
+    // Muaz Khan         - www.MuazKhan.com
+    // MIT License       - www.WebRTC-Experiment.com/licence
+    // Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
 -->
 
 <html lang="en">
@@ -17,30 +20,26 @@
         
     </head>
     <body>
-        <div class="settings">
-            <button id="settings">Settings</button>
-        </div>
-	
-        <h1>
-            <img src="images/rtc_logo.png"><br />
-        </h1>
-		
-        <div class="users-list">
-            <div class="numbers-of-users">0</div>
-            <img src="images/rtc_users.png">
-        </div>
-		
-        <div class="main-input-box">
-            <textarea placeholder="Send a message"></textarea>
-			
-			<p id="who-is-typing"></p>
-			
             <div class="controls">
                 <button id="allow-webcam" class="icon" disabled></button>
                 <button id="allow-mic" class="icon" disabled></button>
                 <button id="allow-screen" class="icon" disabled></button>
                 <button id="share-files" class="icon" disabled></button>
             </div>
+
+        <div class="settings">
+            <button id="settings">Settings</button>
+        </div>
+	
+        <div class="users-list">
+            <span>Users: </span><span class="numbers-of-users">0</span>
+        </div>
+		
+        <div class="main-input-box">
+            <textarea placeholder="...type your blah blahs out..."></textarea>
+			
+			<p id="who-is-typing"></p>
+			
         </div>
         
         <div class="settings-panel">
@@ -183,20 +182,11 @@
         <div class="users-container"></div>
 		
         <div class="main">
-            <div class="new-message">
-                <div class="user-info">
-                    <img src="images/rtc_user.png">
-                </div>
-				
-                <div class="user-activity">
-                    <h2 class="header">Welcome Sir!</h2>
-                    <p class="message">
-                        Please Enter Your Name: <input type="text"><button id="continue">continue</button>
-                    </p>
-                </div>
-            </div>
+            <div class="new-message"> </div>
         </div>
         
+
+        <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 
         <script type="text/javascript" src='/js/firebase.js''></script>
 

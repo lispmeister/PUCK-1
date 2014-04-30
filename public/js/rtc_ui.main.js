@@ -18,21 +18,25 @@ function getRandomColor() {
 }
 
 function addNewMessage(args) {
+
     var newMessageDIV = document.createElement('div');
     newMessageDIV.className = 'new-message';
 
     var userinfoDIV = document.createElement('div');
     userinfoDIV.className = 'user-info';
-    userinfoDIV.innerHTML = args.userinfo || '<img src="images/rtc_rtc_user.png">';
 
-    userinfoDIV.style.background = args.color || rtcMultiConnection.extra.color || getRandomColor();
+    // userinfoDIV.innerHTML = args.userinfo || '<img src="images/rtc_rtc_user.png">';
+    userinfoDIV.innerHTML = '<div style="padding: .6em .8em;">' + args.header + '</div>'
+
+//    userinfoDIV.style.background = args.color || rtcMultiConnection.extra.color || getRandomColor();
+    userinfoDIV.style.color = args.color || rtcMultiConnection.extra.color || getRandomColor();
 
     newMessageDIV.appendChild(userinfoDIV);
 
     var userActivityDIV = document.createElement('div');
     userActivityDIV.className = 'user-activity';
 
-    userActivityDIV.innerHTML = '<h2 class="header">' + args.header + '</h2>';
+    // userActivityDIV.innerHTML = '<span>' + args.header + '</span>';
 
     var p = document.createElement('p');
     p.className = 'message';
@@ -50,58 +54,6 @@ function addNewMessage(args) {
     }
 
 }
-
-main.querySelector('input').onkeyup = function(e) {
-    if (e.keyCode != 13) return;
-    main.querySelector('button').onclick();
-};
-
-main.querySelector('button').onclick = function() {
-    var input = this.parentNode.querySelector('input');
-    input.disabled = this.disabled = true;
-
-    var username = input.value || 'Anonymous';
-
-    rtcMultiConnection.extra = {
-        username: username,
-        color: getRandomColor()
-    };
-
-    addNewMessage({
-        header: username,
-        message: 'Searching for existing rooms...',
-        userinfo: '<img src="images/rtc_action-needed.png">'
-    });
-
-    var roomid = rtcMultiConnection.channel;
-
-    var websocket = new WebSocket(SIGNALING_SERVER);
-    websocket.onmessage = function(event) {
-        var data = JSON.parse(event.data);
-        if (data.isChannelPresent == false) {
-            addNewMessage({
-                header: username,
-                message: 'No room found. Creating new room...<br /><br />You can share following link with your friends:<br /><a href="' + location.href + '">' + location.href + '</a>',
-                userinfo: '<img src="images/rtc_action-needed.png">'
-            });
-
-            rtcMultiConnection.open();
-        } else {
-            addNewMessage({
-                header: username,
-                message: 'Room found. Joining the room...',
-                userinfo: '<img src="images/rtc_action-needed.png">'
-            });
-            rtcMultiConnection.join(roomid);
-        }
-    };
-    websocket.onopen = function() {
-        websocket.send(JSON.stringify({
-            checkPresence: true,
-            channel: roomid
-        }));
-    };
-};
 
 function getUserinfo(blobURL, imageURL) {
     return blobURL ? '<video src="' + blobURL + '" autoplay></vide>' : '<img src="' + imageURL + '">';
@@ -144,7 +96,7 @@ getElement('.main-input-box textarea').onkeyup = function(e) {
 
     addNewMessage({
         header: rtcMultiConnection.extra.username,
-        message: 'Your Message:<br /><br />' + linkify(this.value),
+        message: linkify(this.value),
         userinfo: getUserinfo(rtcMultiConnection.blobURLs[rtcMultiConnection.userid], 'images/rtc_chat-message.png'),
         color: rtcMultiConnection.extra.color
     });
@@ -231,3 +183,46 @@ function bytesToSize(bytes) {
     var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
+
+
+
+
+$(document).ready(function () {
+
+    var username = location.hostname
+
+    rtcMultiConnection.extra = {
+        username: username,
+        color: getRandomColor()
+    };
+
+    var roomid = rtcMultiConnection.channel;
+
+    var websocket = new WebSocket(SIGNALING_SERVER);
+    websocket.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        if (data.isChannelPresent == false) {
+            addNewMessage({
+                header: username,
+                message: 'Creating new room...',
+                userinfo: '<img src="images/rtc_action-needed.png">'
+            });
+
+            rtcMultiConnection.open();
+        } else {
+            addNewMessage({
+                header: username,
+                message: 'Joining existing room...',
+                userinfo: '<img src="images/rtc_action-needed.png">'
+            });
+            rtcMultiConnection.join(roomid);
+        }
+    };
+    websocket.onopen = function() {
+        websocket.send(JSON.stringify({
+            checkPresence: true,
+            channel: roomid
+        }));
+    };
+})
+

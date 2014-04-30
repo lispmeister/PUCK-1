@@ -1,7 +1,9 @@
-/*
+/* slightly modded version of:
+
 // Muaz Khan         - www.MuazKhan.com
 // MIT License       - www.WebRTC-Experiment.com/licence
 // Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
 */
 
 body, body * {
@@ -9,19 +11,13 @@ body, body * {
     margin: 0;
     outline: none;
     -webkit-user-drag: none;
-    font-family: Myriad, Arial, Verdana;
-}
-
-html {
-    background: rgb(247, 253, 244);
 }
 
 body {
-    border-right: 2px solid rgb(23, 228, 56);
-    border-left: 2px solid rgb(80, 238, 29);
+    border-right: 2px solid gray;
+    border-left: 2px solid gray;
     margin: 0 2%;
     background: white;
-    font-size: 1.2em;
     line-height: 1.5em;
 }
 
@@ -35,7 +31,6 @@ body {
 }
 
 .new-message {
-    min-height: 7em;
     border-top: 1px solid black;
 }
 
@@ -45,7 +40,6 @@ body {
 
 .user-info {
     width: 10em;
-    min-height: 7em;
     float: left;
     border-right: 1px solid black;
     text-align: center;
@@ -61,7 +55,7 @@ body {
 }
 
 .user-activity {
-    margin-left: 10em;
+    margin-left: 50px;
     padding: .4em .8em;
 }
 
@@ -70,22 +64,23 @@ body {
 
 .message {
     padding: .6em .8em;
+    color: red;
 }
 
 .message img, .message iframe {
     width: 64%;
-    border: 2px solid black;
     border-radius: 5px;
 }
 
 .main-input-box {
-    border: 1px solid black;
+    border: 1px solid e6e6e6;
     border-bottom: 0;
     padding-bottom: 1px;
     text-align: right;
-    margin-left: 193px;
+    margin-left: 220px;
     margin-right: 125px;
     padding-right: 21px;
+
 }
 
 .main-input-box textarea {
@@ -104,12 +99,9 @@ button, .users-list
 	padding: 5px 10px;
 	cursor: pointer;
 	display:inline-block;
-	color: #FDFDFD;
-	font-size: 20px;
 	color: black;
 	border: 1px solid rgba(231, 72, 50, 0.59);
 	border-radius: 2px;
-	background-color: rgba(204, 60, 25, 0.63);
 }
 button:hover, .users-list:hover
 {
@@ -177,7 +169,6 @@ a:active {
 input {
     border-radius: 1px;
     border: 1px solid #d9d9d9;
-    font-size: 15px;
     height: 32px;
     width: 200px;
     margin-top: .5em;
@@ -202,38 +193,12 @@ h1 {
     text-shadow: 1px 1px rgb(7, 129, 160);
 }
 
-h1 img {
-    width: 160px;
-    height: 60px;
-}
-
-.users-list {
-    position: absolute;
-    right: 63px;
-    padding: 0;
-    color: white;
-    margin-top: 0px;
-    width: 118px;
-    height: 110px;
-    cursor: default;
-    border-radius: 0;
-    border-top-right-radius: 20px;
-}
-
 .users-list.selected {
     background-color: black;
 }
 
-.users-list img {
-    width: 82%;
-    height: 104px;
-}
-
 .numbers-of-users {
-    position: absolute;
-    font-size: 3em;
-    left: 38%;
-    top: 60px;
+    font-size: 2em;
 }
 
 .users-container, .settings-panel {
@@ -241,7 +206,7 @@ h1 img {
     border: 1px solid black;
     overflow: hidden;
     overflow-x: auto;
-    height: 180px;
+    height: 100px;
     border-radius: 5px;
     display: none;
 }
@@ -284,12 +249,6 @@ h1 img {
     padding: .4em .8em;
 }
 
-strong {
-    color: rgb(204, 14, 14);
-    font-family: inherit;
-    font-weight: normal;
-}
-
 tr, td, th {
     vertical-align: top;
     padding: .7em 1.4em;
@@ -305,7 +264,6 @@ h1, h2 {
     border-bottom: 1px solid rgb(189, 189, 189);
     display: inline;
     font-weight: normal;
-    line-height: 36px;
     padding: 0 0 3px 0;
 }
 
