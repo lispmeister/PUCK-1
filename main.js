@@ -1628,15 +1628,11 @@ function forward_port(req, res, next) {
 
     console.log(direction, local_port, remote_ip, remote_port, proto)
 
-    // what's our IP addr?
-    // looks like host: '192.168.0.250:12034',
-    var ip_addr_server = req.headers.host.split(':')[0]
-
     console.log('request to ' + ip_addr_server)
 
     var cmd = puck_bin + '/forward_port.sh'
 
-    var args  = [direction, ip_addr_server, local_port, remote_ip, remote_port, proto]
+    var args  = [direction, local_port, remote_ip, remote_port, proto]
 
     puck_spawn(cmd, args)
 
