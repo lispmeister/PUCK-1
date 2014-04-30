@@ -1782,7 +1782,7 @@ var ping_done = false
 
 function httpsPing(puckid, ipaddr, res, next) {
 
-    console.log("\n\n++++pinging... " + puckid + ' / ' + ipaddr)
+    console.log("++++pinging... " + puckid + ' / ' + ipaddr)
 
     ping_done = false
 
@@ -1804,7 +1804,7 @@ function httpsPing(puckid, ipaddr, res, next) {
             return; 
         }
 
-        console.log('pinging  ' + ip);
+        // console.log('pinging  ' + ip);
 
         var url = 'https://' + ip + ':' + puck_port + '/ping'
 
@@ -2037,44 +2037,21 @@ function serverRestart(req, res, next) {
 }
 
 //
-// setup signal socket server - from https://github.com/muaz-khan/WebRTC-Experiment   (http version)
-//
-// XXXX
-// XXXX
-// XXXX
-//
-// THIS IS NOT ENCRYPTED!  This is meant to be run over a VPN
+// setup signal socket server - from https://github.com/muaz-khan/WebRTC-Experiment
 //
 // In production/whatever, BLOCK THE PORT FROM THE WORLD
-// if it's even running - ONLY expose it to the VPN.
-//
-// XXXX
-// XXXX
-// XXXX
+// if it's even running - ONLY expose it to the VPN or local
 //
 function SSSUp (_server) {
 
     console.log('Socket Signal Server!')
 
-    var _static = require('node-static');
-    var file = new _static.Server(puck_public)
-    
-    var http = require('http').createServer(function (request, response) {
-        // host: '192.168.0.250:12034',
-        var ip_addr = request.headers.host.split(':')[0]
-        console.log('request *to* ' + ip_addr)
-    
-        request.addListener('end', function () {
-            file.serve(request, response)
-        }).resume();
-    }).listen(puck_port_signal);
-    
     var CHANNELS = {};
     
     var WebSocketServer = require('websocket').server;
     
     new WebSocketServer({
-        httpServer: http,
+        httpServer: server,
         autoAcceptConnections: false
     }).on('request', onRequest);
     
@@ -2095,6 +2072,7 @@ function SSSUp (_server) {
     }
     
     function onMessage(message, websocket) {
+        console.log('on message: ' + message)
         if (message.checkPresence)
             checkPresence(message, websocket);
         else if (message.open)
@@ -2104,6 +2082,7 @@ function SSSUp (_server) {
     }
     
     function onOpen(message, websocket) {
+        console.log('on open: ' + message)
         var channel = CHANNELS[message.channel];
     
         if (channel)
@@ -2113,6 +2092,7 @@ function SSSUp (_server) {
     }
     
     function sendMessage(message, websocket) {
+        console.log('send message: ' + message)
         message.data = JSON.stringify(message.data);
         var channel = CHANNELS[message.channel];
         if (!channel) {
