@@ -3546,6 +3546,7 @@
 
         var iceServers = [];
 
+        /*
         if (isFirefox) {
             iceServers.push({
                 url: 'stun:23.21.150.121'
@@ -3597,6 +3598,7 @@
                 username: 'webrtc'
             });
         }
+        */
         connection.iceServers = iceServers;
 
         // www.RTCMultiConnection.org/docs/preferSCTP/

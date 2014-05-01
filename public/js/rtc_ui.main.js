@@ -17,6 +17,8 @@ function getRandomColor() {
     return color;
 }
 
+var number_vids = 0
+
 function addNewMessage(args) {
 
     var newMessageDIV = document.createElement('div');
@@ -26,8 +28,26 @@ function addNewMessage(args) {
     userinfoDIV.className = 'user-info';
 
     // userinfoDIV.innerHTML = args.userinfo || '<img src="images/rtc_rtc_user.png">';
-    userinfoDIV.innerHTML = '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    // userinfoDIV.innerHTML = '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    
+    // ignore images
+    if (args.userinfo.indexOf('.png') >= 0) {
+        userinfoDIV.innerHTML = '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    }
+    else if (args.userinfo.indexOf('<video') >= 0) {
+        if (number_vids < 2) {
+            if (!number_vids) var num = "one"
+            else              var num = "two"
+            number_vids++
+            console.log('adding video ' + num)
+            $('#video_' + num).html('<div style="width=200px"; padding: .6em .8em;">' + args.userinfo + '</div>')
+        }
+    }
+    else {
+        userinfoDIV.innerHTML = args.userinfo || '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    }
 
+// not background, just font
 //    userinfoDIV.style.background = args.color || rtcMultiConnection.extra.color || getRandomColor();
     userinfoDIV.style.color = args.color || rtcMultiConnection.extra.color || getRandomColor();
 

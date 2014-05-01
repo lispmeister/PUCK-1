@@ -221,6 +221,27 @@ h1 {
     left: 251px;
 }
 
+#video_one {
+    position: absolute;
+    top: 33px;
+    left: 120;
+}
+#video_one video {
+    width: 100%;
+    height: 150px;
+}
+
+#video_two {
+    position: absolute;
+    top: 33px;
+    left: 500;
+}
+#video_two video {
+    width: 100%;
+    height: 150px;
+}
+
+
 .settings {
     position: absolute;
     top: 33px;

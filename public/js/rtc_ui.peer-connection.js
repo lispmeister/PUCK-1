@@ -125,10 +125,10 @@ rtcMultiConnection.onRequest = function(request) {
 
 rtcMultiConnection.onCustomMessage = function(message) {
     if (message.hasCamera || message.hasScreen) {
-        var msg = message.extra.username + ' enabled webcam. <button id="preview">Preview</button> ---- <button id="share-your-cam">Share Your Webcam</button>';
+        var msg = message.extra.username + ' enabled webcam. <button id="preview">Preview</button> ---- <button id="share-your-cam">Share your Webcam</button>';
 
         if (message.hasScreen) {
-            msg = message.extra.username + ' is ready to share screen. <button id="preview">View His Screen</button> ---- <button id="share-your-cam">Share Your Screen</button>';
+            msg = message.extra.username + ' is ready to share screen. <button id="preview">View His Screen</button> ---- <button id="share-your-cam">Share your Screen</button>';
         }
 
         addNewMessage({
@@ -176,7 +176,7 @@ rtcMultiConnection.onCustomMessage = function(message) {
     if (message.hasMic) {
         addNewMessage({
             header: message.extra.username,
-            message: message.extra.username + ' enabled microphone. <button id="listen">Listen</button> ---- <button id="share-your-mic">Share Your Mic</button>',
+            message: message.extra.username + ' enabled microphone. <button id="listen">Listen</button> ---- <button id="share-your-mic">Share your Mic</button>',
             userinfo: '<img src="images/rtc_action-needed.png">',
             color: message.extra.color,
             callback: function(div) {
