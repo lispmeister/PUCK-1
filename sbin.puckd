@@ -92,11 +92,33 @@ mask10="255.255.255.248"
 
 cd $PUCK_HOME
 
+echo flushing all iptables and cached routes
+./exe/flush.sh
+
 openvpn --server $base10.0 $mask10 --config S.conf &
 
 echo "$base10.1" > $PUCK_HOME/public/openvpn_server.ip
 
 yate -c $PUCK_HOME/yate/ -vvvvv -d -l $PUCK_HOME/log/yate.log -Dt
+
+# another... hack... in a long line of ... oh, forget it.
+vpn_sleep=10
+echo sleeping for $vpn_sleep seconds to try to ensure openvpn has an ip adddress up
+
+sleep $vpn_sleep
+
+vpn_ip=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}'| sed 's/,]$/]/')
+
+if [ "X$vpn_ip" = "X" ]; then
+    echo "WARNING!  No IP picked up for OpenVPN"
+    echo "WARNING!  No IP picked up for OpenVPN"
+    echo "WARNING!  No IP picked up for OpenVPN"
+    echo "WARNING!  No IP picked up for OpenVPN"
+    echo "WARNING!  No IP picked up for OpenVPN"
+else
+    ./exe/forward_port.sh up 5555 $vpn_ip 12034 tcp
+fi
+
 
 exit 0
 
