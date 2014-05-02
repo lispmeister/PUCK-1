@@ -151,51 +151,6 @@ watch_logs("server_vpn", "OpenVPN Server")
 watch_logs("client_vpn", "OpenVPN Client")
 
 //
-// promise her anything... buy her a chicken.  A json chicken, of course.
-//
-// function someday_get_https(url) {
-
-function someday_get_https (url) {
-
-    console.log('someday... I will get_https ' + url)
-
-    data = ""
-
-    // var deferred = Q.defer();
-
-        https.get(url, function (res) {
-
-            console.log('fucking ' + res)
-
-            if (res.statusCode !== 200) {
-                // deferred.reject("HTTPs erz " + res.statusCode + " for " + url);
-                console.log("HTTPs erz " + res.statusCode + " for " + url)
-                return('err: res.statusCode')
-            }
-            res.on("data", function (chunk) {
-                data += chunk;
-            })
-
-            res.on("end", function () { 
-                console.log("... data is in...?")
-                console.log(data)
-                // deferred.resolve(data); 
-                return(data); 
-            })
-        })
-        .on("error", function(e) {
-            console.log('tomorrow never errz!')
-            // deferred.reject
-            // deferred.promise.fail(console.log);
-            // return('erzoid: ' + e)
-            return(e)
-            // deferred.reject('erzoid: ' + e)
-        })
-//  return deferred.promise;
-
-}
-
-//
 // drag in PUCK data to the server
 //
 // the very first time it's a bit of a chicken and egg thing;
@@ -211,43 +166,38 @@ console.log('pulling in puck data for the server itself')
 events    = require('events');
 emitter   = new events.EventEmitter();
 
+wait_for_puck = null
+
 var uber_puck = function uber_puck() {
 
     console.log("it's time...!")
 
-    // Q.nfcall(someday_get_https, 'https://localhost:' + puck_port + '/puck/' + puck_id).then(function(res)
-
     var url = 'https://localhost:' + puck_port + '/puck/' + puck_id
 
-    https.get(url, function(response) {
-        var data = ''
-        response.on('data', function(chunk) {
-            data += chunk
-        })
-        response.on('end', function() {
-            console.log(url + ' snatched')
-            // console.log(data)
-
+    request(url, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
             // success
             console.log('finally got server response...')
+            // console.log(body)
 
-            if (data.indexOf("was not found") != -1) {
-                console.log('no woman no puck: ' + data)
+            if (body.indexOf("was not found") != -1) {
+                console.log('no woman no puck: ' + body)
                 // trytryagain(options, callback);
             }
             else {
                 console.log('puckarrific!')
-                // console.log(data)
-                bwana_puck = JSON.parse(data)
+                // console.log(body)
+                bwana_puck = JSON.parse(body)
                 createEvent('internal server', {event_type: "create", puck_id: bwana_puck.PUCK_ID})
+                clearInterval(wait_for_puck)
             }
-        })
-        .on('error', function(e) {
+        }
+        else {
             // error
-            console.log('Error: ', err);
+            console.log('Error: ', error);
             console.log("well... try again?")
-            trytryagain(options, callback);
-        })
+            wait_for_puck = setInterval(emitter.emit, 2000, 'loaded')
+        }
     })
 
 }
@@ -840,23 +790,23 @@ function create_puck_key_store(puck) {
     });
 
     // xxx - errs to user!
-    fs.writeFile(puck_dir + '/puck.pid', bwana_puck.PUCK_ID, function(err) {
+    fs.writeFile(puck_home + '/puck.pid', bwana_puck.PUCK_ID, function(err) {
         if (err) { console.log('err writing pid - : ' + err) }
         else     { console.log('wrote pid') }
     });
-    fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
+    fs.writeFile(puck_home + '/puckroot.crt', ca, function(err) {
         if (err) { console.log('err writing ca - : ' + err) }
         else     { console.log('wrote root crt') }
     });
-    fs.writeFile(puck_dir + '/puck.key', key, function(err) {
+    fs.writeFile(puck_home + '/puck.key', key, function(err) {
         if (err) { console.log('err writing key - : ' + err) }
         else     { console.log('wrote key') }
     });
-    fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
+    fs.writeFile(puck_home + '/puck.crt', cert, function(err) {
         if (err) { console.log('err writing crt - : ' + err) }
         else     { console.log('wrote crt') }
     });
-    fs.writeFile(puck_dir + '/ta.key', tls, function(err) {
+    fs.writeFile(puck_home + '/ta.key', tls, function(err) {
         if (err) { console.log('err writing tls - : ' + err) }
         else     { console.log('wrote tls') }
     });
@@ -1231,7 +1181,7 @@ function getPuck(req, res, next) {
         }
         else {
             console.log(err, 'getPuck: unable to retrieve %s', req.puck);
-            next(err);
+            res.send(404, { "no": "puck"});
         }
     });
 }
@@ -1874,8 +1824,6 @@ function formCreate(req, res, next) {
     console.log('ping get_https ' + url)
 
     // is it a puck?
-    // Q.nfcall(someday_get_https, url).then(function(data) {
-
     var req = https.get(url, function(response) {
         var data = ''
         response.on('data', function(chunk) {
@@ -2353,6 +2301,10 @@ server.all('/url', webProxy)
 //
 // and... finally... relax and listen
 //
+//
+
+//
+// promise her anything... buy her a chicken.  A json chicken, of course.
 //
 var pucky = https.createServer(credentials, server)
 

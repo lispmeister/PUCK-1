@@ -30,8 +30,9 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
 
     cd ..
 
-    mkdir $puck_keystore
-    mkdir $keystore/vpn_client
+    mkdir $puck_keystore       2> /dev/null
+    mkdir $keystore/vpn_client 2> /dev/null
+    mkdir $PUCK_UPLOADS        2> /dev/null
 
     cp $hell/ca* $hell/puck* $puck_keystore
 
@@ -64,10 +65,17 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
 #   NODE_PATH="/etc/puck/" node main.js &
     NODE_PATH="$PUCK_HOME/" node main.js &
 
-    # XXX - make REST pings or something every sec until an answer, but for now...
-    sleep 15
-
-    ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+    # try try again.... until... cant try no more
+    # have to do this because it takes awhile for
+    # the server to start up
+    while test 1 = 1 ; do
+        echo sleeping for 2 seconds
+        sleep 2
+        ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+        if [ $? == 0 ] ; then
+            break
+        fi
+    done
 
 else
     cp $puck_keystore/puck.pid $PUCK_HOME/public/puck.pid

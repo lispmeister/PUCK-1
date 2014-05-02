@@ -25,6 +25,8 @@ export vpn_life_tmp=30
 export PUCK_HOME="/etc/puck"
 export PUCK_LOGS="$PUCK_HOME/logs"
 export PUCK_TMP="$PUCK_HOME/tmp"
+export PUCK_PUBLIC="$PUCK_HOME/public"
+export PUCK_UPLOADS="$PUCK_HOME/public/uploads"
 
 export hell="$PUCK_HOME/f-u-openssl"
 
