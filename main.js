@@ -990,7 +990,7 @@ function createEvent(client_ip, event_data) {
         }
     })
 
-    change_status() // make sure everyone hears this
+//  change_status() // make sure everyone hears this
 
 }
 
@@ -1224,35 +1224,20 @@ function echoReply(req, res, next) {
  *       Otherwise throw error.
  */
 function echoStatus(req, res, next) {
-    res.send(200, "{\"status\": \"OK\"}");
+    res.send(200, {status: "OK"});
 }
 
  /**
  * Stop the local OpenVPN client via an external bash script.
  */
 function stopVPN(req, res, next) {
-    var exec    = require('child_process').exec;
-    var command = puck_bin + '/stop_vpn.sh';
+    var cmd     = puck_bin + '/stop_vpn.sh';
 
     console.log('stop VPN!')
-    var child = exec(command,
-    function (error, stdout, stderr) {
-        console.log('stop VPN stdout: ' + stdout);
-        console.log('stop VPN stderr: ' + stderr);
 
-        client_magic = {
-            vpn_status : "down",
-            start      : "n/a",
-            start_s    : "n/a",
-            duration   : "unknown",
-            stop       : "unknown",
-            stop_s     : "unknown"
-        }
+    puck_spawn(cmd, [])
 
-        // createEvent('internal server', {event_type: "vpn_client_stop", puck_id: bwana_puck.PUCK_ID})
-        res.send(200, {"status": "vpn down"});
-
-    });
+    res.send(200, {"status": "vpn down"});
 
 }
 
@@ -1574,7 +1559,9 @@ function forward_port(req, res, next) {
 
     puck_spawn(cmd, args)
 
-    res.send(200, {"status" : "OK"})
+    createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
+
+    res.send(204)
 
 }
 

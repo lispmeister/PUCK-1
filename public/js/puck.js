@@ -11,6 +11,7 @@ all_puck_ids   = []
 var puck_current            = {}
     puck_current.incoming   = false,
     puck_current.outgoing   = false,
+    puck_current.enroute    = false,
     last_file               = "",
     killed_call             = false;
 
@@ -264,6 +265,10 @@ function state_vpn(state, browser_ip) {
         // ensure video button is enabled if a call is in progress
         $('#puck_video').addClass('green').addClass('pulse')
 
+        $('#puck_vpn_' + puck_status.openvpn_server.client_pid).text('connected')
+
+        $('button:contains("connecting")').text('connected')
+
         console.log('incoming ring from ' +  puck_status.openvpn_server.client)
         incoming_ip = puck_status.openvpn_server.client
         // ring them gongs, etc.
@@ -279,27 +284,38 @@ function state_vpn(state, browser_ip) {
     }
 
     if (state == "outgoing") {
-        $('#puck_video').addClass('green').addClass('pulse')
-        console.log('outgoing ring!')
-        state_ring('true')
-        puck_status.browser_events[browser_ip].notify_ring = true
 
-        fire_puck_status(puck_status)
+        if (! puck_current.outgoing) {
 
-        if (!puck_status.browser_events[browser_ip].notify_ring) {
-            event_connect("outgoing", incoming_ip)
+            $('#puck_video').addClass('green').addClass('pulse')
+
+            $('button:contains("connecting")').text('Hang Up').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
+
+            // ... for bye bye
+            $('button:contains("connecting")').click(false)
+            $('body').on('click', '.hang_up', function() {
+                $(this).text('hanging up...')
+                event_hang_up()
+            })
+
+            console.log('outgoing ring!')
+            state_ring('true')
             puck_status.browser_events[browser_ip].notify_ring = true
+
+            // fire_puck_status(puck_status)
+
+            if (!puck_status.browser_events[browser_ip].notify_ring) {
+                event_connect("outgoing", incoming_ip)
+                puck_status.browser_events[browser_ip].notify_ring = true
+            }
+
+            other_puck = puck_status.openvpn_client.server
+            puck_current.outgoing = true
+
+            $('body').removeClass('avgrund-active');
+            $('body').append("<span class='dead_center animated fadeOut'><h1>Connected!</h1></span>")
         }
 
-        other_puck = puck_status.openvpn_client.server
-
-        puck_current.outgoing = true
-
-        // go to vpn page
-        $('body').removeClass('avgrund-active');
-        $('#puck_vpn').click()
-        window.location.href = "/puck.html#puck_vpn"
-        // window.location.href = "vpn.html"
     }
 
 }
@@ -346,7 +362,7 @@ function event_connect(direction, puck) {
         onBlurContainer: '.container',
         template: '<div class="row">' +
                   '<div id="puck_ring_img" class="col-md-4"></div>' +
-                  '<a style="text-decoration: none" href="#puck_vpn"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
+                  '<a style="text-decoration: none" href="#"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="puck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
                   '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
                   '</div>'
         })
@@ -358,7 +374,16 @@ function event_connect(direction, puck) {
 
     // after things popup, add caller/callee
     if (direction == "incoming") {
+
+        // tell who is calling
         $('#vpn_target').on('change', '#vpn_target').html('Call from ' + puck)
+
+        // if answer, remove avg
+        $(document).on('click', '#puck_answer', function() {
+            $("body").removeClass("avgrund-active")
+            puck_current.enroute = false
+        })
+
     }
     else {
         $('#vpn_target').on('change', '#vpn_target').append(' ' + puck)
@@ -383,7 +408,6 @@ function event_hang_up() {
 
     var jqXHR_stopVPN = $.ajax({
         url: url,
-        // probably shouldn't, but...
         // async:false,
         dataType: 'json',
     })
@@ -399,19 +423,7 @@ function event_hang_up() {
     // kill the CSS UI signs
     remove_signs_of_call()
 
-    fire_puck_status(puck_status)
-
-    console.log('waiting 2 secs to kill...?')
-
-    setTimeout(function(){
-        window.location.href = "/puck.html"
-    }, 2000)
-
-    $('body').removeClass('avgrund-active');
-
-    // if (window.location.pathname.split( '/' )[1] != "puck.html") {
-    //     setTimeout(window.location.href = "/puck.html", 2000)
-    // }
+    // fire_puck_status(puck_status)
 
 }
 
@@ -442,9 +454,13 @@ function get_ip(element) {
 function puck_vpn(element, puckid, ipaddr) {
 
     console.log('firing up VPN')
+
+    // don't change anything until the call efforts pass/fail
+    puck_current.enroute = true
+
     console.log(puckid, ipaddr)
 
-    $(element).text("connecting...").removeClass("btn-success").addClass("btn-danger")
+    $(element).text("connecting...").removeClass("btn-primary").addClass("btn-danger")
 
     var pvpn = $.ajax({
         type: "POST",
@@ -469,7 +485,7 @@ function go_puck_or_go_home() {
 
 function puck_create(element, ip_addr) {
 
-    $(element).text("creating...").removeClass("btn-success").addClass("btn-danger")
+    $(element).text("creating...").removeClass("btn-primary").addClass("btn-danger")
 
     // adapted from http://css-tricks.com/css3-progress-bars/
     console.log('barberizing -> ' + ip_addr)
@@ -486,7 +502,7 @@ function puck_create(element, ip_addr) {
     post_data.puck_action = "CREATE"
     post_data = JSON.stringify(post_data)
 
-    console.log(post_data)
+    // console.log(post_data)
 
     $.ajax({
         type: "POST",
@@ -494,7 +510,6 @@ function puck_create(element, ip_addr) {
         headers: { 'Content-Type': 'application/json', },
         data: post_data,
         success: function(data, status) {
-            console.log(data)
             console.log('suck... sess.... ')
             // yes... I suck
             setTimeout(go_puck_or_go_home, 2000)
@@ -543,20 +558,20 @@ function puck_ping(all_ips, puckid, url) {
         if (data.status == "OK") {
             // console.log('success with ' + element_id)
             // console.log('ok...')
-            $('#'+element_id).addClass('btn-success').removeClass('disabled')
+            $('#'+element_id).addClass('btn-primary').removeClass('disabled')
         }
         else {
             console.log('not ok...')
-            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            $('#'+element_id).removeClass('btn-primary').addClass('disabled')
         }
     }).fail(function(err) {
             // console.log( "ping fail for " + ping_url)
             // console.log(err)
-            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            $('#'+element_id).removeClass('btn-primary').addClass('disabled')
     }).error(function(err) {
             // console.log( "ping error for " + ping_url)
             // console.log(err)
-            $('#'+element_id).removeClass('btn-success').addClass('disabled')
+            $('#'+element_id).removeClass('btn-primary').addClass('disabled')
     })
 
 // console.log('post-pingy ' + puckid + '... putting into ' + element_id)
@@ -619,9 +634,9 @@ function isEmpty(obj) {
 //
 function status_or_die() {
 
-    console.log('sailing on the sneeze of cheeze')
-    console.log(puck_status)
-    console.log('I hear something... from... ' + browser_ip)
+    console.log('sailing on the sneeze of cheeze... when I hear something... from... ' + browser_ip)
+
+    console.log(JSON.stringify(puck_status))
 
     if (typeof puck_status.browser_events == "undefined" || typeof puck_status.browser_events[browser_ip] == "undefined") {
         console.log('stuffing browser events...')
@@ -633,6 +648,7 @@ function status_or_die() {
     // and hopefully won't fuck up anything you're doing
 
     console.log('a friend...?')
+
     if (puck_status.events.new_puck.length && ! puck_status.browser_events[browser_ip].notify_add) {
         var remote_ip = puck_status.events.new_puck
         console.log(remote_ip + ' added!')
@@ -665,11 +681,10 @@ function status_or_die() {
         // xxx - one for out, one for in?
         puck_status.browser_events[browser_ip].notify_ring = false
         remove_signs_of_call()
-        $('body').removeClass('avgrund-active');
+        puck_current.incoming = false
+        puck_current.outgoing = false
+        puck_current.enroute  = false
     }
-
-    if (puck_status.openvpn_client.vpn_status != "up") puck_current.outgoing = false
-    if (puck_status.openvpn_server.vpn_status != "up") puck_current.incoming = false
 
     // did santa come?
     console.log('new toyz...?')
@@ -681,7 +696,7 @@ function status_or_die() {
         puck_status.browser_events[browser_ip].notify_file = true
     }
 
-    fire_puck_status(puck_status)
+    // fire_puck_status(puck_status)
 
 }
 
@@ -690,12 +705,16 @@ function status_or_die() {
 //
 function remove_signs_of_call() {
 
-    console.log('killing call signatures...')
-    $('.puck_vpn').text("Call").removeClass("btn-danger")
-    $('#puck_video').addClass('disabled')
-    $('#puck_video').removeClass('green').removeClass('pulse')
-    $('.avgrund-popin').remove();
-    // $('.btn-danger').text("connected")
+    if (! puck_current.enroute) {
+        console.log('killing call signatures...')
+        $('.hang_up').text("Call").removeClass("btn-warning").removeClass("hang_up")
+        $('.hang_up').removeClass('hang_up')
+        $('.puck_vpn').text("Call").removeClass("btn-danger")
+        $('#puck_video').addClass('disabled')
+        $('#puck_video').removeClass('green').removeClass('pulse')
+        $('body').removeClass('avgrund-active');
+        // fire_puck_status(puck_status)
+    }
 
 }
 
@@ -852,7 +871,13 @@ function drag_and_puck() {
 // according to socksjs - "Current state of the connection: 0-connecting, 1-open, 2-closing, 3-closed"
 function check_sock () {
 
-    var state = local_socket._transport.ws.readyState
+    try {
+        var state = local_socket._transport.ws.readyState
+    }
+    catch (e) {
+        // console.log('not connected')
+        return
+    }
 
     // kill them all and add any that apply
     $('#socket_wrench').removeClass("amber").removeClass("red").removeClass("green")
@@ -899,16 +924,8 @@ function socket_looping() {
     });
 
     local_socket.onopen = function() {
-
         console.log('[*] socksjs open... sez a me')
-
         clearInterval(connectRetry);
-
-        $('.connect-status')
-            .removeClass('disconnected')
-            .addClass('connected')
-            .text('Connected');
-
     }
  
     // hoop, skip, jump
@@ -916,11 +933,7 @@ function socket_looping() {
         console.log('[-] sockjs closed')
         clearInterval(connectRetry);
         connectRetry = setInterval(socket_looping, PUCK_SOCK_RETRY);
-        $('.connect-status')
-            .removeClass('connected')
-            .addClass('disconnected')
-            .text('Disconnected');
-    };
+    }
  
     local_socket.onmessage = function(puck_message) {
         // console.log('[@] messages or cat facts!')
@@ -956,7 +969,7 @@ function socket_looping() {
             $("#ovpn_server_infinity").mCustomScrollbar("update")
             $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
         }
-        else if (puck_message.type == "ovpn_server") {
+        else if (puck_message.type == "openvpn_client") {
             console.log('ovpn client logz')
             $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
             $("#ovpn_client_infinity").mCustomScrollbar("update")

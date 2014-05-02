@@ -41,6 +41,9 @@
 <!-- nav menus -->
 <link href="/css/yamm.css" rel="stylesheet">
 
+<!-- css animation -->
+<link href="/css/animate.css" rel="stylesheet">
+
 <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -152,7 +155,7 @@
                             <div class="control-group">
                                 <div class="controls">
                                 <!-- this does some javascript fu below to post the data and redirect back to this page -->
-                                <button id="puck_button_create" class="btn btn-success">Create</button>
+                                <button id="puck_button_create" class="btn btn-primary">Create</button>
                                 </div>
                             </div>
 
@@ -173,7 +176,7 @@
     
                 <div class="row-fluid marketing" id="puck_friends">
                     <div class="muted">
-                        <h3>Friends <a href="#modalPuck" role="button" class="btn btn-success btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span></a></h3>
+                        <h3>Friends <a href="#modalPuck" role="button" class="btn btn-primary btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span></a></h3>
                     </div>
         
                     <!-- spinner when loading pucks -->
@@ -200,7 +203,7 @@
 
                         <p> Pushing these buttons is not for the faint of heart.
                         <ul>
-                            <p> <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.</li>
+                            <p> <li><strong>PANIC</strong> will crush your PUCK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.  Don't worry, it isn't implemented yet.</li>
                             <p> <li><strong>Stop server</strong> stops the PUCK server dead.  UI will no longer work until restarted!</li>
                             <p> <li><strong>Restart server</strong> does just that - the PUCK server restarts.  UI will no longer work until it finishes restarting.</li>
                             <p> <li><strong>Stop VPN client</strong> kills any VPN clients
@@ -553,6 +556,15 @@
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 <script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
 
+<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
+<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
+<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
+<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
+<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
+<script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
+<script type="text/javascript" src="/js/jquery.filer.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
 <script type="text/javascript" src="/js/underscore-min.js"></script>
@@ -564,15 +576,6 @@
 <!-- <script type="text/javascript" src="/socket.io/socket.io.js"></script> -->
 <script type="text/javascript" src="/js/sockjs.min.js"></script>
 <script type="text/javascript" src="/js/sockjs_reconnect.min.js"></script>
-
-<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
-<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
-<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
-<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
-<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
-<script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
-<script type="text/javascript" src="/js/jquery.filer.js"></script>
-<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
 
 <!-- the amazing rtc stuff -->
 <!-- <script type="text/javascript" src="/js/PeerConnection.js"> -->

@@ -18,14 +18,11 @@ var ovpn_slogs = 'openvpn_server_logs'
 var ovpn_clogs = 'openvpn_client_logs'
 
 // conf file fodder
-var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
-var PREGNANT_PAUSE       = 3000 // 5 seconds should be enough for anyone!
+var PUCK_TIMEOUT         = 5000  // 5 seconds should be enough for anyone!
+var PREGNANT_PAUSE       = 3000
 var SOCK_CHECK           = 1000
 
-var SIGNALING_SERVER = 'wss://192.168.0.250:12034'
-
-// for web rtc
-var puck_meeting = {}
+var all_puck_ids = {}
 
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
 ring = new Audio("media/ringring.mp3") // load it up
@@ -40,7 +37,7 @@ $(document).ready(function () {
               'socket_wrench', 'puck_git']
 
     for (var i = 0 ; i < tt.length; i++) {
-        $('#' + tt[i]).popover( {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
+        $('#' + tt[i]).popover( {delay: { show: 1000, hide: 200 }, trigger: "hover", placement: "bottom"})
     }
 
     // disable a/href pushing if disabled
@@ -75,19 +72,23 @@ $(document).ready(function () {
     load_vault()
     
     //
-    // user clicks vpn, and....
+    // user clicks call and...
     //
     // ring them gongs
     $('body').on('click', '.puck_vpn', function(e) {
         e.preventDefault()
-        // id.substr(9) == puck id
-        // possibly a better way to get name :)
-        event_connect('outgoing', $(this).parent().parent().find('.puckname').text())
 
-        var vpuckid = $("#puckid").val()
-        var ipaddr  = $("#ipaddr").val()
-        var target  = $("#name").val()
-        puck_vpn(this, vpuckid, ipaddr)
+        // one call at a time, for now
+        if (!puck_current.incoming && !puck_current.outgoing) {
+            // possibly a better way to get name :)
+            event_connect('outgoing', $(this).parent().parent().find('.puckname').text())
+
+            var vpuckid = $("#puckid").val()
+            var ipaddr  = $("#ipaddr").val()
+            var target  = $("#name").val()
+
+            puck_vpn(this, vpuckid, ipaddr)
+        }
         
     })
 
@@ -108,12 +109,12 @@ $(document).ready(function () {
     // toss your ip in the footer
     get_ip('#ip_diddy')
 
-    // ... bye bye
-    $('body').on('click', '#puck_disconnect', function() { 
-        event_hang_up() 
-    })
     $('body').on('click', '#halt_vpn_client', function() { 
         alert('bye-bye vpn')
+        event_hang_up() 
+    })
+
+    $('body').on('click', '#puck_disconnect', function() { 
         event_hang_up() 
     })
 
@@ -121,6 +122,11 @@ $(document).ready(function () {
     $('body').on('click', '#puck_help', function() { 
         alert('yeah... right... you do it!')
     })
+
+    $('body').on('click', '#puck_panic', function() { 
+        alert('... you need to really start panicking... this isnt implemented yet!')
+    })
+
 
     // pleased to meet me, whomever I am
     $.get('/ping', function(puck) {
@@ -218,9 +224,6 @@ $(document).ready(function () {
                  
                         var trunc_puckid     = truncate(puckid)
                  
-                        // keep track of everything
-                        all_puck_ids[puckid] = puckid
-                 
                         var puck = {
                            puckid         : puckid,
                            name           : name,
@@ -235,6 +238,9 @@ $(document).ready(function () {
                            span_owner     : 'span_' + owner,
                            span_email     : 'span_' + email
                            }
+                 
+                        // keep track of everything
+                        all_puck_ids[puckid] = puckinfo
                  
                         // basic single puck layout, 'stache style
                         var template = 
@@ -305,7 +311,8 @@ $(document).ready(function () {
     socket_looping()
 
     // sow the seed o' doubt
-    setInterval(get_status,PREGNANT_PAUSE)
+    get_status()
+    // setInterval(get_status,PREGNANT_PAUSE)
 
     setInterval(check_sock,SOCK_CHECK)
 
@@ -318,5 +325,14 @@ $(document).ready(function () {
         return false;
     })
 
-})
 
+    // http://stackoverflow.com/questions/16214326/bootstrap-dropdown-with-hover
+    $(function(){               
+        $('.dropdown').hover(function() {
+            $(this).addClass('open');
+        }, function() { 
+            $(this).removeClass('open');
+        });                         
+    }); 
+
+})
