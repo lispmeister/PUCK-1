@@ -11,7 +11,7 @@ all_puck_ids   = []
 var puck_current            = {}
     puck_current.incoming   = false,
     puck_current.outgoing   = false,
-    puck_current.enroute    = false,
+    puck_current.busy       = false,
     last_file               = "",
     killed_call             = false;
 
@@ -261,59 +261,66 @@ function state_video(state) {
 //
 function state_vpn(state, browser_ip) {
 
+    // an incoming connect was successful
     if (state == "incoming") {
-        // ensure video button is enabled if a call is in progress
-        $('#puck_video').addClass('green').addClass('pulse')
+        console.log('incoming call')
 
-        $('#puck_vpn_' + puck_status.openvpn_server.client_pid).text('connected')
+        // is anything else going on?  If so, for now dont do anything
+        if (! puck_current.busy) {
+            puck_current.incoming = true
 
-        $('button:contains("connecting")').text('connected')
+            console.log('\t[+] fire up the alarms')
 
-        console.log('incoming ring from ' +  puck_status.openvpn_server.client)
-        incoming_ip = puck_status.openvpn_server.client
-        // ring them gongs, etc.
+            if (!puck_status.browser_events[browser_ip].notify_ring) {
+                event_connect("incoming", incoming_ip)
+                puck_status.browser_events[browser_ip].notify_ring = true
+            }
 
-        if (!puck_status.browser_events[browser_ip].notify_ring) {
-            event_connect("incoming", incoming_ip)
-            puck_status.browser_events[browser_ip].notify_ring = true
+            // ensure video button is enabled if a call is in progress
+            $('#puck_video').addClass('green').addClass('pulse')
+            $('#puck_vpn_' + puck_status.openvpn_server.client_pid).text('connected')
+            $('button:contains("connecting")').text('connected')
+            console.log('incoming ring from ' + puck_status.openvpn_server.client)
+            incoming_ip = puck_status.openvpn_server.client
+            // ring them gongs, etc.
+
+            puck_status.browser_events[browser_ip].notify_file = true
+            other_puck = puck_status.openvpn_server.client
+
+        }
+        else {
+            console.log('\t[-] not doing anything with incoming call, currently busy')
         }
 
-        puck_current.incoming = true
-        puck_status.browser_events[browser_ip].notify_file = true
-        other_puck = puck_status.openvpn_server.client
     }
 
+    // an outgoing connect was successful
     if (state == "outgoing") {
 
-        if (! puck_current.outgoing) {
+        console.log('outgoing call is up')
+
+        if (! puck_current.busy) {
+            console.log('\t[+] fire up the outbound signs')
 
             $('#puck_video').addClass('green').addClass('pulse')
-
             $('button:contains("connecting")').text('Hang Up').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
 
-            // ... for bye bye
+            // ... setup bye bye
             $('button:contains("connecting")').click(false)
             $('body').on('click', '.hang_up', function() {
                 $(this).text('hanging up...')
                 event_hang_up()
             })
 
-            console.log('outgoing ring!')
-            state_ring('true')
-            puck_status.browser_events[browser_ip].notify_ring = true
-
-            // fire_puck_status(puck_status)
-
-            if (!puck_status.browser_events[browser_ip].notify_ring) {
-                event_connect("outgoing", incoming_ip)
-                puck_status.browser_events[browser_ip].notify_ring = true
-            }
+            puck_current.outgoing = true
 
             other_puck = puck_status.openvpn_client.server
-            puck_current.outgoing = true
 
             $('body').removeClass('avgrund-active');
             $('body').append("<span class='dead_center animated fadeOut'><h1>Connected!</h1></span>")
+        }
+        else {
+            console.log('\t[-] not doing anything with outgoing call, currently busy')
         }
 
     }
@@ -351,6 +358,11 @@ function event_connect(direction, puck) {
     // energize modals
     //
     // "Avgrund is Swedish for abyss"
+
+    // first destroy
+    $('.avgrund-popin').remove()
+
+    // then create
     $('#' + direction).avgrund({
         height: 120,
         openOnEvent: false,
@@ -381,7 +393,6 @@ function event_connect(direction, puck) {
         // if answer, remove avg
         $(document).on('click', '#puck_answer', function() {
             $("body").removeClass("avgrund-active")
-            puck_current.enroute = false
         })
 
     }
@@ -398,11 +409,13 @@ function event_connect(direction, puck) {
 //
 function event_hang_up() {
 
+    // i has gone
     console.log('hanging up!')
 
     state_ring('false')
 
-    // i has gone
+    // don't change anything until the call efforts pass/fail
+    puck_current.busy = true
 
     var url = "/vpn/stop"
 
@@ -453,14 +466,14 @@ function get_ip(element) {
 //
 function puck_vpn(element, puckid, ipaddr) {
 
-    console.log('firing up VPN')
-
-    // don't change anything until the call efforts pass/fail
-    puck_current.enroute = true
-
-    console.log(puckid, ipaddr)
+    console.log('starting up VPN to ' + puckid + ' : ' + ipaddr)
 
     $(element).text("connecting...").removeClass("btn-primary").addClass("btn-danger")
+
+    event_connect("outgoing", ipaddr)
+
+    // don't change anything until the call efforts pass/fail
+    puck_current.busy = true
 
     var pvpn = $.ajax({
         type: "POST",
@@ -616,7 +629,7 @@ function get_status() {
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
         // console.log('status wootz\n' + data)
         puck_status = JSON.parse(data)
-        // console.log("INITIAL STATUS: " + JSON.stringify(puck_status))
+        console.log("INITIAL STATUS: " + JSON.stringify(puck_status))
     }).fail(ajaxError);
 
 }
@@ -656,13 +669,14 @@ function status_or_die() {
         $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see details)", {offset: {from: 'top', amount: 70}, delay: -1})
 
         puck_status.browser_events[browser_ip].notify_add = true
-// <input type="button" value="Reload Page" onClick="history.go(0)">
     }
 
     console.log('incoming...?')
 
     // server... incoming ring
     if (puck_status.openvpn_server.vpn_status == "up") {
+        puck_current.busy     = false
+        puck_current.incoming = true
         state_vpn('incoming', browser_ip)
     }
 
@@ -670,6 +684,8 @@ function status_or_die() {
 
     // client... outgoing ring
     if (puck_status.openvpn_client.vpn_status == "up") {
+        puck_current.busy     = false
+        puck_current.outgoing = true
         state_vpn('outgoing', browser_ip)
         // cat facts!
         state_cam(true, 'local')
@@ -677,13 +693,18 @@ function status_or_die() {
 
     // if nothing up now, kill any signs of a call, just to be sure
     if (puck_status.openvpn_client.vpn_status != "up" && puck_status.openvpn_server.vpn_status != "up") {
+        puck_current.incoming = false
+        puck_current.outgoing = false
+        puck_current.busy     = false
+
         other_puck = "local"
+
         // xxx - one for out, one for in?
         puck_status.browser_events[browser_ip].notify_ring = false
         remove_signs_of_call()
-        puck_current.incoming = false
-        puck_current.outgoing = false
-        puck_current.enroute  = false
+
+        console.log('clearing all flags of any calls to false')
+
     }
 
     // did santa come?
@@ -705,14 +726,14 @@ function status_or_die() {
 //
 function remove_signs_of_call() {
 
-    if (! puck_current.enroute) {
+    if (! puck_current.busy) {
         console.log('killing call signatures...')
         $('.hang_up').text("Call").removeClass("btn-warning").removeClass("hang_up")
         $('.hang_up').removeClass('hang_up')
         $('.puck_vpn').text("Call").removeClass("btn-danger")
         $('#puck_video').addClass('disabled')
         $('#puck_video').removeClass('green').removeClass('pulse')
-        $('body').removeClass('avgrund-active');
+        $('body').removeClass('avgrund-active')
         // fire_puck_status(puck_status)
     }
 
@@ -939,12 +960,7 @@ function socket_looping() {
         // console.log('[@] messages or cat facts!')
         // console.log(puck_message)
 
-        var x = puck_message
-
-        try {
-            puck_message = JSON.parse(puck_message.data)
-        }
-        catch (e) { puck_message = x; console.log('no harm, no foul') }
+        puck_message = JSON.parse(puck_message.data)
 
         if (puck_message.type == "status") {
             // console.log('processing status message')
@@ -1177,6 +1193,44 @@ function detect_webRTC(element) {
                 '<tr><td>WebAudio API</td><td>'       + DetectRTC.isAudioContextSupported     + '</td>' +
                 '    <td>SCTP Data Channels</td><td>' + DetectRTC.isSctpDataChannelsSupported + '</td></tr>' +
                 '<tr><td>RTP Data Channels</td><td>'  + DetectRTC.isRtpDataChannelsSupported  + '</td></tr>')
+
+}
+
+
+/*
+
+states and desired implications
+
+Basics:
+
+incoming call -
+
+    if (first notice) ring, say who from
+
+    else    keep ring indicator on UNLESS user has turned it off
+
+
+outgoing call -
+
+    if (first notice) ring, say who to
+
+    else    keep ring indicator on UNLESS user has turned it off
+
+
+Two other states exist - setting up or tearing down a call/connection.
+With both:
+
+    indicate this intermediate state
+
+    freeze all other UI changes
+
+*/
+function state_of_the_union() {
+
+   // if (puck_current.incoming)
+
+
+    //puck_current.outgoing
 
 }
 

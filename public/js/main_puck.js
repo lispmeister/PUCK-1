@@ -19,7 +19,7 @@ var ovpn_clogs = 'openvpn_client_logs'
 
 // conf file fodder
 var PUCK_TIMEOUT         = 5000  // 5 seconds should be enough for anyone!
-var PREGNANT_PAUSE       = 3000
+var PREGNANT_PAUSE       = 5000
 var SOCK_CHECK           = 1000
 
 var all_puck_ids = {}
@@ -79,7 +79,7 @@ $(document).ready(function () {
         e.preventDefault()
 
         // one call at a time, for now
-        if (!puck_current.incoming && !puck_current.outgoing) {
+        if (!puck_current.incoming && !puck_current.outgoing && !puck_current.busy) {
             // possibly a better way to get name :)
             event_connect('outgoing', $(this).parent().parent().find('.puckname').text())
 
@@ -312,7 +312,9 @@ $(document).ready(function () {
 
     // sow the seed o' doubt
     get_status()
+
     // setInterval(get_status,PREGNANT_PAUSE)
+    setTimeout(get_status,PREGNANT_PAUSE)
 
     setInterval(check_sock,SOCK_CHECK)
 
@@ -336,3 +338,4 @@ $(document).ready(function () {
     }); 
 
 })
+

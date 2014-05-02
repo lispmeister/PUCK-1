@@ -364,6 +364,7 @@ function watch_logs(logfile, log_type) {
 
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, puck_id: bwana_puck.PUCK_ID})
 
+                change_status() // make sure everyone hears the news
             }
             // down
             else if (line.indexOf(magic_server_down1) > -1 || line.indexOf(magic_server_down2) > -1) {
@@ -391,6 +392,7 @@ function watch_logs(logfile, log_type) {
                     }
 
                 createEvent('internal server', {event_type: "vpn_server_disconnected", puck_id: bwana_puck.PUCK_ID})
+                change_status() // make sure everyone hears the news
             }
         }
         else if (log_type.indexOf("Client") > -1) {
@@ -455,6 +457,7 @@ function watch_logs(logfile, log_type) {
                     }
     
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, puck_id: bwana_puck.PUCK_ID})
+                change_status() // make sure everyone hears the news
     
             }
             // down
@@ -491,6 +494,8 @@ function watch_logs(logfile, log_type) {
                     if (err) { console.log('err... no local vpn ip... looks bad.... gasp... choke...' + err) }
                     else     { console.log('wrote local vpn server IP') }
                 });
+
+                change_status() // make sure everyone hears the news
 
             }
         }
@@ -1509,7 +1514,6 @@ function startVPN(req, res, next) {
         if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
         else { console.log('wrote remote vpn server IP') }
     });
-
 
     // finis
     res.send(204)
