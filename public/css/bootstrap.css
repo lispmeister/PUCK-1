@@ -5816,6 +5816,7 @@ button.close {
     font-size: 200%;
 }
 
-.green { color:#5cb85c }
-.red   { color:#d9534f }
+.green { color:#5cb85c; }
+.red   { color:#d9534f; }
+.amber { color:#ffc200; }
 

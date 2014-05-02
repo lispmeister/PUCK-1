@@ -27,7 +27,7 @@ var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
-var PUCK_SOCK_RETRY   = 10000
+var PUCK_SOCK_RETRY   = 3000
 var LOCAL_VIDEO_WIDTH = 480
 
 var sock = null
@@ -515,14 +515,14 @@ function puck_create(element, ip_addr) {
 //
 function puck_ping(all_ips, puckid, url) {
 
-    console.log('in puck_ping')
-    console.log(puckid, url)
-    console.log(all_ips)
+    // console.log('in puck_ping')
+    // console.log(puckid, url)
+    // console.log(all_ips)
 
     // var ping_url = '/sping/' + puckid + "/" + all_ip_string
     var ping_url = '/sping/' + puckid + "/" + all_ips
 
-    console.log('pinging ' + puckid + ' ... URL ... ' + ping_url)
+    // console.log('pinging ' + puckid + ' ... URL ... ' + ping_url)
 
     var ping_id  = ''
 
@@ -537,11 +537,11 @@ function puck_ping(all_ips, puckid, url) {
 
     jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
         var ret = data
-        console.log("pingzor " + JSON.stringify(ret))
+        // console.log("pingzor " + JSON.stringify(ret))
 
         // make the button clickable and green
         if (data.status == "OK") {
-            console.log('success with ' + element_id)
+            // console.log('success with ' + element_id)
             // console.log('ok...')
             $('#'+element_id).addClass('btn-success').removeClass('disabled')
         }
@@ -592,7 +592,7 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
 //
 function get_status() {
 
-    console.log('get STATUS')
+    // console.log('get STATUS')
 
     var url = "/status"
 
@@ -783,8 +783,7 @@ function stop_server() {
 //
 function fire_puck_status(jstatus) {
 
-    console.log('firing status off')
-    console.log(typeof jstatus)
+    // console.log('firing status off')
     jstatus = JSON.stringify(jstatus)
 
     var status_xhr = $.ajax({
@@ -794,7 +793,7 @@ function fire_puck_status(jstatus) {
         contentType: "application/json; charset=utf-8",
         data: jstatus,
         success: function(res) {
-            console.log('status off!')
+            // console.log('status off!')
             console.log(res)
         },
         error: function (txtstat, e) {
@@ -849,6 +848,39 @@ function drag_and_puck() {
 //
 // try to get web sockets going
 //
+
+// according to socksjs - "Current state of the connection: 0-connecting, 1-open, 2-closing, 3-closed"
+function check_sock () {
+
+    var state = local_socket._transport.ws.readyState
+
+    // kill them all and add any that apply
+    $('#socket_wrench').removeClass("amber").removeClass("red").removeClass("green")
+
+    if (state == 0) {
+        $('#socket_wrench').addClass("amber")
+        console.log('[>] sockjs connecting...')
+    }
+    else if (state == 1) {
+        $('#socket_wrench').addClass("green")
+        // console.log('[+] sockjs good...')
+    }
+    else if (state == 2) {
+        $('#socket_wrench').addClass("amber")
+        console.log('[<] sockjs closing...')
+    }
+    else if (state == 3) {
+        $('#socket_wrench').addClass("red")
+        console.log('[.] sockjs closed...')
+    }
+    else {
+        console.log('UNKNOWN SOCKJS status: ' + state)
+    }
+}
+
+//
+// enter the socket loop!
+//
 local_socket = null
 
 function socket_looping() {
@@ -891,11 +923,18 @@ function socket_looping() {
     };
  
     local_socket.onmessage = function(puck_message) {
-        console.log('[@] socksjs + cat facts!')
-        console.log(JSON.stringify(puck_message))
+        // console.log('[@] messages or cat facts!')
+        // console.log(puck_message)
+
+        var x = puck_message
+
+        try {
+            puck_message = JSON.parse(puck_message.data)
+        }
+        catch (e) { puck_message = x; console.log('no harm, no foul') }
 
         if (puck_message.type == "status") {
-            console.log('processing status message')
+            // console.log('processing status message')
 
             puck_status = puck_message.status
 
@@ -906,11 +945,11 @@ function socket_looping() {
                 status_or_die()
             }
             else {
-                console.log('same ol, same ol')
+                // console.log('same ol, same ol')
             }
         }
         // OVPN logs for client/server
-        else if (puck_message.type == "ovpn_server") {
+        else if (puck_message.type == "openvpn_server") {
             console.log('ovpn server logz')
             // console.log('server: ' + data.line)
             $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
@@ -923,8 +962,14 @@ function socket_looping() {
             $("#ovpn_client_infinity").mCustomScrollbar("update")
             $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
         }
+        else if (puck_message.type == "cat_fact") {
+            console.log('incoming cat fact!')
+            console.log(puck_message.fact)
+             $('#ip_diddy').append('<br />' + data.fact)
+        }
         else {
            console.log('UNRECOGNIZED message type')
+           console.log(puck_message.type)
         }
     }
 

@@ -586,10 +586,10 @@ function cat_power(msg) {
     // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
     try {
-        cat_sock.send(msg)
+        cat_sock.write(JSON.stringify(msg))
     }
     catch (e) {
-        // console.log('channel not up yet....?')
+        console.log('channel not up yet....?')
     }
 
 }
@@ -2280,15 +2280,17 @@ ios.on('connection', function (sock_puppet) {
     // a friendly cat fact
     var cool_cat_fact = random_cat_fact(cat_facts)
 
+    var msg = {type: "cat_fact", fact: cool_cat_fact})
+
+    cat_sock.write(msg)
+
     sock_puppet.on('data', function(res) {
         console.log('data received ')
         console.log(res)
     })
 })
 
-
 pucky.listen(puck_port, function() {
     console.log('[+] server listening at %s', puck_port)
 })
-
 

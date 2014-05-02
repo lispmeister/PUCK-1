@@ -20,8 +20,8 @@ echo > $PUCK_LOGS/client_vpn.log
 echo > $PUCK_LOGS/server_vpn.log
 
 # wipe out command logs
-rm -f $PUCK_LOGS/*.err
-rm -f $PUCK_LOGS/*.out
+rm -f $PUCK_LOGS/*.err.log
+rm -f $PUCK_LOGS/*.out.log
 
 # if no dir or symlink
 if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then

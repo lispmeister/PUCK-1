@@ -20,7 +20,7 @@ var ovpn_clogs = 'openvpn_client_logs'
 // conf file fodder
 var PUCK_TIMEOUT         = 5000 // 5 seconds should be enough for anyone!
 var PREGNANT_PAUSE       = 3000 // 5 seconds should be enough for anyone!
-var PUCK_RECONNECT_DELAY =  100
+var SOCK_CHECK           = 1000
 
 var SIGNALING_SERVER = 'wss://192.168.0.250:12034'
 
@@ -36,7 +36,8 @@ $(document).ready(function () {
     // var puck_id   = ""
 
     var tt = ['puck_top_left', 'puck_top_cog', 'puck_top_home', 'puck_top_skull', 'puck_top_ewe', 
-              'puck_top_love', 'puck_top_cloud', 'puck_top_messages', 'puck_help', 'puck_video', 'puck_git']
+              'puck_top_love', 'puck_top_cloud', 'puck_top_messages', 'puck_help', 'puck_video', 
+              'socket_wrench', 'puck_git']
 
     for (var i = 0 ; i < tt.length; i++) {
         $('#' + tt[i]).popover( {delay: { show: 200, hide: 200 }, trigger: "hover", placement: "bottom"})
@@ -305,6 +306,8 @@ $(document).ready(function () {
 
     // sow the seed o' doubt
     setInterval(get_status,PREGNANT_PAUSE)
+
+    setInterval(check_sock,SOCK_CHECK)
 
     // hack attack, look out... this had better be temporary, lol
     var hack_rl = 'http://' + location.hostname + ':5555/rtc.html'
