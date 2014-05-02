@@ -239,12 +239,12 @@ div.growlUI h1, div.growlUI h2 {
     text-align: center;
     top: 50%;
     width: 100%;
-    /* for fadeout */
-
+    /* for fadeout 
     -webkit-animation-duration: 10s;
        -moz-animation-duration: 10s;
         -ms-animation-duration: 10s;
          -o-animation-duration: 10s;
             animation-duration: 10s;
+    */
 }
 

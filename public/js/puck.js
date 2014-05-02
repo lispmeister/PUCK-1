@@ -436,7 +436,7 @@ function event_hang_up() {
     // kill the CSS UI signs
     remove_signs_of_call()
 
-    // fire_puck_status(puck_status)
+    $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnected!</h1></span>")
 
 }
 
@@ -640,6 +640,35 @@ function isEmpty(obj) {
 }
 
 
+/*
+
+states and desired implications
+
+Basics:
+
+incoming call -
+
+    if (first notice) ring, say who from
+
+    else    keep ring indicator on UNLESS user has turned it off
+
+
+outgoing call -
+
+    if (first notice) ring, say who to
+
+    else    keep ring indicator on UNLESS user has turned it off
+
+
+Two other states exist - setting up or tearing down a call/connection.
+With both:
+
+    indicate this intermediate state
+
+    freeze all other UI changes
+
+*/
+
 //
 // get events, status... or... well....
 //
@@ -696,6 +725,10 @@ function status_or_die() {
         puck_current.incoming = false
         puck_current.outgoing = false
         puck_current.busy     = false
+
+        if ($('button:contains("connected")').length) {
+            $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnected!</h1></span>")
+        }
 
         other_puck = "local"
 
@@ -1193,44 +1226,6 @@ function detect_webRTC(element) {
                 '<tr><td>WebAudio API</td><td>'       + DetectRTC.isAudioContextSupported     + '</td>' +
                 '    <td>SCTP Data Channels</td><td>' + DetectRTC.isSctpDataChannelsSupported + '</td></tr>' +
                 '<tr><td>RTP Data Channels</td><td>'  + DetectRTC.isRtpDataChannelsSupported  + '</td></tr>')
-
-}
-
-
-/*
-
-states and desired implications
-
-Basics:
-
-incoming call -
-
-    if (first notice) ring, say who from
-
-    else    keep ring indicator on UNLESS user has turned it off
-
-
-outgoing call -
-
-    if (first notice) ring, say who to
-
-    else    keep ring indicator on UNLESS user has turned it off
-
-
-Two other states exist - setting up or tearing down a call/connection.
-With both:
-
-    indicate this intermediate state
-
-    freeze all other UI changes
-
-*/
-function state_of_the_union() {
-
-   // if (puck_current.incoming)
-
-
-    //puck_current.outgoing
 
 }
 

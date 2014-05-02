@@ -434,8 +434,8 @@ function watch_logs(logfile, log_type) {
                 console.log('forward url => ' + url)
                 request(url,
                     function (error, response, body) {
-                         if (!error && response.statusCode == 200) {
-                            console.log(body)
+                         if (!error && response.statusCode == 204) {
+                            console.log('redirect worked')
                          }
                          else {
                             console.log('ummm... efforts to redirect port... failzor?')
