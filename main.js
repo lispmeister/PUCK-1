@@ -212,9 +212,8 @@ if (isEmpty(bwana_puck)) {
 
 
 //
-// XXX - TBD - replace with socket.io
-//
 // send a message out that things are different
+//
 function change_status() {
 
     console.log('changing status...')
@@ -276,8 +275,7 @@ for (var dev in ifaces) {
 
 // set to local VPN int
 cat_fact_server = my_devs["tun0"]
-// proxy_love(cat_fact_server)
-    
+
 // write the IP addr to a file
 fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
     if (err) { console.log('err... no local vpn ip... looks bad.... gasp... choke...' + err) }
@@ -365,9 +363,6 @@ function watch_logs(logfile, log_type) {
                     }
 
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, puck_id: bwana_puck.PUCK_ID})
-
-                // proxy even local calls to socket.io
-                // proxy_love(cat_fact_server)
 
             }
             // down
@@ -460,11 +455,6 @@ function watch_logs(logfile, log_type) {
                     }
     
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, puck_id: bwana_puck.PUCK_ID})
-
-                // if we're doing the calling, we want to setup a proxy so our
-                // browser web requests can go into the tunnel to this vs. trying to flail at
-                // some random IP
-                // proxy_love(cat_fact_server)
     
             }
             // down
@@ -495,7 +485,6 @@ function watch_logs(logfile, log_type) {
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
-                // proxy_love(cat_fact_server)
     
                 // write the IP addr to a file
                 fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
@@ -2114,47 +2103,6 @@ function SSSUp () {
     
 }
 
-//
-// socket stuff stuffed in here
-//
-function do_sock_stuff () {
-    
-    //
-    // sockets time
-    //
-    
-    var cat_fact_server = "",
-        puck_users      = {},
-        cat_sock        = {},
-        all_cats        = []
-    
-    //
-    // for socket channel stuff - both video and log watching and chat and all that stuff
-    //
-    
-    var cat_fact_server = "",
-        puck_users      = {},
-        cat_sock        = {},
-        all_cats        = []
-    
-    
-    ios.on('connection', function (sock_puppet) {
-        // console.log('[+] NEW connext from ' + sock_puppet.handshake.address.address)
-        console.log('[+] NEW connext')
-    
-        cat_sock = sock_puppet
-    
-        // a friendly cat fact
-        var cool_cat_fact = random_cat_fact(cat_facts)
-    
-        sock_puppet.on('data', function(res) {
-            console.log('data received ')
-            console.log(res)
-        })
-    })
-
-}
-
 ///--- Server
 
 // Cert stuff
@@ -2311,15 +2259,36 @@ var pucky = https.createServer(credentials, server)
 // socket signal server
 SSSUp()
 
-// sockjs to the rescue
+// fire up web sockets
 var sockjs = require('sockjs')
 var ios = sockjs.createServer()
-ios.installHandlers(server, {prefix: '/pux'})
+ios.installHandlers(pucky, {prefix: '/pux'})
+
+//
+// sockets time
+//
+var puck_users      = {},
+    cat_sock        = {},
+    all_cats        = []
+
+ios.on('connection', function (sock_puppet) {
+    // console.log('[+] NEW connext from ' + sock_puppet.handshake.address.address)
+    console.log('[+] NEW connext')
+
+    cat_sock = sock_puppet
+
+    // a friendly cat fact
+    var cool_cat_fact = random_cat_fact(cat_facts)
+
+    sock_puppet.on('data', function(res) {
+        console.log('data received ')
+        console.log(res)
+    })
+})
+
 
 pucky.listen(puck_port, function() {
     console.log('[+] server listening at %s', puck_port)
 })
 
-// fire up web sockets
-do_sock_stuff()
 

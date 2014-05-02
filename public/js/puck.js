@@ -27,14 +27,12 @@ var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
-var PUCK_SOCK_RETRY   = 5000
+var PUCK_SOCK_RETRY   = 10000
 var LOCAL_VIDEO_WIDTH = 480
-
-local_sock_flag  = false
-remote_sock_flag = false
 
 var sock = null
 
+var socket_addr = "/pux"
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
@@ -609,56 +607,6 @@ function get_status() {
 }
 
 
-function socket_looping(){
-
-    console.log('status loop')
-
-    local_socket = put_a_sock_in_it('/')
-
-    local_socket.onopen = function()  {
-        print('[*] open... sez a me', local_socket.protocol);
-    }
-
-    local_socket.onmessage = function(puck_message) {
-        console.log('[@] + cat facts... wait...no... status :!:')
-        console.log(JSON.stringify(puck_message))
-
-        if (puck_message.type == "status") {
-            console.log('processing status message')
-
-            puck_status = puck_message.status
-
-            // if something is new, do something!
-            if (! _.isEqual(old_puck_status, puck_status)) {
-                console.log('something new in the state of denmark!')
-                old_puck_status = puck_status
-                status_or_die()
-            }
-            else {
-                console.log('same ol, same ol')
-            }
-        }
-        // OVPN logs for client/server
-        else if (puck_message.type == "ovpn_server") {
-            console.log('ovpn server logz')
-            // console.log('server: ' + data.line)
-            $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
-            $("#ovpn_server_infinity").mCustomScrollbar("update")
-            $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        }
-        else if (puck_message.type == "ovpn_server") {
-            console.log('ovpn client logz')
-            $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
-            $("#ovpn_client_infinity").mCustomScrollbar("update")
-            $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        }
-        else {
-           console.log('UNRECOGNIZED message type')
-        }
-    }
-
-}
-
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
@@ -901,40 +849,87 @@ function drag_and_puck() {
 //
 // try to get web sockets going
 //
-function put_a_sock_in_it(sock_url) {
+local_socket = null
 
-    console.log('trying to do a socket connect to ' + sock_url)
+function socket_looping() {
+
+    console.log('trying to do a socket connect')
 
     var recInterval = null;
     var socket = null;
 
-    var sock = function() {    
-        socket = new SockJS(protocol + serverDomain + '/pux', null, {
-            'protocols_whitelist': [
-                'websocket',          'xdr-streaming',      'xhr-streaming', 
-                'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
-                'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
-                ]
-        });
+    local_socket = new SockJS(socket_addr, null, {
+        'protocols_whitelist': [
+            'websocket',          'xdr-streaming',      'xhr-streaming', 
+            'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
+            'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
+            ]
+    });
 
-        socket.onopen = function () {
-            clearInterval(recInterval);
-        };  
+    local_socket.onopen = function() {
 
-        socket.onclose = function () {    
-            recInterval = setInterval(function () {
-                new_conn();
-            }, PUCK_RECONNECT_DELAY);
-        };
+        console.log('[*] socksjs open... sez a me')
+
+        clearInterval(connectRetry);
+
+        $('.connect-status')
+            .removeClass('disconnected')
+            .addClass('connected')
+            .text('Connected');
+
+    }
+ 
+    // hoop, skip, jump
+    local_socket.onclose = function() {
+        console.log('[-] sockjs closed')
+        clearInterval(connectRetry);
+        connectRetry = setInterval(socket_looping, PUCK_SOCK_RETRY);
+        $('.connect-status')
+            .removeClass('connected')
+            .addClass('disconnected')
+            .text('Disconnected');
     };
+ 
+    local_socket.onmessage = function(puck_message) {
+        console.log('[@] socksjs + cat facts!')
+        console.log(JSON.stringify(puck_message))
 
+        if (puck_message.type == "status") {
+            console.log('processing status message')
 
-    console.log('got a sock, hope its not used...')
+            puck_status = puck_message.status
 
-    if (sock_url == '/') { local_sock_flag = true  }
-    else                 { remote_sock_flag = true }
+            // if something is new, do something!
+            if (! _.isEqual(old_puck_status, puck_status)) {
+                console.log('something new in the state of denmark!')
+                old_puck_status = puck_status
+                status_or_die()
+            }
+            else {
+                console.log('same ol, same ol')
+            }
+        }
+        // OVPN logs for client/server
+        else if (puck_message.type == "ovpn_server") {
+            console.log('ovpn server logz')
+            // console.log('server: ' + data.line)
+            $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
+            $("#ovpn_server_infinity").mCustomScrollbar("update")
+            $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
+        else if (puck_message.type == "ovpn_server") {
+            console.log('ovpn client logz')
+            $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + puck_message.line + "</div>")
+            $("#ovpn_client_infinity").mCustomScrollbar("update")
+            $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
+        else {
+           console.log('UNRECOGNIZED message type')
+        }
+    }
 
-    return(sock)
+    // keep going back for more
+    var connectRetry = setInterval(socket_looping, PUCK_SOCK_RETRY);
 
 }
 
