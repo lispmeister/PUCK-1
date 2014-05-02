@@ -550,13 +550,13 @@ function puck_ping(all_ips, puckid, url) {
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
         }
     }).fail(function(err) {
-            console.log( "ping fail for " + ping_url)
+            // console.log( "ping fail for " + ping_url)
+            // console.log(err)
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
-            console.log(err)
     }).error(function(err) {
-            console.log( "ping error for " + ping_url)
+            // console.log( "ping error for " + ping_url)
+            // console.log(err)
             $('#'+element_id).removeClass('btn-success').addClass('disabled')
-            console.log(err)
     })
 
 // console.log('post-pingy ' + puckid + '... putting into ' + element_id)
@@ -965,7 +965,7 @@ function socket_looping() {
         else if (puck_message.type == "cat_fact") {
             console.log('incoming cat fact!')
             console.log(puck_message.fact)
-             $('#ip_diddy').append('<br />' + data.fact)
+             $('#ip_diddy').append('<br />' + puck_message.fact)
         }
         else {
            console.log('UNRECOGNIZED message type')

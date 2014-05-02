@@ -2280,9 +2280,9 @@ ios.on('connection', function (sock_puppet) {
     // a friendly cat fact
     var cool_cat_fact = random_cat_fact(cat_facts)
 
-    var msg = {type: "cat_fact", fact: cool_cat_fact})
+    var msg = {type: "cat_fact", fact: cool_cat_fact}
 
-    cat_sock.write(msg)
+    cat_power(msg)
 
     sock_puppet.on('data', function(res) {
         console.log('data received ')
