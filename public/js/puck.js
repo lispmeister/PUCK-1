@@ -1217,8 +1217,12 @@ function print_puck(ipuck, puckinfo, elements) {
 //
 function detect_webRTC(element) {
 
-    // ~ two per row
-    $('#' + element).append('' +
+    // some browsers really don't like this
+    $.getScript( "/js/DetectRTC.js" )
+    .done(function( script, textStatus ) {
+        console.log( textStatus );
+        // ~ two per row
+        $('#' + element).append('' +
                 '<tr><td>Microphone    </td><td>'     + DetectRTC.hasMicrophone               + '</td>' +
                     '<td>Webcam        </td><td>'     + DetectRTC.hasWebcam                   + '</td></tr>' +
                 '<tr><td>Screen Capture</td><td>'     + DetectRTC.isScreenCapturingSupported  + '</td>' +
@@ -1226,6 +1230,12 @@ function detect_webRTC(element) {
                 '<tr><td>WebAudio API</td><td>'       + DetectRTC.isAudioContextSupported     + '</td>' +
                 '    <td>SCTP Data Channels</td><td>' + DetectRTC.isSctpDataChannelsSupported + '</td></tr>' +
                 '<tr><td>RTP Data Channels</td><td>'  + DetectRTC.isRtpDataChannelsSupported  + '</td></tr>')
+
+    })
+    .fail(function( jqxhr, settings, exception ) {
+        $(element).text( "This browser doesn't seem to allow the detection of WebRTC features" );
+        return
+    });
 
 }
 

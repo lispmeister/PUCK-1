@@ -303,7 +303,7 @@ $(document).ready(function () {
         })
     })
 
-    // detect_webRTC('puck_rtc_health_check')
+    detect_webRTC('puck_rtc_health_check')
 
     // message data
     list_events()

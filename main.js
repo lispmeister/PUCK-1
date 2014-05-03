@@ -139,7 +139,7 @@ function random_cat_fact (facts) {
     var max  = facts.length
 
     var fact = facts[Math.floor(Math.random() * (max - 1) + 1)]
-    console.log('cat fact! ' + fact)
+    // console.log('cat fact! ' + fact)
     return(fact)
 }
 
@@ -594,7 +594,7 @@ function cat_power(msg) {
         cat_sock.write(JSON.stringify(msg))
     }
     catch (e) {
-        console.log('channel not up yet....?')
+        console.log('channel not up yet....? ' + e)
     }
 
 }
@@ -2281,7 +2281,13 @@ ios.on('connection', function (sock_puppet) {
     })
 })
 
-pucky.listen(puck_port, function() {
-    console.log('[+] server listening at %s', puck_port)
-})
+try {
+    pucky.listen(puck_port, function() {
+        console.log('[+] server listening at %s', puck_port)
+    })
+}
+catch (e) {
+    console.log('The PUCK server died when trying to start: ' + e)
+
+}
 

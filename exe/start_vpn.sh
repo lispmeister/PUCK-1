@@ -3,7 +3,7 @@
 #
 #  Try to start a VPN between the PUCK we're on and the remote one - the start of a bold new world...!
 #
-#  Usage: $0 target
+#  Usage: $0 puck-id ip-address
 #
 
 . /etc/puck/config.sh

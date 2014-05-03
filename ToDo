@@ -1,4 +1,10 @@
 
+* authentication - right now anyone can connect to a PUCK and just go.  This will change ;)
+
+* authorization - right now anyone can talk to anyone else's PUCK and friend them.  There will be settings for this
+
+* setup wizard - I actually have this all drafted and partially coded,
+  but there's a one-page intro that asks you a few questions will be done.
 
 *** status of VPN in a clear, clear way
 
