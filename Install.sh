@@ -1,5 +1,10 @@
 # 
-# stuff you need to run a PUCK
+# stuff you need to run a PUCK... for ubuntu
+#
+# EC2 uses yum... big interesting one is:
+#
+#   sudo yum install nodejs npm --enablerepo=epel
+#
 #
 # - zen
 #

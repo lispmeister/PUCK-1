@@ -1,0 +1,451 @@
+
+<!-- slightly modified version from:
+
+    // Muaz Khan         - www.MuazKhan.com
+    // MIT License       - www.WebRTC-Experiment.com/licence
+    // Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
+-->
+
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        
+        <!-- ui-stylesheet -->
+        <link href="/css/rtc_style.css" rel="stylesheet">
+        <link href="/css/rtc_scroll.css" rel="stylesheet">
+        
+        <link href="/css/bootstrap.css" rel="stylesheet">
+
+    </head>
+    <body>
+
+        <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
+
+<script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
+
+<script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
+<script type="text/javascript" src='/js/jquery.json-2.4.min.js'></script>
+<script type="text/javascript" src='/js/jquery.inputmask.js'></script>
+<script type="text/javascript" src='/js/jquery.blockUI.js'></script>
+<script type="text/javascript" src='/js/jquery.avgrund.js'></script>
+<script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
+<script type="text/javascript" src="/js/jquery.filer.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+
+<script type="text/javascript" src='/js/bootstrap.js'></script>
+<script type="text/javascript" src='/js/moustache.js'></script>
+<script type="text/javascript" src="/js/underscore-min.js"></script>
+
+<script type="text/javascript" src='/js/spin.js'></script>
+<script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
+<script type="text/javascript" src="/js/sockjs.min.js"></script>
+<script type="text/javascript" src="/js/sockjs_reconnect.min.js"></script>
+
+
+
+
+        <script type="text/javascript" src="/js/puck.js"></script>
+        <script type="text/javascript" src="/js/main_puck.js"></script>
+
+        <script type="text/javascript" src='/js/firebase.js''></script>
+        <script type="text/javascript" src="/js/RTCMultiConnection-v1.7.js"> </script>
+
+<script>
+
+// Muaz Khan         - www.MuazKhan.com
+// MIT License       - www.WebRTC-Experiment.com/licence
+// Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
+function getElement(selector) {
+    return document.querySelector(selector);
+}
+
+var main = getElement('.main');
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.round(Math.random() * 15)];
+    }
+    return color;
+}
+
+var number_vids = 0
+
+function addNewMessage(args) {
+
+    var newMessageDIV = document.createElement('div');
+    newMessageDIV.className = 'new-message';
+
+    var userinfoDIV = document.createElement('div');
+    userinfoDIV.className = 'user-info';
+
+    // userinfoDIV.innerHTML = args.userinfo || '<img src="images/rtc_rtc_user.png">';
+    // userinfoDIV.innerHTML = '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    
+    // ignore images
+    if (args.userinfo.indexOf('.png') >= 0) {
+        userinfoDIV.innerHTML = '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    }
+    else if (args.userinfo.indexOf('<video') >= 0) {
+        if (number_vids < 2) {
+            if (!number_vids) var num = "one"
+            else              var num = "two"
+            number_vids++
+            console.log('adding video ' + num)
+            $('#video_' + num).html('<div style="width=200px"; padding: .6em .8em;">' + args.userinfo + '</div>')
+        }
+    }
+    else {
+        userinfoDIV.innerHTML = args.userinfo || '<div style="padding: .6em .8em;">' + args.header + '</div>'
+    }
+
+// not background, just font
+//    userinfoDIV.style.background = args.color || rtcMultiConnection.extra.color || getRandomColor();
+    userinfoDIV.style.color = args.color || rtcMultiConnection.extra.color || getRandomColor();
+
+    newMessageDIV.appendChild(userinfoDIV);
+
+    var userActivityDIV = document.createElement('div');
+    userActivityDIV.className = 'user-activity';
+
+    // userActivityDIV.innerHTML = '<span>' + args.header + '</span>';
+
+    var p = document.createElement('p');
+    p.className = 'message';
+    userActivityDIV.appendChild(p);
+    p.innerHTML = args.message;
+
+    newMessageDIV.appendChild(userActivityDIV);
+
+//  main.insertBefore(newMessageDIV, main.firstChild);
+
+    userinfoDIV.style.height = newMessageDIV.clientHeight + 'px';
+
+    if (args.callback) {
+        args.callback(newMessageDIV);
+    }
+
+}
+
+function getUserinfo(blobURL, imageURL) {
+    return blobURL ? '<video src="' + blobURL + '" autoplay></vide>' : '<img src="' + imageURL + '">';
+}
+
+
+function bytesToSize(bytes) {
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    if (bytes == 0) return '0 Bytes';
+    var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+    return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+}
+
+
+
+$(document).ready(function () {
+
+    var username = location.hostname
+
+    rtcMultiConnection.extra = {
+        username: username,
+        color: getRandomColor()
+    };
+
+    var roomid = rtcMultiConnection.channel;
+
+    var websocket = new WebSocket(SIGNALING_SERVER);
+    websocket.onmessage = function(event) {
+        console.log('[m] websocket.onmessage')
+        var data = JSON.parse(event.data);
+        if (data.isChannelPresent == false) {
+            addNewMessage({
+                header: username,
+                message: 'Creating new room...',
+                userinfo: '<img src="images/rtc_action-needed.png">'
+            });
+
+            rtcMultiConnection.open();
+        } else {
+            addNewMessage({
+                header: username,
+                message: 'Joining existing room...',
+                userinfo: '<img src="images/rtc_action-needed.png">'
+            });
+            rtcMultiConnection.join(roomid);
+        }
+    };
+    websocket.onopen = function() {
+        console.log('[o] websocket.onopen')
+        websocket.send(JSON.stringify({
+            checkPresence: true,
+            channel: roomid
+        }));
+    };
+})
+
+
+// Muaz Khan         - www.MuazKhan.com
+// MIT License       - www.WebRTC-Experiment.com/licence
+// Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
+var rtcMultiConnection = new RTCMultiConnection('puckasaurus');
+
+rtcMultiConnection.session = { data: true };
+
+rtcMultiConnection.sdpConstraints.mandatory = {
+    OfferToReceiveAudio: true,
+    OfferToReceiveVideo: true
+};
+
+// using websockets for signaling!
+// https://github.com/muaz-khan/WebRTC-Experiment/tree/master/websocket-over-nodejs
+// var SIGNALING_SERVER = 'wss://wsnodejs.nodejitsu.com:443';
+// var SIGNALING_SERVER = 'wss://10.1.80.1:12034';
+// var SIGNALING_SERVER = 'wss://192.168.0.250:5555';
+// var SIGNALING_SERVER = 'ws://192.168.0.250:5555';
+// var SIGNALING_SERVER = 'ws://' + location.hostname + ':5555';
+var SIGNALING_SERVER = 'ws://' + location.hostname + ':5555';
+
+rtcMultiConnection.openSignalingChannel = function(config) {
+    config.channel = config.channel || this.channel;
+    var websocket = new WebSocket(SIGNALING_SERVER);
+    websocket.channel = config.channel;
+    websocket.onopen = function() {
+        websocket.push(JSON.stringify({
+            open: true,
+            channel: config.channel
+        }));
+        if (config.callback)
+            config.callback(websocket);
+    };
+    websocket.onmessage = function(event) {
+        config.onmessage(JSON.parse(event.data));
+    };
+    websocket.push = websocket.send;
+    websocket.send = function(data) {
+        websocket.push(JSON.stringify({
+            data: data,
+            channel: config.channel
+        }));
+    };
+};
+rtcMultiConnection.customStreams = { };
+
+/*
+// http://www.rtcmulticonnection.org/docs/fakeDataChannels/
+rtcMultiConnection.fakeDataChannels = true;
+if(rtcMultiConnection.UA.Firefox) {
+rtcMultiConnection.session.data = true;
+}
+*/
+
+rtcMultiConnection.autoTranslateText = false;
+
+rtcMultiConnection.onopen = function(e) {
+    getElement('#allow-webcam').disabled = false;
+    getElement('#allow-mic').disabled = false;
+    getElement('#share-files').disabled = false;
+    getElement('#allow-screen').disabled = false;
+
+    addNewMessage({
+        header: e.extra.username,
+        message: 'Data connection is opened between you and ' + e.extra.username + '.',
+        userinfo: getUserinfo(rtcMultiConnection.blobURLs[rtcMultiConnection.userid], 'images/rtc_info.png'),
+        color: e.extra.color
+    });
+
+    numbersOfUsers.innerHTML = parseInt(numbersOfUsers.innerHTML) + 1;
+};
+
+var whoIsTyping = document.querySelector('#who-is-typing');
+rtcMultiConnection.onmessage = function(e) {
+    if (e.data.typing) {
+        whoIsTyping.innerHTML = e.extra.username + ' is typing ...';
+        return;
+    }
+
+    if (e.data.stoppedTyping) {
+        whoIsTyping.innerHTML = '';
+        return;
+    }
+
+    whoIsTyping.innerHTML = '';
+
+    addNewMessage({
+        header: e.extra.username,
+        // message: 'Text message from ' + e.extra.username + ':<br /><br />' + (rtcMultiConnection.autoTranslateText ? linkify(e.data) + ' ( ' + linkify(e.original) + ' )' : linkify(e.data)),
+        message: (rtcMultiConnection.autoTranslateText ? linkify(e.data) + ' ( ' + linkify(e.original) + ' )' : linkify(e.data)),
+        userinfo: getUserinfo(rtcMultiConnection.blobURLs[e.userid], 'images/chat-message.png'),
+        color: e.extra.color
+    });
+    document.title = e.data;
+};
+
+var sessions = { };
+rtcMultiConnection.onNewSession = function(session) {
+    console.log('onNewSession ')
+    console.log(session)
+
+    if (sessions[session.sessionid]) return;
+    sessions[session.sessionid] = session;
+
+    session.join();
+
+    addNewMessage({
+        header: session.extra.username,
+        message: 'Making handshake with room owner....!',
+        userinfo: '<img src="images/rtc_action-needed.png">',
+        color: session.extra.color
+    });
+};
+
+rtcMultiConnection.onRequest = function(request) {
+    rtcMultiConnection.accept(request);
+    addNewMessage({
+        header: 'New Participant',
+        message: 'A participant found. Accepting request of ' + request.extra.username + ' ( ' + request.userid + ' )...',
+        userinfo: '<img src="images/rtc_action-needed.png">',
+        color: request.extra.color
+    });
+};
+
+rtcMultiConnection.onCustomMessage = function(message) {
+    if (message.hasCamera || message.hasScreen) {
+        var msg = message.extra.username + ' enabled webcam. <button id="preview">Preview</button> ---- <button id="share-your-cam">Share your Webcam</button>';
+
+        if (message.hasScreen) {
+            msg = message.extra.username + ' is ready to share screen. <button id="preview">View His Screen</button> ---- <button id="share-your-cam">Share your Screen</button>';
+        }
+
+        addNewMessage({
+            header: message.extra.username,
+            message: msg,
+            userinfo: '<img src="images/rtc_action-needed.png">',
+            color: message.extra.color,
+            callback: function(div) {
+                div.querySelector('#preview').onclick = function() {
+                    this.disabled = true;
+
+                    message.session.oneway = true;
+                    rtcMultiConnection.sendMessage({
+                        renegotiate: true,
+                        streamid: message.streamid,
+                        session: message.session
+                    });
+                };
+
+                div.querySelector('#share-your-cam').onclick = function() {
+                    this.disabled = true;
+
+                    if (!message.hasScreen) {
+                        session = { audio: true, video: true };
+
+                        rtcMultiConnection.captureUserMedia(function(stream) {
+                            rtcMultiConnection.peers[message.userid].peer.connection.addStream(stream);
+                            div.querySelector('#preview').onclick();
+                        }, session);
+                    }
+
+                    if (message.hasScreen) {
+                        var session = { screen: true };
+
+                        rtcMultiConnection.captureUserMedia(function(stream) {
+                            rtcMultiConnection.peers[message.userid].peer.connection.addStream(stream);
+                            div.querySelector('#preview').onclick();
+                        }, session);
+                    }
+                };
+            }
+        });
+    }
+
+    if (message.hasMic) {
+        addNewMessage({
+            header: message.extra.username,
+            message: message.extra.username + ' enabled microphone. <button id="listen">Listen</button> ---- <button id="share-your-mic">Share your Mic</button>',
+            userinfo: '<img src="images/rtc_action-needed.png">',
+            color: message.extra.color,
+            callback: function(div) {
+                div.querySelector('#listen').onclick = function() {
+                    this.disabled = true;
+                    message.session.oneway = true;
+                    rtcMultiConnection.sendMessage({
+                        renegotiate: true,
+                        streamid: message.streamid,
+                        session: message.session
+                    });
+                };
+
+                div.querySelector('#share-your-mic').onclick = function() {
+                    this.disabled = true;
+
+                    var session = { audio: true };
+
+                    rtcMultiConnection.captureUserMedia(function(stream) {
+                        rtcMultiConnection.peers[message.userid].peer.connection.addStream(stream);
+                        div.querySelector('#listen').onclick();
+                    }, session);
+                };
+            }
+        });
+    }
+
+    if (message.renegotiate) {
+        var customStream = rtcMultiConnection.customStreams[message.streamid];
+        if (customStream) {
+            rtcMultiConnection.peers[message.userid].renegotiate(customStream, message.session);
+        }
+    }
+};
+
+
+rtcMultiConnection.blobURLs = { };
+rtcMultiConnection.onstream = function(e) {
+    if (e.stream.getVideoTracks().length) {
+        rtcMultiConnection.blobURLs[e.userid] = e.blobURL;
+        /*
+        if( document.getElementById(e.userid) ) {
+            document.getElementById(e.userid).muted = true;
+        }
+        */
+        addNewMessage({
+            header: e.extra.username,
+            message: e.extra.username + ' enabled swebcam.',
+            userinfo: '<video id="' + e.userid + '" src="' + URL.createObjectURL(e.stream) + '" autoplay muted=true volume=0></vide>',
+            color: e.extra.color
+        });
+    } else {
+        addNewMessage({
+            header: e.extra.username,
+            message: e.extra.username + ' enabled microphone.',
+            userinfo: '<audio src="' + URL.createObjectURL(e.stream) + '" controls muted=true volume=0></vide>',
+            color: e.extra.color
+        });
+    }
+    usersContainer.appendChild(e.mediaElement);
+};
+
+rtcMultiConnection.sendMessage = function(message) {
+    message.userid = rtcMultiConnection.userid;
+    message.extra = rtcMultiConnection.extra;
+    rtcMultiConnection.sendCustomMessage(message);
+};
+
+rtcMultiConnection.onclose = rtcMultiConnection.onleave = function(event) {
+    addNewMessage({
+        header: event.extra.username,
+        message: event.extra.username + ' left the room.',
+        userinfo: getUserinfo(rtcMultiConnection.blobURLs[event.userid], 'images/rtc_info.png'),
+        color: event.extra.color
+    });
+};
+
+</script>
+
+    </body>
+</html>

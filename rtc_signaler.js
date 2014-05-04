@@ -1,6 +1,8 @@
 var fs = require('fs')
-//var https = require('https')
+var https = require('https')
 var http = require('http')
+
+port = 8081
 
 var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
     cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
@@ -9,8 +11,8 @@ var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
 var credentials = {key: key, cert: cert, ca: ca};
 
 // HTTPs server
-// var app = https.createServer(credentials, function(request, response) {
-var app = http.createServer(function(request, response) {
+var app = https.createServer(credentials, function(request, response) {
+// var app = http.createServer(function(request, response) {
     console.log('incoming...')
     request.addListener('end', function() {
         console.log('do nothing, file request')
@@ -125,7 +127,7 @@ function truncateChannels(websocket) {
     }
 }
 
-app.listen(12034, function () {
-    // console.log('signaler up @ https://xxx:12034/');
-    console.log('signaler up @ http://xxx:12034/');
+app.listen(port, function () {
+    console.log('signaler up @ https://xxx:' + port)
+    // console.log('signaler up @ http://' + port)
 })

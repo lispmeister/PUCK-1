@@ -57,6 +57,12 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
     rmdir $puck_keystore
     ln -s $keystore/$pid $puck_keystore
 
+    # print out some summary data about the keys
+    for cert in $puck_keystore/{puck,ca}.crt $puck_keystore/vpn_client/vpn_client.crt ; do
+        $PUCK_BIN/dump_cert.sh $cert > $cert.info
+    done
+
+
     # current eth0 ip addr
     ip=$(ifconfig eth0 | awk '/inet/ {split($2, ip, ":"); print ip[2]}')
 

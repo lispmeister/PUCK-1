@@ -27,6 +27,7 @@ export PUCK_LOGS="$PUCK_HOME/logs"
 export PUCK_TMP="$PUCK_HOME/tmp"
 export PUCK_PUBLIC="$PUCK_HOME/public"
 export PUCK_UPLOADS="$PUCK_HOME/public/uploads"
+export PUCK_BIN="$PUCK_HOME/exe"
 
 export hell="$PUCK_HOME/f-u-openssl"
 

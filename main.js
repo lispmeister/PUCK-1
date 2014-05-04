@@ -103,6 +103,8 @@ var puck_proxy_up = false,
     proxy_server  = "",
     proxy         = ""
 
+var all_client_ips = []
+
 // keep an eye on the above
 pollStatus(puck_status_file)
 
@@ -305,6 +307,8 @@ function watch_logs(logfile, log_type) {
     var tail = new Tail(logfile)
 
     tail.on("line", function(line) {
+
+        if (line == "" || line == null || typeof line == "undefined") return
 
         // console.log("got line from " + logfile + ":" + line)
     
@@ -776,7 +780,8 @@ function create_puck_key_store(puck) {
 
     var puck_dir = puck_keystore + '/' + puck.PUCK_ID
 
-    fs.mkdir(puck_dir, function(err){
+    // has to exist before the below will work...
+    fs.mkdirSync(puck_dir, function(err){
         if(err) {
             // xxx - user error, bail
             console.log(err);
@@ -824,7 +829,7 @@ function createPuck(req, res, next) {
     }
 
     var client_ip      = get_client_ip(req)
-    var all_client_ips = req.body.value.all_ips
+    all_client_ips = req.body.value.all_ips
 
     // if the IP we get the add from isn't in the ips the other puck
     // says it has... add it in; they may be coming from a NAT or
