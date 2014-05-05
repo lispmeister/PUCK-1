@@ -1001,7 +1001,7 @@ function createEvent(client_ip, event_data) {
         }
     })
 
-//  change_status() // make sure everyone hears this
+    change_status() // make sure everyone hears this
 
 }
 
@@ -1905,6 +1905,7 @@ function formCreate(req, res, next) {
 
                             puck_spawn(cmd, argz)
                         }
+                        createEvent(ip_addr, {event_type: "create", puck_id: data.PUCK_ID})
                     })
                     req.on('error', function(e) {
                         console.log('create Error... no puck data back? ', e.message)
