@@ -1,12 +1,12 @@
 
 var Tail       = require('tail').Tail,
-    Q          = require('q'),
     cors       = require('cors'),
     crypto     = require('crypto'),
     express    = require('express'),
     fs         = require('fs'),
     formidable = require('formidable'),
     https      = require('https'),
+    mkdirp     = require('mkdirp'),
     moment     = require('moment'),
     os         = require('os'),
     path       = require('path'),
@@ -782,12 +782,12 @@ function create_puck_key_store(puck) {
     var puck_dir = puck_keystore + '/' + puck.PUCK_ID
 
     // has to exist before the below will work...
-    fs.mkdirSync(puck_dir, function(err){
+    mkdirp.sync(puck_dir, function () {
         if(err) {
             // xxx - user error, bail
             console.log(err);
         }
-    });
+    })
 
     // xxx - errs to user!
     fs.writeFile(puck_dir + '/puck.pid', bwana_puck.PUCK_ID, function(err) {
@@ -1837,12 +1837,12 @@ function formCreate(req, res, next) {
     
                 var puck_dir = config.PUCK.keystore + '/' + data.pid
     
-                fs.mkdir(puck_dir, function(err){
+                mkdirp.sync(puck_dir, function () {
                     if(err) {
                         // xxx - user error, bail
                         console.log(err);
                     }
-                });
+                })
     
                 // if ping is successful, rustle up and write appropriate data
                 var req = https.get(url, function(response) {
