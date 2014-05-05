@@ -273,11 +273,6 @@ function state_vpn(state, browser_ip) {
 
             console.log('\t[+] fire up the alarms')
 
-            if (!puck_status.browser_events[browser_ip].notify_ring) {
-                event_connect("incoming", incoming_ip)
-                puck_status.browser_events[browser_ip].notify_ring = true
-            }
-
             // ensure video button is enabled if a call is in progress
             $('#puck_video').addClass('green').addClass('pulse')
             $('#puck_vpn_' + puck_status.openvpn_server.client_pid).text('connected')
@@ -285,6 +280,11 @@ function state_vpn(state, browser_ip) {
             console.log('incoming ring from ' + puck_status.openvpn_server.client)
             incoming_ip = puck_status.openvpn_server.client
             // ring them gongs, etc.
+
+            if (!puck_status.browser_events[browser_ip].notify_ring) {
+                event_connect("incoming", incoming_ip)
+                puck_status.browser_events[browser_ip].notify_ring = true
+            }
 
             puck_status.browser_events[browser_ip].notify_file = true
             other_puck = puck_status.openvpn_server.client
