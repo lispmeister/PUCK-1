@@ -765,8 +765,7 @@ function remove_signs_of_call() {
     if (! puck_current.busy) {
         console.log('killing call signatures...')
         $('.hang_up').text("Call").removeClass("btn-warning").removeClass("hang_up")
-        $('.hang_up').removeClass('hang_up')
-        $('.puck_vpn').text("Call").removeClass("btn-danger")
+        $('.puck_vpn').text("Call").removeClass("btn-danger").removeClass('btn-success')
         $('#puck_video').addClass('disabled')
         $('#puck_video').removeClass('green').removeClass('pulse')
         $('body').removeClass('avgrund-active')
