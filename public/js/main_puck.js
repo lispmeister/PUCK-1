@@ -83,9 +83,10 @@ $(document).ready(function () {
             // possibly a better way to get name :)
             event_connect('outgoing', $(this).parent().parent().find('.puckname').text())
 
-            var vpuckid = $("#puckid").val()
-            var ipaddr  = $("#ipaddr").val()
-            var target  = $("#name").val()
+            // gather up the current target details
+            var vpuckid = $(this).parent().find('#puckid').val()
+            var ipaddr  = $(this).parent().find('#ipaddr').val()
+            var target  = $(this).parent().find('#name').val()
 
             puck_vpn(this, vpuckid, ipaddr)
         }

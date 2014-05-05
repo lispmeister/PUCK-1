@@ -352,7 +352,7 @@ function state_ring(sound) {
 //
 // calls, in or out
 //
-function event_connect(direction, puck) {
+function event_connect(direction, caller) {
 
     console.log('connexting')
 
@@ -390,7 +390,7 @@ function event_connect(direction, puck) {
     if (direction == "incoming") {
 
         // tell who is calling
-        $('#vpn_target').on('change', '#vpn_target').html('Call from ' + puck)
+        $('#vpn_target').on('change', '#vpn_target').html('Call from ' + caller)
 
         // if answer, remove avg
         $(document).on('click', '#puck_answer', function() {
@@ -399,7 +399,7 @@ function event_connect(direction, puck) {
 
     }
     else {
-        $('#vpn_target').on('change', '#vpn_target').append(' ' + puck)
+        $('#vpn_target').on('change', '#vpn_target').append(' ' + caller)
     }
 
     $('#puck_ring_img').on('change', '#puck_ring_img').html(ring_img)
@@ -729,7 +729,7 @@ function status_or_die() {
         puck_current.busy     = false
 
         if ($('button:contains("connected")').length) {
-            $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnected!</h1></span>")
+            $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnecting!</h1></span>")
         }
 
         other_puck = "local"
