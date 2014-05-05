@@ -384,7 +384,7 @@ function event_connect(direction, caller) {
                   '</div>'
         })
 
-    state_ring('true')
+    state_ring(true)
 
     // xxx - conf file, obv....
     var ring_img = '<img src="/img/ringring.gif">'
@@ -398,6 +398,7 @@ function event_connect(direction, caller) {
         // if answer, remove avg
         $(document).on('click', '#puck_answer', function() {
             $("body").removeClass("avgrund-active")
+            state_ring(false)
         })
 
     }
@@ -417,7 +418,7 @@ function event_hang_up() {
     // i has gone
     console.log('hanging up!')
 
-    state_ring('false')
+    state_ring(false)
 
     // don't change anything until the call efforts pass/fail
     puck_current.busy = true
@@ -769,6 +770,7 @@ function remove_signs_of_call() {
         $('#puck_video').addClass('disabled')
         $('#puck_video').removeClass('green').removeClass('pulse')
         $('body').removeClass('avgrund-active')
+        state_ring(false)
         // fire_puck_status(puck_status)
     }
 
