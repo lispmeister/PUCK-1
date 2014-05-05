@@ -733,15 +733,13 @@ function status_or_die() {
 
         if ($('button:contains("connected")').length) {
             $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnecting!</h1></span>")
+            // xxx - one for out, one for in?
+            puck_status.browser_events[browser_ip].notify_ring = false
+            remove_signs_of_call()
+            console.log('clearing all flags of any calls to false')
         }
 
         other_puck = "local"
-
-        // xxx - one for out, one for in?
-        puck_status.browser_events[browser_ip].notify_ring = false
-        remove_signs_of_call()
-
-        console.log('clearing all flags of any calls to false')
 
     }
 
