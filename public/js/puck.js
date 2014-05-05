@@ -275,8 +275,9 @@ function state_vpn(state, browser_ip) {
 
             // ensure video button is enabled if a call is in progress
             $('#puck_video').addClass('green').addClass('pulse')
-            $('#puck_vpn_' + puck_status.openvpn_server.client_pid).text('connected')
-            $('button:contains("connecting")').text('connected')
+            $('button:contains("connecting")').text('connected from')
+            $('#puck_vpn_' + puck_status.openvpn_server.client_pid).text('connected').removeClass('btn-primary').addClass('btn-success')
+
             console.log('incoming ring from ' + puck_status.openvpn_server.client)
             incoming_ip = puck_status.openvpn_server.client
             // ring them gongs, etc.
@@ -305,10 +306,12 @@ function state_vpn(state, browser_ip) {
             console.log('\t[+] fire up the outbound signs')
 
             $('#puck_video').addClass('green').addClass('pulse')
+
             $('button:contains("connecting")').text('Hang Up').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
 
             // ... setup bye bye
             $('button:contains("connecting")').click(false)
+
             $('body').on('click', '.hang_up', function() {
                 $(this).text('hanging up...')
                 event_hang_up()
