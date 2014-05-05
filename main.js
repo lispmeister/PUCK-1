@@ -2015,7 +2015,6 @@ function SSSUp () {
         autoAcceptConnections: false
     }).on('request', onRequest)
 
-
     sockit.on('error', function(err) {
         console.log('socket error (' + err.listenKey + '): ' + err.message);
     });
@@ -2023,7 +2022,7 @@ function SSSUp () {
     sockit.on('clientError', function(err) {
         // ETIMEDOUT, EPIPE, ECONNRESET, "This socket is closed." are all very
         // very common occurrences.
-        logger.debug('HTTP client error (' + err.listenKey + '): ' + err.message);
+        console.log('HTTP client error (' + err.listenKey + '): ' + err.message);
     });
 
 
