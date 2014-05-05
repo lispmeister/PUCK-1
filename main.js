@@ -2010,10 +2010,23 @@ function SSSUp () {
 //      console.log('[+] http server listening at %s', puck_port_signal)
 //  })
 
-    new WebSocketServer({
+    var sockit = new WebSocketServer({
         httpServer: sig_pucky,
         autoAcceptConnections: false
-    }).on('request', onRequest);
+    }).on('request', onRequest)
+
+
+    sockit.on('error', function(err) {
+        console.log('socket error (' + err.listenKey + '): ' + err.message);
+    });
+
+    sockit.on('clientError', function(err) {
+        // ETIMEDOUT, EPIPE, ECONNRESET, "This socket is closed." are all very
+        // very common occurrences.
+        logger.debug('HTTP client error (' + err.listenKey + '): ' + err.message);
+    });
+
+
     
     function onRequest(socket) {
         var origin = socket.origin + socket.resource;
