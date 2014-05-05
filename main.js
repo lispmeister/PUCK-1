@@ -1917,8 +1917,12 @@ function formCreate(req, res, next) {
             console.log('errz snatchin ' + url + ' ... ' + e.message)
             return(e)
         })
-
     })
+    req.on('error', function(e) {
+        console.log('errz snatchin ' + url + ' ... ' + e.message)
+        return(e)
+    })
+
 
 }
   
