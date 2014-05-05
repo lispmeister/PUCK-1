@@ -341,7 +341,8 @@ function watch_logs(logfile, log_type) {
             // Peer Connection Initiated with 192.168.0.141:41595
             if (line.indexOf(magic_server_remote) > -1) {
                 // http://stackoverflow.com/questions/106179/regular-expression-to-match-hostname-or-ip-address
-                client_remote_ip = line.match(/((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]){3})/)[0]
+                // client_remote_ip = line.match(/((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]){3})/)[0]
+                client_remote_ip = line.match(/((([0-9]+\.){3}([0-9]+){1}))/)[0]
                 // client_remote_ip = line.match(/ip_regexp/)[1]
                 console.log('incoming call from ' + client_remote_ip)
                 console.log(line)

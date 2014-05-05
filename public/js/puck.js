@@ -265,6 +265,8 @@ function state_vpn(state, browser_ip) {
     if (state == "incoming") {
         console.log('incoming call')
 
+        console.log(puck_status.browser_events[browser_ip].notify_ring)
+
         // is anything else going on?  If so, for now dont do anything
         if (! puck_current.busy) {
             puck_current.incoming = true
