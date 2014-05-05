@@ -731,7 +731,7 @@ function status_or_die() {
         puck_current.outgoing = false
         puck_current.busy     = false
 
-        if ($('button:contains("connected")').length) {
+        if ($('button:contains("connected")',button:contains("hanging up")').length) {
             $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnecting!</h1></span>")
             // xxx - one for out, one for in?
             puck_status.browser_events[browser_ip].notify_ring = false
