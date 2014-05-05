@@ -322,7 +322,8 @@ function state_vpn(state, browser_ip) {
             other_puck = puck_status.openvpn_client.server
 
             $('body').removeClass('avgrund-active');
-            $('body').append("<span class='dead_center animated fadeOut'><h1>Connected!</h1></span>")
+            state_ring(false)
+
         }
         else {
             console.log('\t[-] not doing anything with outgoing call, currently busy')
@@ -347,6 +348,7 @@ function state_ring(sound) {
     }
     else {
         // ring ring - play sound
+        console.log("ding a ling ring")
         ring.play()
     }
 
