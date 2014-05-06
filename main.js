@@ -2293,8 +2293,7 @@ var puck_users      = {},
     all_cats        = []
 
 ios.on('connection', function (sock_puppet) {
-    // console.log('[+] NEW connext from ' + sock_puppet.handshake.address.address)
-    console.log('[+] NEW connext')
+    console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
 
     cat_sock = sock_puppet
 
