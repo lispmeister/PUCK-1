@@ -18,8 +18,8 @@
 # See flush.sh & forward_port.sh for more on what this does
 #
 
-if [ $# -ne 5 ] ; then
-   echo "Usage: $0 up|down port-1 ip-2 port-2 tcp|udp"
+if [ $# -ne 6 ] ; then
+   echo "Usage: $0 up|down ip-1 port-1 ip-2 port-2 tcp|udp"
    exit 1
 fi
 
@@ -33,10 +33,11 @@ else
     exit 2
 fi
 
-local_port=$2
-remote_ip=$3
-remote_port=$4
-proto=$5
+local_ip=$2
+local_port=$3
+remote_ip=$4
+remote_port=$5
+proto=$6
 
 # out with the old
 echo flushing old iptables rules n routes
@@ -47,6 +48,8 @@ echo "1" > /proc/sys/net/ipv4/ip_forward
 
 # get the ip addrs for a host, in its mind
 all_ips=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && !match($1, "^tun")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) printf("%s ", all[i]) ; print ""}'| sed 's/,]$/]/')
+
+all_ips="$all_ips $local_ip"
 
 if [ $direction = "up" ] ; then
     for ip in $all_ips; do
