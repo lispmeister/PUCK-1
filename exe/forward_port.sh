@@ -65,18 +65,22 @@ all_ips=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n
 if [ $direction = "up" ] ; then
     for ip in $all_ips; do
         echo "forwarding $proto traffic from $ip : $local_port => $remote_ip : $remote_port"
-        echo iptables -t nat -A PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        echo iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -A PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        echo iptables -t nat -A PREROUTING  -i eth0 -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+             iptables -t nat -A PREROUTING  -i eth0 -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+
+        echo iptables -t nat -A POSTROUTING -o tun0 -p tcp --dport $remote_port -j MASQUERADE
+             iptables -t nat -A POSTROUTING -o tun0 -p tcp --dport $remote_port -j MASQUERADE
+
     done
 else
     for ip in $all_ips; do
         echo "disabling forwarding of $proto traffic from $ip : $local_port => $remote_ip : $remote_port"
-        echo iptables -t nat -D PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        echo iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -D PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        echo iptables -t nat -D PREROUTING  -i tun0 -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+             iptables -t nat -D PREROUTING  -i tun0 -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+
+        echo iptables -t nat -D POSTROUTING -i eth0 -p tcp --dport $remote_port -j MASQUERADE
+             iptables -t nat -D POSTROUTING -o eth0 -p tcp --dport $remote_port -j MASQUERADE
+
     done
 fi
 

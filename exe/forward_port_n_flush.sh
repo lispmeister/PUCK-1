@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#
+# XXXXX
+#
+#... xxxx... slight differences now... plus... wil have to refactor
+# and clean dis shit up.
+#
+# biggest diff between forward_port.sh - this acts on tun1, the
+# other on tun0... no matter what, hard coded interfaces makes me sad.
+#
+# XXXXX ^^^^
+#
+
 # The same as forward_port.sh except this calls flush.sh to clear
 # out any old routes/iptables rules
 #
@@ -41,16 +53,16 @@ if [ $direction = "up" ] ; then
         echo "forwarding $proto traffic from $ip : $local_port => $remote_ip : $remote_port"
         echo iptables -t nat -A PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
         echo iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -A PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        iptables -t nat -A PREROUTING  -i eth0 -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        iptables -t nat -A POSTROUTING -o tun1 -p tcp --dport $remote_port -j MASQUERADE
     done
 else
     for ip in $all_ips; do
         echo "disabling forwarding of $proto traffic from $ip : $local_port => $remote_ip : $remote_port"
         echo iptables -t nat -D PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
         echo iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -D PREROUTING  -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        iptables -t nat -D PREROUTING  -i tun1 -p tcp -d $ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        iptables -t nat -D POSTROUTING -o eth0 -p tcp --dport $remote_port -j MASQUERADE
     done
 fi
 
