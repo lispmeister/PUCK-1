@@ -598,6 +598,7 @@ function cat_power(msg) {
 
     try {
         cat_sock.write(JSON.stringify(msg))
+        console.log('catpower writez!  ' + JSON.stringify(msg))
     }
     catch (e) {
         console.log('channel not up yet....? ' + e)

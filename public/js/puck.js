@@ -577,7 +577,7 @@ function puck_ping(all_ips, puckid, url) {
 
         // make the button clickable and green
         if (data.status == "OK") {
-            console.log('success with ' + element_id)
+            console.log('success with ' + ping_url)
             // console.log('ok...')
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
         }
