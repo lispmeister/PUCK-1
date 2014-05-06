@@ -87,7 +87,6 @@ else
     cp $puck_keystore/puck.pid $PUCK_HOME/public/puck.pid
 
     # if not started above, do so now
-#   NODE_PATH="/etc/puck/" node main.js &
     NODE_PATH="$PUCK_HOME/" node main.js &
 
 fi

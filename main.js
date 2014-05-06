@@ -424,7 +424,7 @@ function watch_logs(logfile, log_type) {
                 //
 
                 // clear the decks and put back the original port forwarding stuff
-                forward_port_and_flush(puck_port_forward, remote_ip, puck_port_signal, puck_proto_signal)
+                forward_port_and_flush(puck_port_forward, cat_fact_server, puck_port_signal, puck_proto_signal)
 
                 // if starting simply take the current stuff
                 client_magic = {
@@ -1568,7 +1568,7 @@ function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 
     puck_spawn(cmd, args)
 
-    createEvent(ip, {event_type: "flush forwarding", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
+    createEvent("internal server", {event_type: "flush forwarding", puck_id: bwana_puck.PUCK_ID})
 
 }
 
