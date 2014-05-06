@@ -88,10 +88,13 @@
 
             // verify to see if "openSignalingChannel" exists!
             prepareSignalingChannel(function () {
+                console.log('prep')
                 // connect with signaling channel
                 initRTCMultiSession(function () {
+                    console.log('init')
                     // for session-initiator, user-media is captured as soon as "open" is invoked.
                     captureUserMedia(function () {
+                        console.log('capture')
                         rtcMultiSession.initSession({
                             sessionDescription: connection.sessionDescription,
                             dontTransmit: dontTransmit
@@ -99,6 +102,7 @@
                     });
                 });
             });
+            console.log(connection.sessionDescription)
             return connection.sessionDescription;
         };
 
@@ -235,6 +239,7 @@
             // connection.join('sessionid');
             if (typeof session == 'string') {
                 console.log("session: " + session)
+                console.log(connection.stats)
                 if (connection.stats.sessions[session]) {
                     session = connection.stats.sessions[session];
                 } else

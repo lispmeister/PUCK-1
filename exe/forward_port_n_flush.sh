@@ -28,7 +28,7 @@ proto=$5
 
 # out with the old
 echo flushing old iptables rules n routes
-/etc/puck/exe/flush.sh
+bash /etc/puck/exe/flush.sh
 
 # will not reverse this, as other PUCK stuff might break, but ensure it's on!
 echo "1" > /proc/sys/net/ipv4/ip_forward
