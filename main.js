@@ -1541,7 +1541,7 @@ function forward_port(req, res, next) {
     // flush the past away and then add iptables rules
     var cmd = puck_bin + '/forward_port_n_flush.sh'
 
-    var args  = [direction, local_port, remote_ip, remote_port, proto]
+    var args  = [direction, puck_server_ip, local_port, remote_ip, remote_port, proto]
 
     puck_spawn(cmd, args)
 
