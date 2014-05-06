@@ -429,7 +429,8 @@ function watch_logs(logfile, log_type) {
                 remote_port = puck_port_signal
                 proto       = "tcp"
 
-                var url = 'https://' + puck_server_ip + ':'   + puck_port +
+                // var url = 'https://' + puck_server_ip + ':'   + puck_port +
+                var url = 'https://localhost:'  + puck_port   +
                           '/forward?direction=' + direction   +
                           '&local_port='        + port        +
                           '&remote_ip='         + remote_ip   +
@@ -2033,6 +2034,11 @@ function SSSUp () {
 
     
     function onRequest(socket) {
+        console.log('on request')
+        console.log(socket)
+        console.log(socket.orgin)
+        console.log(socket.resource)
+
         var origin = socket.origin + socket.resource;
     
         var websocket = socket.accept(null, origin);
@@ -2087,6 +2093,7 @@ function SSSUp () {
     }
     
     function checkPresence(message, websocket) {
+        console.log('check presc: ' + JSON.stringify(message))
         websocket.sendUTF(JSON.stringify({
             isChannelPresent: !! CHANNELS[message.channel]
         }));
