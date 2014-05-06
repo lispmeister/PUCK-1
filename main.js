@@ -35,6 +35,7 @@ var puck_public       = puck_home + config.PUCK.pub
 var puck_port         = config.PUCK.puck_port
 var puck_port_forward = config.PUCK.puck_port_forward
 var puck_port_signal  = config.PUCK.puck_port_signal
+var puck_proto_signal = config.PUCK.puck_proto_signal
 
 // what the client is using to get to us
 var puck_server_ip    = ""
@@ -421,34 +422,9 @@ function watch_logs(logfile, log_type) {
                 //
                 // forward a port for web RTC
                 //
-                // XXX - need to turn this off when done!
-                //
-                direction   = "up"
-                port        = puck_port_forward
-                remote_ip   = cat_fact_server
-                remote_port = puck_port_signal
-                proto       = "tcp"
 
-                // var url = 'https://' + puck_server_ip + ':'   + puck_port +
-                var url = 'https://localhost:'  + puck_port   +
-                          '/forward?direction=' + direction   +
-                          '&local_port='        + port        +
-                          '&remote_ip='         + remote_ip   +
-                          '&remote_port='       + remote_port +
-                          '&proto='             + proto
-
-                console.log('forward url => ' + url)
-                request(url,
-                    function (error, response, body) {
-                         if (!error && response.statusCode == 204) {
-                            console.log('redirect worked')
-                         }
-                         else {
-                            console.log('ummm... efforts to redirect port... failzor?')
-                            console.log(error)
-                            console.log(body)
-                         }
-                    })
+                // clear the decks and put back the original port forwarding stuff
+                forward_port_and_flush(puck_port_forward, remote_ip, puck_port_signal, puck_proto_signal)
 
                 // if starting simply take the current stuff
                 client_magic = {
@@ -474,11 +450,9 @@ function watch_logs(logfile, log_type) {
     
                 var v_duration = 0
     
-                // if stopping read the status for when we started
-    //          if (status_data != "" && status_data.vpn_status == "up") {
-    //              v_duration = moment_in_secs - status_data.start_s
-    //          }
-    
+                // clear the decks and put back the original port forwarding stuff
+                forward_port_and_flush(puck_port_forward, my_devs["tun0"], puck_port_signal, puck_proto_signal)
+
                 client_magic = {
                     vpn_status : "down",
                     start      : "n/a",
@@ -1576,6 +1550,28 @@ function forward_port(req, res, next) {
     res.send(204)
 
 }
+
+//
+// flush all IP tables rules and then add a given forwarding
+//
+// this is done differently because of sync/async... need to absolutely 
+// be sure flushing is done before adding other rules, or they'll simply
+// get tossed
+//
+function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
+
+    console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
+
+    // flush the past away and then add iptables rules
+    var cmd  = puck_bin + '/flush.sh'
+    var args = ["up", local_port, remote_ip, remote_port, proto]
+
+    puck_spawn(cmd, args)
+
+    createEvent(ip, {event_type: "flush forwarding", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
+
+}
+
 
 /**
  * Replaces a Puck completely

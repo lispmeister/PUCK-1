@@ -1,14 +1,15 @@
 {
     "PUCK" : {
-        "home"              : "/etc/puck",
-        "keystore"          : "/pucks",
-        "bin"               : "/exe",
-        "pub"               : "/public",
-        "tmp"               : "/tmp",
-        "logs"              : "/logs",
-        "puck_port"         : "8080",
-        "puck_port_signal"  : "12034",
-        "puck_port_forward" : "5555"
+        "home"               : "/etc/puck",
+        "keystore"           : "/pucks",
+        "bin"                : "/exe",
+        "pub"                : "/public",
+        "tmp"                : "/tmp",
+        "logs"               : "/logs",
+        "puck_port"          : "8080",
+        "puck_port_signal"   : "12034",
+        "puck_proto_signal"  : "tcp",
+        "puck_port_forward"  : "5555"
         },
     
     "crypto": {
