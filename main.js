@@ -1189,7 +1189,7 @@ function echoReply(req, res, next) {
     // looks like host: '192.168.0.250:12034',
     puck_server_ip = req.headers.host.split(':')[0]
 
-    // console.log('pingasaurus from ' + client_ip + ' hitting us at ' + puck_server_ip)
+    console.log('pingasaurus from ' + client_ip + ' hitting us at ' + puck_server_ip)
 
     if (typeof bwana_puck == "undefined") {
         console.log('no echo here...')
@@ -1558,13 +1558,15 @@ function forward_port(req, res, next) {
 // be sure flushing is done before adding other rules, or they'll simply
 // get tossed
 //
+// IN ADDITION. Forwards traffic for the IP that outsiders might be sending to us
+//
 function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 
     console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
     var cmd  = puck_bin + '/forward_port_n_flush.sh'
-    var args = ["up", local_port, remote_ip, remote_port, proto]
+    var args = ["up", puck_server_ip, local_port, remote_ip, remote_port, proto]
 
     puck_spawn(cmd, args)
 

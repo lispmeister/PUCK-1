@@ -730,6 +730,7 @@ function status_or_die() {
 
     // if nothing up now, kill any signs of a call, just to be sure
     if (puck_status.openvpn_client.vpn_status != "up" && puck_status.openvpn_server.vpn_status != "up") {
+        console.log("it's dead, jim")
         puck_current.incoming = false
         puck_current.outgoing = false
         puck_current.busy     = false
