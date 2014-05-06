@@ -1563,7 +1563,7 @@ function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
     console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
-    var cmd  = puck_bin + '/flush.sh'
+    var cmd  = puck_bin + '/forward_port_n_flush.sh'
     var args = ["up", local_port, remote_ip, remote_port, proto]
 
     puck_spawn(cmd, args)
