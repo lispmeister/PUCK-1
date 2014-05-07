@@ -1189,7 +1189,7 @@ function echoReply(req, res, next) {
     // looks like host: '192.168.0.250:12034',
     puck_server_ip = req.headers.host.split(':')[0]
 
-    console.log('pingasaurus from ' + client_ip + ' hitting us at ' + puck_server_ip)
+    // console.log('pingasaurus from ' + client_ip + ' hitting us at ' + puck_server_ip)
 
     if (typeof bwana_puck == "undefined") {
         console.log('no echo here...')
