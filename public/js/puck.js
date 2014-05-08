@@ -287,7 +287,7 @@ function state_vpn(state, browser_ip) {
                 puck_status.browser_events[browser_ip].notify_ring = true
             }
 
-            puck_status.browser_events[browser_ip].notify_file = true
+            // puck_status.browser_events[browser_ip].notify_file = true
             drag_and_puck(puck_status.openvpn_server.client)
 
         }
@@ -718,11 +718,11 @@ function status_or_die() {
             $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
             $('#puck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + puck_status.file_events.file_name + '">' + puck_status.file_events.file_name + '</a></td></tr>')
-            puck_status.browser_events[browser_ip].notify_file = true
+            // puck_status.browser_events[browser_ip].notify_file = true
             }
         else {
             console.log('file(z) from remote')
-            $.bootstrapGrowl("File transferred: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes)")
+            $.bootstrapGrowl("File transferred: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes)", {offset: {from: 'top', amount: 70}, delay: -1})
         }
     }
     // server... incoming ring
