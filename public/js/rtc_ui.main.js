@@ -56,6 +56,8 @@ function addNewMessage(args) {
     var userActivityDIV = document.createElement('div');
     userActivityDIV.className = 'user-activity';
 
+    userActivityDIV.style.color = userinfoDIV.style.color
+
     // userActivityDIV.innerHTML = '<span>' + args.header + '</span>';
 
     var p = document.createElement('p');

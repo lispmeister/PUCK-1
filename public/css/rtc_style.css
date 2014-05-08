@@ -64,7 +64,7 @@ body {
 
 .message {
     padding: .6em .8em;
-    color: red;
+/*    color: red; */
 }
 
 .message img, .message iframe {
