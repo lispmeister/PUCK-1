@@ -705,6 +705,9 @@ function status_or_die() {
         puck_status.browser_events[browser_ip].notify_add = true
     }
     // did santa come?
+
+    // XXX - odd corner case... if both systems have the same IP ... say... testing behind a nat...
+    // this won't work as expected, but the file should transfer anyway....
     else if (puck_status.file_events.file_name.length && ! puck_status.browser_events[browser_ip].notify_file) {
         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
         // if we're connected, the file is being shipped to the other machine, not local
