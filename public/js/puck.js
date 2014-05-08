@@ -306,11 +306,10 @@ function state_vpn(state, browser_ip) {
             console.log('\t[+] fire up the outbound signs')
 
             $('#puck_video').addClass('green').addClass('pulse')
-
-            $('button:contains("connecting")').text('Hang Up').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
+            $('button:contains("connecting"),button:contains("Call")').text('Hang Up').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
 
             // ... setup bye bye
-            $('button:contains("connecting")').click(false)
+            $('button:contains("connecting"),button:contains("Call")').click(false)
 
             $('body').on('click', '.hang_up', function() {
                 $(this).text('hanging up...')
@@ -889,11 +888,9 @@ function fire_puck_status(jstatus) {
 // draws the drag-n-drop box... need to call it anytime
 // vpn state changes
 function drag_and_puck(other_puck) { 
-    console.log('draggin n puckin')
+    console.log('draggin n puckin to ' + other_puck)
 
-    console.log('drawin the box')
-
-        // out with the old, in with the new
+    // out with the old, in with the new
     $('.dragDropBox').remove()
 
     $('#uppity').filer({

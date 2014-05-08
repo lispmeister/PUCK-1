@@ -1346,72 +1346,73 @@ function uploadSchtuff(req, res, next) {
         //
         // also... slight race condition.  Life goes on.
 
-            console.log('trying to rename....')
+        console.log('trying to rename....')
     
-            // XXX if on different FS, have to copy
-//          fs.readFile(tmpfile, function (err, data) {
-//              console.log('reading file...')
-                // XXX
-                // if exists... dont overwrite; reject, pick new filename, etc.
+        // XXX if on different FS, have to copy
+        // also check to see if exists!
+        fs.rename(tmpfile, target_path, function (err) {
+            if (err)  {
+                console.log('errz - ')
+                console.log(err)
+            }
+            else {
+                console.log('rename complete');
+                console.log('woohoo')
+
+                file_magic = {
+                    file_name : target_file,
+                    file_size : target_size,
+                    file_from : client_ip
+                }
+
                 //
-//              fs.writeFile(target_path, data, function (err) {
-                fs.rename(tmpfile, target_path, function (err) {
-                    if (err)  {
-                        console.log('errz - ')
-                        console.log(err)
-                    }
-                    else {
-                        console.log('renamed complete');
-                        console.log('woohoo')
+                // LOCAL or remote?
+                //
+                console.log('moment of truth.. local or no?  => ' + upload_target)
 
-                        file_magic = {
-                            file_name : target_file,
-                            file_size : target_size,
-                            file_from : client_ip
-                        }
+                //
+                // LOCAL - file still stashed here for now
+                //
+                if (upload_target == "local") {
+                    console.log('local')
+                    createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
+                    res.send(204, {"status" : target_file})
+                }
 
-                        //
-                        // LOCAL or remote?
-                        //
-                        console.log('moment of truth.. local or no?  => ' + upload_target)
+                //
+                // REMOTE
+                //
+                // post to a remote PUCK, if connected... first look up IP based on PID, then post to it
+                else {
+                    console.log("going to push it to the next in line: " + upload_target)
 
-                        //
-                        // LOCAL - file still stashed here for now
-                        //
-                        if (upload_target == "local") {
-                            console.log('local')
-                            createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
+                    restler.post("https://" + upload_target + ":8080/up/local", {
+                        multipart: true,
+                        data: { "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg") }
+                    }).on("complete", function(data) {
+
+                        if (data instanceof Error) {
+                            console.log('Error:', data.message);
+                            res.send(200, {"error" : data.message})
+                        } 
+                        else {
+                            console.log('upload to ' + upload_target + ' complete')
+                            createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[upload_target]})
+                            console.log(data);
+
+                            // get rid of evidence
+                            fs.unlink(target_path, function (err) {
+                                if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
+                                console.log('successfully deleted ' + target_path)
+                            });
+
+
                             res.send(204, {"status" : target_file})
                         }
-
-                        //
-                        // REMOTE
-                        //
-                        // post to a remote PUCK, if connected... first look up IP based on PID, then post to it
-                        else {
-                            console.log("going to push it to the next in line: " + upload_target)
-
-                            restler.post("https://" + upload_target + ":8080/up/local", {
-                                multipart: true,
-                                data: { "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg") }
-                            }).on("complete", function(data) {
-
-                                if (data instanceof Error) {
-                                    console.log('Error:', data.message);
-                                    res.send(200, {"error" : data.message})
-                                } 
-                                else {
-                                    console.log('upload to ' + upload_target + ' complete')
-                                    createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[upload_target]})
-                                    console.log(data);
-                                    res.send(204, {"status" : target_file})
-                                }
-                            })
-                        }
-                    }
-                })
-
-//      })
+                    })
+                }
+            }
+        })
     }
 
 }
@@ -1753,7 +1754,7 @@ function httpsPing(puckid, ipaddr, res, next) {
                 data += chunk
             })
             response.on('end', function() {
-                console.log('+++ someday has come for ' + ip + ' ... ping worked')
+                // console.log('+++ someday has come for ' + ip + ' ... ping worked')
                 // console.log(data)
                 data = JSON.parse(data)
 
