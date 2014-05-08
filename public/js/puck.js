@@ -706,10 +706,11 @@ function status_or_die() {
     }
     // did santa come?
     else if (puck_status.file_events.file_name.length && ! puck_status.browser_events[browser_ip].notify_file) {
+        console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
         // if we're connected, the file is being shipped to the other machine, not local
         // show inbound note if you sent file, else say when it succeeds
-        if (puck_status.file_events.file_from == browser_ip && puck_status.openvpn_client.vpn_status != "up" && puck_status.openvpn_server.vpn_status != "up") {
-            console.log('new file(z)!')
+        if ((puck_status.file_events.file_from == browser_ip && puck_status.openvpn_client.vpn_status != "up" && puck_status.openvpn_server.vpn_status != "up") || puck_status.file_events.file_from != browser_ip) {
+            console.log('new local file(z)!')
             // put in or lookup PiD, then owner/puck's name!
             $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
@@ -717,6 +718,7 @@ function status_or_die() {
             puck_status.browser_events[browser_ip].notify_file = true
             }
         else {
+            console.log('file(z) from remote')
             $.bootstrapGrowl("File transferred: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes)")
         }
     }

@@ -22,6 +22,3 @@ echo Device  :  $dev
 echo MTU     :  $mtu
 echo MTU2    :  $mtu2
 
-ping -c 5 $remote_ip | tee -a /tmp/xoxo
-
-
