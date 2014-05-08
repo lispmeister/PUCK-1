@@ -288,7 +288,7 @@ function state_vpn(state, browser_ip) {
             }
 
             puck_status.browser_events[browser_ip].notify_file = true
-            other_puck = puck_status.openvpn_server.client
+            drag_and_puck(puck_status.openvpn_server.client)
 
         }
         else {
@@ -319,7 +319,7 @@ function state_vpn(state, browser_ip) {
 
             puck_current.outgoing = true
 
-            other_puck = puck_status.openvpn_client.server
+            drag_and_puck(puck_status.openvpn_client.server)
 
             $('body').removeClass('avgrund-active');
             state_ring(false)
@@ -743,7 +743,7 @@ function status_or_die() {
             console.log('clearing all flags of any calls to false')
         }
 
-        other_puck = "local"
+        drag_and_puck("local")
 
     }
 
@@ -888,8 +888,7 @@ function fire_puck_status(jstatus) {
 
 // draws the drag-n-drop box... need to call it anytime
 // vpn state changes
-function drag_and_puck() {
-
+function drag_and_puck(other_puck) { 
     console.log('draggin n puckin')
 
     console.log('drawin the box')

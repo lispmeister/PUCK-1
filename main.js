@@ -81,7 +81,7 @@ var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","durati
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
     puck_events     = {"new_puck":""},
-    browser_magic   = {"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
+    browser_magic   = {client_ip :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
     old_puck_status = {},
     puck_status     = {};
 
@@ -100,11 +100,12 @@ var server           = "",
     puck_remote_vpn  = puck_public + '/openvpn_server.ip';
 
 // proxy up?
-var puck_proxy_up = false,
-    proxy_server  = "",
-    proxy         = ""
+var puck_proxy_up  = false,
+    proxy_server   = "",
+    proxy          = "";
 
-var all_client_ips = []
+var all_client_ips = [],
+    client_ip      = "";
 
 // keep an eye on the above
 pollStatus(puck_status_file)
@@ -543,7 +544,7 @@ function NotImplementedError() {
 // the browser's IP
 function get_client_ip(req) {
 
-    var client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+    client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
 
     if (typeof client_ip == "undefined") {
         console.log('no IP here...')
@@ -682,7 +683,7 @@ function postStatus (req, res, next) {
     console.log ("posting browser's status")
     console.log (req.body)
 
-    var client_ip      = get_client_ip(req)
+    client_ip = get_client_ip(req)
 
     console.log('posting from : ' + client_ip)
 
@@ -805,7 +806,7 @@ function createPuck(req, res, next) {
         return;
     }
 
-    var client_ip      = get_client_ip(req)
+    client_ip  = get_client_ip(req)
     all_client_ips = req.body.value.all_ips
 
     // if the IP we get the add from isn't in the ips the other puck
@@ -1249,7 +1250,7 @@ function knockKnock(req, res, next) {
    
     console.log("you've passed the first test...")
 
-    var client_ip = get_client_ip(req)
+    client_ip = get_client_ip(req)
 
     // You're not from around here, are ya, boy?
     if (typeof my_net[client_ip] == "undefined") {
@@ -1327,7 +1328,7 @@ function uploadSchtuff(req, res, next) {
 
     console.log(req.files)
 
-    var client_ip = get_client_ip(req)
+    client_ip = get_client_ip(req)
 
     console.log('from : ' + client_ip)
 

@@ -2,8 +2,6 @@
 // after all is said and done... let the JS fur fly
 //
 
-var other_puck = "local"
-
 // poll until we get something, then stop polling
 var vault_poll     = 1000
 var already_polled = false
@@ -66,7 +64,7 @@ $(document).ready(function () {
     //
     // setup user drag/click files to browser
     //
-    drag_and_puck()
+    drag_and_puck('local')
 
     // load up filenames already in vault
     load_vault()
