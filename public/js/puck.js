@@ -696,35 +696,42 @@ function status_or_die() {
     // if someone has added you, create a modest sized bit of text that tells you
     // and hopefully won't fuck up anything you're doing
 
-    console.log('a friend...?')
-
     if (puck_status.events.new_puck.length && ! puck_status.browser_events[browser_ip].notify_add) {
         var remote_ip = puck_status.events.new_puck
-        console.log(remote_ip + ' added!')
+        console.log(remote_ip + ' added as friend')
         // a bit down from the top, and stay until wiped away or refreshed
         $.bootstrapGrowl(remote_ip + " added your PUCK as a friend (refresh page to see details)", {offset: {from: 'top', amount: 70}, delay: -1})
 
         puck_status.browser_events[browser_ip].notify_add = true
     }
+    // did santa come?
+    else if (puck_status.file_events.file_name.length && ! puck_status.browser_events[browser_ip].notify_file) {
+        console.log('new file(z)!')
+        // put in or lookup PiD, then owner/puck's name!
+        $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
-    console.log('incoming...?')
-
+        puck_status.browser_events[browser_ip].notify_file = true
+    }
     // server... incoming ring
-    if (puck_status.openvpn_server.vpn_status == "up") {
+    else if (puck_status.openvpn_server.vpn_status == "up") {
+        console.log('incoming...!')
         puck_current.busy     = false
         puck_current.incoming = true
         state_vpn('incoming', browser_ip)
     }
 
-    console.log('outgoing...?')
-
     // client... outgoing ring
-    if (puck_status.openvpn_client.vpn_status == "up") {
+    else if (puck_status.openvpn_client.vpn_status == "up") {
+        console.log('outgoing...!')
         puck_current.busy     = false
         puck_current.outgoing = true
         state_vpn('outgoing', browser_ip)
         // cat facts!
         state_cam(true, 'local')
+    }
+
+    else {
+        console.log("\n\nI'm not sure why you called me here...?\n")
     }
 
     // if nothing up now, kill any signs of a call, just to be sure
@@ -744,16 +751,6 @@ function status_or_die() {
 
         drag_and_puck("local")
 
-    }
-
-    // did santa come?
-    console.log('new toyz...?')
-    if (puck_status.file_events.file_name.length && ! puck_status.browser_events[browser_ip].notify_file) {
-        console.log('new file(z)!')
-        // put in or lookup PiD, then owner/puck's name!
-        $.bootstrapGrowl("New file: <strong>" + puck_status.file_events.file_name + "</strong>  ("  + puck_status.file_events.file_size + " bytes); from " + puck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
-
-        puck_status.browser_events[browser_ip].notify_file = true
     }
 
     // fire_puck_status(puck_status)

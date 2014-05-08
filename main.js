@@ -81,7 +81,7 @@ var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","durati
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
     puck_events     = {"new_puck":""},
-    browser_magic   = {client_ip :{ "notify_add":false, "notify_ring":false, "notify_file":false}},
+    browser_magic   = {}
     old_puck_status = {},
     puck_status     = {};
 
@@ -232,10 +232,10 @@ function change_status() {
 
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
-    // wiping out manually once used
-    // xxx zero ring ring?
-    file_magic  = { "file_name" : "", "file_size" : "", "file_from" : ""},
-    puck_events = {"new_puck":""},
+    // clear some vars so dont re-status them
+    file_magic               = { "file_name" : "", "file_size" : "", "file_from" : ""}
+    puck_events              = {"new_puck":""}
+    browser_magic[client_ip] = { "notify_add":false, "notify_ring":false, "notify_file":false}
 
     console.log("status: " + puck_status)
 
@@ -680,7 +680,8 @@ function puckStatus(req, res, next) {
 //
 function postStatus (req, res, next) {
 
-    console.log ("posting browser's status")
+    console.log ("got browser's status posted")
+
     console.log (req.body)
 
     client_ip = get_client_ip(req)
