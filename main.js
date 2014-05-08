@@ -224,18 +224,14 @@ function change_status() {
 
     // in with the old, out with the new... er, reverse that
     puck_status                = {}
-    puck_status.events         = puck_events
     puck_status.openvpn_server = server_magic
     puck_status.openvpn_client = client_magic
+
+    puck_status.events         = puck_events
     puck_status.file_events    = file_magic
     puck_status.browser_events = browser_magic
 
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
-
-    // clear some vars so dont re-status them
-    file_magic               = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    puck_events              = {"new_puck":""}
-    browser_magic[client_ip] = { "notify_add":false, "notify_ring":false, "notify_file":false}
 
     console.log("status: " + puck_status)
 
@@ -249,6 +245,15 @@ function change_status() {
     });
 
     console.log('end status')
+
+    // reset/clear
+    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+    puck_events                = {"new_puck":""}
+    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+    puck_status.events         = puck_events
+    puck_status.file_events    = file_magic
+    puck_status.browser_events = browser_magic
+
 }
 
 //
