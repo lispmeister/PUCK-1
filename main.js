@@ -2158,38 +2158,38 @@ server.use(express.multipart());
 server.use(express.methodOverride());
 server.use(server.router);
 
-// if all else fails
-server.use(express.static(puck_public));
-
 //
 // routes
 //
 
+// if all else fails... serve up an index or public
+server.use(express.static(puck_public))
+
 // send me anything... I'll give you a chicken.  Or... status.
-server.get("/status", puckStatus);
+server.get("/status", puckStatus)
 
 //
 // send any actions done on client... like ringing a phone or whatever
 // this is to help keep state in case of moving off web page, browser
 // crashes, etc.
 //
-server.post("/status", postStatus);
+server.post("/status", postStatus)
 
 /// Now the real handlers. Here we just CRUD on Puck blobs
 
-server.post('/puck', createPuck);
-server.get('/puck', listPucks);
-server.head('/puck', listPucks);
+server.post('/puck', createPuck)
+server.get('/puck', listPucks)
+server.head('/puck', listPucks)
 
 // Ping action
-server.get('/ping', echoReply);
-server.get('/ping/:key', echoStatus);
+server.get('/ping', echoReply)
+server.get('/ping/:key', echoStatus)
 
 // cuz ajax doesn't like to https other sites...
 server.get('/sping/:key1/:key2', function (req, res, next) {
     // console.log('spinging')
     httpsPing(req.params.key1, req.params.key2, res, next)
-});
+})
 
 
 // get your ip addr(s)
@@ -2209,11 +2209,11 @@ server.del('/puck', deleteAll, function respond(req, res, next) {
 
 
 // Register a default '/' handler
-
 // xxx - update!
-server.get('/', function root(req, res, next) {
+
+server.get('/rest', function root(req, res, next) {
     var routes = [
-        'GET     /',
+        'GET     /rest',
         'POST    /puck',
         'GET     /puck',
         'DELETE  /puck',
