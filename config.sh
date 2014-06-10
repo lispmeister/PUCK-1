@@ -18,8 +18,10 @@ export KEY_LIFE=365
 
 export bits_o_128=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
 
-export vpn_life_puck=365
-export vpn_life_tmp=30
+export puck_vpn_life_puck=365
+export puck_vpn_life_tmp=30
+export puck_vpn_proto="udp"
+export puck_vpn_port="80"
 
 # file/dir locations
 export PUCK_HOME="/etc/puck"
@@ -54,9 +56,9 @@ export KEY_ORG="PuckasaurusRex"     # organization
 export KEY_OU="SillyLittleArms"     # org unit
 export KEY_EMAIL="puck@example.com" # org unit
 # COMMON_NAME="$bits_o_128.example.com"      # hmm....
-export COMMON_NAME="*"
+export COMMON_NAME='*'
 export KEY_NAME="PUCK"              # X509 Subject Field
-export KEY_CN="$COMMON_NAME"
+export KEY_CN='*'
 
 export days="-days $KEY_LIFE"       # 999 days from now
 
