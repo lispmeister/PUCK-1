@@ -13,5 +13,5 @@ sudo rm -rf /etc/puck/pucks/*
 sudo rm -rf /etc/puck/public/uploads/*
 
 sudo /etc/init.d/redis*  start
-sudo /etc/init.d/puck start
+# sudo /etc/init.d/puck start
 

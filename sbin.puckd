@@ -58,7 +58,7 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
     ln -s $keystore/$pid $puck_keystore
 
     # print out some summary data about the keys
-    for cert in $puck_keystore/{puck,ca}.crt $puck_keystore/vpn_client/vpn_client.crt ; do
+    for cert in $puck_keystore/{puck,ca}.crt $keystore/vpn_client/vpn_client.crt ; do
         $PUCK_BIN/dump_cert.sh $cert > $cert.info
     done
 

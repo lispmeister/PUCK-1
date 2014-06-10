@@ -18,7 +18,7 @@ if [ -f $keyfile -o -f $vpn_keyfile ] ; then
 fi
 
 echo creating DH parameters... 
-echo ... unfasten your seatbelt and take a walk, maybe a vacation, this\'ll take awhile....
+echo "... unfasten your seatbelt and take a walk, maybe a vacation, this'll take awhile...."
 
 mkdir /etc/puck/PUCK 2> /dev/null
 
