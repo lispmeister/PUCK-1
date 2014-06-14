@@ -86,7 +86,7 @@ rclient.get(puck_id, function (err, reply) {
             sys.exit({'error': 'no PUCK Found'})
         }
         else {
-            bwana_puck = reply
+            bwana_puck = JSON.parse(reply)
             console.log('puckaroo')
             console.log(bwana_puck)
         }
@@ -1936,6 +1936,9 @@ function formCreate(req, res, next) {
                         var cmd  = puck_bin + '/create_puck.sh'
                         var argz = [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
                         puck_spawn(cmd, argz)
+
+                        console.log(bwana_puck)
+                        console.log(typeof bwana_puck)
 
                         if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
                             console.log("posting our puck data to the puck we just added....")
