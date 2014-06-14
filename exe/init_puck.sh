@@ -99,16 +99,16 @@ remote_vpn=$(./setup_vpnclient.sh)
 
 # XXX - silly format that should be changed... leftover from... oh, bah, who cares, just fix it
 value='{ 
-        "name"        : \"'"$name"'\"\", 
-        "PUCK_ID"     : \"'"$puck_id"'\", 
-        "image"       : \"'"$image"'\", 
-        "ip_addr"     : \"'"$ip_addr"'\", 
-        "ip_addr_vpn" : \"'"$ip_addr_vpn"'\", 
-        \"'"$all_net"'\",
+        "name"        : "'"$name"'", 
+        "PUCK_ID"     : "'"$puck_id"'", 
+        "image"       : "'"$image"'", 
+        "ip_addr"     : "'"$ip_addr"'", 
+        "ip_addr_vpn" : "'"$ip_addr_vpn"'", 
+        '"$all_net"',
         "owner": 
             { 
-                "name"  : \"'"$name"'\",
-                "email" : \"'"$email"'\"
+                "name"  : "'"$name"'",
+                "email" : "'"$email"'"
             },
         '"$vpn"',
         '"$remote_vpn"' 
