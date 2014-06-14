@@ -68,7 +68,7 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
 
     # need to start this before we try a REST call to it....
 
-    ./exe/init_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+    ./exe/init_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms_PUCK puck@example.com
 
     NODE_PATH="$PUCK_HOME/" node main.js &
 
@@ -78,7 +78,7 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
     while test 2 = 1 ; do
         echo sleeping for 2 seconds
         sleep 2
-        echo ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+        echo ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms_PUCK puck@example.com
 
         # ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
 
