@@ -2018,7 +2018,7 @@ function serverRestart(req, res, next) {
 }
 
 //
-// setup signal socket server - from https://github.com/muaz-khan/WebRTC-Experiment
+// setup signal socket server - almost all from https://github.com/muaz-khan/WebRTC-Experiment
 //
 // In production/whatever, BLOCK THE PORT FROM THE WORLD
 // if it's even running - ONLY expose it to the VPN or local
@@ -2027,140 +2027,109 @@ function SSSUp () {
 
     console.log('Socket Signal Server!')
 
+var _static = require('node-static');
+var file = new _static.Server('./public');
+
     var CHANNELS = {};
 
     var WebSocketServer = require('websocket').server;
 
-    // something breaks w certs... this is only used over openvpn, but... blech.
-    var http = require('http')
+    var wss_pucky = https.createServer(credentials, function (request, response) {
+        request.addListener('end', function () {
+            file.serve(request, response);
+        }).resume();
+        console.log('[+] wss/https server listening at %s', puck_port_signal)
+    }).listen(puck_port_signal);
 
-//  var sig_pucky = https.createServer(credentials, function (request, response) {
-
-    var connect = require('connect');
-
-    sig_pucky = connect().use(connect.static(puck_public)).listen(puck_port_signal, function() {
-        console.log('[+] http connect server listening at %s', puck_port_signal)
-    })
-
-
-//  var sig_pucky = http.createServer(function (request, response) {
-//      request.addListener('end', function() {
-//          console.log('do nothing, file request')
-//          response.writeHead(200, {
-//              'Content-Type': 'text/plain'
-//          });
-//          response.end('puck http web server');
-//
-//      }).resume();
-//  }).listen(puck_port_signal, function() {
-//      console.log('[+] http server listening at %s', puck_port_signal)
-//  })
-
-    var sockit = new WebSocketServer({
-        httpServer: sig_pucky,
+    new WebSocketServer({
+        httpServer: wss_pucky,
         autoAcceptConnections: false
-    }).on('request', onRequest)
+    }).on('request', onRequest);
 
-    sockit.on('error', function(err) {
-        console.log('socket error (' + err.listenKey + '): ' + err.message);
+
+// from signaler.js in WebRTC-Experiment/MultiRTC
+function onRequest(socket) {
+    var origin = socket.origin + socket.resource;
+
+    var websocket = socket.accept(null, origin);
+
+    websocket.on('message', function (message) {
+        if (message.type === 'utf8') {
+            onMessage(JSON.parse(message.utf8Data), websocket);
+        }
     });
 
-    sockit.on('clientError', function(err) {
-        // ETIMEDOUT, EPIPE, ECONNRESET, "This socket is closed." are all very
-        // very common occurrences.
-        console.log('HTTP client error (' + err.listenKey + '): ' + err.message);
+    websocket.on('close', function () {
+        truncateChannels(websocket);
     });
+}
 
+function onMessage(message, websocket) {
+    if (message.checkPresence)
+        checkPresence(message, websocket);
+    else if (message.open)
+        onOpen(message, websocket);
+    else
+        sendMessage(message, websocket);
+}
 
+function onOpen(message, websocket) {
+    var channel = CHANNELS[message.channel];
 
-    function onRequest(socket) {
-        console.log('on request')
-        console.log(socket)
-        console.log(socket.orgin)
-        console.log(socket.resource)
+    if (channel)
+        CHANNELS[message.channel][channel.length] = websocket;
+    else
+        CHANNELS[message.channel] = [websocket];
+}
 
-        var origin = socket.origin + socket.resource;
-
-        var websocket = socket.accept(null, origin);
-
-        websocket.on('message', function (message) {
-            if (message.type === 'utf8') {
-                onMessage(JSON.parse(message.utf8Data), websocket);
-            }
-        });
-
-        websocket.on('close', function () {
-            truncateChannels(websocket);
-        });
+function sendMessage(message, websocket) {
+    message.data = JSON.stringify(message.data);
+    var channel = CHANNELS[message.channel];
+    if (!channel) {
+        console.error('no such channel exists');
+        return;
     }
 
-    function onMessage(message, websocket) {
-        console.log('on message: ' + JSON.stringify(message))
-        if (message.checkPresence)
-            checkPresence(message, websocket);
-        else if (message.open)
-            onOpen(message, websocket);
-        else
-            sendMessage(message, websocket);
-    }
-
-    function onOpen(message, websocket) {
-        console.log('on open: ' + JSON.stringify(message))
-        var channel = CHANNELS[message.channel];
-
-        if (channel)
-            CHANNELS[message.channel][channel.length] = websocket;
-        else
-            CHANNELS[message.channel] = [websocket];
-    }
-
-    function sendMessage(message, websocket) {
-        console.log('send message: ' + JSON.stringify(message))
-        message.data = JSON.stringify(message.data);
-        var channel = CHANNELS[message.channel];
-        if (!channel) {
-            console.error('no such channel exists');
-            return;
-        }
-
-        for (var i = 0; i < channel.length; i++) {
-            if (channel[i] && channel[i] != websocket) {
-                try {
-                    channel[i].sendUTF(message.data);
-                } catch (e) {}
-            }
+    for (var i = 0; i < channel.length; i++) {
+        if (channel[i] && channel[i] != websocket) {
+            try {
+                channel[i].sendUTF(message.data);
+            } catch (e) {}
         }
     }
+}
 
-    function checkPresence(message, websocket) {
-        console.log('check presc: ' + JSON.stringify(message))
-        websocket.sendUTF(JSON.stringify({
-            isChannelPresent: !! CHANNELS[message.channel]
-        }));
+function checkPresence(message, websocket) {
+    websocket.sendUTF(JSON.stringify({
+        isChannelPresent: !! CHANNELS[message.channel]
+    }));
+}
+
+function swapArray(arr) {
+    var swapped = [],
+        length = arr.length;
+    for (var i = 0; i < length; i++) {
+        if (arr[i])
+            swapped[swapped.length] = arr[i];
     }
+    return swapped;
+}
 
-    function swapArray(arr) {
-        var swapped = [],
-            length = arr.length;
-        for (var i = 0; i < length; i++) {
-            if (arr[i])
-                swapped[swapped.length] = arr[i];
+function truncateChannels(websocket) {
+    for (var channel in CHANNELS) {
+        var _channel = CHANNELS[channel];
+        for (var i = 0; i < _channel.length; i++) {
+            if (_channel[i] == websocket)
+                delete _channel[i];
         }
-        return swapped;
+        CHANNELS[channel] = swapArray(_channel);
+        if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
+            delete CHANNELS[channel];
     }
+}
 
-    function truncateChannels(websocket) {
-        for (var channel in CHANNELS) {
-            var _channel = CHANNELS[channel];
-            for (var i = 0; i < _channel.length; i++) {
-                if (_channel[i] == websocket)
-                    delete _channel[i];
-            }
-            CHANNELS[channel] = swapArray(_channel);
-            if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
-                delete CHANNELS[channel];
-        }
-    }
+
+
 
 }
 
