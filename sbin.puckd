@@ -68,16 +68,20 @@ if [ ! -d $puck_keystore -o ! -h $puck_keystore ] ; then
 
     # need to start this before we try a REST call to it....
 
-#   NODE_PATH="/etc/puck/" node main.js &
+    ./exe/init_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+
     NODE_PATH="$PUCK_HOME/" node main.js &
 
     # try try again.... until... cant try no more
     # have to do this because it takes awhile for
     # the server to start up
-    while test 1 = 1 ; do
+    while test 2 = 1 ; do
         echo sleeping for 2 seconds
         sleep 2
-        ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+        echo ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+
+        # ./exe/create_puck.sh $pid img/puck.png $ip "$($PUCK_HOME/exe/get_net.sh)" Ms.PUCK puck@example.com
+
         if [ $? == 0 ] ; then
             break
         fi

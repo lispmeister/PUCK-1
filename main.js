@@ -15,9 +15,12 @@ var Tail       = require('tail').Tail,
     response   = require('response-time'),
     rest       = require('rest'),
     restler    = require("restler"),
-    __         = require('underscore'),   // note; not one, two _'s, just for node
-    puck       = require('./modules')
-    uuid       = require('node-uuid');
+    sleep      = require('sleep'),
+    puck       = require('./modules'),
+    uuid       = require('node-uuid'),
+    Q          = require('q'),
+    __         = require('underscore');   // note; not one, two _'s, just for node
+
 
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
@@ -70,6 +73,31 @@ catch (e) {
     process.exit(2)
 }
 
+// suck up our own puck
+
+rclient.get(puck_id, function (err, reply) {
+    console.log('bwana!')
+    console.log(puck_id)
+
+    if (!err) {
+        console.log(reply)
+        if (reply == null) {
+            console.log('getour puck: unable to retrieve %s', puck_id)
+            sys.exit({'error': 'no PUCK Found'})
+        }
+        else {
+            bwana_puck = reply
+            console.log('puckaroo')
+            console.log(bwana_puck)
+        }
+    }
+    else {
+        console.log(err, 'getPuck: unable to retrieve %s', req.puck);
+        sys.exit({ "no": "puck"})
+    }
+})
+
+
 //
 // get the latest status... create the file if it doesn't exist...
 //
@@ -121,7 +149,7 @@ var cat_facts = []
 
 // json scrobbled from bits at from - https://user.xmission.com/~emailbox/trivia.htm
 console.log('hoovering up cat facts... look out, tabby!')
-    
+
 fs.readFile(puck_home + "/catfacts.json", function (err, data) {
     if (err) {
         console.log('cant live without cat facts! ' + err)
@@ -172,11 +200,26 @@ emitter   = new events.EventEmitter();
 
 wait_for_puck = null
 
-var uber_puck = function uber_puck() {
 
-    console.log("it's time...!")
+//
+// suck in our PUCK's data
+//
+// if it doesn't exist yet, spin and wait until it does... can't go anywhere without this
+//
+var deferred = Q.defer();
+
+var sleepy_time = 5
+
+var init = false
+
+// xxx null for now
+while (init) {
+
+    console.log('suckit, puck!')
 
     var url = 'https://localhost:' + puck_port + '/puck/' + puck_id
+
+    console.log('requesting puck from: ' + url)
 
     request(url, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -193,27 +236,18 @@ var uber_puck = function uber_puck() {
                 // console.log(body)
                 bwana_puck = JSON.parse(body)
                 createEvent('internal server', {event_type: "create", puck_id: bwana_puck.PUCK_ID})
-                clearInterval(wait_for_puck)
+                init = true
             }
         }
         else {
             // error
             console.log('Error: ', error);
-            console.log("well... try again?")
-            wait_for_puck = setInterval(emitter.emit, 2000, 'loaded')
         }
     })
 
+    sleep.sleep(sleepy_time)
+
 }
-
-// set the mousetrap
-emitter.on('loaded', uber_puck);
-
-// try it once
-if (isEmpty(bwana_puck)) {
-    emitter.emit('loaded')
-}
-
 
 //
 // send a message out that things are different
@@ -318,7 +352,7 @@ function watch_logs(logfile, log_type) {
         if (line == "" || line == null || typeof line == "undefined") return
 
         // console.log("got line from " + logfile + ":" + line)
-    
+
         // xxx - for client openvpn - config... which ones to choose?  Another method?
         var magic_client_up     = "Initialization Sequence Completed",
             magic_client_up     = "/sbin/route add",
@@ -390,7 +424,7 @@ function watch_logs(logfile, log_type) {
     //          if (status_data != "" && status_data.vpn_status == "up") {
     //              v_duration = moment_in_secs - status_data.start_s
     //          }
-    
+
                 server_magic = {
                     vpn_status : "down",
                     start      : "n/a",
@@ -443,19 +477,19 @@ function watch_logs(logfile, log_type) {
                     stop       : "n/a",
                     stop_s     : "n/a"
                     }
-    
+
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, puck_id: bwana_puck.PUCK_ID})
                 change_status() // make sure everyone hears the news
-    
+
             }
             // down
             else if (line.indexOf(magic_client_down) > -1) {
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn client Down!\n\n')
                 console.log(line)
                 console.log('\n\n')
-    
+
                 var v_duration = 0
-    
+
                 // clear the decks and put back the original port forwarding stuff
                 forward_port_and_flush(puck_port_forward, my_devs["tun0"], puck_port_signal, puck_proto_signal)
 
@@ -469,12 +503,12 @@ function watch_logs(logfile, log_type) {
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
                     }
-    
+
                 createEvent('internal server', {event_type: "vpn_client_disconnected", puck_id: bwana_puck.PUCK_ID})
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
-    
+
                 // write the IP addr to a file
                 fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
                     if (err) { console.log('err... no local vpn ip... looks bad.... gasp... choke...' + err) }
@@ -850,10 +884,6 @@ function createPuck(req, res, next) {
             next(err);
         } else {
             console.log({puck: req.body}, 'putPuck: done');
-            // if we still haven't loaded our PUCK data in, do so now
-            if (isEmpty(bwana_puck)) {
-                emitter.emit('loaded')
-            }
 
             //
             // if it's from a remote system, wake up local UI and tell user
@@ -1035,7 +1065,7 @@ function _old_listEvents(req, res, next) {
         var multi = rclient.multi()
         var keys  = Object.keys(lists)
         var i     = 0
- 
+
         console.log('all lists...')
         // console.log(lists)
         // console.log(keys)
@@ -1253,7 +1283,7 @@ function knockKnock(req, res, next) {
       console.log(bad_dog)
       res.send(403, { "bad": "dog"});
     }
-   
+
     console.log("you've passed the first test...")
 
     client_ip = get_client_ip(req)
@@ -1304,12 +1334,12 @@ function createMultipartBuffer(boundary, size) {
           + '\r\n'
         , tail = '\r\n--'+boundary+'--\r\n'
         , buffer = new Buffer(size);
-    
+
       buffer.write(head, 'ascii', 0);
       buffer.write(tail, 'ascii', buffer.length - tail.length);
       return buffer;
 }
-    
+
 // req.files contains all the goods, including:
 //
 //  size
@@ -1353,7 +1383,7 @@ function uploadSchtuff(req, res, next) {
         // also... slight race condition.  Life goes on.
 
         console.log('trying to rename....')
-    
+
         // XXX if on different FS, have to copy
         // also check to see if exists!
         fs.rename(tmpfile, target_path, function (err) {
@@ -1493,7 +1523,7 @@ function startVPN(req, res, next) {
     }
 
     var cmd   = puck_bin + '/start_vpn.sh'
-    
+
     // fire up vpn
     puck_spawn(cmd, args)
 
@@ -1734,7 +1764,7 @@ function httpsPing(puckid, ipaddr, res, next) {
     var all_ips   = ipaddr.split(','),
         done      = false,
         responses = 0;
-    
+
     var err = {}
 
 //  cache results, do that first
@@ -1835,23 +1865,23 @@ function formCreate(req, res, next) {
             else {
                 console.log('ping sez yes')
                 console.log(data)
-    
+
                 console.log('starting... writing...')
                 // make the puck's dir... should not exist!
-    
+
                 data = JSON.parse(data)
                 // now get remote information
                 url = 'https://' + ip_addr + ':' + puck_port + '/puck/' + data.pid
-    
+
                 var puck_dir = config.PUCK.keystore + '/' + data.pid
-    
+
                 mkdirp.sync(puck_dir, function () {
                     if(err) {
                         // xxx - user error, bail
                         console.log(err);
                     }
                 })
-    
+
                 // if ping is successful, rustle up and write appropriate data
                 var req = https.get(url, function(response) {
                     var data = ''
@@ -1859,7 +1889,7 @@ function formCreate(req, res, next) {
                         data += chunk
                     })
                     response.on('end', function() {
-        
+
                         data = JSON.parse(data)
                         console.log('remote puck info in...!')
 
@@ -1883,11 +1913,11 @@ function formCreate(req, res, next) {
                         }
 
                         // console.log(data);
-        
+
                         create_puck_key_store(data)
-        
+
                         var puck_fs_home = __dirname
-        
+
                         //
                         // execute a shell script with appropriate args to create a puck.
                         // ... of course... maybe should be done in node/js anyway...
@@ -1906,7 +1936,7 @@ function formCreate(req, res, next) {
                         var cmd  = puck_bin + '/create_puck.sh'
                         var argz = [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
                         puck_spawn(cmd, argz)
-            
+
                         if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
                             console.log("posting our puck data to the puck we just added....")
                             argz = [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr]
@@ -1934,7 +1964,7 @@ function formCreate(req, res, next) {
 
 
 }
-  
+
 //
 // server stuff... perhaps a bit odd... but so am I
 //
@@ -1995,7 +2025,7 @@ function SSSUp () {
     console.log('Socket Signal Server!')
 
     var CHANNELS = {};
-    
+
     var WebSocketServer = require('websocket').server;
 
     // something breaks w certs... this is only used over openvpn, but... blech.
@@ -2039,7 +2069,7 @@ function SSSUp () {
     });
 
 
-    
+
     function onRequest(socket) {
         console.log('on request')
         console.log(socket)
@@ -2047,20 +2077,20 @@ function SSSUp () {
         console.log(socket.resource)
 
         var origin = socket.origin + socket.resource;
-    
+
         var websocket = socket.accept(null, origin);
-    
+
         websocket.on('message', function (message) {
             if (message.type === 'utf8') {
                 onMessage(JSON.parse(message.utf8Data), websocket);
             }
         });
-    
+
         websocket.on('close', function () {
             truncateChannels(websocket);
         });
     }
-    
+
     function onMessage(message, websocket) {
         console.log('on message: ' + JSON.stringify(message))
         if (message.checkPresence)
@@ -2070,17 +2100,17 @@ function SSSUp () {
         else
             sendMessage(message, websocket);
     }
-    
+
     function onOpen(message, websocket) {
         console.log('on open: ' + JSON.stringify(message))
         var channel = CHANNELS[message.channel];
-    
+
         if (channel)
             CHANNELS[message.channel][channel.length] = websocket;
         else
             CHANNELS[message.channel] = [websocket];
     }
-    
+
     function sendMessage(message, websocket) {
         console.log('send message: ' + JSON.stringify(message))
         message.data = JSON.stringify(message.data);
@@ -2089,7 +2119,7 @@ function SSSUp () {
             console.error('no such channel exists');
             return;
         }
-    
+
         for (var i = 0; i < channel.length; i++) {
             if (channel[i] && channel[i] != websocket) {
                 try {
@@ -2098,14 +2128,14 @@ function SSSUp () {
             }
         }
     }
-    
+
     function checkPresence(message, websocket) {
         console.log('check presc: ' + JSON.stringify(message))
         websocket.sendUTF(JSON.stringify({
             isChannelPresent: !! CHANNELS[message.channel]
         }));
     }
-    
+
     function swapArray(arr) {
         var swapped = [],
             length = arr.length;
@@ -2115,7 +2145,7 @@ function SSSUp () {
         }
         return swapped;
     }
-    
+
     function truncateChannels(websocket) {
         for (var channel in CHANNELS) {
             var _channel = CHANNELS[channel];
@@ -2128,7 +2158,7 @@ function SSSUp () {
                 delete CHANNELS[channel];
         }
     }
-    
+
 }
 
 ///--- Server
@@ -2157,6 +2187,8 @@ server.use(express.multipart());
 
 server.use(express.methodOverride());
 server.use(server.router);
+
+
 
 //
 // routes
