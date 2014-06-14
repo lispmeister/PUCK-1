@@ -125,8 +125,8 @@ echo "using redis-cli to create PUCK..."
 # echo value: $value
 
 echo set $puck_id \'$(echo $value)\' > $tmp_reddit
-# echo set $puck_id \'$(echo $value | tr '\n' ' ')\' | redis-cli
-redis-cli --pipe < $tmp_reddit
+# redis-cli --pipe < $tmp_reddit
+cat $tmp_reddit | xargs  -L1 redis-cli 
 
 if [ $? != 0 ] ; then
     echo "failzor, unknown error, bailin' out"
