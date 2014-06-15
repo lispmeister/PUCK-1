@@ -80,7 +80,7 @@ rclient.get(puck_id, function (err, reply) {
     console.log(puck_id)
 
     if (!err) {
-        console.log(reply)
+        // console.log(reply)
         if (reply == null) {
             console.log('getour puck: unable to retrieve %s', puck_id)
             sys.exit({'error': 'no PUCK Found'})
@@ -88,7 +88,7 @@ rclient.get(puck_id, function (err, reply) {
         else {
             bwana_puck = JSON.parse(reply)
             console.log('puckaroo')
-            console.log(bwana_puck)
+            // console.log(bwana_puck)
         }
     }
     else {
