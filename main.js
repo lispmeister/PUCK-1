@@ -1,14 +1,18 @@
 
 var Tail       = require('tail').Tail,
+    bcrypt     = require('bcrypt'),
     cors       = require('cors'),
     crypto     = require('crypto'),
     express    = require('express'),
+    flash      = require('connect-flash'),
     fs         = require('fs'),
     formidable = require('formidable'),
     https      = require('https'),
     mkdirp     = require('mkdirp'),
     moment     = require('moment'),
     os         = require('os'),
+    passport   = require('passport'),
+    l_Strategy = require('passport-local').Strategy,
     path       = require('path'),
     tcpProxy   = require('tcp-proxy'),
     request    = require('request'),
@@ -22,6 +26,7 @@ var Tail       = require('tail').Tail,
     __         = require('underscore');   // note; not one, two _'s, just for node
 
 
+  
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
 console.log(config);
@@ -47,6 +52,9 @@ var puck_server_ip    = ""
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
 //
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
+// for auth/salting/hashing
+var N_ROUNDS = 12
 
 ///--- Redis
 var redis = require("redis"),
@@ -761,23 +769,6 @@ function formatPuck(req, res, body) {
     return (body);
 }
 
-
-
-///--- Handlers
-
-/**
- * Only checks for HTTP Basic Authenticaion
- *
- * Some handler before is expected to set the accepted user/pass combo
- * on req as:
- *
- * req.allow = { user: '', pass: '' };
- *
- * Or this will be skipped.
- */
-function authenticate(req, res, next) {
-    next();
-}
 
 //
 // write the crypto key stuff to the FS
@@ -2158,16 +2149,22 @@ server.use(express.urlencoded());
 server.use(express.multipart());
 
 server.use(express.methodOverride());
-server.use(server.router);
-
 
 
 //
 // routes
 //
 
-// if all else fails... serve up an index or public
-server.use(express.static(puck_public))
+// passport/auth stuff
+server.use(express.cookieParser());
+server.use(express.session({ secret: 'kittykittykittycat' }));
+server.use(flash());
+server.use(passport.initialize());
+server.use(passport.session());
+
+server.use(server.router);
+
+
 
 // send me anything... I'll give you a chicken.  Or... status.
 server.get("/status", puckStatus)
@@ -2178,8 +2175,6 @@ server.get("/status", puckStatus)
 // crashes, etc.
 //
 server.post("/status", postStatus)
-
-/// Now the real handlers. Here we just CRUD on Puck blobs
 
 server.post('/puck', createPuck)
 server.get('/puck', listPucks)
@@ -2277,6 +2272,142 @@ server.get('/down', downloadStuff)
 // get a url from wherever the puck is
 server.all('/url', webProxy)
 
+server.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/');
+});
+
+server.post('/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/loginFailure'
+  })
+);
+ 
+server.get('/loginFailure', function(req, res, next) {
+  res.send('Failed to authenticate');
+});
+
+ 
+// server.get('/loginSuccess', function(req, res, next) {
+//   res.send('Successfully authenticated');
+// })
+
+
+
+// if all else fails... serve up an index or public
+// server.use(function(req,res,next) {
+//     auth(req,res,next)
+// }
+server.use(auth)
+
+server.use(express.static(puck_public))
+
+
+
+//
+// auth/passport stuff
+//
+var users = [
+    { id: 0, name: 'd3ck', password: 'd3ck', email: 'z@example.com', hash: '' },
+    { id: 1, name: 'dd', password: 'dd', email: 'z@example.com', hash: '' }
+];
+
+console.log(users[0])
+
+for (var j = 0, len = users.length; j < len; j++) {
+    console.log('J is: ' + j)
+    console.log(JSON.stringify(users[j]))
+    console.log(users[j].hash)
+    bcrypt.hashSync(users[j].password, N_ROUNDS, function(err, hash) {
+        if (err) {
+            console.log('Error hashing password: ' + err)
+        }
+        else {
+            console.log('hash : ' + hash)
+            console.log('j j j : ' + j)
+            console.log(users[j].hash)
+            users[j].hash = hash
+            console.log('user - hash : ' + users[j].name + ' - '  + hash)
+        }
+    });
+}
+
+function findById(id, fn) {
+  var idx = id - 1;
+  if (users[idx]) {
+    fn(null, users[idx]);
+  } else {
+    fn(new Error('User ' + id + ' does not exist'));
+  }
+}
+
+function findByUsername(name, fn) {
+  for (var i = 0, len = users.length; i < len; i++) {
+    var user = users[i];
+    if (user.name === name) {
+      return fn(null, user);
+    }
+  }
+  return fn(null, null);
+}
+
+// authenticated or no?
+function auth(req, res, next) {
+
+    console.log('authentication check for... ' + req.path)
+
+    if (req.isAuthenticated()) { 
+        console.log('ur good')
+        return next(); 
+    }
+
+    // res.redirect('/login')
+    if (req.path != '/login.html') {
+        console.log('bad luck, off to dancing school')
+        res.redirect(302, '/login.html')
+    }
+    else {
+        console.log('public page?')
+        return next();
+    }
+}
+
+// Passport session setup.
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  findById(id, function (err, user) {
+    done(err, user);
+  });
+});
+
+
+// Use the LocalStrategy within Passport.
+passport.use(new l_Strategy(
+    function(name, password, done) {
+        var _hash = ""
+
+        bcrypt.hash(password, N_ROUNDS, function(err, _hash) { hash = _hash; console.log('user entered hash = ' + hash); })
+
+        // asynchronous verification, for effect...
+        process.nextTick(function () {
+            findByUsername(name, function(err, user) {
+                if (err) { return done(err); }
+                if (!user) { return done(null, false, { message: 'Unknown user ' + name }); }
+
+                if (user.password != password) { return done(null, false, { message: 'Invalid password' }); }
+
+                return done(null, user);
+            })
+        })
+    }
+
+))
+
+
 //
 //
 // and... finally... relax and listen
@@ -2287,6 +2418,8 @@ server.all('/url', webProxy)
 // promise her anything... buy her a chicken.  A json chicken, of course.
 //
 var pucky = https.createServer(credentials, server)
+
+
 
 // socket signal server
 SSSUp()
@@ -2320,6 +2453,12 @@ ios.on('connection', function (sock_puppet) {
         console.log(res)
     })
 })
+
+
+
+
+
+
 
 try {
     pucky.listen(puck_port, function() {

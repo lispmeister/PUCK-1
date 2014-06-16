@@ -55,6 +55,8 @@ $(document).ready(function () {
     $('#puck_panic').click(function     (e) { panic_button() })
     $('#restart_server').click(function (e) { restart_server() })
     $('#stop_server').click(function    (e) { stop_server() })
+    $('#logout').click(function         (e) { window.location.href='/logout'; })
+
 
     // log areas
     $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } })
