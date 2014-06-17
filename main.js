@@ -301,14 +301,14 @@ while (init) {
 //
 function findById(id, fn) {
     if (puck_owners[id]) {
-        console.log('found....')
-        console.log(puck_owners)
-        console.log(puck_owners[0])
+        // console.log('found....')
+        // console.log(puck_owners)
+        // console.log(puck_owners[0])
         fn(null, puck_owners[id]);
     } else {
-        console.log('User ' + id + ' does not exist');
-        console.log(puck_owners)
-        console.log(puck_owners[0])
+        // console.log('User ' + id + ' does not exist');
+        // console.log(puck_owners)
+        // console.log(puck_owners[0])
         return fn(null, null);
     }
 }
