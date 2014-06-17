@@ -393,8 +393,8 @@ passport.use(new l_Strategy(
 
         process.nextTick(function () {
             findByUsername(name, function(err, user) {
-                if (err) { return done(err); }
-                if (!user) { return done(null, false, { message: 'Unknown user ' + name }); }
+                if (err)   { console.log("erzz in pass: " + err);  return done(err); }
+                if (!user) { console.log("unknown user: " + name); return done(null, false, { message: 'Unknown user ' + name }); }
 
                 // if (_hash == puck_owners[0].hash) {
                 bcrypt.compare(password, puck_owners[0].hash, function(err, res) {
