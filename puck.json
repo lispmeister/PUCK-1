@@ -2,6 +2,7 @@
     "PUCK" : {
         "home"               : "/etc/puck",
         "keystore"           : "/pucks",
+        "secretz"            : "/secretz.json",
         "bin"                : "/exe",
         "pub"                : "/public",
         "tmp"                : "/tmp",

@@ -10,6 +10,7 @@ var Tail       = require('tail').Tail,
     https      = require('https'),
     mkdirp     = require('mkdirp'),
     moment     = require('moment'),
+    _static    = require('node-static'),
     os         = require('os'),
     passport   = require('passport'),
     l_Strategy = require('passport-local').Strategy,
@@ -39,11 +40,15 @@ var puck_keystore     = puck_home + config.PUCK.keystore
 var puck_bin          = puck_home + config.PUCK.bin
 var puck_logs         = puck_home + config.PUCK.logs
 var puck_public       = puck_home + config.PUCK.pub
+var puck_secretz      = puck_home + config.PUCK.secretz
 
 var puck_port         = config.PUCK.puck_port
 var puck_port_forward = config.PUCK.puck_port_forward
 var puck_port_signal  = config.PUCK.puck_port_signal
 var puck_proto_signal = config.PUCK.puck_proto_signal
+
+// user data, password, etc. Secret stuff.
+var secretz = {}
 
 // what the client is using to get to us
 var puck_server_ip    = ""
@@ -55,6 +60,24 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 // for auth/salting/hashing
 var N_ROUNDS = 12
+
+// owner user array
+var puck_owners = []
+
+//
+// URLs that anyone can contact
+//
+public_urls = ['puck',          // have think this over... can only get puck data if ID == server's id
+               'login',
+               'favicon.ico',
+               'login.html',
+               'loginFailure',
+               'quikstart.html',// no logins have been created yet, so... ;)
+               'quik',          // post
+               'js',            // hmm....
+               'css'            //
+]
+
 
 ///--- Redis
 var redis = require("redis"),
@@ -105,6 +128,22 @@ rclient.get(puck_id, function (err, reply) {
     }
 })
 
+//
+// THE VERY FIRST THING YOU SEE... might be the quick install.
+//
+// if we don't see d3ck owner data, push the user to the install page
+//
+if (fs.existsSync(puck_secretz)) {
+    console.log('\n\n\nSECRETZ!!!!\n\n\nfound secret file... does it check out?\n\n\n')
+    secretz = JSON.parse(fs.readFileSync(puck_secretz).toString())
+    console.log(JSON.stringify(secretz))
+    console.log('\n\n\n')
+
+    // should be a single user, but keep this code in case we support more in future
+    secretz.id = 0
+    puck_owners[0] = secretz
+
+}
 
 //
 // get the latest status... create the file if it doesn't exist...
@@ -256,6 +295,128 @@ while (init) {
     sleep.sleep(sleepy_time)
 
 }
+
+//
+// auth/passport stuff
+//
+function findById(id, fn) {
+    if (puck_owners[id]) {
+        console.log('found....')
+        console.log(puck_owners)
+        console.log(puck_owners[0])
+        fn(null, puck_owners[id]);
+    } else {
+        console.log('User ' + id + ' does not exist');
+        console.log(puck_owners)
+        console.log(puck_owners[0])
+        return fn(null, null);
+    }
+}
+
+function findByUsername(name, fn) {
+  for (var i = 0, len = puck_owners.length; i < len; i++) {
+    var user = puck_owners[i];
+    if (user.name === name) {
+      return fn(null, user);
+    }
+  }
+  return fn(null, null);
+}
+
+
+// authenticated or no?
+function auth(req, res, next) {
+
+    console.log('authentication check for... ' + req.path)
+
+    if (req.body.ip_addr == '127.0.0.1') {
+        console.log('pass... localhost')
+        return next();
+    }
+
+    var url_bits = req.path.split('/')
+
+    // console.log('first bit: ' + url_bits[1])
+
+    if (__.contains(public_urls, url_bits[1])) {
+        console.log('pass... public URL')
+        return next();
+    }
+
+    if (req.isAuthenticated()) { 
+        console.log('chex')
+        return next(); 
+    }
+
+    console.log('bad luck, off to dancing school')
+    res.redirect(302, '/login.html')
+
+}
+
+// Passport session setup.
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+    findById(id, function (err, user) {
+        done(err, user);
+    });
+});
+
+// return hash of password on N rounds
+function hashit(password, N_ROUNDS) {
+
+    console.log('hashing ' + password)
+
+    var hash = bcrypt.hashSync(password, N_ROUNDS, function(err, _hash) { 
+        if (err) {
+            console.log("hash error: " + err)
+            return("")
+        }
+        else {
+            console.log('hashing ' + password + ' => ' + _hash); 
+            return(_hash)
+        }
+    })
+
+    return(hash)
+}
+
+// Use the LocalStrategy within Passport.
+passport.use(new l_Strategy(
+
+    function(name, password, done) {
+        // var _hash = hashit(password, N_ROUNDS)
+
+        console.log('checking password ' + password + ' for user ' + name)
+
+        process.nextTick(function () {
+            findByUsername(name, function(err, user) {
+                if (err) { return done(err); }
+                if (!user) { return done(null, false, { message: 'Unknown user ' + name }); }
+
+                // if (_hash == puck_owners[0].hash) {
+                bcrypt.compare(password, puck_owners[0].hash, function(err, res) {
+                    if (err) {
+                        console.log('password failzor')
+                        return done(null, false)
+                    }
+                    else {
+                        console.log('password matches, successsssss....!')
+                        return done(null, user)
+                    }
+                });
+                // if (_hash == puck_owners[0].hash) {
+                //     return done(null, false, { message: 'Invalid password' });
+                // }
+            })
+        })
+    }
+
+))
+
+
 
 //
 // send a message out that things are different
@@ -623,7 +784,8 @@ function cat_power(msg) {
         console.log('catpower writez!  ' + JSON.stringify(msg))
     }
     catch (e) {
-        console.log('channel not up yet....? ' + e)
+        // need a browser...
+        // console.log('channel not up yet....? ' + e)
     }
 
 }
@@ -1827,6 +1989,94 @@ function httpsPing(puckid, ipaddr, res, next) {
 
 }
 
+//
+// first thing the user sees... what do they say?
+//
+function quikStart(req, res, next) {
+
+    var name     = "JaneDoe",
+        email    = "jane@example.com",
+        puck     = "PuckimusRex",
+        stance   = "reasonable",
+        password = ""                   // hey, if you don't want one, who am I to judge?
+
+    console.log('quicky!')
+
+    console.log(req.body)
+
+    if (typeof req.body.user_name == "undefined") {
+        console.log('user name is required')
+    }
+    else {
+        name = req.body.user_name
+    }
+
+    if (typeof req.body.email_address == "undefined") {
+        console.log('user name is required')
+    }
+    else {
+        email = req.body.email_address
+    }
+
+    if (typeof req.body.puck_name == "undefined") {
+        console.log('puck name is required')
+    }
+    else {
+        puck = req.body.puck_name
+    }
+
+    if (typeof req.body.puck_password == "undefined") {
+        console.log('password is required')
+    }
+    else {
+        password = req.body.puck_password
+    }
+
+    if (typeof req.body.radio_free_puck == "undefined") {
+        console.log('security stance is required')
+    }
+    else {
+        stance = req.body.radio_free_puck
+    }
+
+    // var form = new formidable.IncomingForm();
+    // form.parse(req, function(err, fields, files)
+    //     console.log(fields)
+    //     console.log(JSON.stringify(fields))
+    //     if (err) {
+    //         console.log('ererz parsin quickstartz!')
+    //         console.log(err)
+    //     }
+        // else {
+        //     req.body.puck_user_name
+        //     req.body.puck_email_address
+        //     req.body.puck_name
+        //     req.body.puck_image
+        //     req.body.puck_password
+
+    // });
+    secretz.id       = 0
+    secretz.name     = name
+    secretz.email    = email
+    secretz.puck     = puck
+    secretz.stance   = stance
+
+    secretz.hash = hashit(password, N_ROUNDS)
+
+    console.log(name, email, puck, stance, password, secretz.hash)
+
+    console.log('SZ: ' )
+    console.log(secretz.hash)
+
+    fs.writeFile(puck_secretz, JSON.stringify(secretz), function(err) {
+        if (err) { console.log('err... no secretz... looks bad.... gasp... choke...' + err) }
+        else { console.log('wrote status') }
+    });
+
+    res.redirect(302, '/')
+
+}
+
 function formCreate(req, res, next) {
 
     console.log("creating puck...")
@@ -2018,8 +2268,7 @@ function SSSUp () {
 
     console.log('Socket Signal Server!')
 
-var _static = require('node-static');
-var file = new _static.Server('./public');
+    var file = new _static.Server('./public');
 
     var CHANNELS = {};
 
@@ -2150,66 +2399,66 @@ server.use(express.multipart());
 
 server.use(express.methodOverride());
 
-
-//
-// routes
-//
-
 // passport/auth stuff
 server.use(express.cookieParser());
 server.use(express.session({ secret: 'kittykittykittycat' }));
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
-
 server.use(server.router);
 
+// passport auth
+server.use(auth)
+
+//
+// actual routes n stuff
+//
+
+// initial starting form
+server.post('/quik', quikStart)
+
+// Ping action
+server.get('/ping', echoReply)
 
 
 // send me anything... I'll give you a chicken.  Or... status.
-server.get("/status", puckStatus)
+server.get("/status", auth, puckStatus)
 
 //
 // send any actions done on client... like ringing a phone or whatever
 // this is to help keep state in case of moving off web page, browser
 // crashes, etc.
 //
-server.post("/status", postStatus)
+server.post("/status", auth, postStatus)
 
-server.post('/puck', createPuck)
-server.get('/puck', listPucks)
-server.head('/puck', listPucks)
+server.post('/puck', auth, createPuck)
+server.get('/puck', auth, listPucks)
 
-// Ping action
-server.get('/ping', echoReply)
-server.get('/ping/:key', echoStatus)
+// Ping another
+server.get('/ping/:key', auth, echoStatus)
 
 // cuz ajax doesn't like to https other sites...
-server.get('/sping/:key1/:key2', function (req, res, next) {
+server.get('/sping/:key1/:key2', auth, function (req, res, next) {
     // console.log('spinging')
     httpsPing(req.params.key1, req.params.key2, res, next)
 })
 
-
 // get your ip addr(s)
-server.get('/getip', getIP);
+server.get('/getip', auth, getIP);
 
 // Return a Puck by key
-server.get('/puck/:key', getPuck);
-server.head('/puck/:key', getPuck);
+server.get('/puck/:key', auth, getPuck);
 
 // Delete a Puck by key
-server.del('/puck/:key', deletePuck);
+server.del('/puck/:key', auth, deletePuck);
 
 // Destroy everything
-server.del('/puck', deleteAll, function respond(req, res, next) {
+server.del('/puck', auth, deleteAll, function respond(req, res, next) {
     res.send(204);
 });
 
 
-// Register a default '/' handler
-// xxx - update!
-
+// XXX - update!
 server.get('/rest', function root(req, res, next) {
     var routes = [
         'GET     /rest',
@@ -2228,49 +2477,48 @@ server.get('/rest', function root(req, res, next) {
     res.send(200, routes);
 });
 
-server.post('/form', handleForm);
+server.post('/form', auth, handleForm);
 
 // knock knock?
-server.post('/vpn/knock', knockKnock);
+server.post('/vpn/knock', auth, knockKnock);
 
-server.post('/vpn/start', startVPN);
+server.post('/vpn/start', auth, startVPN);
 
 // stop
-server.get('/vpn/stop', stopVPN);
+server.get('/vpn/stop', auth, stopVPN);
 
 //
 // server stuff... start, stop, restart, etc.
 //
-server.get('/server',         serverStatus);   // status
-server.get('/server/stop',    serverDie);      // die, die, die!
-server.get('/server/restart', serverRestart);  // die and restart
-
+server.get('/server',         auth, serverStatus);   // status
+server.get('/server/stop',    auth, serverDie);      // die, die, die!
+server.get('/server/restart', auth, serverRestart);  // die and restart
 
 // setup a tcp proxy
-server.get('/setproxy', setTCPProxy)
+server.get('/setproxy', auth, setTCPProxy)
 
 // forward a port
-server.get('/forward', forward_port)
+server.get('/forward', auth, forward_port)
 
 //
 // events... what's going on?  Maybe should be /marvin?
 //
 // list event types
-server.get('/events',           listEvents);
+server.get('/events',           auth, listEvents);
 // get elements of a particular kind of event (create, delete, etc.); 
-server.get('/events/:key',      getEvent);
+server.get('/events/:key',      auth, getEvent);
 
 //
 // PUCK filestore - send up and getting down
 //
 // send stuff up the pipe....
-server.post('/up/:key', uploadSchtuff)
+server.post('/up/:key', auth, uploadSchtuff)
 // get down with what's up
-server.get('/down', downloadStuff)
+server.get('/down', auth, downloadStuff)
 
 
 // get a url from wherever the puck is
-server.all('/url', webProxy)
+server.all('/url', auth, webProxy)
 
 server.get('/logout', function(req, res) {
     req.logout();
@@ -2288,155 +2536,17 @@ server.get('/loginFailure', function(req, res, next) {
   res.send('Failed to authenticate');
 });
 
- 
-// server.get('/loginSuccess', function(req, res, next) {
-//   res.send('Successfully authenticated');
-// })
-
-
-
 // if all else fails... serve up an index or public
-// server.use(function(req,res,next) {
-//     auth(req,res,next)
-// }
-server.use(auth)
-
 server.use(express.static(puck_public))
 
-
-
 //
-// auth/passport stuff
-//
-var users = [
-    { id: 0, name: 'd3ck', password: 'd3ck', email: 'z@example.com', hash: '' },
-    { id: 1, name: 'dd', password: 'dd', email: 'z@example.com', hash: '' }
-];
-
-console.log(users[0])
-
-for (var j = 0, len = users.length; j < len; j++) {
-    console.log('J is: ' + j)
-    console.log(JSON.stringify(users[j]))
-    console.log(users[j].hash)
-    bcrypt.hashSync(users[j].password, N_ROUNDS, function(err, hash) {
-        if (err) {
-            console.log('Error hashing password: ' + err)
-        }
-        else {
-            console.log('hash : ' + hash)
-            console.log('j j j : ' + j)
-            console.log(users[j].hash)
-            users[j].hash = hash
-            console.log('user - hash : ' + users[j].name + ' - '  + hash)
-        }
-    });
-}
-
-function findById(id, fn) {
-  var idx = id - 1;
-  if (users[idx]) {
-    fn(null, users[idx]);
-  } else {
-    fn(new Error('User ' + id + ' does not exist'));
-  }
-}
-
-function findByUsername(name, fn) {
-  for (var i = 0, len = users.length; i < len; i++) {
-    var user = users[i];
-    if (user.name === name) {
-      return fn(null, user);
-    }
-  }
-  return fn(null, null);
-}
-
-
-public_urls = ['/puck']
-
-// authenticated or no?
-function auth(req, res, next) {
-
-    console.log('authentication check for... ' + req.path)
-
-
-    if (req.body.ip_addr == '127.0.0.1') {
-        console.log('Freebie - from localhost')
-    }
-
-    var url_bits = req.path.split('/')
-
-    console.log('first bit: ' + url_bits[0])
-
-    if (__.contains(public_urls, url_bits[0])) {
-        console.log('Freebie - public URL')
-        return next();
-    }
-
-    if (req.isAuthenticated()) { 
-        console.log('ur good')
-        return next(); 
-    }
-
-    // res.redirect('/login')
-    if (req.path != '/login.html') {
-        console.log('bad luck, off to dancing school')
-        res.redirect(302, '/login.html')
-    }
-    else {
-        console.log('public page?')
-        return next();
-    }
-}
-
-// Passport session setup.
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
-
-passport.deserializeUser(function(id, done) {
-  findById(id, function (err, user) {
-    done(err, user);
-  });
-});
-
-
-// Use the LocalStrategy within Passport.
-passport.use(new l_Strategy(
-    function(name, password, done) {
-        var _hash = ""
-
-        bcrypt.hash(password, N_ROUNDS, function(err, _hash) { hash = _hash; console.log('user entered hash = ' + hash); })
-
-        // asynchronous verification, for effect...
-        process.nextTick(function () {
-            findByUsername(name, function(err, user) {
-                if (err) { return done(err); }
-                if (!user) { return done(null, false, { message: 'Unknown user ' + name }); }
-
-                if (user.password != password) { return done(null, false, { message: 'Invalid password' }); }
-
-                return done(null, user);
-            })
-        })
-    }
-
-))
-
-
-//
-//
-// and... finally... relax and listen
-//
+// after all that, start firing up the engines
 //
 
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
 //
 var pucky = https.createServer(credentials, server)
-
-
 
 // socket signal server
 SSSUp()
@@ -2447,7 +2557,7 @@ var ios = sockjs.createServer()
 ios.installHandlers(pucky, {prefix: '/pux'})
 
 //
-// sockets time
+// socket time
 //
 var puck_users      = {},
     cat_sock        = {},
@@ -2473,9 +2583,14 @@ ios.on('connection', function (sock_puppet) {
 })
 
 
+//
+//
+// and... finally... relax and listen....
+//
+//
 
-
-
+//
+// promise her anything... buy her a chicken.  A json chicken, of course.
 try {
     pucky.listen(puck_port, function() {
         console.log('[+] server listening at %s', puck_port)
@@ -2483,6 +2598,5 @@ try {
 }
 catch (e) {
     console.log('The PUCK server died when trying to start: ' + e)
-
 }
 

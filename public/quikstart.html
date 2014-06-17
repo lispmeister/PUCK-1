@@ -16,7 +16,7 @@
 
 
 <meta charset="utf-8">
-<title>PUCKasaurus Rex!</title>
+<title>d3ck Quickstart</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="rawr!">
 
@@ -62,102 +62,60 @@
 
     <div class="container">
 
-        <div class="container-fluid">
-
-            <!-- for incoming/outgoing calls -->
-
-            <a href="#" id="incoming" class="button left"></a>
-            <a href="#" id="outgoing" class="button left"></a>
-
-            <form id="modalPuck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalPuckLabel" aria-hidden="true" action='/form' method="POST">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                            <h3 id="modalPuckLabel">Add PUCK</h3>
-                        </div>
-                        <div class="modal-body">
-                            <fieldset>
-                            <div class="control-group">
-                                <label class="control-label" for="ip_addr">IP Address</label>
-                                <div class="controls">
-                                    <input type="text" id="ip_addr" name="ip_addr" placeholder="" maxlength="21" class="input-xlarge">
-                                    <p class="help-block"></p>
-                                </div>
-                            </div>
-                            <span> 
-                                <input style="display:none" id="puck_action" name="puck_action" value="CREATE" />
-                            </span>
-
-                            <div class="control-group">
-                                <div class="controls">
-                                <!-- this does some javascript fu below to post the data and redirect back to this page -->
-                                <button id="puck_button_create" class="btn btn-primary">Create</button>
-                                </div>
-                            </div>
-
-                            </fieldset>
-                        </div>
-
-                    </div>
-                </div>
-            </form>
-
-        </div> <!-- end of form/top stuff -->
-
         <div class="container-fluid tab-content">
 
             <div class="tab-pane fade in active" id="home">
     
                 <div class="row-fluid marketing" id="login_formz">
                     <div>
-                        <h1>Welcome to your PUCK!</h1>
-                        You may OPTIONALLY answer any of a few questions.
-                        <span style="color:red">NONE are required!</span>
-                        <br /><span style="color:#c3c3c3" title="They simply are what will appear to others when communicating with your PUCK. Depending on your security settings they may be visible to others that aren't friends">(Then why am I asking?)</span>
+                        <h1>Welcome to your d3ck!</h1>
+
+                        The <span style="color:red">first two questions are required</span> but only visible to you.<br />
+                        You may OPTIONALLY answer any of the rest; they may give hints to others about your identity
 
                     </div>
 
             <div class="btn-toolbar"> <span class="spacer50"></span></div>
 
                     <div class="row">
-                        <form id="initial_questions" role="form" action='/form' method="POST">
+                        <form id="initial_questions" role="form" action='/quik' method="POST">
 
                         <div class="form-group col-md-10">
-                        <label class="wizlable col-md-2" for="input_owner">Your name</label>
-                        <input type="text" id="user_name" name="user_name" placeholder="jane doe" maxlength="512" class="input-xlarge col-md-3">
+                        <label class="wizlable col-md-2" for="input_owner">User name</label>
+                        <input style="outline: 1px solid red;" type="text" id="user_name" name="user_name" value="" placeholder="jane doe" maxlength="512" class="input-xlarge col-md-3">
                         </div>
 
                     </div>
+
+                    <div class="row">
+                        <div class="form-group col-md-10">
+                        <label class="wizlable col-md-2" for="input_password">Password</label>
+                        <input style="outline: 1px solid red;" type="password" id="puck_password" name="puck_password" value="" placeholder="open sez me" maxlength="512" class="input-xlarge col-md-3">
+                        </div>
+
+                    </div>
+
                     <div class="row">
 
                         <div class="form-group col-md-10">
                         <label class="wizlable col-md-2" for="input_email">Email address</label>
-                        <input type="email" id="email_address" name="email_address" placeholder="zen@example.com" maxlength="512" class="input-xlarge col-md-3">
+                        <input type="email" id="email_address" name="email_address" value="" placeholder="zen@example.com" maxlength="512" class="input-xlarge col-md-3">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="form-group col-md-10">
-                        <label class="wizlable col-md-2" for="input_name">PUCK name</label>
-                        <input type="text" id="puck_name" name="puck_name" placeholder="Puckimus Maximus" maxlength="512" class="input-xlarge col-md-3">
+                        <label class="wizlable col-md-2" for="input_name">Your d3ck's name</label>
+                        <input type="text" id="puck_name" name="puck_name" value="" placeholder="Puckimus Maximus" maxlength="512" class="input-xlarge col-md-3">
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="form-group col-md-10">
-                        <label class="wizlable col-md-2" for="input_image">PUCK's image</label>
-                        <input class="col-md-4" type="file" id="puck_image" name="puck_image">
+                        <label class="wizlable col-md-2" for="input_image">Custom image</label>
+                        <input class="col-md-4" type="file" id="puck_image" value="" name="puck_image">
 <!--                    <input type="text" id="puck_image" name="puck_image" placeholder="..." maxlength="512" class="input-xlarge col-md-3"> -->
                         </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="form-group col-md-10">
-                        <label class="wizlable col-md-2" for="input_password">PUCK password</label>
-                        <input type="password" id="puck_password" name="puck_password" placeholder="open sez me" maxlength="512" class="input-xlarge col-md-3">
-                        </div>
-
                     </div>
 
                     <div class="row">
@@ -238,20 +196,6 @@
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
 <script type="text/javascript" src="/js/underscore-min.js"></script>
-
-<script type="text/javascript" src='/js/spin.js'></script>
-<script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
-
-<!-- put a sock in it -->
-<!-- <script type="text/javascript" src="/socket.io/socket.io.js"></script> -->
-<script type="text/javascript" src="/js/sockjs.min.js"></script>
-<script type="text/javascript" src="/js/sockjs_reconnect.min.js"></script>
-
-<!-- the amazing rtc stuff -->
-<!-- <script type="text/javascript" src="/js/PeerConnection.js"> -->
-
-<script type="text/javascript" src="/js/puck.js"></script>
-<script type="text/javascript" src="/js/main_puck.js"></script>
 
 </body>
 
