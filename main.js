@@ -2352,10 +2352,27 @@ function findByUsername(name, fn) {
   return fn(null, null);
 }
 
+
+public_urls = ['/puck']
+
 // authenticated or no?
 function auth(req, res, next) {
 
     console.log('authentication check for... ' + req.path)
+
+
+    if (req.body.ip_addr == '127.0.0.1') {
+        console.log('Freebie - from localhost')
+    }
+
+    var url_bits = req.path.split('/')
+
+    console.log('first bit: ' + url_bits[0])
+
+    if (__.contains(public_urls, url_bits[0])) {
+        console.log('Freebie - public URL')
+        return next();
+    }
 
     if (req.isAuthenticated()) { 
         console.log('ur good')
@@ -2437,6 +2454,7 @@ var puck_users      = {},
     all_cats        = []
 
 ios.on('connection', function (sock_puppet) {
+
     console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
 
     cat_sock = sock_puppet
@@ -2453,8 +2471,6 @@ ios.on('connection', function (sock_puppet) {
         console.log(res)
     })
 })
-
-
 
 
 
