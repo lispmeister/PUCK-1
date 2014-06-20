@@ -1114,9 +1114,24 @@ function createPuck(req, res, next) {
 
 }
 
+
+// a few useful snippets
+
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
+
+/*
+ * base64.js: An extremely simple implementation of base64 encoding / decoding using node.js Buffers (C) 2010, Nodejitsu Inc.
+ */
+var base64 = exports;
+base64.encode = function (unencoded) {
+  return new Buffer(unencoded || '').toString('base64')
+}
+base64.decode = function (encoded) {
+  return new Buffer(encoded || '', 'base64').toString('utf8')
+}
+
 
 /**
  * Deletes a Puck by key
@@ -1851,7 +1866,10 @@ function back_to_home (res) {
     res.redirect(302, home)
 }
 
-// this... unfortunately... is mine
+//
+// create and delete form handlers
+//
+
 function handleForm(req, res, next) {
 
     console.log('handle form called with')
@@ -2124,6 +2142,8 @@ function quikStart(req, res, next) {
 
             fs.readFile(req.files.puck_image.path, function (err, data) {
 
+                var image_b64 = base64.encode(data)
+
                 if (err) {
                     console.log("Couldn't read " + req.files.puck_image.path)
                     return
@@ -2139,8 +2159,12 @@ function quikStart(req, res, next) {
                     try {
                         fs.writeFileSync(full_puck_image, data, 'utf8')
                         console.log('updating puck json')
-                        bwana_puck.image = puck_image
+
+                        bwana_puck.image     = puck_image
+                        bwana_puck.image_b64 = image_b64
+
                         console.log(JSON.stringify(bwana_puck))
+
                         rclient.set(puck_id, JSON.stringify(bwana_puck), function(err) {
                             if (err) {
                                 console.log(err, 'd3ck: unable to update Redis db');
@@ -2190,6 +2214,10 @@ function quikStart(req, res, next) {
 
 }
 
+//
+// take the data pushed to us from the command line and create something... beautiful!
+// a virtual butterfly, no less
+//
 function formCreate(req, res, next) {
 
     console.log("creating puck...")
@@ -2290,6 +2318,13 @@ function formCreate(req, res, next) {
                         var cmd  = puck_bin + '/create_puck.sh'
                         var argz = [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
                         puck_spawn(cmd, argz)
+
+                        // now write the image data for the d3ck in question
+                        var image_data = base64.decode(data.image_b64)
+                        fs.writeFile(data.image, image_data, function(err) {
+                            if (err) { console.log('err... couldnt write image data:' + JSON.stringify(err)) }
+                            else     { console.log('wrote image data to ' + data.image) }
+                        })
 
                         console.log(bwana_puck)
                         console.log(typeof bwana_puck)

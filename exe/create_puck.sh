@@ -96,6 +96,8 @@ ip_addr_vpn=`echo $ip_addr | sed 's/:.*$//'`
 
 remote_vpn=$(./setup_vpnclient.sh)
 
+image_b64=$(base64 < $PUCK_HOME/public/img/$puck_id)
+
 # XXX - silly format that should be changed... leftover from... oh, bah, who cares, just fix it
 (
 cat <<E_O_C
@@ -105,6 +107,7 @@ cat <<E_O_C
             "name"        : "$name",
             "PUCK_ID"     : "$puck_id",
             "image"       : "$image",
+            "image_b64"   : "$image_b64",
             "ip_addr"     : "$ip_addr",
             "ip_addr_vpn" : "$ip_addr_vpn",
             $all_net,
