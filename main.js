@@ -378,7 +378,7 @@ function auth(req, res, next) {
             console.log('almost let you go to login.html, but nothing to login to')
         }
         else {
-            console.log('pass... public URL')
+            console.log('public: ' + req.path)
             return next();
         }
     }
@@ -808,6 +808,8 @@ function NotImplementedError() {
 function get_client_ip(req) {
 
     client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+
+    console.log("C-ip: " + client_ip)
 
     if (typeof client_ip == "undefined") {
         console.log('no IP here...')
@@ -1501,15 +1503,25 @@ function knockKnock(req, res, next) {
     //console.log(req.params)
 
     // bail if we don't get ID
-    if (typeof req.params.puckid === 'undefined' || req.params.puckid == "") {
+    console.log(typeof req.params.puckid)
+    if (typeof req.params.puckid == "undefined") {
       var bad_dog = "No ID, no love";
       console.log(bad_dog)
       res.send(403, { "bad": "dog"});
+      return
+    }
+    else {
+        console.log("you've passed the first test...", req.params.puckid)
     }
 
-    console.log("you've passed the first test...")
+    console.log('moving on...')
 
     client_ip = get_client_ip(req)
+
+    console.log("x-for  : " + req.headers['x-forwarded-for'])
+    console.log("conn-RA: " + req.connection.remoteAddress)
+    console.log("sock-RA: " + req.socket.remoteAddress)
+    console.log("conn-sock-RA: " + req.connection.socket.remoteAddress)
 
     // You're not from around here, are ya, boy?
     if (typeof my_net[client_ip] == "undefined") {
@@ -2188,6 +2200,7 @@ function quikStart(req, res, next) {
 
     console.log("PUCK image... " + puck_image)
 
+    secretz          = {}
     secretz.id       = 0
     secretz.name     = name
     secretz.email    = email
@@ -2199,7 +2212,7 @@ function quikStart(req, res, next) {
 
     console.log(name, email, puck, stance, password, secretz.hash, puck_image)
 
-    console.log('SZ: ' )
+    console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
     fs.writeFile(puck_secretz, JSON.stringify(secretz), function(err) {
@@ -2646,10 +2659,8 @@ function fire_up_server_routes() {
     // get your ip addr(s)
     server.get('/getip', auth, getIP);
 
-
-
-    // knock knock?
-    server.post('/vpn/knock', auth, knockKnock);
+    // knock knock proto to request access to a system that doesn't trust you
+    server.post('/knock', auth, knockKnock);
 
     server.post('/vpn/start', auth, startVPN);
 
