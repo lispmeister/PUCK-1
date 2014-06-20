@@ -497,10 +497,7 @@ function change_status() {
     cat_power(msg)
 
     // xxx - errs to user!
-    fs.writeFile(puck_status_file, JSON.stringify(puck_status), function(err) {
-        if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
-        else { console.log('wrote status') }
-    });
+    _writeObj2File(puck_status_file, puck_status)
 
     console.log('end status')
 
@@ -544,10 +541,7 @@ for (var dev in ifaces) {
 cat_fact_server = my_devs["tun0"]
 
 // write the IP addr to a file
-fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
-    if (err) { console.log('err... no local vpn ip... looks bad.... gasp... choke...' + err) }
-    else     { console.log('wrote local vpn server IP') }
-})
+_write2File(puck_remote_vpn, cat_fact_server)
 
 // console.log(my_ips)
 
@@ -561,7 +555,7 @@ function watch_logs(logfile, log_type) {
     // create if doesn't exist...?
     if (!fs.existsSync(logfile)) {
         console.log('creating ' + logfile)
-        fs.writeFileSync(logfile, "")
+        _write2File(logfile, "")
     }
     else {
         console.log('watching ' + logfile)
@@ -734,10 +728,7 @@ function watch_logs(logfile, log_type) {
                 cat_fact_server = my_devs["tun0"]
 
                 // write the IP addr to a file
-                fs.writeFile(puck_remote_vpn, cat_fact_server, function(err) {
-                    if (err) { console.log('err... no local vpn ip... looks bad.... gasp... choke...' + err) }
-                    else     { console.log('wrote local vpn server IP') }
-                });
+                _write2File(puck_remote_vpn, cat_fact_server)
 
                 change_status() // make sure everyone hears the news
 
@@ -885,7 +876,7 @@ function pollStatus(file) {
     if (puck_status == {}) {
         if (!fs.existsSync(puck_status_file)) {
             console.log('creating ' + puck_status_file)
-            fs.writeFileSync(puck_status_file, JSON.stringify(puck_status))
+            _writeObj2File(puck_status_file, puck_status)
         }
     }
     fs.readFile(puck_status_file, function (err, data) {
@@ -1017,26 +1008,11 @@ function create_puck_key_store(puck) {
     })
 
     // xxx - errs to user!
-    fs.writeFile(puck_dir + '/puck.pid', bwana_puck.PUCK_ID, function(err) {
-        if (err) { console.log('err writing pid - : ' + err) }
-        else     { console.log('wrote pid') }
-    });
-    fs.writeFile(puck_dir + '/puckroot.crt', ca, function(err) {
-        if (err) { console.log('err writing ca - : ' + err) }
-        else     { console.log('wrote root crt') }
-    });
-    fs.writeFile(puck_dir + '/puck.key', key, function(err) {
-        if (err) { console.log('err writing key - : ' + err) }
-        else     { console.log('wrote key') }
-    });
-    fs.writeFile(puck_dir + '/puck.crt', cert, function(err) {
-        if (err) { console.log('err writing crt - : ' + err) }
-        else     { console.log('wrote crt') }
-    });
-    fs.writeFile(puck_dir + '/ta.key', tls, function(err) {
-        if (err) { console.log('err writing tls - : ' + err) }
-        else     { console.log('wrote tls') }
-    });
+    _write2File(puck_dir + '/puck.pid', bwana_puck.PUCK_ID)
+    _write2File(puck_dir + '/puckroot.crt', ca)
+    _write2File(puck_dir + '/puck.key', key)
+    _write2File(puck_dir + '/puck.crt', cert)
+    _write2File(puck_dir + '/ta.key', tls)
 
 }
 
@@ -1118,6 +1094,44 @@ function createPuck(req, res, next) {
 
 
 // a few useful snippets
+
+// the pi's storage media can take awhile to register a
+// write... so I'm using sync'd writes, where I don't have
+// to on other systems. At least... that's what seems to
+// be happening... so that's my story and I'm sticking to it!
+
+// assumes data is an object
+function _writeObj2File(file, obj) {
+
+    var stringy = JSON.stringify(obj)
+
+    console.log('trying to write ' + stringy.length + ' bytes to ' + file)
+
+    try {
+        fs.writeFileSync(file, stringy)
+        console.log('...success...')
+    }
+    catch (e) {
+        console.log('err writing to ' + file + '...' + stringy)
+    }
+
+}
+
+// non-obj version
+function _write2File(file, stringy) {
+
+    console.log('trying to write string ' + stringy.length + ' bytes to ' + file)
+
+    try {
+        fs.writeFileSync(file, stringy)
+        console.log('...success...')
+    }
+    catch (e) {
+        console.log('err writing to ' + file + '...' + stringy)
+    }
+
+}
+
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
@@ -2215,13 +2229,7 @@ function quikStart(req, res, next) {
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
-    try {
-        fs.writeFileSync(puck_secretz, JSON.stringify(secretz))
-        console.log('wrote status')
-    }
-    catch (e) {
-        console.log('err... writing ' + puck_secretz + '...' + JSON.stringify(e))
-    }
+    _writeObj2File(puck_secretz, secretz)
 
     // no longer go here
     redirect_to_quickstart = false
@@ -2337,10 +2345,7 @@ function formCreate(req, res, next) {
 
                         // now write the image data for the d3ck in question
                         var image_data = base64.decode(data.image_b64)
-                        fs.writeFile(data.image, image_data, function(err) {
-                            if (err) { console.log('err... couldnt write image data:' + JSON.stringify(err)) }
-                            else     { console.log('wrote image data to ' + data.image) }
-                        })
+                        _write2File(data.image, image_data)
 
                         console.log(bwana_puck)
                         console.log(typeof bwana_puck)
