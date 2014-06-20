@@ -177,6 +177,7 @@ $(document).ready(function () {
                 $.getJSON('/puck/' + val, function(puckinfo) {
                     console.log('v/p')
                     console.log(val)
+                    console.log(puckinfo)
         
                     // bit of a race condition... figure out how to get the puckID of
                     // this PUCK (see above) prior to these so I can not put it up
@@ -248,7 +249,7 @@ $(document).ready(function () {
                              '<div class="col-md-3">'                                                                  + 
                               '<div class="thumbnail" style="background-color: #eaf1f1" id="{{puckid}}">'              +
                                  '<a href="/puck_details.html?puckid={{puckid}}">'                                     +
-                                 '<img id="{{puckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
+                                 '<img id="{{puckid}}" width=128 style="padding: 4;" src="public/img/' + puckid + '.png"></a> <br />' +
                                  '<div class="caption">'                                                               +
                                     '<span>PUCK: </span><span class="puckname"><b>{{name}}</b></span> <br />'          +
                                     '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +

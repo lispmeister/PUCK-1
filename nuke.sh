@@ -11,6 +11,7 @@ sudo /etc/init.d/puck stop
 sudo rm -f /etc/puck/redis/dump.rdb 
 sudo rm -rf /etc/puck/pucks/*
 sudo rm -rf /etc/puck/public/uploads/*
+sudo rm -rf /etc/puck/secretz.json
 
 sudo /etc/init.d/redis*  start
 # sudo /etc/init.d/puck start

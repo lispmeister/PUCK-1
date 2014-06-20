@@ -14,9 +14,34 @@
         },
     
     "crypto": {
-        "keysize"  : "1024",
-        "life_puck": "365",
-        "life_vpn" : "30"
-    }
+        "keysize"       : "1024",
+        "life_puck"     : "365",
+        "life_vpn"      : "30",
+        "bcrypt_rounds" : "12"
+    },
+
+    "limits": {
+        "max_upload_size" : "1073741824",
+        "max_image_size"  : "1048576"
+    },
+
+    "misc": {
+        "pid_polling_time" : "3000"
+    },
+
+    "public_routes": [
+        "js",
+        "css",
+        "puck",
+        "login",
+        "favicon.ico",
+        "login.html",
+        "loginFailure",
+        "quikstart.html",
+        "quik",
+        "qs"
+    ]
+
+
 
 }

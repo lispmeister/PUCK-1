@@ -1,5 +1,9 @@
+//
+// d3ck server
+//
 
 var Tail       = require('tail').Tail,
+    async      = require('async'),
     bcrypt     = require('bcrypt'),
     cors       = require('cors'),
     crypto     = require('crypto'),
@@ -27,7 +31,22 @@ var Tail       = require('tail').Tail,
     __         = require('underscore');   // note; not one, two _'s, just for node
 
 
+
+//
+// Initial setup
+//
+// ... followed by all the various functions....
+//
+// ... which in turn is followed by the server setup...
+//
+// ... followed by the server start...
+//
   
+
+//
+// init
+//
+
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
 console.log(config);
@@ -59,7 +78,22 @@ var puck_server_ip    = ""
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 // for auth/salting/hashing
-var N_ROUNDS = 12
+var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
+
+// image uploads
+var MAX_IMAGE_SIZE   = config.limits.max_image_size
+
+// file transfers/uploads
+var MAX_UPLOAD_SIZE  = config.limits.max_upload_size
+
+// this many milliseconds to look to see if new data has arrived....
+var PID_POLLING_TIME = config.misc.pid_polling_time
+
+// users must run quickstart if they haven't already
+var redirect_to_quickstart = true
+if (fs.existsSync(puck_secretz)) {
+    redirect_to_quickstart = false
+}
 
 // owner user array
 var puck_owners = []
@@ -67,30 +101,34 @@ var puck_owners = []
 //
 // URLs that anyone can contact
 //
-public_urls = ['puck',          // have think this over... can only get puck data if ID == server's id
-               'login',
-               'favicon.ico',
-               'login.html',
-               'loginFailure',
-               'quikstart.html',// no logins have been created yet, so... ;)
-               'quik',          // post
-               'js',            // hmm....
-               'css'            //
-]
-
+// puck    have think this over... can only get puck data if ID == server's id
+/* stuff like -
+   'login',
+   'favicon.ico',
+   'login.html',
+   'loginFailure',
+   'quikstart.html',// no logins have been created yet, so... ;)
+   'quik',          // post
+   'qs',            // post
+   'js',            // hmm....
+   'css'            //
+*/
+public_routes = config.public_routes
 
 ///--- Redis
 var redis = require("redis"),
-  rclient = redis.createClient();    
+rclient   = redis.createClient();    
 
 rclient.on("error", function (err) {
-   console.log("Redis client error: " + err);
+    console.log("Redis client error: " + err);
+    process.exit(3)
 });
 
+//
 // file reads to string nodey stuff
+//
 var StringDecoder = require('string_decoder').StringDecoder;
 var decoder       = new StringDecoder('utf8');
-
 
 // global PUCK ID for this server's PUCK
 try {
@@ -103,9 +141,9 @@ catch (e) {
     console.log(e)
     process.exit(2)
 }
-
+    
 // suck up our own puck
-
+    
 rclient.get(puck_id, function (err, reply) {
     console.log('bwana!')
     console.log(puck_id)
@@ -113,7 +151,7 @@ rclient.get(puck_id, function (err, reply) {
     if (!err) {
         // console.log(reply)
         if (reply == null) {
-            console.log('getour puck: unable to retrieve %s', puck_id)
+            console.log('unable to retrieve our puck; id: %s', puck_id)
             sys.exit({'error': 'no PUCK Found'})
         }
         else {
@@ -127,23 +165,6 @@ rclient.get(puck_id, function (err, reply) {
         sys.exit({ "no": "puck"})
     }
 })
-
-//
-// THE VERY FIRST THING YOU SEE... might be the quick install.
-//
-// if we don't see d3ck owner data, push the user to the install page
-//
-if (fs.existsSync(puck_secretz)) {
-    console.log('\n\n\nSECRETZ!!!!\n\n\nfound secret file... does it check out?\n\n\n')
-    secretz = JSON.parse(fs.readFileSync(puck_secretz).toString())
-    console.log(JSON.stringify(secretz))
-    console.log('\n\n\n')
-
-    // should be a single user, but keep this code in case we support more in future
-    secretz.id = 0
-    puck_owners[0] = secretz
-
-}
 
 //
 // get the latest status... create the file if it doesn't exist...
@@ -188,6 +209,31 @@ pollStatus(puck_status_file)
 // start with a clean slate
 change_status()
 
+
+//
+// only exist after user has run startup
+//
+function get_puck_vital_bits () {
+
+    //
+    // THE VERY FIRST THING YOU SEE... might be the quick install.
+    //
+    // if we don't see d3ck owner data, push the user to the install page
+    //
+    if (fs.existsSync(puck_secretz)) {
+        console.log('\n\n\nSECRETZ!!!!\n\n\nfound secret file... does it check out?\n\n\n')
+        secretz = JSON.parse(fs.readFileSync(puck_secretz).toString())
+        console.log(JSON.stringify(secretz))
+        console.log('\n\n\n')
+    
+        // should be a single user, but keep this code in case we support more in future
+        secretz.id = 0
+        puck_owners[0] = secretz
+    }
+    
+
+}
+    
 //
 // pick up cat facts!
 //
@@ -323,29 +369,38 @@ function findByUsername(name, fn) {
   return fn(null, null);
 }
 
-
 // authenticated or no?
 function auth(req, res, next) {
+
+    var url_bits = req.path.split('/')
+    if (__.contains(public_routes, url_bits[1])) {
+        if (redirect_to_quickstart && url_bits[1] == "login.html") {
+            console.log('almost let you go to login.html, but nothing to login to')
+        }
+        else {
+            console.log('pass... public URL')
+            return next();
+        }
+    }
+
+    // I don't care if you are auth'd or not, you don't get much but quickstart until
+    // you've set up your d3ck....
+    if (redirect_to_quickstart) {
+        res.redirect(302, '/quikstart.html')
+        return
+        // return next({ redirecting: 'quikstart.html'});
+    }
+
+    if (req.isAuthenticated()) { 
+        console.log('already chex')
+        return next(); 
+    }
 
     console.log('authentication check for... ' + req.path)
 
     if (req.body.ip_addr == '127.0.0.1') {
         console.log('pass... localhost')
         return next();
-    }
-
-    var url_bits = req.path.split('/')
-
-    // console.log('first bit: ' + url_bits[1])
-
-    if (__.contains(public_urls, url_bits[1])) {
-        console.log('pass... public URL')
-        return next();
-    }
-
-    if (req.isAuthenticated()) { 
-        console.log('chex')
-        return next(); 
     }
 
     console.log('bad luck, off to dancing school')
@@ -1528,6 +1583,14 @@ function uploadSchtuff(req, res, next) {
         var target_path = puck_public + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
 
+        // skip if too big
+        if (target_size > MAX_UPLOAD_SIZE) {
+            // XXX-errz to user
+            console.log('upload size (' + target_size + ') exceeds limit: ' + target_size)
+            continue
+        }
+
+
         console.log('trying ' + tmpfile + ' -> ' + target_path)
 
         //
@@ -1990,15 +2053,17 @@ function httpsPing(puckid, ipaddr, res, next) {
 }
 
 //
-// first thing the user sees... what do they say?
+// after first thing the user sees... what have they said in the form?
 //
 function quikStart(req, res, next) {
 
-    var name     = "JaneDoe",
-        email    = "jane@example.com",
-        puck     = "PuckimusRex",
-        stance   = "reasonable",
-        password = ""                   // hey, if you don't want one, who am I to judge?
+    var name       = "JaneDoe",
+        email      = "jane@example.com",
+        puck       = "PuckimusRex",
+        stance     = "reasonable",
+        password   = "",                  // sigh... should allow nulls, but libs don't like it... bah
+        puck_image = ""
+
 
     console.log('quicky!')
 
@@ -2039,31 +2104,76 @@ function quikStart(req, res, next) {
         stance = req.body.radio_free_puck
     }
 
-    // var form = new formidable.IncomingForm();
-    // form.parse(req, function(err, fields, files)
-    //     console.log(fields)
-    //     console.log(JSON.stringify(fields))
-    //     if (err) {
-    //         console.log('ererz parsin quickstartz!')
-    //         console.log(err)
-    //     }
-        // else {
-        //     req.body.puck_user_name
-        //     req.body.puck_email_address
-        //     req.body.puck_name
-        //     req.body.puck_image
-        //     req.body.puck_password
+    // grab the file from whereever it's stashed, write it
+    if (req.files.puck_image.path != "" && typeof req.files.puck_image.type != "undefined") {
+        msg = ""
+        if (req.files.puck_image.type != 'image/png' && req.files.puck_image.type != 'image/jpeg' && req.files.puck_image.type != 'image/gif') {
+            msg = 'Invalid image format (' + req.files.puck_image.type + '), only accept: GIF, JPG, and PNG'
+        }
 
-    // });
+        if (req.files.puck_image.size > MAX_IMAGE_SIZE) {
+            msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.puck_image.size
+        }
+
+        if (msg == "") {
+            var iname  = req.files.puck_image.name
+            var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
+
+            puck_image      = '/img/' + puck_id + suffix
+            full_puck_image = puck_public + '/img/' + puck_id + suffix
+
+            fs.readFile(req.files.puck_image.path, function (err, data) {
+
+                if (err) {
+                    console.log("Couldn't read " + req.files.puck_image.path)
+                    return
+                }
+
+                // in case someone tries some monkey biz...
+                if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
+                    console.log('err: filename suffix borked: ' + suffix)
+                }
+                else {
+                    console.log('trying to write... ' + puck_image)
+                    // weirdness... writefile returns nada
+                    try {
+                        fs.writeFileSync(full_puck_image, data, 'utf8')
+                        console.log('updating puck json')
+                        bwana_puck.image = puck_image
+                        console.log(JSON.stringify(bwana_puck))
+                        rclient.set(puck_id, JSON.stringify(bwana_puck), function(err) {
+                            if (err) {
+                                console.log(err, 'd3ck: unable to update Redis db');
+                                console.log(err)
+                            } else {
+                                console.log('puck updated')
+                            }
+                        })
+                    }
+                    catch (err) {
+                        console.log('error writing image file "' + full_puck_image + '": ' + JSON.stringify(err))
+                    }
+
+                }
+            })
+        }
+        else {
+            console.log('error uploading: ' + msg)
+        }
+    }
+
+    console.log("PUCK image... " + puck_image)
+
     secretz.id       = 0
     secretz.name     = name
     secretz.email    = email
     secretz.puck     = puck
     secretz.stance   = stance
+    secretz.image    = puck_image
 
-    secretz.hash = hashit(password, N_ROUNDS)
+    secretz.hash     = hashit(password, N_ROUNDS)
 
-    console.log(name, email, puck, stance, password, secretz.hash)
+    console.log(name, email, puck, stance, password, secretz.hash, puck_image)
 
     console.log('SZ: ' )
     console.log(secretz.hash)
@@ -2072,6 +2182,9 @@ function quikStart(req, res, next) {
         if (err) { console.log('err... no secretz... looks bad.... gasp... choke...' + err) }
         else { console.log('wrote status') }
     });
+
+    // no longer go here
+    redirect_to_quickstart = false
 
     res.redirect(302, '/')
 
@@ -2414,131 +2527,199 @@ server.use(auth)
 // actual routes n stuff
 //
 
-// initial starting form
+// always serve up the install page
+// server.use(express.static(puck_public + '/qs'))
+
+// initial starting form - no auth
 server.post('/quik', quikStart)
-
-// Ping action
-server.get('/ping', echoReply)
-
-
-// send me anything... I'll give you a chicken.  Or... status.
-server.get("/status", auth, puckStatus)
-
-//
-// send any actions done on client... like ringing a phone or whatever
-// this is to help keep state in case of moving off web page, browser
-// crashes, etc.
-//
-server.post("/status", auth, postStatus)
-
-server.post('/puck', auth, createPuck)
-server.get('/puck', auth, listPucks)
-
-// Ping another
-server.get('/ping/:key', auth, echoStatus)
-
-// cuz ajax doesn't like to https other sites...
-server.get('/sping/:key1/:key2', auth, function (req, res, next) {
-    // console.log('spinging')
-    httpsPing(req.params.key1, req.params.key2, res, next)
-})
-
-// get your ip addr(s)
-server.get('/getip', auth, getIP);
-
-// Return a Puck by key
-server.get('/puck/:key', auth, getPuck);
-
-// Delete a Puck by key
-server.del('/puck/:key', auth, deletePuck);
-
-// Destroy everything
-server.del('/puck', auth, deleteAll, function respond(req, res, next) {
-    res.send(204);
-});
-
-
-// XXX - update!
-server.get('/rest', function root(req, res, next) {
-    var routes = [
-        'GET     /rest',
-        'POST    /puck',
-        'GET     /puck',
-        'DELETE  /puck',
-        'PUT     /puck/:key',
-        'GET     /puck/:key',
-        'DELETE  /puck/:key',
-        'GET     /ping',
-        'GET     /ping/:key',
-        'GET     /sping/:key',
-        'POST    /vpn/start',
-        'GET     /vpn/stop'
-    ];
-    res.send(200, routes);
-});
-
-server.post('/form', auth, handleForm);
-
-// knock knock?
-server.post('/vpn/knock', auth, knockKnock);
-
-server.post('/vpn/start', auth, startVPN);
-
-// stop
-server.get('/vpn/stop', auth, stopVPN);
-
-//
-// server stuff... start, stop, restart, etc.
-//
-server.get('/server',         auth, serverStatus);   // status
-server.get('/server/stop',    auth, serverDie);      // die, die, die!
-server.get('/server/restart', auth, serverRestart);  // die and restart
-
-// setup a tcp proxy
-server.get('/setproxy', auth, setTCPProxy)
-
-// forward a port
-server.get('/forward', auth, forward_port)
-
-//
-// events... what's going on?  Maybe should be /marvin?
-//
-// list event types
-server.get('/events',           auth, listEvents);
-// get elements of a particular kind of event (create, delete, etc.); 
-server.get('/events/:key',      auth, getEvent);
-
-//
-// PUCK filestore - send up and getting down
-//
-// send stuff up the pipe....
-server.post('/up/:key', auth, uploadSchtuff)
-// get down with what's up
-server.get('/down', auth, downloadStuff)
-
-
-// get a url from wherever the puck is
-server.all('/url', auth, webProxy)
 
 server.get('/logout', function(req, res) {
     req.logout();
     res.redirect('/');
 });
 
-server.post('/login',
-  passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/loginFailure'
-  })
-);
- 
 server.get('/loginFailure', function(req, res, next) {
   res.send('Failed to authenticate');
 });
 
-// if all else fails... serve up an index or public
-server.use(express.static(puck_public))
+// before this really don't answer to much other than the user startup
+console.log('adding routes')
+fire_up_server_routes()
 
+
+//
+// wait until user has run startup
+//
+async.whilst(
+    function () { 
+        if (fs.existsSync(puck_secretz)) {
+            console.log('ready to rock-n-roll')
+            // means the startup has run and the PUCK has an ID, which must be done before anything else
+
+            console.log('get user data')
+            get_puck_vital_bits()
+
+            // before this really don't answer to much other than the user startup
+            // console.log('adding routes')
+            // fire_up_server_routes()
+
+            return false
+        }
+
+        return true
+        
+    },
+
+    function (callback) {
+        setTimeout(callback, PID_POLLING_TIME);
+    },
+
+    function (err) {
+        if (typeof err != "undefined") {
+            console.log('something terrible has happened....?')
+            console.log(err)
+        }
+        else {
+            console.log('whilst terminated normally')
+        }
+    }
+)
+
+function fire_up_server_routes() {
+
+    // Ping action - no auth
+    server.get('/ping', echoReply)
+
+    // get or list pucks
+    server.post('/puck', auth, createPuck)
+    server.get('/puck', auth, listPucks)
+
+    // Return a Puck by key
+    server.get('/puck/:key', auth, getPuck);
+
+    // Delete a Puck by key
+    server.del('/puck/:key', auth, deletePuck);
+
+    // Destroy everything
+    server.del('/puck', auth, deleteAll, function respond(req, res, next) {
+        res.send(204);
+    });
+
+
+    server.post('/form', auth, handleForm);
+
+    // get your ip addr(s)
+    server.get('/getip', auth, getIP);
+
+
+
+    // knock knock?
+    server.post('/vpn/knock', auth, knockKnock);
+
+    server.post('/vpn/start', auth, startVPN);
+
+    // stop
+    server.get('/vpn/stop', auth, stopVPN);
+
+    //
+    // server stuff... start, stop, restart, etc.
+    //
+    server.get('/server',         auth, serverStatus);   // status
+    server.get('/server/stop',    auth, serverDie);      // die, die, die!
+    server.get('/server/restart', auth, serverRestart);  // die and restart
+
+    // setup a tcp proxy
+    server.get('/setproxy', auth, setTCPProxy)
+
+    // forward a port
+    server.get('/forward', auth, forward_port)
+
+    //
+    // events... what's going on?  Maybe should be /marvin?
+    //
+    // list event types
+    server.get('/events',           auth, listEvents);
+    // get elements of a particular kind of event (create, delete, etc.); 
+    server.get('/events/:key',      auth, getEvent);
+
+    //
+    // PUCK filestore - send up and getting down
+    //
+    // send stuff up the pipe....
+    server.post('/up/:key', auth, uploadSchtuff)
+    // get down with what's up
+    server.get('/down', auth, downloadStuff)
+
+
+    // get a url from wherever the puck is
+    server.all('/url', auth, webProxy)
+
+    server.post('/login',
+        passport.authenticate('local', {
+            successRedirect: '/',
+            failureRedirect: '/loginFailure'
+        })
+    )
+
+    // Ping another
+    server.get('/ping/:key', auth, echoStatus)
+    
+    // cuz ajax doesn't like to https other sites...
+    server.get('/sping/:key1/:key2', auth, function (req, res, next) {
+        // console.log('spinging')
+        httpsPing(req.params.key1, req.params.key2, res, next)
+    })
+    
+    // send me anything... I'll give you a chicken.  Or... status.
+    server.get("/status", auth, puckStatus)
+    
+    //
+    // send any actions done on client... like ringing a phone or whatever
+    // this is to help keep state in case of moving off web page, browser
+    // crashes, etc.
+    //
+    server.post("/status", auth, postStatus)
+
+    // XXX - update!
+    server.get('/rest', function root(req, res, next) {
+        var routes = [
+            'GET     /down',
+            'GET     /events',
+            'GET     /events/:key',
+            'GET     /forward',
+            'GET     /logout',
+            'GET     /rest',
+            'GET     /getip',
+            'POST    /puck',
+            'GET     /puck',
+            'DELETE  /puck',
+            'PUT     /puck/:key',
+            'GET     /puck/:key',
+            'DELETE  /puck/:key',
+            'GET     /ping',
+            'GET     /ping/:key',
+            'GET     /server',
+            'GET     /server/stop',
+            'GET     /server/restart',
+            'GET     /setproxy',
+            'GET     /sping/:key',
+            'GET     /status',
+            'POST    /status',
+            'GET     /up/:key',
+            'GET     /url',
+            'POST    /vpn/start',
+            'GET     /vpn/stop'
+        ];
+        res.send(200, routes);
+    });
+    
+    // if all else fails... serve up an index or public
+    server.use(express.static(puck_public))
+
+    console.log('rtz')
+    console.log(server.routes)
+}
+ 
 //
 // after all that, start firing up the engines
 //
