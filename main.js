@@ -2216,7 +2216,7 @@ function quikStart(req, res, next) {
     console.log(secretz.hash)
 
     try {
-        fs.writeFile(puck_secretz, JSON.stringify(secretz))
+        fs.writeFileSync(puck_secretz, JSON.stringify(secretz))
         console.log('wrote status')
     }
     catch (e) {
