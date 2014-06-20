@@ -2215,10 +2215,13 @@ function quikStart(req, res, next) {
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
-    fs.writeFile(puck_secretz, JSON.stringify(secretz), function(err) {
-        if (err) { console.log('err... no secretz... looks bad.... gasp... choke...' + err) }
-        else { console.log('wrote status') }
-    });
+    try {
+        fs.writeFile(puck_secretz, JSON.stringify(secretz))
+        console.log('wrote status')
+    }
+    catch (e) {
+        console.log('err... writing ' + puck_secretz + '...' + JSON.stringify(e))
+    }
 
     // no longer go here
     redirect_to_quickstart = false
