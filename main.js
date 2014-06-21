@@ -1077,15 +1077,21 @@ function createPuck(req, res, next) {
             //
             // if it's from a remote system, wake up local UI and tell user
             //
-            if (typeof my_net[client_ip] == "undefined") {
-                console.log('create appears to be coming from remote: ' + client_ip)
-                puck_events = { new_puck : client_ip }
-                create_puck_key_store(puck.value)
-            }
-            else {
-                puck_events = { new_puck : "" }
-                console.log('create appears to be coming from local PUCK/host: ' + client_ip)
-            }
+            
+            // garrr... openvpn breaks this too... 
+            puck_events = { new_puck : client_ip }
+            create_puck_key_store(puck.value)
+            create_puck_image(puck.value)
+
+            // if (typeof my_net[client_ip] == "undefined") {
+            //     console.log('create appears to be coming from remote: ' + client_ip)
+            //     puck_events = { new_puck : client_ip }
+            //     create_puck_key_store(puck.value)
+            // }
+            // else {
+            //     puck_events = { new_puck : "" }
+            //     console.log('create appears to be coming from local PUCK/host: ' + client_ip)
+            // }
 
             createEvent(get_client_ip(req), {event_type: "create", puck_id: req.body.value.PUCK_ID})
 
@@ -1095,6 +1101,44 @@ function createPuck(req, res, next) {
 
 }
 
+function create_puck_image(data) {
+
+    var image = base64.decode(data.image_b64)
+
+    if (image == "") {
+        console.log("Couldn't decode " + data.image)
+        return
+    }
+
+    msg = ""
+
+    if (image.size > MAX_IMAGE_SIZE) {
+        msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.puck_image.size
+    }
+
+    // just stick to one ending please....
+    data.image.replace('jpeg$','jpg')
+
+    var iname  = data.image
+    var suffix = data.image.substr(iname.length-4, data.image.length).toLowerCase()
+
+    // sanity check suffix
+    if (suffix != 'png' && suffix != 'jpg' && suffix != 'gif') {
+        msg = 'Invalid suffix (' + req.files.puck_image.type + '), only accept: GIF, JPG, and PNG'
+    }
+
+    puck_image      = '/img/' + PUCK_ID + suffix
+    full_puck_image = puck_public + '/img/' + puck_id + suffix
+
+    if (msg) {
+        console.log('err in processing remote image: ' + msg)
+    }
+    else {
+        _write2File(full_puck_image, image)
+    }
+
+
+}
 
 // a few useful snippets
 
@@ -2160,7 +2204,7 @@ function quikStart(req, res, next) {
         }
 
         // just stick to one ending please....
-        req.files.puck_image.name.replace('jpeg','jpg')
+        req.files.puck_image.name.replace('jpeg$','jpg')
 
         if (msg == "") {
             var iname  = req.files.puck_image.name
@@ -2271,7 +2315,7 @@ function formCreate(req, res, next) {
 
             else {
                 console.log('ping sez yes')
-                console.log(data)
+                // console.log(data)
 
                 console.log('starting... writing...')
                 // make the puck's dir... should not exist!
@@ -2343,9 +2387,7 @@ function formCreate(req, res, next) {
                         puck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
-                        var image_data = base64.decode(data.image_b64)
-
-                        _write2File(puck_public + data.image, image_data)
+                        _write2File(puck_public + data.image         , base64.decode(data.image_b64))
                         _write2File(puck_public + data.image + ".b64", data.image_b64)
 
                         console.log(bwana_puck)
