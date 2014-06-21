@@ -62,16 +62,16 @@ all_ips=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n
 
 if [ $direction = "up" ] ; then
         echo "forwarding $proto traffic from $local_ip : $local_port => $remote_ip : $remote_port"
-        echo iptables -t nat -A PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        echo iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -A PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        echo iptables -t nat -A PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        echo iptables -t nat -A POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
+        iptables -t nat -A PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        iptables -t nat -A POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
 else
         echo "disabling forwarding of $proto traffic from $local_ip : $local_port => $remote_ip : $remote_port"
-        echo iptables -t nat -D PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        echo iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -D PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        echo iptables -t nat -D PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        echo iptables -t nat -D POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
+        iptables -t nat -D PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        iptables -t nat -D POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
 fi
 
 

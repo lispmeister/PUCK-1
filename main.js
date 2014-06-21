@@ -1108,7 +1108,7 @@ function create_puck_image(data) {
         data = JSON.parse(data)
     }
 
-    var image = new Buffer(data.image_b64, 'base64').toString('binary');
+    var image = b64_decode(data.image_b64)
 
     console.log('trying to decode: ' + data.image)
 
@@ -1186,6 +1186,13 @@ function _write2File(file, stringy) {
 
 }
 
+function b64_encode(data) {
+    return new Buffer(data).toString('base64');
+}
+
+function b64_decode(str) {
+    return new Buffer(str, 'base64');
+}
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
@@ -2209,7 +2216,7 @@ function quikStart(req, res, next) {
             full_puck_image = puck_public + '/img/' + puck_id + suffix
 
             fs.readFile(req.files.puck_image.path, function (err, data) {
-                var image_b64 = new Buffer(data, 'binary').toString('base64')
+                var image_b64 = b64_encode(data)
 
                 if (err) {
                     console.log("Couldn't read " + req.files.puck_image.path)
@@ -2382,7 +2389,7 @@ function formCreate(req, res, next) {
                         puck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
-                        _write2File(puck_public + data.image         , new Buffer(data.image_b64, 'base64').toString('binary'))
+                        _write2File(puck_public + data.image         , b64_decode(data.image_b64)
                         _write2File(puck_public + data.image + ".b64", data.image_b64)
 
                         console.log(bwana_puck)
