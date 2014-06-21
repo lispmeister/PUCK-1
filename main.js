@@ -1108,9 +1108,9 @@ function create_puck_image(data) {
         data = JSON.parse(data)
     }
 
-    var image = new Buffer(data, 'base64').toString('binary');
+    var image = new Buffer(data.image_b64, 'base64').toString('binary');
 
-    console.log('trying to decode: ' + data)
+    console.log('trying to decode: ' + data.image)
 
     if (image == "") {
         console.log("Couldn't decode " + data.image)
