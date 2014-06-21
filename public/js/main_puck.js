@@ -249,7 +249,8 @@ $(document).ready(function () {
                              '<div class="col-md-3">'                                                                  + 
                               '<div class="thumbnail" style="background-color: #eaf1f1" id="{{puckid}}">'              +
                                  '<a href="/puck_details.html?puckid={{puckid}}">'                                     +
-                                 '<img id="{{puckid}}" width=128 style="padding: 4;" src="public/img/' + puckid + '.png"></a> <br />' +
+                                 // '<img id="{{puckid}}" width=128 style="padding: 4;" src="public/img/' + puckid + '.png"></a> <br />' +
+                                 '<img id="{{puckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
                                  '<div class="caption">'                                                               +
                                     '<span>PUCK: </span><span class="puckname"><b>{{name}}</b></span> <br />'          +
                                     '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +

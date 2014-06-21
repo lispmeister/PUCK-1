@@ -22,7 +22,7 @@
 
     "limits": {
         "max_upload_size" : "1073741824",
-        "max_image_size"  : "1048576"
+        "max_image_size"  : "4194304"
     },
 
     "misc": {

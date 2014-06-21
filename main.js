@@ -798,9 +798,10 @@ function NotImplementedError() {
 // the browser's IP
 function get_client_ip(req) {
 
-    client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+    // client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
+    client_ip = req.ip
 
-    console.log("C-ip: " + client_ip)
+    // console.log("C-ip: " + client_ip)
 
     if (typeof client_ip == "undefined") {
         console.log('no IP here...')
@@ -2167,7 +2168,6 @@ function quikStart(req, res, next) {
             full_puck_image = puck_public + '/img/' + puck_id + suffix
 
             fs.readFile(req.files.puck_image.path, function (err, data) {
-
                 var image_b64 = base64.encode(data)
 
                 if (err) {
@@ -2203,7 +2203,6 @@ function quikStart(req, res, next) {
                     catch (err) {
                         console.log('error writing image file "' + full_puck_image + '": ' + JSON.stringify(err))
                     }
-
                 }
             })
         }

@@ -450,7 +450,16 @@ function event_hang_up() {
 //
 // get the current user's IP addr, put it where the element is
 //
+
+//
+// this broke when OpenVPN started forwarding along the https traffic ;(
+//
 function get_ip(element) {
+
+    return
+
+// brokez
+
     var url = "/getip"
     var jqXHR_getIP = $.ajax({
         url: url,
