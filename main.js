@@ -1080,7 +1080,9 @@ function createPuck(req, res, next) {
             
             // garrr... openvpn breaks this too... 
             puck_events = { new_puck : client_ip }
+
             create_puck_key_store(puck.value)
+
             create_puck_image(puck.value)
 
             // if (typeof my_net[client_ip] == "undefined") {
@@ -1103,7 +1105,13 @@ function createPuck(req, res, next) {
 
 function create_puck_image(data) {
 
-    var image = base64.decode(data.image_b64)
+    if (typeof data != 'object') {
+        data = JSON.parse(data)
+    }
+
+    var image = new Buffer(data.image_b64, 'base64').toString('utf-8')
+
+    console.log('trying to decode: ' + data)
 
     if (image == "") {
         console.log("Couldn't decode " + data.image)
@@ -1113,7 +1121,7 @@ function create_puck_image(data) {
     msg = ""
 
     if (image.size > MAX_IMAGE_SIZE) {
-        msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.puck_image.size
+        msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + image.size
     }
 
     // just stick to one ending please....
@@ -1123,12 +1131,12 @@ function create_puck_image(data) {
     var suffix = data.image.substr(iname.length-4, data.image.length).toLowerCase()
 
     // sanity check suffix
-    if (suffix != 'png' && suffix != 'jpg' && suffix != 'gif') {
-        msg = 'Invalid suffix (' + req.files.puck_image.type + '), only accept: GIF, JPG, and PNG'
+    if (suffix != '.png' && suffix != '.jpg' && suffix != '.gif') {
+        msg = 'Invalid suffix (' + suffix + '), only accept: GIF, JPG, and PNG'
     }
 
-    puck_image      = '/img/' + PUCK_ID + suffix
-    full_puck_image = puck_public + '/img/' + puck_id + suffix
+    puck_image      = '/img/' + data.PUCK_ID + suffix
+    full_puck_image = puck_public + '/img/' + data.PUCK_ID + suffix
 
     if (msg) {
         console.log('err in processing remote image: ' + msg)
@@ -1183,18 +1191,6 @@ function _write2File(file, stringy) {
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
-
-/*
- * base64.js: An extremely simple implementation of base64 encoding / decoding using node.js Buffers (C) 2010, Nodejitsu Inc.
- */
-var base64 = exports;
-base64.encode = function (unencoded) {
-  return new Buffer(unencoded || '').toString('base64')
-}
-base64.decode = function (encoded) {
-  return new Buffer(encoded || '', 'base64').toString('utf8')
-}
-
 
 /**
  * Deletes a Puck by key
@@ -2214,7 +2210,7 @@ function quikStart(req, res, next) {
             full_puck_image = puck_public + '/img/' + puck_id + suffix
 
             fs.readFile(req.files.puck_image.path, function (err, data) {
-                var image_b64 = base64.encode(data)
+                var image_b64 = new Buffer(data).toString('base64')
 
                 if (err) {
                     console.log("Couldn't read " + req.files.puck_image.path)
@@ -2387,7 +2383,7 @@ function formCreate(req, res, next) {
                         puck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
-                        _write2File(puck_public + data.image         , base64.decode(data.image_b64))
+                        _write2File(puck_public + data.image         , new Buffer( data.image_b64, 'base64').toString('utf-8'))
                         _write2File(puck_public + data.image + ".b64", data.image_b64)
 
                         console.log(bwana_puck)
