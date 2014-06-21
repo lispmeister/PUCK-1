@@ -25,12 +25,11 @@ var Tail       = require('tail').Tail,
     rest       = require('rest'),
     restler    = require("restler"),
     sleep      = require('sleep'),
+    sys        = require('sys'),
     puck       = require('./modules'),
     uuid       = require('node-uuid'),
     Q          = require('q'),
     __         = require('underscore');   // note; not one, two _'s, just for node
-
-
 
 //
 // Initial setup
