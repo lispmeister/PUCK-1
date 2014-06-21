@@ -61,7 +61,9 @@ var puck_logs         = puck_home + config.PUCK.logs
 var puck_public       = puck_home + config.PUCK.pub
 var puck_secretz      = puck_home + config.PUCK.secretz
 
-var puck_port         = config.PUCK.puck_port
+// oh, the tangled web we weave... "we"?  Well, I.
+var puck_port_int     = config.PUCK.puck_port_int
+var puck_port_ext     = config.PUCK.puck_port_ext
 var puck_port_forward = config.PUCK.puck_port_forward
 var puck_port_signal  = config.PUCK.puck_port_signal
 var puck_proto_signal = config.PUCK.puck_proto_signal
@@ -310,7 +312,7 @@ while (init) {
 
     console.log('suckit, puck!')
 
-    var url = 'https://localhost:' + puck_port + '/puck/' + puck_id
+    var url = 'https://localhost:' + puck_port_int + '/puck/' + puck_id
 
     console.log('requesting puck from: ' + url)
 
@@ -2039,7 +2041,7 @@ function httpsPing(puckid, ipaddr, res, next) {
 
         // console.log('pinging  ' + ip);
 
-        var url = 'https://' + ip + ':' + puck_port + '/ping'
+        var url = 'https://' + ip + ':' + puck_port_ext + '/ping'
 
         var req = https.get(url, function(response) {
 
@@ -2248,7 +2250,7 @@ function formCreate(req, res, next) {
 
     var ip_addr = req.body.ip_addr
 
-    var url = 'https://' + ip_addr + ':' + puck_port + '/ping'
+    var url = 'https://' + ip_addr + ':' + puck_port_ext + '/ping'
 
     console.log('ping get_https ' + url)
 
@@ -2276,7 +2278,7 @@ function formCreate(req, res, next) {
 
                 data = JSON.parse(data)
                 // now get remote information
-                url = 'https://' + ip_addr + ':' + puck_port + '/puck/' + data.pid
+                url = 'https://' + ip_addr + ':' + puck_port_ext + '/puck/' + data.pid
 
                 var puck_dir = config.PUCK.keystore + '/' + data.pid
 
@@ -2826,8 +2828,8 @@ ios.on('connection', function (sock_puppet) {
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
 try {
-    pucky.listen(puck_port, function() {
-        console.log('[+] server listening at %s', puck_port)
+    pucky.listen(puck_port_int, function() {
+        console.log('[+] server listening at %s', puck_port_int)
     })
 }
 catch (e) {
