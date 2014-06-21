@@ -1943,9 +1943,6 @@ function formDelete(req, res, next) {
     // have to have these
     var puckid = req.body.puckid
 
-    // TODO - figure out how/create some global vars to read in
-    var puck_fs_home = __dirname
-
     //
     // execute a shell script with appropriate args to create a puck.
     // ... of course... maybe should be done in node/js anyway...
@@ -2321,8 +2318,6 @@ function formCreate(req, res, next) {
 
                         create_puck_key_store(data)
 
-                        var puck_fs_home = __dirname
-
                         //
                         // execute a shell script with appropriate args to create a puck.
                         // ... of course... maybe should be done in node/js anyway...
@@ -2344,7 +2339,9 @@ function formCreate(req, res, next) {
 
                         // now write the image data for the d3ck in question
                         var image_data = base64.decode(data.image_b64)
-                        _write2File(data.image, image_data)
+
+                        _write2File(puck_public + data.image, image_data)
+                        _write2File(puck_public + data.image + ".b64", data.image_b64)
 
                         console.log(bwana_puck)
                         console.log(typeof bwana_puck)
