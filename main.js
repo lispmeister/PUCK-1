@@ -2157,6 +2157,9 @@ function quikStart(req, res, next) {
             msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.puck_image.size
         }
 
+        // just stick to one ending please....
+        req.files.puck_image.name.replace('jpeg','jpg')
+
         if (msg == "") {
             var iname  = req.files.puck_image.name
             var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
