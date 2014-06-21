@@ -2389,7 +2389,7 @@ function formCreate(req, res, next) {
                         puck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
-                        _write2File(puck_public + data.image         , b64_decode(data.image_b64)
+                        _write2File(puck_public + data.image         , b64_decode(data.image_b64))
                         _write2File(puck_public + data.image + ".b64", data.image_b64)
 
                         console.log(bwana_puck)
