@@ -14,16 +14,16 @@ var Tail       = require('tail').Tail,
     response   = require('response-time'),
     util       = require('util'),
     __         = require('underscore'),   // note; not one, two _'s, just for node
-    puck       = require('./modules');
+    d3ck       = require('./modules');
 
-var puck_port = 8080
+var d3ck_port = 8080
 
 var httpProxy = require('http-proxy')
 
 
 var proxy_port  = 7777,
     remote_host = '192.168.0.7',
-    remote_port = puck_port;
+    remote_port = d3ck_port;
 
     remote_port = 8081
 
@@ -31,9 +31,9 @@ var remote_url  = "https://" + remote_host + ":" + remote_port
 
 console.log('\n\n[+] proxying from the local server on port ' + proxy_port + ' => ' + remote_url)
 
-var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
-    cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
-    ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
+var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key"),
+    cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt"),
+    ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
 
 var credentials = {key: key, cert: cert, ca: ca};
 

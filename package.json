@@ -1,7 +1,7 @@
 {
-  "name": "PuckApp",
+  "name": "d3ck",
   "version": "0.0.1",
-  "description": "REST prototype of Puck backend",
+  "description": "d3ck server",
   "main": "main.js",
   "dependencies": {
     "asn1": "latest",

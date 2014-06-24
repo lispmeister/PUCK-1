@@ -11,7 +11,7 @@ Also - meld in signal server
 
 
 
-CURRENT ASSUMPTION: if PUCK-1 can ip-connect to PUCK-2, user-1 can ip-connect to PUCK-2 as well
+CURRENT ASSUMPTION: if D3CK-1 can ip-connect to D3CK-2, user-1 can ip-connect to D3CK-2 as well
 
 # Installed node from:
 # 
@@ -21,15 +21,15 @@ CURRENT ASSUMPTION: if PUCK-1 can ip-connect to PUCK-2, user-1 can ip-connect to
 cd /tmp
 wget http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
 
-mkdir /usr/local/puck_stuff
-cd /usr/local/puck_stuff
+mkdir /usr/local/d3ck_stuff
+cd /usr/local/d3ck_stuff
 
 tar xvf /tmp/node-v0.10.24-linux-arm-pi.tar.gz
 rm /tmp/node-v0.10.24-linux-arm-pi.tar.gz
 
 # add line to .bash_profile
 
-echo export PATH=$PATH:/usr/local/puck_stuff/node-v0.10.24-linux-arm-pi/bin >> ~/.bash_profile
+echo export PATH=$PATH:/usr/local/d3ck_stuff/node-v0.10.24-linux-arm-pi/bin >> ~/.bash_profile
 
 
 # used this branch of node-http-proxy

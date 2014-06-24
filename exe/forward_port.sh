@@ -56,7 +56,7 @@ remote_ip=$3
 remote_port=$4
 proto=$5
 
-# will not reverse this, as other PUCK stuff might break, but ensure it's on!
+# will not reverse this, as other D3CK stuff might break, but ensure it's on!
 echo "1" > /proc/sys/net/ipv4/ip_forward
 
 # get the ip addrs for a host, in its mind

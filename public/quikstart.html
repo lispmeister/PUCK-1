@@ -30,7 +30,7 @@
 <link href="/css/avgrund.css" rel="stylesheet">
 
 <!-- trivial bits here -->
-<link href="/css/puck.css" rel="stylesheet">
+<link href="/css/d3ck.css" rel="stylesheet">
 
 <!-- form to add files -->
 <link href="/css/jquery.filer.css" rel="stylesheet">
@@ -51,10 +51,12 @@
   <script src="/js/html5shiv.js"></script>
 <![endif]-->
 
-<!-- for pucks -->
+<!-- for d3cks -->
 <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
 <!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
 
+<!-- browser warning -->
+<link href="/css/jquery.reject.css" rel="stylesheet">
 
 </head>
 
@@ -91,7 +93,7 @@
                         <div class="row">
                             <div class="form-group col-md-10">
                             <label class="wizlable col-md-2" for="input_password">Password</label>
-                            <input style="outline: 1px solid red;" type="password" id="puck_password" name="puck_password" value="" placeholder="open sez me" maxlength="512" class="input-xlarge col-md-3">
+                            <input style="outline: 1px solid red;" type="password" id="d3ck_password" name="d3ck_password" value="" placeholder="open sez me" maxlength="512" class="input-xlarge col-md-3">
                             </div>
                         </div>
 
@@ -105,14 +107,14 @@
                         <div class="row">
                             <div class="form-group col-md-10">
                             <label class="wizlable col-md-2" for="input_name">Your d3ck's name</label>
-                            <input type="text" id="puck_name" name="puck_name" value="" placeholder="Puckimus Maximus" maxlength="512" class="input-xlarge col-md-3">
+                            <input type="text" id="d3ck_name" name="d3ck_name" value="" placeholder="D3ckimus Maximus" maxlength="512" class="input-xlarge col-md-3">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="form-group col-md-10">
                             <label class="wizlable col-md-2" for="input_image">Custom image</label>
-                            <input class="col-md-4" type="file" id="puck_image" name="puck_image">
+                            <input class="col-md-4" type="file" id="d3ck_image" name="d3ck_image">
                             </div>
                         </div>
 
@@ -124,7 +126,7 @@
                           <div class="col-md-10">
                             <div class="inline radio">
                                 <label> I'm not only paranoid, they *are* out to get me!  </label>
-                                <input type="radio" name="radio_free_puck" id="radio_free_puck1" value="paranoid">
+                                <input type="radio" name="radio_free_d3ck" id="radio_free_d3ck1" value="paranoid">
                             </div>
                           </div>
                         </div>
@@ -133,7 +135,7 @@
                           <div class="col-md-10">
                             <div class="inline radio">
                                 <label> I'm reasonably concerned about security </label>
-                                <input type="radio" name="radio_free_puck" id="radio_free_puck2" value="reasonable">
+                                <input type="radio" name="radio_free_d3ck" id="radio_free_d3ck2" value="reasonable">
                             </div>
                           </div>
                         </div>
@@ -142,7 +144,7 @@
                           <div class="col-md-10">
                             <div class="inline radio">
                                 <label> For the love of god, just make it work!  </label>
-                                <input type="radio" name="radio_free_puck" id="radio_free_puck3" value="make_it_work" checked>
+                                <input type="radio" name="radio_free_d3ck" id="radio_free_d3ck3" value="make_it_work" checked>
                             </div>
                           </div>
                         </div>
@@ -150,11 +152,11 @@
                         <div class="row">
 
                         <div class="btn-toolbar"> <span class="spacer20"></span></div>
-                        <div class="col-md-3"> </div>
+                        <div class="col-md-5"> </div>
                         <div class="col-md-2">
-                          <span> <input style="display:none" id="puck_action" name="puck_action" value="SETUP" /> </span>
+                          <span> <input style="display:none" id="d3ck_action" name="d3ck_action" value="SETUP" /> </span>
                           <!-- this does some javascript fu below to post the data and redirect back to this page -->
-                          <button id="puck_button_create" class="btn btn-primary">Make it so!</button>
+                          <button id="d3ck_button_create" class="btn btn-large btn-primary"><h4>Make it so!</h4></button>
                         </div>
 
                 </form>
@@ -172,7 +174,7 @@
         <div class="btn-toolbar"> <span></span></div>
         <div class="btn-toolbar"> <span class="spacer100"></span></div>
 
-        <div class="footer" id="puck_footy">
+        <div class="footer" id="d3ck_footy">
             <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
         </div>
 
@@ -193,6 +195,25 @@
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
 <script type="text/javascript" src="/js/underscore-min.js"></script>
+
+<script type="text/javascript" src="/js/jquery.reject.js"></script>
+<script>
+
+// $('#demo4').click(function() {
+$(document).ready(function () {
+    $.reject({
+        reject: { all: true },
+        display: ['firefox','chrome'],
+        header: "WARNING - this uses modern browsers only... if you're using something other than these it may or may not work",
+        paragraph1: "If your browser works @ <a href='http://appear.in' target='_blank'>appear.in's</a> fine site you'll probably be good.",
+        paragraph2: "",
+        closeLink: '<span style="color:red"><b> Close This Window </b></span>', 
+        closeMessage: "By closing this window you acknowledge that (a) I can't program browsers very well and (b) your normal browsing experience here may be degraded or cease to function. But good luck anyway :)"
+    });
+
+})
+
+</script>
 
 </body>
 

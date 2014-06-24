@@ -41,9 +41,9 @@ proto=$6
 
 # out with the old
 echo flushing old iptables rules n routes
-bash /etc/puck/exe/flush.sh
+bash /etc/d3ck/exe/flush.sh
 
-# will not reverse this, as other PUCK stuff might break, but ensure it's on!
+# will not reverse this, as other D3CK stuff might break, but ensure it's on!
 echo "1" > /proc/sys/net/ipv4/ip_forward
 
 # get the ip addrs for a host, in its mind

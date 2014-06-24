@@ -29,10 +29,10 @@ var remote_url  = "https://" + remote_host + ":" + remote_port
 
 console.log('proxying from the local server on port ' + proxy_port + ' => ' + remote_url)
 
-// use the same keys as the main puck server
-var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
-    cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
-    ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
+// use the same keys as the main d3ck server
+var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key"),
+    cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt"),
+    ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
 
 var credentials = {key: key, cert: cert, ca: ca};
 

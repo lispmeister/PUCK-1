@@ -1,6 +1,0 @@
-#
-# for PUCK key insertion/removal
-#
-SUBSYSTEMS=="usb",KERNEL=="sd[a-h]1",SYMLINK+="usbkey", RUN+="/etc/puck/usbkey.sh %k"
-SUBSYSTEMS=="usb",KERNEL=="sd[a-h]1",ACTION=="remove",  RUN+="/etc/puck/usbkey.sh"
-

@@ -1,5 +1,5 @@
 # 
-# stuff you need to run a PUCK... for ubuntu
+# stuff you need to run a D3CK... for ubuntu
 #
 # EC2 uses yum... big interesting one is:
 #
@@ -31,9 +31,9 @@ apt-get install -y redis-server
 apt-get install -y curl
 apt-get install -y nodejs
 
-git clone https://github.com/zenfish/PUCK
+git clone https://github.com/zenfish/D3CK
 
-cd PUCK
+cd D3CK
 
 npm install
 
@@ -43,5 +43,5 @@ npm install
 # and finally....
 
 # start, stop, restart... sort of work ;)
-service puck start
+service d3ck start
 

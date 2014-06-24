@@ -1,18 +1,20 @@
 #!/bin/bash -x
 
-cd /etc/puck
+cd /etc/d3ck
 
 sudo killall redis-server
 
 sleep 2
 
-sudo /etc/init.d/puck stop
+sudo /etc/init.d/d3ck stop
 
-sudo rm -f /etc/puck/redis/dump.rdb 
-sudo rm -rf /etc/puck/pucks/*
-sudo rm -rf /etc/puck/public/uploads/*
-sudo rm -rf /etc/puck/secretz.json
+sudo rm -f /etc/d3ck/redis/dump.rdb 
+sudo rm -rf /etc/d3ck/d3cks/*
+sudo rm -rf /etc/d3ck/public/uploads/*
+sudo rm -rf /etc/d3ck/secretz.json
+
+sudo rm -f /etc/d3ck/public/img/????????????????????????????????????????.???
 
 sudo /etc/init.d/redis*  start
-# sudo /etc/init.d/puck start
+# sudo /etc/init.d/d3ck start
 

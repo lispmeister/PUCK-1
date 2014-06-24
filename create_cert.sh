@@ -1,7 +1,7 @@
 #!/bin/bash -x
 
 #
-# Generate cert pair for PUCK
+# Generate cert pair for D3CK
 #
 # Usage: $0 name client/server
 #
@@ -23,26 +23,26 @@ fi
 
 # should set...
 # KEY_SIZE=512
-. /etc/puck/config.sh
+. /etc/d3ck/config.sh
 
 org="$1"
 
 mode="$2"
 
 # key files
-key="$keystore/$org/puck.key"    # private key
-pid="$keystore/$org/puck.pid"    # PUCK id
-crt="$keystore/$org/puck.crt"    # certificate
-csr="$keystore/$org/puck.csr"    # signing request
+key="$keystore/$org/d3ck.key"    # private key
+pid="$keystore/$org/d3ck.pid"    # D3CK id
+crt="$keystore/$org/d3ck.crt"    # certificate
+csr="$keystore/$org/d3ck.csr"    # signing request
 
 if [ $mode = "server" ]; then
-    CAkey="$keystore/PUCK/puckroot.key"
-    CAcrt="$keystore/PUCK/puckroot.crt"
+    CAkey="$keystore/D3CK/d3ckroot.key"
+    CAcrt="$keystore/D3CK/d3ckroot.crt"
 else
-    CAkey="$keystore/PUCK/puckroot.key"
-    CAcrt="$keystore/PUCK/puckroot.crt"
-    # CAkey="$keystore/PUCK/puck.key"
-    # CAcrt="$keystore/PUCK/puck.crt"
+    CAkey="$keystore/D3CK/d3ckroot.key"
+    CAcrt="$keystore/D3CK/d3ckroot.crt"
+    # CAkey="$keystore/D3CK/d3ck.key"
+    # CAcrt="$keystore/D3CK/d3ck.crt"
 fi
 
 if [ -f $key -o -f $pid -o -f $crt -o -f $csr ]; then

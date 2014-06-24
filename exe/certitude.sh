@@ -8,8 +8,8 @@
 usage="Usage: $0 cert.crt"
 cert="$1"
 
-tmp="/etc/puck/tmp"
-tmp_file="/etc/puck/tmp/certy.$$"
+tmp="/etc/d3ck/tmp"
+tmp_file="/etc/d3ck/tmp/certy.$$"
 
 if [ "X$1" = "X" ]; then
     echo $usage

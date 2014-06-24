@@ -26,7 +26,7 @@ var Tail       = require('tail').Tail,
     restler    = require("restler"),
     sleep      = require('sleep'),
     sys        = require('sys'),
-    puck       = require('./modules'),
+    d3ck       = require('./modules'),
     uuid       = require('node-uuid'),
     Q          = require('q'),
     __         = require('underscore');   // note; not one, two _'s, just for node
@@ -47,31 +47,40 @@ var Tail       = require('tail').Tail,
 //
 
 // simple conf file...
-var config = JSON.parse(fs.readFileSync('/etc/puck/puck.json').toString())
+var config = JSON.parse(fs.readFileSync('/etc/d3ck/d3ck.json').toString())
 console.log(config);
 
-console.log(config.PUCK)
+console.log(config.D3CK)
 
 // shortcuts
-var puck_home         = config.PUCK.home
-var puck_keystore     = puck_home + config.PUCK.keystore
-var puck_bin          = puck_home + config.PUCK.bin
-var puck_logs         = puck_home + config.PUCK.logs
-var puck_public       = puck_home + config.PUCK.pub
-var puck_secretz      = puck_home + config.PUCK.secretz
+var d3ck_home         = config.D3CK.home
+var d3ck_keystore     = d3ck_home + config.D3CK.keystore
+var d3ck_bin          = d3ck_home + config.D3CK.bin
+var d3ck_logs         = d3ck_home + config.D3CK.logs
+var d3ck_public       = d3ck_home + config.D3CK.pub
+var d3ck_secretz      = d3ck_home + config.D3CK.secretz
 
 // oh, the tangled web we weave... "we"?  Well, I.
-var puck_port_int     = config.PUCK.puck_port_int
-var puck_port_ext     = config.PUCK.puck_port_ext
-var puck_port_forward = config.PUCK.puck_port_forward
-var puck_port_signal  = config.PUCK.puck_port_signal
-var puck_proto_signal = config.PUCK.puck_proto_signal
+var d3ck_port_int     = config.D3CK.d3ck_port_int
+var d3ck_port_ext     = config.D3CK.d3ck_port_ext
+var d3ck_port_forward = config.D3CK.d3ck_port_forward
+var d3ck_port_signal  = config.D3CK.d3ck_port_signal
+var d3ck_proto_signal = config.D3CK.d3ck_proto_signal
+
+// capabilities...
+var capabilities      = config.capabilities
+
+var d3ck = require('./modules');
+
+// firing up the auth engine
+d3ck.init_capabilities(capabilities)
+
 
 // user data, password, etc. Secret stuff.
 var secretz = {}
 
 // what the client is using to get to us
-var puck_server_ip    = ""
+var d3ck_server_ip    = ""
 
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
@@ -92,17 +101,17 @@ var PID_POLLING_TIME = config.misc.pid_polling_time
 
 // users must run quickstart if they haven't already
 var redirect_to_quickstart = true
-if (fs.existsSync(puck_secretz)) {
+if (fs.existsSync(d3ck_secretz)) {
     redirect_to_quickstart = false
 }
 
 // owner user array
-var puck_owners = []
+var d3ck_owners = []
 
 //
 // URLs that anyone can contact
 //
-// puck    have think this over... can only get puck data if ID == server's id
+// d3ck    have think this over... can only get d3ck data if ID == server's id
 /* stuff like -
    'login',
    'favicon.ico',
@@ -131,39 +140,39 @@ rclient.on("error", function (err) {
 var StringDecoder = require('string_decoder').StringDecoder;
 var decoder       = new StringDecoder('utf8');
 
-// global PUCK ID for this server's PUCK
+// global D3CK ID for this server's D3CK
 try {
-    puck_id = fs.readFileSync(puck_keystore + '/PUCK/puck.pid')
-    puck_id = decoder.write(puck_id);
-    puck_id = puck_id.replace(/\n/, '');
+    d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.pid')
+    d3ck_id = decoder.write(d3ck_id);
+    d3ck_id = d3ck_id.replace(/\n/, '');
 } 
 catch (e) {
-    console.log("no PUCK ID for this potential PUCK... you won't get anywhere w/o it....\n")
+    console.log("no D3CK ID for this potential D3CK... you won't get anywhere w/o it....\n")
     console.log(e)
     process.exit(2)
 }
     
-// suck up our own puck
+// suck up our own d3ck
     
-rclient.get(puck_id, function (err, reply) {
+rclient.get(d3ck_id, function (err, reply) {
     console.log('bwana!')
-    console.log(puck_id)
+    console.log(d3ck_id)
 
     if (!err) {
         // console.log(reply)
         if (reply == null) {
-            console.log('unable to retrieve our puck; id: %s', puck_id)
-            sys.exit({'error': 'no PUCK Found'})
+            console.log('unable to retrieve our d3ck; id: %s', d3ck_id)
+            sys.exit({'error': 'no D3CK Found'})
         }
         else {
-            bwana_puck = JSON.parse(reply)
-            console.log('puckaroo')
-            // console.log(bwana_puck)
+            bwana_d3ck = JSON.parse(reply)
+            console.log('d3ckaroo')
+            // console.log(bwana_d3ck)
         }
     }
     else {
-        console.log(err, 'getPuck: unable to retrieve %s', req.puck);
-        sys.exit({ "no": "puck"})
+        console.log(err, 'getd3ck: unable to retrieve %s', req.d3ck);
+        sys.exit({ "no": "d3ck"})
     }
 })
 
@@ -177,27 +186,27 @@ rclient.get(puck_id, function (err, reply) {
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
-    puck_events     = {"new_puck":""},
+    d3ck_events     = {"new_d3ck":""},
     browser_magic   = {}
-    old_puck_status = {},
-    puck_status     = {};
+    old_d3ck_status = {},
+    d3ck_status     = {};
 
-    puck_status.events         = puck_events
-    puck_status.openvpn_server = server_magic
-    puck_status.openvpn_client = client_magic
-    puck_status.file_events    = file_magic
-    puck_status.browser_events = browser_magic
+    d3ck_status.events         = d3ck_events
+    d3ck_status.openvpn_server = server_magic
+    d3ck_status.openvpn_client = client_magic
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
 
 
 var server           = "",
-    puck2ip          = {},      // puck ID to IP mapping
-    ip2puck          = {},      // IP mapping to puck ID
-    bwana_puck       = {},
-    puck_status_file = puck_home   + '/status.puck',
-    puck_remote_vpn  = puck_public + '/openvpn_server.ip';
+    d3ck2ip          = {},      // d3ck ID to IP mapping
+    ip2d3ck          = {},      // IP mapping to d3ck ID
+    bwana_d3ck       = {},
+    d3ck_status_file = d3ck_home   + '/status.d3ck',
+    d3ck_remote_vpn  = d3ck_public + '/openvpn_server.ip';
 
 // proxy up?
-var puck_proxy_up  = false,
+var d3ck_proxy_up  = false,
     proxy_server   = "",
     proxy          = "";
 
@@ -205,7 +214,7 @@ var all_client_ips = [],
     client_ip      = "";
 
 // keep an eye on the above
-pollStatus(puck_status_file)
+pollStatus(d3ck_status_file)
 
 // start with a clean slate
 change_status()
@@ -214,22 +223,22 @@ change_status()
 //
 // only exist after user has run startup
 //
-function get_puck_vital_bits () {
+function get_d3ck_vital_bits () {
 
     //
     // THE VERY FIRST THING YOU SEE... might be the quick install.
     //
     // if we don't see d3ck owner data, push the user to the install page
     //
-    if (fs.existsSync(puck_secretz)) {
+    if (fs.existsSync(d3ck_secretz)) {
         console.log('\n\n\nSECRETZ!!!!\n\n\nfound secret file... does it check out?\n\n\n')
-        secretz = JSON.parse(fs.readFileSync(puck_secretz).toString())
+        secretz = JSON.parse(fs.readFileSync(d3ck_secretz).toString())
         console.log(JSON.stringify(secretz))
         console.log('\n\n\n')
     
         // should be a single user, but keep this code in case we support more in future
         secretz.id = 0
-        puck_owners[0] = secretz
+        d3ck_owners[0] = secretz
     }
     
 
@@ -244,7 +253,7 @@ var cat_facts = []
 // json scrobbled from bits at from - https://user.xmission.com/~emailbox/trivia.htm
 console.log('hoovering up cat facts... look out, tabby!')
 
-fs.readFile(puck_home + "/catfacts.json", function (err, data) {
+fs.readFile(d3ck_home + "/catfacts.json", function (err, data) {
     if (err) {
         console.log('cant live without cat facts! ' + err)
         console.log('going down!')
@@ -277,26 +286,26 @@ watch_logs("server_vpn", "OpenVPN Server")
 watch_logs("client_vpn", "OpenVPN Client")
 
 //
-// drag in PUCK data to the server
+// drag in D3CK data to the server
 //
 // the very first time it's a bit of a chicken and egg thing;
-// how do you get the PUCK data loaded into the server if 
+// how do you get the D3CK data loaded into the server if 
 // the client hasn't posted it yet? Wait for the first time
 // something is posted, that should be the one that we can
 // trigger on.
 //
 
-console.log('pulling in puck data for the server itself')
+console.log('pulling in d3ck data for the server itself')
 
-// wait for the first puck to be loaded in
+// wait for the first d3ck to be loaded in
 events    = require('events');
 emitter   = new events.EventEmitter();
 
-wait_for_puck = null
+wait_for_d3ck = null
 
 
 //
-// suck in our PUCK's data
+// suck in our D3CK's data
 //
 // if it doesn't exist yet, spin and wait until it does... can't go anywhere without this
 //
@@ -309,11 +318,11 @@ var init = false
 // xxx null for now
 while (init) {
 
-    console.log('suckit, puck!')
+    console.log('suckit, d3ck!')
 
-    var url = 'https://localhost:' + puck_port_int + '/puck/' + puck_id
+    var url = 'https://localhost:' + d3ck_port_int + '/d3ck/' + d3ck_id
 
-    console.log('requesting puck from: ' + url)
+    console.log('requesting d3ck from: ' + url)
 
     request(url, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -322,14 +331,14 @@ while (init) {
             // console.log(body)
 
             if (body.indexOf("was not found") != -1) {
-                console.log('no woman no puck: ' + body)
+                console.log('no woman no d3ck: ' + body)
                 // trytryagain(options, callback);
             }
             else {
-                console.log('puckarrific!')
+                console.log('d3ckarrific!')
                 // console.log(body)
-                bwana_puck = JSON.parse(body)
-                createEvent('internal server', {event_type: "create", puck_id: bwana_puck.PUCK_ID})
+                bwana_d3ck = JSON.parse(body)
+                createEvent('internal server', {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
                 init = true
             }
         }
@@ -347,22 +356,22 @@ while (init) {
 // auth/passport stuff
 //
 function findById(id, fn) {
-    if (puck_owners[id]) {
+    if (d3ck_owners[id]) {
         // console.log('found....')
-        // console.log(puck_owners)
-        // console.log(puck_owners[0])
-        fn(null, puck_owners[id]);
+        // console.log(d3ck_owners)
+        // console.log(d3ck_owners[0])
+        fn(null, d3ck_owners[id]);
     } else {
         // console.log('User ' + id + ' does not exist');
-        // console.log(puck_owners)
-        // console.log(puck_owners[0])
+        // console.log(d3ck_owners)
+        // console.log(d3ck_owners[0])
         return fn(null, null);
     }
 }
 
 function findByUsername(name, fn) {
-  for (var i = 0, len = puck_owners.length; i < len; i++) {
-    var user = puck_owners[i];
+  for (var i = 0, len = d3ck_owners.length; i < len; i++) {
+    var user = d3ck_owners[i];
     if (user.name === name) {
       return fn(null, user);
     }
@@ -452,8 +461,8 @@ passport.use(new l_Strategy(
                 if (err)   { console.log("erzz in pass: " + err);  return done(err); }
                 if (!user) { console.log("unknown user: " + name); return done(null, false, { message: 'Unknown user ' + name }); }
 
-                // if (_hash == puck_owners[0].hash) {
-                bcrypt.compare(password, puck_owners[0].hash, function(err, res) {
+                // if (_hash == d3ck_owners[0].hash) {
+                bcrypt.compare(password, d3ck_owners[0].hash, function(err, res) {
                     if (err) {
                         console.log('password failzor')
                         return done(null, false)
@@ -463,7 +472,7 @@ passport.use(new l_Strategy(
                         return done(null, user)
                     }
                 });
-                // if (_hash == puck_owners[0].hash) {
+                // if (_hash == d3ck_owners[0].hash) {
                 //     return done(null, false, { message: 'Invalid password' });
                 // }
             })
@@ -482,33 +491,33 @@ function change_status() {
     console.log('changing status...')
 
     // in with the old, out with the new... er, reverse that
-    puck_status                = {}
-    puck_status.openvpn_server = server_magic
-    puck_status.openvpn_client = client_magic
+    d3ck_status                = {}
+    d3ck_status.openvpn_server = server_magic
+    d3ck_status.openvpn_client = client_magic
 
-    puck_status.events         = puck_events
-    puck_status.file_events    = file_magic
-    puck_status.browser_events = browser_magic
+    d3ck_status.events         = d3ck_events
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
 
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
-    console.log("status: " + puck_status)
+    console.log("status: " + d3ck_status)
 
-    var msg = {type: "status", status: puck_status}
+    var msg = {type: "status", status: d3ck_status}
     cat_power(msg)
 
     // xxx - errs to user!
-    _writeObj2File(puck_status_file, puck_status)
+    _writeObj2File(d3ck_status_file, d3ck_status)
 
     console.log('end status')
 
     // reset/clear
     file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    puck_events                = {"new_puck":""}
+    d3ck_events                = {"new_d3ck":""}
     browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-    puck_status.events         = puck_events
-    puck_status.file_events    = file_magic
-    puck_status.browser_events = browser_magic
+    d3ck_status.events         = d3ck_events
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
 
 }
 
@@ -542,7 +551,7 @@ for (var dev in ifaces) {
 cat_fact_server = my_devs["tun0"]
 
 // write the IP addr to a file
-_write2File(puck_remote_vpn, cat_fact_server)
+_write2File(d3ck_remote_vpn, cat_fact_server)
 
 // console.log(my_ips)
 
@@ -551,7 +560,7 @@ _write2File(puck_remote_vpn, cat_fact_server)
 //
 function watch_logs(logfile, log_type) {
 
-    logfile = puck_logs + "/" + logfile + ".log"
+    logfile = d3ck_logs + "/" + logfile + ".log"
 
     // create if doesn't exist...?
     if (!fs.existsSync(logfile)) {
@@ -620,14 +629,14 @@ function watch_logs(logfile, log_type) {
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
                     client     : client_remote_ip,
-                    client_pid : ip2puck[client_remote_ip],
+                    client_pid : ip2d3ck[client_remote_ip],
                     server_ip  : cat_fact_server,
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
                     }
 
-                createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
 
                 change_status() // make sure everyone hears the news
             }
@@ -656,7 +665,7 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
-                createEvent('internal server', {event_type: "vpn_server_disconnected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
                 change_status() // make sure everyone hears the news
             }
         }
@@ -683,7 +692,7 @@ function watch_logs(logfile, log_type) {
                 //
 
                 // clear the decks and put back the original port forwarding stuff
-                forward_port_and_flush(puck_port_forward, cat_fact_server, puck_port_signal, puck_proto_signal)
+                forward_port_and_flush(d3ck_port_forward, cat_fact_server, d3ck_port_signal, d3ck_proto_signal)
 
                 // if starting simply take the current stuff
                 client_magic = {
@@ -691,13 +700,13 @@ function watch_logs(logfile, log_type) {
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
                     server     : server_remote_ip,
-                    server_pid : ip2puck[server_remote_ip],
+                    server_pid : ip2d3ck[server_remote_ip],
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
                     }
 
-                createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
                 change_status() // make sure everyone hears the news
 
             }
@@ -710,7 +719,7 @@ function watch_logs(logfile, log_type) {
                 var v_duration = 0
 
                 // clear the decks and put back the original port forwarding stuff
-                forward_port_and_flush(puck_port_forward, my_devs["tun0"], puck_port_signal, puck_proto_signal)
+                forward_port_and_flush(d3ck_port_forward, my_devs["tun0"], d3ck_port_signal, d3ck_proto_signal)
 
                 client_magic = {
                     vpn_status : "down",
@@ -723,13 +732,13 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
-                createEvent('internal server', {event_type: "vpn_client_disconnected", puck_id: bwana_puck.PUCK_ID})
+                createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
 
                 // write the IP addr to a file
-                _write2File(puck_remote_vpn, cat_fact_server)
+                _write2File(d3ck_remote_vpn, cat_fact_server)
 
                 change_status() // make sure everyone hears the news
 
@@ -762,27 +771,27 @@ function MissingValueError() {
     this.name = 'MissingValueError';
 }
 
-function PuckExistsError(key) {
+function d3ckExistsError(key) {
     express.RestError.call(this, {
         statusCode: 409,
-        restCode: 'PuckExists',
+        restCode: 'd3ckExists',
         message: key + ' already exists',
-        constructorOpt: PuckExistsError
+        constructorOpt: d3ckExistsError
     });
 
-    this.name = 'PuckExistsError';
+    this.name = 'd3ckExistsError';
 }
 
 
-function PuckNotFoundError(key) {
+function d3ckNotFoundError(key) {
     express.RestError.call(this, {
         statusCode: 404,
-        restCode: 'PuckNotFound',
+        restCode: 'd3ckNotFound',
         message: key + ' was not found',
-        constructorOpt: PuckNotFoundError
+        constructorOpt: d3ckNotFoundError
     });
 
-    this.name = 'PuckNotFoundError';
+    this.name = 'd3ckNotFoundError';
 }
 
 function NotImplementedError() {
@@ -875,19 +884,19 @@ function pollStatus(file) {
     console.log('here to statusfy you...')
 
     // read or create it initially
-    if (puck_status == {}) {
-        if (!fs.existsSync(puck_status_file)) {
-            console.log('creating ' + puck_status_file)
-            _writeObj2File(puck_status_file, puck_status)
+    if (d3ck_status == {}) {
+        if (!fs.existsSync(d3ck_status_file)) {
+            console.log('creating ' + d3ck_status_file)
+            _writeObj2File(d3ck_status_file, d3ck_status)
         }
     }
-    fs.readFile(puck_status_file, function (err, data) {
+    fs.readFile(d3ck_status_file, function (err, data) {
         if (err) {
             console.log('file errz - ' + err)
         }
         else {
             console.log(data.toString())
-            puck_status = JSON.parse(data.toString())
+            d3ck_status = JSON.parse(data.toString())
         }
     })
 
@@ -896,18 +905,18 @@ function pollStatus(file) {
     // the status with the new contents
     //
 
-    console.log("I'm watching you, punk " + puck_status_file)
+    console.log("I'm watching you, punk " + d3ck_status_file)
 
-//  fs.watchFile(puck_status_file, function (curr, prev) {
+//  fs.watchFile(d3ck_status_file, function (curr, prev) {
 //      console.log('changezor')
         // simple conf file...
-//      fs.readFile(puck_status_file, function (err, data) {
+//      fs.readFile(d3ck_status_file, function (err, data) {
 //          if (err) {
 //              console.log('errz - ' + err)
 //          }
 //          else {
 //              console.log(data.toString())
-//              puck_status = JSON.parse(data.toString())
+//              d3ck_status = JSON.parse(data.toString())
 //          }
 //       })
 //  })
@@ -919,18 +928,18 @@ function pollStatus(file) {
 //
 // hand out the latest news
 //
-function puckStatus(req, res, next) {
+function d3ckStatus(req, res, next) {
 
-    // console.log('puck status check... ' + JSON.stringify(puck_status))
+    // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
     if (typeof ios == "object") { 
-        // console.log('boosting status on iOS ' + JSON.stringify(puck_status))
-        var msg = {type: "status", status: puck_status}
+        // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
+        var msg = {type: "status", status: d3ck_status}
         cat_power(msg)
     }
     else { console.log('iOS not ready') }
 
-    res.send(200, JSON.stringify(puck_status))
+    res.send(200, JSON.stringify(d3ck_status))
 
 }
 
@@ -947,15 +956,15 @@ function postStatus (req, res, next) {
 
     console.log('posting from : ' + client_ip)
 
-    puck_events   = req.body.events
+    d3ck_events   = req.body.events
     file_magic    = req.body.file_events
     browser_magic = req.body.browser_events
     server_magic  = req.body.openvpn_server
     client_magic  = req.body.openvpn_client
 
-    if (! __.isEqual(old_puck_status, puck_status)) {
+    if (! __.isEqual(old_d3ck_status, d3ck_status)) {
         change_status()
-        old_puck_status = puck_status
+        old_d3ck_status = d3ck_status
     }
 
     res.send(200, {"status" : "OK"})
@@ -964,11 +973,11 @@ function postStatus (req, res, next) {
 
 
 /**
- * This is a nonsensical custom content-type 'application/puck', just to
+ * This is a nonsensical custom content-type 'application/d3ck', just to
  * demonstrate how to support additional content-types.  Really this is
  * the same as text/plain, where we pick out 'value' if available
  */
-function formatPuck(req, res, body) {
+function formatd3ck(req, res, body) {
     if (body instanceof Error) {
         res.statusCode = body.statusCode || 500;
         body = body.message;
@@ -985,24 +994,24 @@ function formatPuck(req, res, body) {
 //
 // write the crypto key stuff to the FS
 //
-function create_puck_key_store(puck) {
+function create_d3ck_key_store(d3ck) {
 
     console.log('PUUUUUUCKKKKKK!')
-    // console.log(puck)
+    // console.log(d3ck)
 
-    if (typeof puck != 'object') {
-        puck = JSON.parse(puck)
+    if (typeof d3ck != 'object') {
+        d3ck = JSON.parse(d3ck)
     }
 
-    var ca   = puck.vpn_client.ca.join('\n')
-    var key  = puck.vpn_client.key.join('\n')
-    var cert = puck.vpn_client.cert.join('\n')
-    var tls  = puck.vpn.tlsauth.join('\n')
+    var ca   = d3ck.vpn_client.ca.join('\n')
+    var key  = d3ck.vpn_client.key.join('\n')
+    var cert = d3ck.vpn_client.cert.join('\n')
+    var tls  = d3ck.vpn.tlsauth.join('\n')
 
-    var puck_dir = puck_keystore + '/' + puck.PUCK_ID
+    var d3ck_dir = d3ck_keystore + '/' + d3ck.D3CK_ID
 
     // has to exist before the below will work...
-    mkdirp.sync(puck_dir, function () {
+    mkdirp.sync(d3ck_dir, function () {
         if(err) {
             // xxx - user error, bail
             console.log(err);
@@ -1010,26 +1019,51 @@ function create_puck_key_store(puck) {
     })
 
     // xxx - errs to user!
-    _write2File(puck_dir + '/puck.pid', bwana_puck.PUCK_ID)
-    _write2File(puck_dir + '/puckroot.crt', ca)
-    _write2File(puck_dir + '/puck.key', key)
-    _write2File(puck_dir + '/puck.crt', cert)
-    _write2File(puck_dir + '/ta.key', tls)
+    _write2File(d3ck_dir + '/d3ck.pid', bwana_d3ck.D3CK_ID)
+    _write2File(d3ck_dir + '/d3ckroot.crt', ca)
+    _write2File(d3ck_dir + '/d3ck.key', key)
+    _write2File(d3ck_dir + '/d3ck.crt', cert)
+    _write2File(d3ck_dir + '/ta.key', tls)
 
 }
 
 //
-// Redis PUCKs key are all upper case+digits
+// take a d3ck, update it in the DB and the filesystem, do error checking, etc., etc.
 //
-function createPuck(req, res, next) {
+function updated3ck(_d3ck) {
 
-    console.log ('creating puck')
+    console.log('updating data for ' + _d3ck.D3CK_ID)
+
+    rclient.set(_d3ck.key, _d3ck.value, function(err) {
+
+        if (err) {
+            console.log(err, 'updated3ck failed ' + JSON.stringify(err));
+            return(err);
+        } else {
+            console.log('redis update success')
+
+            _d3ck_events = { updated_d3ck : client_ip }
+            create_d3ck_key_store(_d3ck.value)
+            create_d3ck_image(_d3ck.value)
+            createEvent(get_client_ip(req), {event_type: "create", d3ck_id: req.body.value.D3CK_ID})
+        }
+    })
+
+
+}
+
+//
+// Redis D3CKs key are all upper case+digits
+//
+function created3ck(req, res, next) {
+
+    console.log ('creating d3ck')
     console.log (req.params)
 
     var ip_addr = req.body.ip_addr
 
     if (!req.body.value) {
-        console.log('createPuck: missing value');
+        console.log('created3ck: missing value');
         next(new MissingValueError());
         return;
     }
@@ -1037,7 +1071,7 @@ function createPuck(req, res, next) {
     client_ip  = get_client_ip(req)
     all_client_ips = req.body.value.all_ips
 
-    // if the IP we get the add from isn't in the ips the other puck
+    // if the IP we get the add from isn't in the ips the other d3ck
     // says it has... add it in; they may be coming from a NAT or
     // something weird
     console.log('looking to see if your current ip is in your pool')
@@ -1055,54 +1089,55 @@ function createPuck(req, res, next) {
     }
 
 
-    var puck = {
+    var d3ck = {
         key: req.body.key || req.body.value.replace(/\W+/g, '_'),
         value:  JSON.stringify(req.body.value)
     }
 
 
-    // TODO: Check if Puck exists using EXISTS and fail if it does
+    // TODO: Check if d3ck exists using EXISTS and fail if it does
 
-    console.log("key: " + puck.key);
-    console.log("value: " + puck.value);
+    console.log("key: " + d3ck.key);
+    console.log("value: " + d3ck.value);
 
-    rclient.set(puck.key, puck.value, function(err) {
+    rclient.set(d3ck.key, d3ck.value, function(err) {
         if (err) {
-            console.log(err, 'putPuck: unable to store in Redis db');
+            console.log(err, 'putd3ck: unable to store in Redis db');
             next(err);
         } else {
-            console.log({puck: req.body}, 'putPuck: done');
+            console.log({d3ck: req.body}, 'putd3ck: done');
 
             //
             // if it's from a remote system, wake up local UI and tell user
             //
             
             // garrr... openvpn breaks this too... 
-            puck_events = { new_puck : client_ip }
+            d3ck_events = { new_d3ck : client_ip }
 
-            create_puck_key_store(puck.value)
+            create_d3ck_key_store(d3ck.value)
 
-            create_puck_image(puck.value)
+            create_d3ck_image(d3ck.value)
 
             // if (typeof my_net[client_ip] == "undefined") {
             //     console.log('create appears to be coming from remote: ' + client_ip)
-            //     puck_events = { new_puck : client_ip }
-            //     create_puck_key_store(puck.value)
+            //     d3ck_events = { new_d3ck : client_ip }
+            //     create_d3ck_key_store(d3ck.value)
             // }
             // else {
-            //     puck_events = { new_puck : "" }
-            //     console.log('create appears to be coming from local PUCK/host: ' + client_ip)
+            //     d3ck_events = { new_d3ck : "" }
+            //     console.log('create appears to be coming from local D3CK/host: ' + client_ip)
             // }
 
-            createEvent(get_client_ip(req), {event_type: "create", puck_id: req.body.value.PUCK_ID})
+            createEvent(get_client_ip(req), {event_type: "create", d3ck_id: req.body.value.D3CK_ID})
 
-            res.send(204);
         }
     })
 
+    res.send(204);
+
 }
 
-function create_puck_image(data) {
+function create_d3ck_image(data) {
 
     if (typeof data != 'object') {
         data = JSON.parse(data)
@@ -1134,14 +1169,14 @@ function create_puck_image(data) {
         msg = 'Invalid suffix (' + suffix + '), only accept: GIF, JPG, and PNG'
     }
 
-    puck_image      = '/img/' + data.PUCK_ID + suffix
-    full_puck_image = puck_public + '/img/' + data.PUCK_ID + suffix
+    d3ck_image      = '/img/' + data.D3CK_ID + suffix
+    full_d3ck_image = d3ck_public + '/img/' + data.D3CK_ID + suffix
 
     if (msg) {
         console.log('err in processing remote image: ' + msg)
     }
     else {
-        _write2File(full_puck_image, image)
+        _write2File(full_d3ck_image, image)
     }
 
 
@@ -1199,19 +1234,19 @@ function isEmpty(obj) {
 }
 
 /**
- * Deletes a Puck by key
+ * Deletes a d3ck by key
  */
-function deletePuck(req, res, next) {
+function deleted3ck(req, res, next) {
 
     console.log('NUKE it from orbit!')
 
     rclient.del(req.params.key, function (err) {
         if (err) {
-            console.log(err, 'deletePuck: unable to delete %s', req.params.key)
+            console.log(err, 'deleted3ck: unable to delete %s', req.params.key)
             next(err);
         } else {
-            console.log('deletePuck: success deleting %s', req.params.key)
-            createEvent(get_client_ip(req), {event_type: "delete", puck_id: req.params.key})
+            console.log('deleted3ck: success deleting %s', req.params.key)
+            createEvent(get_client_ip(req), {event_type: "delete", d3ck_id: req.params.key})
             res.send(204);
         }
     });
@@ -1219,7 +1254,7 @@ function deletePuck(req, res, next) {
 
 
 /**
- * Deletes all Pucks (in parallel)
+ * Deletes all d3cks (in parallel)
  */
 function deleteAll(req, res, next) {
         console.log({params: req.params}, 'deleteAll: not implemented');
@@ -1270,7 +1305,7 @@ function setTCPProxy(req, res, next) {
 
     console.log('set proxy to listen on port ' + proxy_local_port)
 
-    res.send(200, {"puck_local_port": proxy_local_port, "proxy_remote_port": proxy_remote_port, "proxy_remote_host": proxy_remote_host})
+    res.send(200, {"d3ck_local_port": proxy_local_port, "proxy_remote_port": proxy_remote_port, "proxy_remote_host": proxy_remote_host})
 
 }
 
@@ -1278,7 +1313,7 @@ function setTCPProxy(req, res, next) {
 //
 // info about events is stored here.
 //
-// Redis keys will all be lowercase, while PUCKs are all upper case+digits
+// Redis keys will all be lowercase, while D3CKs are all upper case+digits
 //
 function createEvent(client_ip, event_data) {
 
@@ -1348,7 +1383,7 @@ function _old_listEvents(req, res, next) {
 
     var data = []
 
-    // non PUCKs
+    // non D3CKs
     rclient.keys('[^A-Z0-9]*', function(err, lists) {
         var multi = rclient.multi()
         var keys  = Object.keys(lists)
@@ -1414,7 +1449,7 @@ function getEvent(req, res, next) {
             // console.log(replies)
             if (replies == null) {
                 console.log(err, 'getEvent: unable to retrieve keys matching %s', req.params.key);
-                // next(new PuckNotFoundError(req.params.key));
+                // next(new d3ckNotFoundError(req.params.key));
                 next({'error': 'Event Not Found'})
                 res.send(418, replies)  // 418 I'm a teapot (RFC 2324)
             } 
@@ -1429,7 +1464,7 @@ function getEvent(req, res, next) {
                         // console.log(data)
                         if (data == null) {
                             console.log('no data returned with key ', req.params.key);
-                            // next(new PuckNotFoundError(req.params.key));
+                            // next(new d3ckNotFoundError(req.params.key));
                             next({'error': 'Event data not found'})
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
                         } 
@@ -1451,7 +1486,7 @@ function getEvent(req, res, next) {
 
         }
         else {
-            console.log(err, 'getEvent: unable to retrieve %s', req.puck);
+            console.log(err, 'getEvent: unable to retrieve %s', req.d3ck);
             res.send(418, reply);   // 418 I'm a teapot (RFC 2324)
         }
     })
@@ -1459,11 +1494,11 @@ function getEvent(req, res, next) {
 }
 
 /**
- * Loads a Puck by key
+ * Loads a d3ck by key
  */
-function getPuck(req, res, next) {
+function getd3ck(req, res, next) {
 
-    console.log('getPuck')
+    console.log('getd3ck')
 
     // console.log(req.params)
 
@@ -1471,9 +1506,9 @@ function getPuck(req, res, next) {
 
         if (!err) {
             if (reply == null) {
-                console.log(err, 'getPuck: unable to retrieve %s', req.puck);
-                // next(new PuckNotFoundError(req.params.key));
-                next({'error': 'PUCK Not Found'})
+                console.log(err, 'getd3ck: unable to retrieve %s', req.d3ck);
+                // next(new d3ckNotFoundError(req.params.key));
+                next({'error': 'D3CK Not Found'})
             } 
             else {
                 // console.log("Value retrieved: " + reply.toString());
@@ -1481,22 +1516,22 @@ function getPuck(req, res, next) {
             }
         }
         else {
-            console.log(err, 'getPuck: unable to retrieve %s', req.puck);
-            res.send(404, { "no": "puck"});
+            console.log(err, 'getd3ck: unable to retrieve %s', req.d3ck);
+            res.send(404, { "no": "d3ck"});
         }
     });
 }
 
 /**
- * Simple returns the list of Puck Ids that are stored in redis
+ * Simple returns the list of d3ck Ids that are stored in redis
  */
-function listPucks(req, res, next) {
+function listd3cks(req, res, next) {
     rclient.keys('[A-F0-9]*', function (err, keys) {
         if (err) {
-            console.log(err, 'listPuck: unable to retrieve all Pucks');
+            console.log(err, 'listd3ck: unable to retrieve all d3cks');
             next(err);            
         } else {
-            console.log('Number of Pucks found: ', keys.length);
+            console.log('Number of d3cks found: ', keys.length);
             res.send(200, JSON.stringify(keys));
         }
     });
@@ -1504,7 +1539,7 @@ function listPucks(req, res, next) {
 
 /**
  * Echo reply
- * TODO: Return actual Puck ID
+ * TODO: Return actual d3ck ID
  */
 function echoReply(req, res, next) {
 
@@ -1512,17 +1547,17 @@ function echoReply(req, res, next) {
 
     // & what's our IP addr?
     // looks like host: '192.168.0.250:12034',
-    puck_server_ip = req.headers.host.split(':')[0]
+    d3ck_server_ip = req.headers.host.split(':')[0]
 
-    // console.log('pingasaurus from ' + client_ip + ' hitting us at ' + puck_server_ip)
+    // console.log('pingasaurus from ' + client_ip + ' hitting us at ' + d3ck_server_ip)
 
-    if (typeof bwana_puck == "undefined") {
+    if (typeof bwana_d3ck == "undefined") {
         console.log('no echo here...')
         var response = {status: "bad"}
     }
     else {
         // console.log('echo, echo, echo....')
-        var response = {status: "OK", "name": bwana_puck.name, "pid": puck_id}
+        var response = {status: "OK", "name": bwana_d3ck.name, "pid": d3ck_id}
     }
 
     // res.send(200, response)
@@ -1543,11 +1578,11 @@ function echoStatus(req, res, next) {
  * Stop the local OpenVPN client via an external bash script.
  */
 function stopVPN(req, res, next) {
-    var cmd     = puck_bin + '/stop_vpn.sh';
+    var cmd     = d3ck_bin + '/stop_vpn.sh';
 
     console.log('stop VPN!')
 
-    puck_spawn(cmd, [])
+    d3ck_spawn(cmd, [])
 
     res.send(200, {"status": "vpn down"});
 
@@ -1557,7 +1592,7 @@ function stopVPN(req, res, next) {
  *
  * knock on the door... anyone home?
  *
- * Check welcome/black lists to see if your PUCK will talk
+ * Check welcome/black lists to see if your D3CK will talk
  *
 */
 function knockKnock(req, res, next) {
@@ -1566,15 +1601,15 @@ function knockKnock(req, res, next) {
     //console.log(req.params)
 
     // bail if we don't get ID
-    console.log(typeof req.params.puckid)
-    if (typeof req.params.puckid == "undefined") {
+    console.log(typeof req.params.d3ckid)
+    if (typeof req.params.d3ckid == "undefined") {
       var bad_dog = "No ID, no love";
       console.log(bad_dog)
       res.send(403, { "bad": "dog"});
       return
     }
     else {
-        console.log("you've passed the first test...", req.params.puckid)
+        console.log("you've passed the first test...", req.params.d3ckid)
     }
 
     console.log('moving on...')
@@ -1590,7 +1625,7 @@ function knockKnock(req, res, next) {
     if (typeof my_net[client_ip] == "undefined") {
        // console.log(req)
         console.log('appears to be coming from remote: ' + client_ip)
-        puck_events = { ring_ring : client_ip }
+        d3ck_events = { ring_ring : client_ip }
     }
     // Local
     else {
@@ -1602,7 +1637,7 @@ function knockKnock(req, res, next) {
 //    res.send(403, invisible_girl);
 //    return next(false);
 
-    console.log(req.url, req.params.puckid)
+    console.log(req.url, req.params.d3ckid)
 
     res.send(200, {"hey" : client_ip});
 
@@ -1614,7 +1649,7 @@ function downloadStuff (req, res, next) {
 
     console.log('in DL stuff')
 
-    var uploadz = puck_public + "/uploads"
+    var uploadz = d3ck_public + "/uploads"
 
     var files = fs.readdirSync(uploadz)
 
@@ -1670,7 +1705,7 @@ function uploadSchtuff(req, res, next) {
 
         var target_size = req.files.uppity[i].size
         var target_file = req.files.uppity[i].name
-        var target_path = puck_public + "/uploads/" + target_file
+        var target_path = d3ck_public + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
 
         // skip if too big
@@ -1717,14 +1752,14 @@ function uploadSchtuff(req, res, next) {
                 //
                 if (upload_target == "local") {
                     console.log('local')
-                    createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[client_ip]})
+                    createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[client_ip]})
                     res.send(204, {"status" : target_file})
                 }
 
                 //
                 // REMOTE
                 //
-                // post to a remote PUCK, if connected... first look up IP based on PID, then post to it
+                // post to a remote D3CK, if connected... first look up IP based on PID, then post to it
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
 
@@ -1739,7 +1774,7 @@ function uploadSchtuff(req, res, next) {
                         } 
                         else {
                             console.log('upload to ' + upload_target + ' complete')
-                            createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "puck_id": ip2puck[upload_target]})
+                            createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
                             console.log(data);
 
                             // get rid of evidence
@@ -1762,17 +1797,17 @@ function uploadSchtuff(req, res, next) {
 //
 // execute a command in the background, log stuff
 //
-function puck_spawn(command, argz) {
+function d3ck_spawn(command, argz) {
 
     cmd = command.split('/')[command.split('/').length -1]
 
-    console.log('a spawn o puck emerges... ' + ' (' + cmd + ')\n\n\t' + command + ' ' + argz.join(' ') + '\n')
+    console.log('a spawn o d3ck emerges... ' + ' (' + cmd + ')\n\n\t' + command + ' ' + argz.join(' ') + '\n')
 
     var spawn   = require('child_process').spawn
 
     try {
-        out = fs.openSync(puck_logs + '/' + cmd + '.out.log', 'a+')
-        err = fs.openSync(puck_logs + '/' + cmd + '.err.log', 'a+')
+        out = fs.openSync(d3ck_logs + '/' + cmd + '.out.log', 'a+')
+        err = fs.openSync(d3ck_logs + '/' + cmd + '.err.log', 'a+')
     }
     catch (e) {
         console.log("log open error with " + command + ' => ' + e.message)
@@ -1800,43 +1835,43 @@ function startVPN(req, res, next) {
     console.log('start vpn2')
     console.log(req.body)
 
-    var home  = "/puck.html"
+    var home  = "/d3ck.html"
 
     var ip_addr = req.body.ip_addr
 
     // bail if we don't get ID
-    if (typeof req.body.puckid === 'undefined' || req.body.puckid == "") {
-        console.log("error... requires a PUCK ID!");
+    if (typeof req.body.d3ckid === 'undefined' || req.body.d3ckid == "") {
+        console.log("error... requires a D3CK ID!");
         res.redirect(302, home)
     }
 
     console.log('onto the execution...')
 
-    puckid = req.body.puckid
+    d3ckid = req.body.d3ckid
     ipaddr = req.body.ipaddr
 
-    console.log(puckid, ipaddr)
+    console.log(d3ckid, ipaddr)
 
     // this means you're trying to do it despite ping not working
-    if (typeof puck2ip[puckid] == 'undefined') {
+    if (typeof d3ck2ip[d3ckid] == 'undefined') {
         console.log("hmmm... trying to VPN when ping couldn't reach it... good luck!")
-        args = [puckid, ipaddr]
+        args = [d3ckid, ipaddr]
     }
 
     else {
-        console.log("using pinged IP addr to VPN: " + puck2ip[puckid])
-        args = [puckid, puck2ip[puckid]]
+        console.log("using pinged IP addr to VPN: " + d3ck2ip[d3ckid])
+        args = [d3ckid, d3ck2ip[d3ckid]]
     }
 
-    var cmd   = puck_bin + '/start_vpn.sh'
+    var cmd   = d3ck_bin + '/start_vpn.sh'
 
     // fire up vpn
-    puck_spawn(cmd, args)
+    d3ck_spawn(cmd, args)
 
-    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
+    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
 
     // write the IP addr to a file
-    fs.writeFile(puck_remote_vpn, puck2ip[puckid], function(err) {
+    fs.writeFile(d3ck_remote_vpn, d3ck2ip[d3ckid], function(err) {
         if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
         else { console.log('wrote remote vpn server IP') }
     });
@@ -1854,10 +1889,10 @@ function startVPN(req, res, next) {
 //
 // normally you have something like:
 //
-//    computer-1 <-> browser-1 <-> PUCK-1 <-- .... network .... --> PUCK-2 <-> browser-2 <-> computer-2
+//    computer-1 <-> browser-1 <-> D3CK-1 <-- .... network .... --> D3CK-2 <-> browser-2 <-> computer-2
 //
 // computer1  & 2 may well not have connectivty to the other, but the js executing
-// in the browser comes from them... but they can always talk to their own PUCK.
+// in the browser comes from them... but they can always talk to their own D3CK.
 //
 function forward_port(req, res, next) {
 
@@ -1883,13 +1918,13 @@ function forward_port(req, res, next) {
     console.log(direction, local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
-    var cmd = puck_bin + '/forward_port_n_flush.sh'
+    var cmd = d3ck_bin + '/forward_port_n_flush.sh'
 
-    var args  = [direction, puck_server_ip, local_port, remote_ip, remote_port, proto]
+    var args  = [direction, d3ck_server_ip, local_port, remote_ip, remote_port, proto]
 
-    puck_spawn(cmd, args)
+    d3ck_spawn(cmd, args)
 
-    createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: puck2ip[puckid], remote_puck_id: puckid})
+    createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
 
     res.send(204)
 
@@ -1909,27 +1944,27 @@ function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
     console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
-    var cmd  = puck_bin + '/forward_port_n_flush.sh'
-    var args = ["up", puck_server_ip, local_port, remote_ip, remote_port, proto]
+    var cmd  = d3ck_bin + '/forward_port_n_flush.sh'
+    var args = ["up", d3ck_server_ip, local_port, remote_ip, remote_port, proto]
 
-    puck_spawn(cmd, args)
+    d3ck_spawn(cmd, args)
 
-    createEvent("internal server", {event_type: "flush forwarding", puck_id: bwana_puck.PUCK_ID})
+    createEvent("internal server", {event_type: "flush forwarding", d3ck_id: bwana_d3ck.D3CK_ID})
 
 }
 
 
 /**
- * Replaces a Puck completely
+ * Replaces a d3ck completely
  */
-function putPuck(req, res, next) {
+function putd3ck(req, res, next) {
     if (!req.params.value) {
-        console.log({params: req.params}, 'putPuck: missing value');
+        console.log({params: req.params}, 'putd3ck: missing value');
         next(new MissingValueError());
         return;
     }
 
-    console.log({params: req.params}, 'putPuck: not implemented');
+    console.log({params: req.params}, 'putd3ck: not implemented');
     next(new NotImplementedError());
     return;
 }
@@ -1937,7 +1972,7 @@ function putPuck(req, res, next) {
 
 function back_to_home (res) {
     console.log('on my way home')
-    var home = "/puck.html"
+    var home = "/d3ck.html"
     res.redirect(302, home)
 }
 
@@ -1952,12 +1987,12 @@ function handleForm(req, res, next) {
 
     // console.log(req.params)
 
-    if (typeof req.body.puck_action === 'undefined' || req.body.puck_action == "") {
-        console.log("error... unrecognized action: " + req.body.puck_action);
+    if (typeof req.body.d3ck_action === 'undefined' || req.body.d3ck_action == "") {
+        console.log("error... unrecognized action: " + req.body.d3ck_action);
         back_to_home(res)
     }
 
-    else if (req.body.puck_action == 'CREATE') {
+    else if (req.body.d3ck_action == 'CREATE') {
         formCreate(req, res, next)
         console.log('... suck... sess...?')
 
@@ -1966,7 +2001,7 @@ function handleForm(req, res, next) {
         // res.end()
     }
 
-    else if (req.body.puck_action == 'DELETE') {
+    else if (req.body.d3ck_action == 'DELETE') {
         formDelete(req, res, next)
         back_to_home(res)
     }
@@ -1982,29 +2017,29 @@ function handleForm(req, res, next) {
 
 function formDelete(req, res, next) {
 
-    console.log("deleting puck...")
+    console.log("deleting d3ck...")
     console.log(req.body)
-    console.log(req.body.puckid)
+    console.log(req.body.d3ckid)
 
-    // script below needs: puck-id
+    // script below needs: d3ck-id
 
     // have to have these
-    var puckid = req.body.puckid
+    var d3ckid = req.body.d3ckid
 
     //
-    // execute a shell script with appropriate args to create a puck.
+    // execute a shell script with appropriate args to create a d3ck.
     // ... of course... maybe should be done in node/js anyway...
     // have to ponder some imponderables....
     //
     // this simply takes the pwd and finds the exe area... really 
-    // want to use a reasonable puck home here!
-    puck_spawn(puck_bin + '/delete_puck.sh', [puckid])
+    // want to use a reasonable d3ck home here!
+    d3ck_spawn(d3ck_bin + '/delete_d3ck.sh', [d3ckid])
 
 
 }
 
 
-function sping_get(url, all_ips, puckid, n) {
+function sping_get(url, all_ips, d3ckid, n) {
 
     var request = https.get(url, function(resp) {
         console.log('trying.... ' + url)
@@ -2016,9 +2051,9 @@ function sping_get(url, all_ips, puckid, n) {
 
             d = JSON.parse(d)
 
-            if (d.pid != puckid) {
-                    console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
-                    console.log(d.pid + ' != ' + puckid)
+            if (d.pid != d3ckid) {
+                    console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
+                    console.log(d.pid + ' != ' + d3ckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     // xxx - need to squawk, but return isnt the way... sock.io?
                     // res.send(420, response) // enhance your calm!
@@ -2026,8 +2061,8 @@ function sping_get(url, all_ips, puckid, n) {
             else {
                     ping_done = true
                     console.log('sping worked - ' + all_ips[n])
-                    puck2ip[puckid] = all_ips[n]
-                    ip2puck[all_ips[n]] = puckid
+                    d3ck2ip[d3ckid] = all_ips[n]
+                    ip2d3ck[all_ips[n]] = d3ckid
                     return(d)
             }
 
@@ -2054,16 +2089,16 @@ function sping_get(url, all_ips, puckid, n) {
 }
 
 //
-// https ping a remote puck... it can have multiple
+// https ping a remote d3ck... it can have multiple
 // IP addrs, so ping them all at once and take the
 // first answer that matches their IP/PID
 //
 
 var ping_done = false
 
-function httpsPing(puckid, ipaddr, res, next) {
+function httpsPing(d3ckid, ipaddr, res, next) {
 
-    // console.log("++++pinging... " + puckid + ' / ' + ipaddr)
+    // console.log("++++pinging... " + d3ckid + ' / ' + ipaddr)
 
     ping_done = false
 
@@ -2074,7 +2109,7 @@ function httpsPing(puckid, ipaddr, res, next) {
     var err = {}
 
 //  cache results, do that first
-//  if (defined puck2ip[ip]) 
+//  if (defined d3ck2ip[ip]) 
 
     all_ips.forEach(function(ip, i) {
 
@@ -2087,7 +2122,7 @@ function httpsPing(puckid, ipaddr, res, next) {
 
         // console.log('pinging  ' + ip);
 
-        var url = 'https://' + ip + ':' + puck_port_ext + '/ping'
+        var url = 'https://' + ip + ':' + d3ck_port_ext + '/ping'
 
         var req = https.get(url, function(response) {
 
@@ -2100,17 +2135,17 @@ function httpsPing(puckid, ipaddr, res, next) {
                 // console.log(data)
                 data = JSON.parse(data)
 
-                if (data.pid != puckid) {
-                    console.log("ID mismatch - the ping you pucked doesn't match the puck-id you gave")
-                    console.log(data.pid + ' != ' + puckid)
+                if (data.pid != d3ckid) {
+                    console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
+                    console.log(data.pid + ' != ' + d3ckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     // res.send(420, response) // enhance your calm!
                 }
 
                 else if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
                     ping_done = true
-                    puck2ip[puckid] = all_ips[i]
-                    ip2puck[all_ips[i]] = puckid
+                    d3ck2ip[d3ckid] = all_ips[i]
+                    ip2d3ck[all_ips[i]] = d3ckid
                     res.send(200, data)
                 }
                 responses++
@@ -2149,10 +2184,10 @@ function quikStart(req, res, next) {
 
     var name       = "JaneDoe",
         email      = "jane@example.com",
-        puck       = "PuckimusRex",
+        d3ck       = "d3ckimusRex",
         stance     = "reasonable",
         password   = "",                  // sigh... should allow nulls, but libs don't like it... bah
-        puck_image = ""
+        d3ck_image = ""
 
 
     console.log('quicky!')
@@ -2160,123 +2195,127 @@ function quikStart(req, res, next) {
     console.log(req.body)
 
     if (typeof req.body.user_name == "undefined") {
-        console.log('user name is required')
+        console.log('user name is required, but using defaults')
     }
     else {
         name = req.body.user_name
     }
 
     if (typeof req.body.email_address == "undefined") {
-        console.log('user name is required')
+        console.log('user name is required, but using defaults')
     }
     else {
         email = req.body.email_address
     }
 
-    if (typeof req.body.puck_name == "undefined") {
-        console.log('puck name is required')
+    if (typeof req.body.d3ck_name == "undefined") {
+        console.log('d3ck name is required, but using defaults')
     }
     else {
-        puck = req.body.puck_name
+        d3ck = req.body.d3ck_name
     }
 
-    if (typeof req.body.puck_password == "undefined") {
-        console.log('password is required')
+    if (typeof req.body.d3ck_password == "undefined") {
+        console.log('password is required, but using defaults (can ... we...?)')
     }
     else {
-        password = req.body.puck_password
+        password = req.body.d3ck_password
     }
 
-    if (typeof req.body.radio_free_puck == "undefined") {
-        console.log('security stance is required')
+    if (typeof req.body.radio_free_d3ck == "undefined") {
+        console.log('security stance is required, but using default')
     }
     else {
-        stance = req.body.radio_free_puck
+        stance = req.body.radio_free_d3ck
     }
 
+    console.log(name, email, d3ck, password, stance)
+
+    bwana_d3ck.name        = d3ck
+    bwana_d3ck.owner.name  = name
+    bwana_d3ck.owner.email = email
+    bwana_d3ck.stance      = stance
+
+    console.log(req.files)
     // grab the file from whereever it's stashed, write it
-    if (req.files.puck_image.path != "" && typeof req.files.puck_image.type != "undefined") {
+    // if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
+    if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
         msg = ""
-        if (req.files.puck_image.type != 'image/png' && req.files.puck_image.type != 'image/jpeg' && req.files.puck_image.type != 'image/gif') {
-            msg = 'Invalid image format (' + req.files.puck_image.type + '), only accept: GIF, JPG, and PNG'
+        if (req.files.d3ck_image.type != 'image/png' && req.files.d3ck_image.type != 'image/jpeg' && req.files.d3ck_image.type != 'image/gif') {
+            msg = 'Invalid image format (' + req.files.d3ck_image.type + '), only accept: GIF, JPG, and PNG'
         }
 
-        if (req.files.puck_image.size > MAX_IMAGE_SIZE) {
-            msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.puck_image.size
+        if (req.files.d3ck_image.size > MAX_IMAGE_SIZE) {
+            msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.d3ck_image.size
         }
 
         // just stick to one ending please....
-        req.files.puck_image.name.replace('jpeg$','jpg')
+        req.files.d3ck_image.name.replace('jpeg$','jpg')
 
         if (msg == "") {
-            var iname  = req.files.puck_image.name
+            var iname  = req.files.d3ck_image.name
             var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
 
-            puck_image      = '/img/' + puck_id + suffix
-            full_puck_image = puck_public + '/img/' + puck_id + suffix
+            d3ck_image      = '/img/' + d3ck_id + suffix
+            full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
 
-            fs.readFile(req.files.puck_image.path, function (err, data) {
-                var image_b64 = b64_encode(data)
+            var data = fs.readFileSync(req.files.d3ck_image.path)
+            var image_b64 = b64_encode(data)
 
-                if (err) {
-                    console.log("Couldn't read " + req.files.puck_image.path)
-                    return
+            // in case someone tries some monkey biz...
+            if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
+                console.log('err: filename suffix borked: ' + suffix)
+            }
+            else {
+                console.log('trying to write... ' + d3ck_image)
+                // weirdness... writefile returns nada
+                try {
+                    fs.writeFileSync(full_d3ck_image, data, 'utf8')
+                    console.log('updating d3ck json')
+
+                    bwana_d3ck.image     = d3ck_image
+                    bwana_d3ck.image_b64 = image_b64
+
+                    console.log(JSON.stringify(bwana_d3ck))
+
                 }
-
-                // in case someone tries some monkey biz...
-                if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
-                    console.log('err: filename suffix borked: ' + suffix)
+                catch (err) {
+                    console.log('error writing image file "' + full_d3ck_image + '": ' + JSON.stringify(err))
                 }
-                else {
-                    console.log('trying to write... ' + puck_image)
-                    // weirdness... writefile returns nada
-                    try {
-                        fs.writeFileSync(full_puck_image, data, 'utf8')
-                        console.log('updating puck json')
-
-                        bwana_puck.image     = puck_image
-                        bwana_puck.image_b64 = image_b64
-
-                        console.log(JSON.stringify(bwana_puck))
-
-                        rclient.set(puck_id, JSON.stringify(bwana_puck), function(err) {
-                            if (err) {
-                                console.log(err, 'd3ck: unable to update Redis db');
-                                console.log(err)
-                            } else {
-                                console.log('puck updated')
-                            }
-                        })
-                    }
-                    catch (err) {
-                        console.log('error writing image file "' + full_puck_image + '": ' + JSON.stringify(err))
-                    }
-                }
-            })
+            }
         }
         else {
             console.log('error uploading: ' + msg)
         }
     }
 
-    console.log("PUCK image... " + puck_image)
+    rclient.set(d3ck_id, JSON.stringify(bwana_d3ck), function(err) {
+        if (err) {
+            console.log(err, 'd3ck: unable to update Redis db');
+            console.log(err)
+        } else {
+            console.log('d3ck updated')
+        }
+    })
+
+    console.log("D3CK image... " + d3ck_image)
 
     secretz          = {}
     secretz.id       = 0
     secretz.name     = name
     secretz.email    = email
-    secretz.puck     = puck
+    secretz.d3ck     = d3ck
     secretz.stance   = stance
-    secretz.image    = puck_image
+    secretz.image    = d3ck_image
 
     secretz.hash     = hashit(password, N_ROUNDS)
 
-    console.log(name, email, puck, stance, password, secretz.hash, puck_image)
+    console.log(name, email, d3ck, stance, password, secretz.hash, d3ck_image)
 
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
-    _writeObj2File(puck_secretz, secretz)
+    _writeObj2File(d3ck_secretz, secretz)
 
     // no longer go here
     redirect_to_quickstart = false
@@ -2291,16 +2330,16 @@ function quikStart(req, res, next) {
 //
 function formCreate(req, res, next) {
 
-    console.log("creating puck...")
+    console.log("creating d3ck...")
     console.log(req.body)
 
     var ip_addr = req.body.ip_addr
 
-    var url = 'https://' + ip_addr + ':' + puck_port_ext + '/ping'
+    var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/ping'
 
     console.log('ping get_https ' + url)
 
-    // is it a puck?
+    // is it a d3ck?
     var req = https.get(url, function(response) {
         var data = ''
         response.on('data', function(chunk) {
@@ -2320,15 +2359,15 @@ function formCreate(req, res, next) {
                 // console.log(data)
 
                 console.log('starting... writing...')
-                // make the puck's dir... should not exist!
+                // make the d3ck's dir... should not exist!
 
                 data = JSON.parse(data)
                 // now get remote information
-                url = 'https://' + ip_addr + ':' + puck_port_ext + '/puck/' + data.pid
+                url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/d3ck/' + data.pid
 
-                var puck_dir = config.PUCK.keystore + '/' + data.pid
+                var d3ck_dir = config.D3CK.keystore + '/' + data.pid
 
-                mkdirp.sync(puck_dir, function () {
+                mkdirp.sync(d3ck_dir, function () {
                     if(err) {
                         // xxx - user error, bail
                         console.log(err);
@@ -2344,9 +2383,9 @@ function formCreate(req, res, next) {
                     response.on('end', function() {
 
                         data = JSON.parse(data)
-                        console.log('remote puck info in...!')
+                        console.log('remote d3ck info in...!')
 
-                        // if the IP we get the add from isn't in the ips the other puck
+                        // if the IP we get the add from isn't in the ips the other d3ck
                         // says it has... add it in; they may be coming from a NAT or
                         // something weird
                         console.log('looking 2 see if your current ip is in your pool')
@@ -2355,7 +2394,7 @@ function formCreate(req, res, next) {
                         var found = false
                         for (var i = 0; i < data.all_ips.length; i++) {
                             if (data.all_ips[i] == ip_addr) {
-                                console.log('remote ip found in puck data')
+                                console.log('remote ip found in d3ck data')
                                 found = true
                                 break
                             }
@@ -2367,10 +2406,10 @@ function formCreate(req, res, next) {
 
                         // console.log(data);
 
-                        create_puck_key_store(data)
+                        create_d3ck_key_store(data)
 
                         //
-                        // execute a shell script with appropriate args to create a puck.
+                        // execute a shell script with appropriate args to create a d3ck.
                         // ... of course... maybe should be done in node/js anyway...
                         // have to ponder the ponderables....
                         //
@@ -2381,30 +2420,30 @@ function formCreate(req, res, next) {
                         //
                         // ... back to the program, dog!
                         //
-                        console.log("executing create_puck.sh")
+                        console.log("executing create_d3ck.sh")
 
                         // this simply takes the pwd and finds the exe area...
-                        var cmd  = puck_bin + '/create_puck.sh'
-                        var argz = [data.PUCK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
-                        puck_spawn(cmd, argz)
+                        var cmd  = d3ck_bin + '/create_d3ck.sh'
+                        var argz = [data.D3CK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
+                        d3ck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
-                        _write2File(puck_public + data.image         , b64_decode(data.image_b64))
-                        _write2File(puck_public + data.image + ".b64", data.image_b64)
+                        _write2File(d3ck_public + data.image         , b64_decode(data.image_b64))
+                        _write2File(d3ck_public + data.image + ".b64", data.image_b64)
 
-                        console.log(bwana_puck)
-                        console.log(typeof bwana_puck)
+                        console.log(bwana_d3ck)
+                        console.log(typeof bwana_d3ck)
 
-                        if (puck_id != data.PUCK_ID && !isEmpty(bwana_puck)) {
-                            console.log("posting our puck data to the puck we just added....")
-                            argz = [puck_id, bwana_puck.image, bwana_puck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_puck.owner.name, bwana_puck.owner.email, ip_addr]
+                        if (d3ck_id != data.D3CK_ID && !isEmpty(bwana_d3ck)) {
+                            console.log("posting our d3ck data to the d3ck we just added....")
+                            argz = [d3ck_id, bwana_d3ck.image, bwana_d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_d3ck.owner.name, bwana_d3ck.owner.email, ip_addr]
 
-                            puck_spawn(cmd, argz)
+                            d3ck_spawn(cmd, argz)
                         }
-                        createEvent(ip_addr, {event_type: "create", puck_id: data.PUCK_ID})
+                        createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
                     })
                     req.on('error', function(e) {
-                        console.log('create Error... no puck data back? ', e.message)
+                        console.log('create Error... no d3ck data back? ', e.message)
                     })
                 })
             }
@@ -2463,12 +2502,12 @@ function serverRestart(req, res, next) {
 
     var exec    = require('child_process').exec;
     // this works if using auto-restart on touch...
-    // var command = 'touch /etc/puck/main.js';
+    // var command = 'touch /etc/d3ck/main.js';
 
-    var cmd  = "/etc/init.d/puck"
+    var cmd  = "/etc/init.d/d3ck"
     var args = ["restart"]
 
-    puck_spawn(cmd, args)
+    d3ck_spawn(cmd, args)
 
 }
 
@@ -2488,15 +2527,15 @@ function SSSUp () {
 
     var WebSocketServer = require('websocket').server;
 
-    var wss_pucky = https.createServer(credentials, function (request, response) {
+    var wss_d3cky = https.createServer(credentials, function (request, response) {
         request.addListener('end', function () {
             file.serve(request, response);
         }).resume();
-        console.log('[+] wss/https server listening at %s', puck_port_signal)
-    }).listen(puck_port_signal);
+        console.log('[+] wss/https server listening at %s', d3ck_port_signal)
+    }).listen(d3ck_port_signal);
 
     new WebSocketServer({
-        httpServer: wss_pucky,
+        httpServer: wss_d3cky,
         autoAcceptConnections: false
     }).on('request', onRequest);
 
@@ -2590,9 +2629,9 @@ function truncateChannels(websocket) {
 ///--- Server
 
 // Cert stuff
-var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key")
-var cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt")
-var ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt")
+var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key")
+var cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt")
+var ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
 
 var credentials = {key: key, cert: cert, ca: ca}
 var server      = express()
@@ -2629,7 +2668,7 @@ server.use(auth)
 //
 
 // always serve up the install page
-// server.use(express.static(puck_public + '/qs'))
+// server.use(express.static(d3ck_public + '/qs'))
 
 // initial starting form - no auth
 server.post('/quik', quikStart)
@@ -2653,12 +2692,12 @@ fire_up_server_routes()
 //
 async.whilst(
     function () { 
-        if (fs.existsSync(puck_secretz)) {
+        if (fs.existsSync(d3ck_secretz)) {
             console.log('ready to rock-n-roll')
-            // means the startup has run and the PUCK has an ID, which must be done before anything else
+            // means the startup has run and the D3CK has an ID, which must be done before anything else
 
             console.log('get user data')
-            get_puck_vital_bits()
+            get_d3ck_vital_bits()
 
             // before this really don't answer to much other than the user startup
             // console.log('adding routes')
@@ -2691,18 +2730,18 @@ function fire_up_server_routes() {
     // Ping action - no auth
     server.get('/ping', echoReply)
 
-    // get or list pucks
-    server.post('/puck', auth, createPuck)
-    server.get('/puck', auth, listPucks)
+    // get or list d3cks
+    server.post('/d3ck', auth, created3ck)
+    server.get('/d3ck', auth, listd3cks)
 
-    // Return a Puck by key
-    server.get('/puck/:key', auth, getPuck);
+    // Return a d3ck by key
+    server.get('/d3ck/:key', auth, getd3ck);
 
-    // Delete a Puck by key
-    server.del('/puck/:key', auth, deletePuck);
+    // Delete a d3ck by key
+    server.del('/d3ck/:key', auth, deleted3ck);
 
     // Destroy everything
-    server.del('/puck', auth, deleteAll, function respond(req, res, next) {
+    server.del('/d3ck', auth, deleteAll, function respond(req, res, next) {
         res.send(204);
     });
 
@@ -2742,7 +2781,7 @@ function fire_up_server_routes() {
     server.get('/events/:key',      auth, getEvent);
 
     //
-    // PUCK filestore - send up and getting down
+    // D3CK filestore - send up and getting down
     //
     // send stuff up the pipe....
     server.post('/up/:key', auth, uploadSchtuff)
@@ -2750,7 +2789,7 @@ function fire_up_server_routes() {
     server.get('/down', auth, downloadStuff)
 
 
-    // get a url from wherever the puck is
+    // get a url from wherever the d3ck is
     server.all('/url', auth, webProxy)
 
     server.post('/login',
@@ -2770,7 +2809,7 @@ function fire_up_server_routes() {
     })
     
     // send me anything... I'll give you a chicken.  Or... status.
-    server.get("/status", auth, puckStatus)
+    server.get("/status", auth, d3ckStatus)
     
     //
     // send any actions done on client... like ringing a phone or whatever
@@ -2789,12 +2828,12 @@ function fire_up_server_routes() {
             'GET     /logout',
             'GET     /rest',
             'GET     /getip',
-            'POST    /puck',
-            'GET     /puck',
-            'DELETE  /puck',
-            'PUT     /puck/:key',
-            'GET     /puck/:key',
-            'DELETE  /puck/:key',
+            'POST    /d3ck',
+            'GET     /d3ck',
+            'DELETE  /d3ck',
+            'PUT     /d3ck/:key',
+            'GET     /d3ck/:key',
+            'DELETE  /d3ck/:key',
             'GET     /ping',
             'GET     /ping/:key',
             'GET     /server',
@@ -2813,10 +2852,10 @@ function fire_up_server_routes() {
     });
     
     // if all else fails... serve up an index or public
-    server.use(express.static(puck_public))
+    server.use(express.static(d3ck_public))
 
-    console.log('rtz')
-    console.log(server.routes)
+    // console.log('rtz')
+    // console.log(server.routes)
 }
  
 //
@@ -2826,7 +2865,7 @@ function fire_up_server_routes() {
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
 //
-var pucky = https.createServer(credentials, server)
+var d3cky = https.createServer(credentials, server)
 
 // socket signal server
 SSSUp()
@@ -2834,12 +2873,12 @@ SSSUp()
 // fire up web sockets
 var sockjs = require('sockjs')
 var ios = sockjs.createServer()
-ios.installHandlers(pucky, {prefix: '/pux'})
+ios.installHandlers(d3cky, {prefix: '/pux'})
 
 //
 // socket time
 //
-var puck_users      = {},
+var d3ck_users      = {},
     cat_sock        = {},
     all_cats        = []
 
@@ -2872,11 +2911,11 @@ ios.on('connection', function (sock_puppet) {
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
 try {
-    pucky.listen(puck_port_int, function() {
-        console.log('[+] server listening at %s', puck_port_int)
+    d3cky.listen(d3ck_port_int, function() {
+        console.log('[+] server listening at %s', d3ck_port_int)
     })
 }
 catch (e) {
-    console.log('The PUCK server died when trying to start: ' + e)
+    console.log('The D3CK server died when trying to start: ' + e)
 }
 

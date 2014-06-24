@@ -3,20 +3,20 @@
 #
 # Generate a tls-auth key.
 #
-#   Usage: $0 PUCK-id
+#   Usage: $0 D3CK-id
 #
-# For the client, so give this their PUCK id
+# For the client, so give this their D3CK id
 #
 #
 
 if [ "X$1" = "X" ]; then
-    echo "Usage: $0 PUCK-id"
+    echo "Usage: $0 D3CK-id"
     exit 1
 fi
 
 pid=$1
 
-keystore="/etc/puck/pucks/"
+keystore="/etc/d3ck/d3cks/"
 keyfile="$keystore/$pid/ta.key"
 
 if [ -f $keyfile ] ; then

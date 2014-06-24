@@ -4,7 +4,7 @@
 # mount when a new USB drive appears
 #
 
-location="/etc/puckey"
+location="/etc/d3ckey"
 
 disk="/dev/$1"
 

@@ -4,9 +4,9 @@ var http = require('http')
 
 port = 8081
 
-var key  = fs.readFileSync("/etc/puck/pucks/PUCK/puck.key"),
-    cert = fs.readFileSync("/etc/puck/pucks/PUCK/puck.crt"),
-    ca   = fs.readFileSync("/etc/puck/pucks/PUCK/ca.crt");
+var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key"),
+    cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt"),
+    ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt");
 
 var credentials = {key: key, cert: cert, ca: ca};
 

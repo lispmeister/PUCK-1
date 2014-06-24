@@ -1,19 +1,19 @@
 
-* authentication - right now anyone can connect to a PUCK and just go.  This will change ;)
+* authentication - right now anyone can connect to a D3CK and just go.  This will change ;)
 
-* authorization - right now anyone can talk to anyone else's PUCK and friend them.  There will be settings for this
+* authorization - right now anyone can talk to anyone else's D3CK and friend them.  There will be settings for this
 
 * setup wizard - I actually have this all drafted and partially coded,
   but there's a one-page intro that asks you a few questions will be done.
 
 *** status of VPN in a clear, clear way
 
-*** on your puck's details show all the crypto key strength/alg stuff
+*** on your d3ck's details show all the crypto key strength/alg stuff
     (run certitude.sh on all crts, show up in UI)
 
     * on a connection show the crypto details
 
-    * on other puck's cards show the crypto details
+    * on other d3ck's cards show the crypto details
 
 
 *** creation ipad/etc keys in UI (done in script gen_ovpn.sh)
@@ -33,9 +33,9 @@
     ... needs more research
 
 * do like a 1 sec ping/heartbeat on VPN connections to be aware of D/C's... 
-  show in UI how many secs/mins it's been since your puck has heard from theirs
+  show in UI how many secs/mins it's been since your d3ck has heard from theirs
 
-M * poll other pucks in UI every.... 5s?  10? ...30/60/xxx?
+M * poll other d3cks in UI every.... 5s?  10? ...30/60/xxx?
 
 * latency!
 
@@ -50,21 +50,21 @@ L * openvpn drops connection maybe... starts up 2nd interface... (haven't seen i
 M * borders/highlighting the one you're talking to - possible:
         outline: 2px solid orange
 
-M * add failure checking when adding pucks
+M * add failure checking when adding d3cks
 
-L * quote puck names/whatever for shell $x's... create_puck.sh in particular.
+L * quote d3ck names/whatever for shell $x's... create_d3ck.sh in particular.
 
 H * need easy disconnect for user
 
-L * when posting/creating puck from form... return success, not errz...!
+L * when posting/creating d3ck from form... return success, not errz...!
 
 n/a?  * ... when does a client drop off a OVPN server's link?  Go to tcp?  Check out ping opts ... fixed with tls?
 
-H/? * when adding puck, immediately goes to home, have to refresh... wait for creation (maybe works, maybe not?)
+H/? * when adding d3ck, immediately goes to home, have to refresh... wait for creation (maybe works, maybe not?)
 
 L * Currently... only caller can really hang up :)  (Will repeat, etc.)
 
-L * document - keys in local pucks subdir... for other pucks, they are
+L * document - keys in local d3cks subdir... for other d3cks, they are
      the ones in their (remote) vpn_client subdir
 
 L * don't send all your key stuffs to anyone who asks... only the min to communicate

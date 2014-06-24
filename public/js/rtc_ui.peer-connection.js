@@ -2,7 +2,7 @@
 // MIT License       - www.WebRTC-Experiment.com/licence
 // Experiments       - github.com/muaz-khan/WebRTC-Experiment
 
-var rtcMultiConnection = new RTCMultiConnection('puckasaurus');
+var rtcMultiConnection = new RTCMultiConnection('d3ckasaurus');
 
 rtcMultiConnection.session = { data: true };
 

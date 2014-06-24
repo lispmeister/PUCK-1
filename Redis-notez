@@ -4,7 +4,7 @@
 # list all vars
 redis-cli keys *
 
-# list all PUCKs
+# list all D3CKs
 redis-cli keys '[A-Z0-9]*'
 
 # list all other things
