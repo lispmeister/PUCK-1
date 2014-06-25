@@ -1,0 +1,60 @@
+{
+    "D3CK" : {
+        "home"               : "/etc/d3ck",
+        "keystore"           : "/d3cks",
+        "secretz"            : "/secretz.json",
+        "bin"                : "/exe",
+        "pub"                : "/public",
+        "tmp"                : "/tmp",
+        "logs"               : "/logs",
+        "d3ck_port_int"      : "8079",
+        "d3ck_port_ext"      : "8080",
+        "d3ck_port_signal"   : "12034",
+        "d3ck_proto_signal"  : "tcp",
+        "d3ck_port_forward"  : "5555"
+        },
+
+    "capabilities" : {
+        "friend request":       { "paranoid": "off", "moderate": "ask", "trusting": "on"  },
+        "VPN":                  { "paranoid": "ask", "moderate": "ask", "trusting": "on"  },
+        "SIP":                  { "paranoid": "off", "moderate": "off", "trusting": "on"  },
+        "webRTC":               { "paranoid": "off", "moderate": "ask", "trusting": "on"  },
+        "file transfer":        { "paranoid": "off", "moderate": "ask", "trusting": "on"  },
+        "messages":             { "paranoid": "ask", "moderate": "ask", "trusting": "on"  },
+        "command execution":    { "paranoid": "off", "moderate": "off", "trusting": "ask" },
+        "Geo-translocation":    { "paranoid": "off", "moderate": "off", "trusting": "ask" }
+    },
+    
+    "crypto": {
+        "keysize"       : "1024",
+        "life_d3ck"     : "365",
+        "life_vpn"      : "30",
+        "bcrypt_rounds" : "12"
+    },
+
+    "limits": {
+        "max_upload_size" : "1073741824",
+        "max_image_size"  : "4194304"
+    },
+
+    "misc": {
+        "pid_polling_time" : "3000"
+    },
+
+    "public_routes": [
+        "js",
+        "css",
+        "img",
+        "images",
+        "d3ck",
+        "knock",
+        "login",
+        "favicon.ico",
+        "login.html",
+        "loginFailure",
+        "quikstart.html",
+        "quik",
+        "qs"
+    ]
+
+}

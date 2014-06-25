@@ -1,0 +1,74 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            93:1a:e9:01:82:0d:b6:fc:db:b6:6f:7d:66:4c:55:26
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex/name=D3CK/emailAddress=d3ck@example.com
+        Validity
+            Not Before: Jun 24 16:47:27 2014 GMT
+            Not After : Jun 24 16:47:27 2015 GMT
+        Subject: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=*
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (1024 bit)
+                Modulus (1024 bit):
+                    00:bb:d9:c8:da:2a:0e:4c:66:e8:02:d4:a9:fb:f9:
+                    db:53:97:9f:17:94:04:fb:ac:f0:e8:68:27:87:11:
+                    db:9c:4b:cb:f7:88:51:b6:18:21:78:e6:b0:46:62:
+                    b9:3f:08:f9:75:00:06:59:ce:b5:75:63:49:f0:4b:
+                    67:21:20:0b:1d:f0:a4:a7:f1:13:24:b3:e8:24:e4:
+                    eb:20:ef:4b:34:ee:ab:6a:74:41:98:ec:08:87:5a:
+                    99:6b:19:4c:8b:a9:63:db:63:c3:ef:8d:cd:1c:8f:
+                    8e:a1:86:c6:58:24:ec:ab:c1:6e:5d:92:3e:0b:69:
+                    83:20:14:ef:53:c0:fb:9e:1f
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            Netscape Comment: 
+                Easy-RSA Generated Server Certificate
+            X509v3 Subject Key Identifier: 
+                F0:AD:CE:E7:AA:D2:9C:E8:DF:59:BF:78:0B:55:8E:42:7B:09:20:0A
+            X509v3 Authority Key Identifier: 
+                keyid:C5:B5:3B:32:4C:5A:51:7D:41:02:AE:00:76:EB:E3:BE:0A:3E:6E:CB
+                DirName:/C=AQ/ST=White/L=D3cktown/O=D3ckasaurusRex/name=D3CK/emailAddress=d3ck@example.com
+                serial:BA:C9:2C:94:B9:30:9D:AB
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha256WithRSAEncryption
+        b1:79:70:a3:67:a1:2b:37:fd:0d:65:61:84:e5:55:ff:63:be:
+        de:70:df:8b:73:54:1f:e1:5e:7d:5f:1d:d9:10:42:c7:95:5f:
+        58:67:e5:a3:7b:9c:f9:4e:ac:f4:d6:09:60:6b:7c:4a:cf:c4:
+        03:10:52:dd:03:d3:c3:59:1d:75:eb:00:15:73:42:8d:e6:e5:
+        ac:b4:07:2c:b2:ba:29:ec:53:a1:b3:df:6a:52:80:52:1b:1c:
+        3f:42:a9:80:c8:bb:3e:56:91:a2:ae:d3:a0:7e:6c:45:2d:bc:
+        e8:3a:44:1d:df:7b:5e:6f:41:04:ed:0f:c1:a5:87:87:c7:16:
+        b9:ab
+-----BEGIN CERTIFICATE-----
+MIIDnTCCAwagAwIBAgIRAJMa6QGCDbb827ZvfWZMVSYwDQYJKoZIhvcNAQELBQAw
+eTELMAkGA1UEBhMCQVExDjAMBgNVBAgTBVdoaXRlMREwDwYDVQQHEwhEM2NrdG93
+bjEXMBUGA1UEChMORDNja2FzYXVydXNSZXgxDTALBgNVBCkTBEQzQ0sxHzAdBgkq
+hkiG9w0BCQEWEGQzY2tAZXhhbXBsZS5jb20wHhcNMTQwNjI0MTY0NzI3WhcNMTUw
+NjI0MTY0NzI3WjBVMQswCQYDVQQGEwJBUTEOMAwGA1UECBMFV2hpdGUxETAPBgNV
+BAcTCEQzY2t0b3duMRcwFQYDVQQKEw5EM2NrYXNhdXJ1c1JleDEKMAgGA1UEAxQB
+KjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAu9nI2ioOTGboAtSp+/nbU5ef
+F5QE+6zw6GgnhxHbnEvL94hRthgheOawRmK5Pwj5dQAGWc61dWNJ8EtnISALHfCk
+p/ETJLPoJOTrIO9LNO6ranRBmOwIh1qZaxlMi6lj22PD743NHI+OoYbGWCTsq8Fu
+XZI+C2mDIBTvU8D7nh8CAwEAAaOCAUcwggFDMAkGA1UdEwQCMAAwEQYJYIZIAYb4
+QgEBBAQDAgZAMDQGCWCGSAGG+EIBDQQnFiVFYXN5LVJTQSBHZW5lcmF0ZWQgU2Vy
+dmVyIENlcnRpZmljYXRlMB0GA1UdDgQWBBTwrc7nqtKc6N9Zv3gLVY5CewkgCjCB
+qwYDVR0jBIGjMIGggBTFtTsyTFpRfUECrgB26+O+Cj5uy6F9pHsweTELMAkGA1UE
+BhMCQVExDjAMBgNVBAgTBVdoaXRlMREwDwYDVQQHEwhEM2NrdG93bjEXMBUGA1UE
+ChMORDNja2FzYXVydXNSZXgxDTALBgNVBCkTBEQzQ0sxHzAdBgkqhkiG9w0BCQEW
+EGQzY2tAZXhhbXBsZS5jb22CCQC6ySyUuTCdqzATBgNVHSUEDDAKBggrBgEFBQcD
+ATALBgNVHQ8EBAMCBaAwDQYJKoZIhvcNAQELBQADgYEAsXlwo2ehKzf9DWVhhOVV
+/2O+3nDfi3NUH+FefV8d2RBCx5VfWGflo3uc+U6s9NYJYGt8Ss/EAxBS3QPTw1kd
+desAFXNCjeblrLQHLLK6KexTobPfalKAUhscP0KpgMi7PlaRoq7ToH5sRS286DpE
+Hd97Xm9BBO0PwaWHh8cWuas=
+-----END CERTIFICATE-----
