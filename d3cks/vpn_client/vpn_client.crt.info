@@ -1,8 +1,0 @@
-Signature Algorithm: sha256WithRSAEncryption
-Issuer: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex/name=D3CK/emailAddress=d3ck@example.com
-Not Before: Jun 24 16:47:27 2014 GMT
-Not After : Jun 24 16:47:27 2015 GMT
-Public Key Algorithm: rsaEncryption
-RSA Public Key: (1024 bit)
-Signature Algorithm: sha256WithRSAEncryption
-SHA1 Fingerprint: 85:3A:C5:13:08:93:1D:2B:28:41:E6:58:52:E4:23:60:1B:F8:59:FA
