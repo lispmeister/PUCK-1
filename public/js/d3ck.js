@@ -989,8 +989,8 @@ function socket_looping() {
 
     console.log('trying to do a socket connect')
 
-    var recInterval  = null
-    var socket       = null
+    var recInterval  = null;
+    var socket       = null;
 
     (function() {
 
@@ -1062,9 +1062,9 @@ function socket_looping() {
                    console.log(d3ck_message.type)
                 }
             }
-        }
+        };
 
-        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY)
+        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
 
     })();
 
