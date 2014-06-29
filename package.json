@@ -28,6 +28,7 @@
     "rest": "latest",
     "restler": "latest",
     "redis": "0.8.3",
+    "sleep": "latest",
     "sockjs": "latest",
     "tail": "latest",
     "tcp-proxy": "latest",
