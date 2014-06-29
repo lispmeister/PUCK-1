@@ -988,8 +988,9 @@ function socket_looping() {
 
     console.log('trying to do a socket connect')
 
-    var recInterval = null;
-    var socket = null;
+    var recInterval  = null
+    var socket       = null
+    var connectRetry = null
 
     local_socket = new SockJS(socket_addr, null, {
         'protocols_whitelist': [
@@ -1001,15 +1002,14 @@ function socket_looping() {
 
     local_socket.onopen = function() {
         console.log('[*] socksjs open... sez a me')
-        clearInterval(connectRetry);
     }
  
     // hoop, skip, jump
     local_socket.onclose = function() {
         console.log('[-] sockjs closed')
-        clearInterval(connectRetry);
+        clearInterval(connectRetry)
         // keep going back for more
-        connectRetry = setInterval(socket_looping, D3CK_SOCK_RETRY);
+        connectRetry = setInterval(socket_looping, D3CK_SOCK_RETRY)
     }
  
     local_socket.onmessage = function(d3ck_message) {
