@@ -2288,6 +2288,9 @@ function quikStart(req, res, next) {
             console.log('error uploading: ' + msg)
         }
     }
+    else {
+        bwana_d3ck.image = "/img/d3ck.png"
+    }
 
     rclient.set(d3ck_id, JSON.stringify(bwana_d3ck), function(err) {
         if (err) {
