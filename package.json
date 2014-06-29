@@ -23,6 +23,7 @@
     "node-static": "0.6.9",
     "passport": ">= 0.0.0",
     "passport-local": ">= 0.0.0",
+    "q": "latest",
     "request": "latest",
     "response-time": "latest",
     "rest": "latest",
