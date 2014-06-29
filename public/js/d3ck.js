@@ -1008,6 +1008,7 @@ function socket_looping() {
     local_socket.onclose = function() {
         console.log('[-] sockjs closed')
         clearInterval(connectRetry);
+        // keep going back for more
         connectRetry = setInterval(socket_looping, D3CK_SOCK_RETRY);
     }
  
@@ -1056,9 +1057,6 @@ function socket_looping() {
            console.log(d3ck_message.type)
         }
     }
-
-    // keep going back for more
-    var connectRetry = setInterval(socket_looping, D3CK_SOCK_RETRY);
 
 }
 
