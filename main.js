@@ -1112,11 +1112,12 @@ function created3ck(req, res, next) {
             //
             
             // garrr... openvpn breaks this too... 
-            d3ck_events = { new_d3ck : client_ip }
+            d3ck_events = { new_d3ck : client_ip, new_d3ck_name: d3ck.value.name }
 
             create_d3ck_key_store(d3ck.value)
 
             create_d3ck_image(d3ck.value)
+
 
             // if (typeof my_net[client_ip] == "undefined") {
             //     console.log('create appears to be coming from remote: ' + client_ip)

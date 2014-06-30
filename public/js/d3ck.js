@@ -706,10 +706,11 @@ function status_or_die() {
     // and hopefully won't fuck up anything you're doing
 
     if (d3ck_status.events.new_d3ck.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
-        var remote_ip = d3ck_status.events.new_d3ck
+        var remote_ip   = d3ck_status.events.new_d3ck   // no longer valid with openvpn intercepting
+        var remote_name = d3ck_status.events.new_d3ck_name
         console.log(remote_ip + ' added as friend')
         // a bit down from the top, and stay until wiped away or refreshed
-        $.bootstrapGrowl(remote_ip + " added your D3CK as a friend (refresh page to see details)", {offset: {from: 'top', amount: 70}, delay: -1})
+        $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
 
         d3ck_status.browser_events[browser_ip].notify_add = true
     }
