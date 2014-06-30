@@ -1112,6 +1112,8 @@ function create_d3ck(req, res, next) {
             //
             
             // garrr... openvpn breaks this too... 
+            console.log('adding from: ' + d3ck.value.name)
+
             d3ck_events = { new_d3ck : client_ip, new_d3ck_name: d3ck.value.name }
 
             create_d3ck_key_store(d3ck.value)
@@ -2409,6 +2411,10 @@ function formCreate(req, res, next) {
                         }
 
                         // console.log(data);
+
+                        d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: bwana_d3ck.name }
+
+                        console.log('adding from: ' + bwana_d3ck.name)
 
                         create_d3ck_key_store(data)
 
