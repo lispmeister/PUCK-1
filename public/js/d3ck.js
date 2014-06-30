@@ -1055,7 +1055,7 @@ function socket_looping() {
                 else if (d3ck_message.type == "cat_fact") {
                     console.log('incoming cat fact!')
                     console.log(d3ck_message.fact)
-                     $('#ip_diddy').append('<br />' + d3ck_message.fact)
+                     $('#d3ck_footy').append('<br />' + d3ck_message.fact)
                 }
                 else {
                    console.log('UNRECOGNIZED message type')
