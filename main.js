@@ -165,13 +165,13 @@ rclient.get(d3ck_id, function (err, reply) {
             sys.exit({'error': 'no D3CK Found'})
         }
         else {
-            bwana_d3ck = JSON.parse(reply)
+            bwana__d3ck = JSON.parse(reply)
             console.log('d3ckaroo')
-            // console.log(bwana_d3ck)
+            // console.log(bwana__d3ck)
         }
     }
     else {
-        console.log(err, 'getd3ck: unable to retrieve %s', req.d3ck);
+        console.log(err, 'get_d3ck: unable to retrieve %s', req.d3ck);
         sys.exit({ "no": "d3ck"})
     }
 })
@@ -186,9 +186,9 @@ rclient.get(d3ck_id, function (err, reply) {
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
-    d3ck_events     = {"new_d3ck":""},
+    d3ck_events     = {"new__d3ck":""},
     browser_magic   = {}
-    old_d3ck_status = {},
+    old__d3ck_status = {},
     d3ck_status     = {};
 
     d3ck_status.events         = d3ck_events
@@ -201,7 +201,7 @@ var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","durati
 var server           = "",
     d3ck2ip          = {},      // d3ck ID to IP mapping
     ip2d3ck          = {},      // IP mapping to d3ck ID
-    bwana_d3ck       = {},
+    bwana__d3ck       = {},
     d3ck_status_file = d3ck_home   + '/status.d3ck',
     d3ck_remote_vpn  = d3ck_public + '/openvpn_server.ip';
 
@@ -223,7 +223,7 @@ change_status()
 //
 // only exist after user has run startup
 //
-function get_d3ck_vital_bits () {
+function get__d3ck_vital_bits () {
 
     //
     // THE VERY FIRST THING YOU SEE... might be the quick install.
@@ -301,7 +301,7 @@ console.log('pulling in d3ck data for the server itself')
 events    = require('events');
 emitter   = new events.EventEmitter();
 
-wait_for_d3ck = null
+wait_for__d3ck = null
 
 
 //
@@ -337,8 +337,8 @@ while (init) {
             else {
                 console.log('d3ckarrific!')
                 // console.log(body)
-                bwana_d3ck = JSON.parse(body)
-                createEvent('internal server', {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
+                bwana__d3ck = JSON.parse(body)
+                createEvent('internal server', {event_type: "create", d3ck_id: bwana__d3ck.D3CK_ID})
                 init = true
             }
         }
@@ -513,7 +513,7 @@ function change_status() {
 
     // reset/clear
     file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    d3ck_events                = {"new_d3ck":""}
+    d3ck_events                = {"new__d3ck":""}
     browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
     d3ck_status.events         = d3ck_events
     d3ck_status.file_events    = file_magic
@@ -636,7 +636,7 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
-                createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
+                createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana__d3ck.D3CK_ID})
 
                 change_status() // make sure everyone hears the news
             }
@@ -665,7 +665,7 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
-                createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
+                createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana__d3ck.D3CK_ID})
                 change_status() // make sure everyone hears the news
             }
         }
@@ -706,7 +706,7 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
-                createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
+                createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana__d3ck.D3CK_ID})
                 change_status() // make sure everyone hears the news
 
             }
@@ -732,7 +732,7 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
-                createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
+                createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana__d3ck.D3CK_ID})
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
@@ -962,9 +962,9 @@ function postStatus (req, res, next) {
     server_magic  = req.body.openvpn_server
     client_magic  = req.body.openvpn_client
 
-    if (! __.isEqual(old_d3ck_status, d3ck_status)) {
+    if (! __.isEqual(old__d3ck_status, d3ck_status)) {
         change_status()
-        old_d3ck_status = d3ck_status
+        old__d3ck_status = d3ck_status
     }
 
     res.send(200, {"status" : "OK"})
@@ -977,7 +977,7 @@ function postStatus (req, res, next) {
  * demonstrate how to support additional content-types.  Really this is
  * the same as text/plain, where we pick out 'value' if available
  */
-function formatd3ck(req, res, body) {
+function format_d3ck(req, res, body) {
     if (body instanceof Error) {
         res.statusCode = body.statusCode || 500;
         body = body.message;
@@ -994,7 +994,7 @@ function formatd3ck(req, res, body) {
 //
 // write the crypto key stuff to the FS
 //
-function create_d3ck_key_store(d3ck) {
+function create__d3ck_key_store(d3ck) {
 
     console.log('PUUUUUUCKKKKKK!')
     // console.log(d3ck)
@@ -1019,7 +1019,7 @@ function create_d3ck_key_store(d3ck) {
     })
 
     // xxx - errs to user!
-    _write2File(d3ck_dir + '/d3ck.pid', bwana_d3ck.D3CK_ID)
+    _write2File(d3ck_dir + '/d3ck.pid', bwana__d3ck.D3CK_ID)
     _write2File(d3ck_dir + '/d3ckroot.crt', ca)
     _write2File(d3ck_dir + '/d3ck.key', key)
     _write2File(d3ck_dir + '/d3ck.crt', cert)
@@ -1030,21 +1030,21 @@ function create_d3ck_key_store(d3ck) {
 //
 // take a d3ck, update it in the DB and the filesystem, do error checking, etc., etc.
 //
-function updated3ck(_d3ck) {
+function update_d3ck(__d3ck) {
 
-    console.log('updating data for ' + _d3ck.D3CK_ID)
+    console.log('updating data for ' + __d3ck.D3CK_ID)
 
-    rclient.set(_d3ck.key, _d3ck.value, function(err) {
+    rclient.set(__d3ck.key, __d3ck.value, function(err) {
 
         if (err) {
-            console.log(err, 'updated3ck failed ' + JSON.stringify(err));
+            console.log(err, 'update_d3ck failed ' + JSON.stringify(err));
             return(err);
         } else {
             console.log('redis update success')
 
-            _d3ck_events = { updated_d3ck : client_ip }
-            create_d3ck_key_store(_d3ck.value)
-            create_d3ck_image(_d3ck.value)
+            __d3ck_events = { updated__d3ck : client_ip }
+            create__d3ck_key_store(__d3ck.value)
+            create__d3ck_image(__d3ck.value)
             createEvent(get_client_ip(req), {event_type: "create", d3ck_id: req.body.value.D3CK_ID})
         }
     })
@@ -1055,7 +1055,7 @@ function updated3ck(_d3ck) {
 //
 // Redis D3CKs key are all upper case+digits
 //
-function created3ck(req, res, next) {
+function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
     console.log (req.params)
@@ -1063,7 +1063,7 @@ function created3ck(req, res, next) {
     var ip_addr = req.body.ip_addr
 
     if (!req.body.value) {
-        console.log('created3ck: missing value');
+        console.log('create_d3ck: missing value');
         next(new MissingValueError());
         return;
     }
@@ -1102,30 +1102,30 @@ function created3ck(req, res, next) {
 
     rclient.set(d3ck.key, d3ck.value, function(err) {
         if (err) {
-            console.log(err, 'putd3ck: unable to store in Redis db');
+            console.log(err, 'put_d3ck: unable to store in Redis db');
             next(err);
         } else {
-            console.log({d3ck: req.body}, 'putd3ck: done');
+            console.log({d3ck: req.body}, 'put_d3ck: done');
 
             //
             // if it's from a remote system, wake up local UI and tell user
             //
             
             // garrr... openvpn breaks this too... 
-            d3ck_events = { new_d3ck : client_ip, new_d3ck_name: d3ck.value.name }
+            d3ck_events = { new__d3ck : client_ip, new__d3ck_name: d3ck.value.name }
 
-            create_d3ck_key_store(d3ck.value)
+            create__d3ck_key_store(d3ck.value)
 
-            create_d3ck_image(d3ck.value)
+            create__d3ck_image(d3ck.value)
 
 
             // if (typeof my_net[client_ip] == "undefined") {
             //     console.log('create appears to be coming from remote: ' + client_ip)
-            //     d3ck_events = { new_d3ck : client_ip }
-            //     create_d3ck_key_store(d3ck.value)
+            //     d3ck_events = { new__d3ck : client_ip }
+            //     create__d3ck_key_store(d3ck.value)
             // }
             // else {
-            //     d3ck_events = { new_d3ck : "" }
+            //     d3ck_events = { new__d3ck : "" }
             //     console.log('create appears to be coming from local D3CK/host: ' + client_ip)
             // }
 
@@ -1138,7 +1138,7 @@ function created3ck(req, res, next) {
 
 }
 
-function create_d3ck_image(data) {
+function create__d3ck_image(data) {
 
     if (typeof data != 'object') {
         data = JSON.parse(data)
@@ -1171,13 +1171,13 @@ function create_d3ck_image(data) {
     }
 
     d3ck_image      = '/img/' + data.D3CK_ID + suffix
-    full_d3ck_image = d3ck_public + '/img/' + data.D3CK_ID + suffix
+    full__d3ck_image = d3ck_public + '/img/' + data.D3CK_ID + suffix
 
     if (msg) {
         console.log('err in processing remote image: ' + msg)
     }
     else {
-        _write2File(full_d3ck_image, image)
+        _write2File(full__d3ck_image, image)
     }
 
 
@@ -1237,16 +1237,16 @@ function isEmpty(obj) {
 /**
  * Deletes a d3ck by key
  */
-function deleted3ck(req, res, next) {
+function delete_d3ck(req, res, next) {
 
     console.log('NUKE it from orbit!')
 
     rclient.del(req.params.key, function (err) {
         if (err) {
-            console.log(err, 'deleted3ck: unable to delete %s', req.params.key)
+            console.log(err, 'delete_d3ck: unable to delete %s', req.params.key)
             next(err);
         } else {
-            console.log('deleted3ck: success deleting %s', req.params.key)
+            console.log('delete_d3ck: success deleting %s', req.params.key)
             createEvent(get_client_ip(req), {event_type: "delete", d3ck_id: req.params.key})
             res.send(204);
         }
@@ -1497,9 +1497,9 @@ function getEvent(req, res, next) {
 /**
  * Loads a d3ck by key
  */
-function getd3ck(req, res, next) {
+function get_d3ck(req, res, next) {
 
-    console.log('getd3ck')
+    console.log('get_d3ck')
 
     // console.log(req.params)
 
@@ -1507,7 +1507,7 @@ function getd3ck(req, res, next) {
 
         if (!err) {
             if (reply == null) {
-                console.log(err, 'getd3ck: unable to retrieve %s', req.d3ck);
+                console.log(err, 'get_d3ck: unable to retrieve %s', req.d3ck);
                 // next(new d3ckNotFoundError(req.params.key));
                 next({'error': 'D3CK Not Found'})
             } 
@@ -1517,7 +1517,7 @@ function getd3ck(req, res, next) {
             }
         }
         else {
-            console.log(err, 'getd3ck: unable to retrieve %s', req.d3ck);
+            console.log(err, 'get_d3ck: unable to retrieve %s', req.d3ck);
             res.send(404, { "no": "d3ck"});
         }
     });
@@ -1526,10 +1526,10 @@ function getd3ck(req, res, next) {
 /**
  * Simple returns the list of d3ck Ids that are stored in redis
  */
-function listd3cks(req, res, next) {
+function list_d3cks(req, res, next) {
     rclient.keys('[A-F0-9]*', function (err, keys) {
         if (err) {
-            console.log(err, 'listd3ck: unable to retrieve all d3cks');
+            console.log(err, 'list_d3ck: unable to retrieve all d3cks');
             next(err);            
         } else {
             console.log('Number of d3cks found: ', keys.length);
@@ -1552,13 +1552,13 @@ function echoReply(req, res, next) {
 
     // console.log('pingasaurus from ' + client_ip + ' hitting us at ' + d3ck_server_ip)
 
-    if (typeof bwana_d3ck == "undefined") {
+    if (typeof bwana__d3ck == "undefined") {
         console.log('no echo here...')
         var response = {status: "bad"}
     }
     else {
         // console.log('echo, echo, echo....')
-        var response = {status: "OK", "name": bwana_d3ck.name, "pid": d3ck_id}
+        var response = {status: "OK", "name": bwana__d3ck.name, "pid": d3ck_id}
     }
 
     // res.send(200, response)
@@ -1854,14 +1854,14 @@ function startVPN(req, res, next) {
     console.log(d3ckid, ipaddr)
 
     // this means you're trying to do it despite ping not working
-    if (typeof d3ck2ip[d3ckid] == 'undefined') {
+    if (typeof d3ck2ip[_d3ckid] == 'undefined') {
         console.log("hmmm... trying to VPN when ping couldn't reach it... good luck!")
-        args = [d3ckid, ipaddr]
+        args = [_d3ckid, ipaddr]
     }
 
     else {
-        console.log("using pinged IP addr to VPN: " + d3ck2ip[d3ckid])
-        args = [d3ckid, d3ck2ip[d3ckid]]
+        console.log("using pinged IP addr to VPN: " + d3ck2ip[_d3ckid])
+        args = [_d3ckid, d3ck2ip[_d3ckid]]
     }
 
     var cmd   = d3ck_bin + '/start_vpn.sh'
@@ -1869,10 +1869,10 @@ function startVPN(req, res, next) {
     // fire up vpn
     d3ck_spawn(cmd, args)
 
-    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
+    createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: d3ck2ip[_d3ckid], remote__d3ck_id: d3ckid})
 
     // write the IP addr to a file
-    fs.writeFile(d3ck_remote_vpn, d3ck2ip[d3ckid], function(err) {
+    fs.writeFile(d3ck_remote_vpn, d3ck2ip[_d3ckid], function(err) {
         if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
         else { console.log('wrote remote vpn server IP') }
     });
@@ -1925,7 +1925,7 @@ function forward_port(req, res, next) {
 
     d3ck_spawn(cmd, args)
 
-    createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
+    createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: d3ck2ip[_d3ckid], remote__d3ck_id: d3ckid})
 
     res.send(204)
 
@@ -1950,7 +1950,7 @@ function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 
     d3ck_spawn(cmd, args)
 
-    createEvent("internal server", {event_type: "flush forwarding", d3ck_id: bwana_d3ck.D3CK_ID})
+    createEvent("internal server", {event_type: "flush forwarding", d3ck_id: bwana__d3ck.D3CK_ID})
 
 }
 
@@ -1958,14 +1958,14 @@ function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 /**
  * Replaces a d3ck completely
  */
-function putd3ck(req, res, next) {
+function put_d3ck(req, res, next) {
     if (!req.params.value) {
-        console.log({params: req.params}, 'putd3ck: missing value');
+        console.log({params: req.params}, 'put_d3ck: missing value');
         next(new MissingValueError());
         return;
     }
 
-    console.log({params: req.params}, 'putd3ck: not implemented');
+    console.log({params: req.params}, 'put_d3ck: not implemented');
     next(new NotImplementedError());
     return;
 }
@@ -2034,7 +2034,7 @@ function formDelete(req, res, next) {
     //
     // this simply takes the pwd and finds the exe area... really 
     // want to use a reasonable d3ck home here!
-    d3ck_spawn(d3ck_bin + '/delete_d3ck.sh', [d3ckid])
+    d3ck_spawn(d3ck_bin + '/delete__d3ck.sh', [_d3ckid])
 
 
 }
@@ -2062,7 +2062,7 @@ function sping_get(url, all_ips, d3ckid, n) {
             else {
                     ping_done = true
                     console.log('sping worked - ' + all_ips[n])
-                    d3ck2ip[d3ckid] = all_ips[n]
+                    d3ck2ip[_d3ckid] = all_ips[n]
                     ip2d3ck[all_ips[n]] = d3ckid
                     return(d)
             }
@@ -2145,7 +2145,7 @@ function httpsPing(d3ckid, ipaddr, res, next) {
 
                 else if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
                     ping_done = true
-                    d3ck2ip[d3ckid] = all_ips[i]
+                    d3ck2ip[_d3ckid] = all_ips[i]
                     ip2d3ck[all_ips[i]] = d3ckid
                     res.send(200, data)
                 }
@@ -2223,19 +2223,19 @@ function quikStart(req, res, next) {
         password = req.body.d3ck_password
     }
 
-    if (typeof req.body.radio_free_d3ck == "undefined") {
+    if (typeof req.body.radio_free__d3ck == "undefined") {
         console.log('security stance is required, but using default')
     }
     else {
-        stance = req.body.radio_free_d3ck
+        stance = req.body.radio_free__d3ck
     }
 
     console.log(name, email, d3ck, password, stance)
 
-    bwana_d3ck.name        = d3ck
-    bwana_d3ck.owner.name  = name
-    bwana_d3ck.owner.email = email
-    bwana_d3ck.stance      = stance
+    bwana__d3ck.name        = d3ck
+    bwana__d3ck.owner.name  = name
+    bwana__d3ck.owner.email = email
+    bwana__d3ck.stance      = stance
 
     console.log(req.files)
     // grab the file from whereever it's stashed, write it
@@ -2258,7 +2258,7 @@ function quikStart(req, res, next) {
             var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
 
             d3ck_image      = '/img/' + d3ck_id + suffix
-            full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
+            full__d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
 
             var data = fs.readFileSync(req.files.d3ck_image.path)
             var image_b64 = b64_encode(data)
@@ -2271,17 +2271,17 @@ function quikStart(req, res, next) {
                 console.log('trying to write... ' + d3ck_image)
                 // weirdness... writefile returns nada
                 try {
-                    fs.writeFileSync(full_d3ck_image, data, 'utf8')
+                    fs.writeFileSync(full__d3ck_image, data, 'utf8')
                     console.log('updating d3ck json')
 
-                    bwana_d3ck.image     = d3ck_image
-                    bwana_d3ck.image_b64 = image_b64
+                    bwana__d3ck.image     = d3ck_image
+                    bwana__d3ck.image_b64 = image_b64
 
-                    console.log(JSON.stringify(bwana_d3ck))
+                    console.log(JSON.stringify(bwana__d3ck))
 
                 }
                 catch (err) {
-                    console.log('error writing image file "' + full_d3ck_image + '": ' + JSON.stringify(err))
+                    console.log('error writing image file "' + full__d3ck_image + '": ' + JSON.stringify(err))
                 }
             }
         }
@@ -2290,10 +2290,10 @@ function quikStart(req, res, next) {
         }
     }
     else {
-        bwana_d3ck.image = "/img/d3ck.png"
+        bwana__d3ck.image = "/img/d3ck.png"
     }
 
-    rclient.set(d3ck_id, JSON.stringify(bwana_d3ck), function(err) {
+    rclient.set(d3ck_id, JSON.stringify(bwana__d3ck), function(err) {
         if (err) {
             console.log(err, 'd3ck: unable to update Redis db');
             console.log(err)
@@ -2410,7 +2410,7 @@ function formCreate(req, res, next) {
 
                         // console.log(data);
 
-                        create_d3ck_key_store(data)
+                        create__d3ck_key_store(data)
 
                         //
                         // execute a shell script with appropriate args to create a d3ck.
@@ -2424,10 +2424,10 @@ function formCreate(req, res, next) {
                         //
                         // ... back to the program, dog!
                         //
-                        console.log("executing create_d3ck.sh")
+                        console.log("executing create__d3ck.sh")
 
                         // this simply takes the pwd and finds the exe area...
-                        var cmd  = d3ck_bin + '/create_d3ck.sh'
+                        var cmd  = d3ck_bin + '/create__d3ck.sh'
                         var argz = [data.D3CK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
                         d3ck_spawn(cmd, argz)
 
@@ -2435,12 +2435,12 @@ function formCreate(req, res, next) {
                         _write2File(d3ck_public + data.image         , b64_decode(data.image_b64))
                         _write2File(d3ck_public + data.image + ".b64", data.image_b64)
 
-                        console.log(bwana_d3ck)
-                        console.log(typeof bwana_d3ck)
+                        console.log(bwana__d3ck)
+                        console.log(typeof bwana__d3ck)
 
-                        if (d3ck_id != data.D3CK_ID && !isEmpty(bwana_d3ck)) {
+                        if (d3ck_id != data.D3CK_ID && !isEmpty(bwana__d3ck)) {
                             console.log("posting our d3ck data to the d3ck we just added....")
-                            argz = [d3ck_id, bwana_d3ck.image, bwana_d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_d3ck.owner.name, bwana_d3ck.owner.email, ip_addr]
+                            argz = [_d3ck_id, bwana__d3ck.image, bwana__d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana__d3ck.owner.name, bwana__d3ck.owner.email, ip_addr]
 
                             d3ck_spawn(cmd, argz)
                         }
@@ -2531,7 +2531,7 @@ function SSSUp () {
 
     var WebSocketServer = require('websocket').server;
 
-    var wss_d3cky = https.createServer(credentials, function (request, response) {
+    var wss__d3cky = https.createServer(credentials, function (request, response) {
         request.addListener('end', function () {
             file.serve(request, response);
         }).resume();
@@ -2539,7 +2539,7 @@ function SSSUp () {
     }).listen(d3ck_port_signal);
 
     new WebSocketServer({
-        httpServer: wss_d3cky,
+        httpServer: wss__d3cky,
         autoAcceptConnections: false
     }).on('request', onRequest);
 
@@ -2701,7 +2701,7 @@ async.whilst(
             // means the startup has run and the D3CK has an ID, which must be done before anything else
 
             console.log('get user data')
-            get_d3ck_vital_bits()
+            get__d3ck_vital_bits()
 
             // before this really don't answer to much other than the user startup
             // console.log('adding routes')
@@ -2735,14 +2735,14 @@ function fire_up_server_routes() {
     server.get('/ping', echoReply)
 
     // get or list d3cks
-    server.post('/d3ck', auth, created3ck)
-    server.get('/d3ck', auth, listd3cks)
+    server.post('/d3ck', auth, create_d3ck)
+    server.get('/d3ck', auth, list_d3cks)
 
     // Return a d3ck by key
-    server.get('/d3ck/:key', auth, getd3ck);
+    server.get('/d3ck/:key', auth, get_d3ck);
 
     // Delete a d3ck by key
-    server.del('/d3ck/:key', auth, deleted3ck);
+    server.del('/d3ck/:key', auth, delete_d3ck);
 
     // Destroy everything
     server.del('/d3ck', auth, deleteAll, function respond(req, res, next) {
