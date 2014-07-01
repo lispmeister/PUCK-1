@@ -1114,7 +1114,7 @@ function create_d3ck(req, res, next) {
             // garrr... openvpn breaks this too... 
             console.log('adding from: ' + req.body.value.name)
 
-            d3ck_events = { new_d3ck : client_ip, new_d3ck_name: d3ck.value.name }
+            d3ck_events = { new_d3ck : client_ip, new_d3ck_name: req.body.value.name }
 
             create_d3ck_key_store(d3ck.value)
 
