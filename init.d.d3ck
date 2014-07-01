@@ -1,6 +1,11 @@
 #!/bin/bash
 
 #
+# xxx - needs fixing, actually track pids, you idiot
+#
+
+
+#
 # D3CK service start
 #
 # Based on /etc/init.d/d3ck on raspberry
@@ -49,8 +54,6 @@ all_da_ps() {
         # only works on D3CK... will kill others if not careful...!   ;)
         echo $(ps axuww|egrep 'openv|yate|node main.js'|grep -v grep | awk '{print $2}')
 }
-
-
 
 case $1 in
 

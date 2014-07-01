@@ -66,7 +66,7 @@ $D3CK_HOME/create_tlsauth.sh $d3ck_id
 # call it awk, you fuckers.  Pissed at time lost.
 
 # clumsy way to get the content into json form
-v_crt=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ckroot.crt)
+v_ca=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}'  $keystore/$d3ck_id/d3ckroot.crt)
 v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.crt)
 v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/ta.key)
 
@@ -85,7 +85,7 @@ fi
 vpn='"vpn" : {
           "port"     : "8080",
           "protocol" : "tcp",
-          "ca"       : ['"$v_crt"'],
+          "ca"       : ['"$v_ca"'],
           "key"      : ['"$v_key"'],
           "cert"     : ['"$v_cert"'],
           "tlsauth"  : ['"$v_ta"'],
