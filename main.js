@@ -1112,7 +1112,7 @@ function create_d3ck(req, res, next) {
             //
             
             // garrr... openvpn breaks this too... 
-            console.log('adding from: ' + d3ck.value.name)
+            console.log('adding from: ' + req.body.value.name)
 
             d3ck_events = { new_d3ck : client_ip, new_d3ck_name: d3ck.value.name }
 
