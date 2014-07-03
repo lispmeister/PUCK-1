@@ -7,7 +7,7 @@
         "pub"                : "/public",
         "tmp"                : "/tmp",
         "logs"               : "/logs",
-        "d3ck_port_int"      : "8079",
+        "d3ck_port_int"      : "8080",
         "d3ck_port_ext"      : "8080",
         "d3ck_port_signal"   : "12034",
         "d3ck_proto_signal"  : "tcp",
@@ -47,19 +47,20 @@
     },
 
     "public_routes": [
-        "js",
         "css",
+        "d3ck",
+        "favicon.ico",
         "img",
         "images",
-        "d3ck",
+        "js",
         "knock",
         "login",
-        "favicon.ico",
         "login.html",
         "loginFailure",
         "quikstart.html",
         "quik",
-        "qs"
+        "qs",
+        "sping"
     ]
 
 }

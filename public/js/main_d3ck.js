@@ -322,14 +322,13 @@ $(document).ready(function () {
     setInterval(check_sock,SOCK_CHECK)
 
     // hack attack, look out... this had better be temporary, lol
-    var hack_rl = 'https://' + location.hostname + ':5555/rtc.html'
-    $("#rtc_hack").attr("href", hack_rl)
+    // var hack_rl = 'https://' + location.hostname + ':5555/rtc.html'
+    // $("#rtc_hack").attr("href", hack_rl)
 
-    $('#rtc_hack').click(function(){
-        window.open(hack_rl, 'insecure')
-        return false;
-    })
-
+    // $('#rtc_hack').click(function(){
+    //     window.open(hack_rl, 'insecure')
+    //     return false;
+    // })
 
     // http://stackoverflow.com/questions/16214326/bootstrap-dropdown-with-hover
     $(function(){               

@@ -145,38 +145,6 @@ getElement('#allow-webcam').onclick = function() {
     }, session);
 };
 
-getElement('#allow-mic').onclick = function() {
-    this.disabled = true;
-    var session = { audio: true };
-
-    rtcMultiConnection.captureUserMedia(function(stream) {
-        var streamid = rtcMultiConnection.token();
-        rtcMultiConnection.customStreams[streamid] = stream;
-
-        rtcMultiConnection.sendMessage({
-            hasMic: true,
-            streamid: streamid,
-            session: session
-        });
-    }, session);
-};
-
-getElement('#allow-screen').onclick = function() {
-    this.disabled = true;
-    var session = { screen: true };
-
-    rtcMultiConnection.captureUserMedia(function(stream) {
-        var streamid = rtcMultiConnection.token();
-        rtcMultiConnection.customStreams[streamid] = stream;
-
-        rtcMultiConnection.sendMessage({
-            hasScreen: true,
-            streamid: streamid,
-            session: session
-        });
-    }, session);
-};
-
 getElement('#share-files').onclick = function() {
     var file = document.createElement('input');
     file.type = 'file';
@@ -221,9 +189,15 @@ $(document).ready(function () {
     var roomid = rtcMultiConnection.channel;
 
     var websocket = new WebSocket(SIGNALING_SERVER);
+
+    console.log('Srvr: ' + SIGNALING_SERVER)
+
     websocket.onmessage = function(event) {
         console.log('[m] websocket.onmessage')
         var data = JSON.parse(event.data);
+
+        console.log('[' + data + ']')
+
         if (data.isChannelPresent == false) {
             addNewMessage({
                 header: username,

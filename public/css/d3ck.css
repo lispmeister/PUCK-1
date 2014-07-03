@@ -17,6 +17,14 @@ video {
     height: 200px;
 }
 
+img {
+    display: block;
+    max-width:230px;
+    max-height:95px;
+    width: auto;
+    height: auto;
+}
+
 
 @font-face {
   font-family: 'Diplomata-Regular';

@@ -379,6 +379,9 @@ function findByUsername(name, fn) {
   return fn(null, null);
 }
 
+
+var last_public_url = ""
+
 // authenticated or no?
 function auth(req, res, next) {
 
@@ -388,7 +391,13 @@ function auth(req, res, next) {
             console.log('almost let you go to login.html, but nothing to login to')
         }
         else {
-            console.log('public: ' + req.path)
+
+            // just to cut down messages...
+            if (last_public_url != req.path)
+                console.log('public: ' + req.path)
+
+            last_public_url = req.path
+
             return next();
         }
     }
@@ -396,13 +405,14 @@ function auth(req, res, next) {
     // I don't care if you are auth'd or not, you don't get much but quickstart until
     // you've set up your d3ck....
     if (redirect_to_quickstart) {
+        console.log('redirecting to qs')
         res.redirect(302, '/quikstart.html')
         return
         // return next({ redirecting: 'quikstart.html'});
     }
 
     if (req.isAuthenticated()) { 
-        console.log('already chex')
+        // console.log('already chex')
         return next(); 
     }
 
@@ -454,7 +464,8 @@ passport.use(new l_Strategy(
     function(name, password, done) {
         // var _hash = hashit(password, N_ROUNDS)
 
-        console.log('checking password ' + password + ' for user ' + name)
+        // XXXXXX - uncomment this if you want to see what the user typed for a password!
+        // console.log('checking password ' + password + ' for user ' + name)
 
         process.nextTick(function () {
             findByUsername(name, function(err, user) {
@@ -838,13 +849,15 @@ function cat_power(msg) {
 
     // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
-    try {
-        cat_sock.write(JSON.stringify(msg))
-        console.log('catpower writez!  ' + JSON.stringify(msg))
-    }
-    catch (e) {
-        // need a browser...
-        // console.log('channel not up yet....? ' + e)
+    if (msg.type != "openvpn_server") {
+        try {
+            console.log('catpower writez!  ' + JSON.stringify(msg))
+            cat_sock.write(JSON.stringify(msg))
+        }
+        catch (e) {
+            // need a browser...
+            // console.log('channel not up yet....? ' + e)
+        }
     }
 
 }
@@ -994,21 +1007,21 @@ function format_d3ck(req, res, body) {
 //
 // write the crypto key stuff to the FS
 //
-function create_d3ck_key_store(d3ck) {
+function create_d3ck_key_store(data) {
 
     console.log('PUUUUUUCKKKKKK!')
-    // console.log(d3ck)
+    // console.log(data)
 
-    if (typeof d3ck != 'object') {
-        d3ck = JSON.parse(d3ck)
+    if (typeof data != 'object') {
+        data = JSON.parse(data)
     }
 
-    var ca   = d3ck.vpn_client.ca.join('\n')
-    var key  = d3ck.vpn_client.key.join('\n')
-    var cert = d3ck.vpn_client.cert.join('\n')
-    var tls  = d3ck.vpn.tlsauth.join('\n')
+    var ca   = data.vpn_client.ca.join('\n')
+    var key  = data.vpn_client.key.join('\n')
+    var cert = data.vpn_client.cert.join('\n')
+    var tls  = data.vpn.tlsauth.join('\n')
 
-    var d3ck_dir = d3ck_keystore + '/' + d3ck.D3CK_ID
+    var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
 
     // has to exist before the below will work...
     mkdirp.sync(d3ck_dir, function () {
@@ -1019,7 +1032,7 @@ function create_d3ck_key_store(d3ck) {
     })
 
     // xxx - errs to user!
-    _write2File(d3ck_dir + '/d3ck.pid', bwana_d3ck.D3CK_ID)
+    _write2File(d3ck_dir + '/d3ck.pid', data.D3CK_ID)
     _write2File(d3ck_dir + '/d3ckroot.crt', ca)
     _write2File(d3ck_dir + '/d3ck.key', key)
     _write2File(d3ck_dir + '/d3ck.crt', cert)
@@ -1838,7 +1851,7 @@ function startVPN(req, res, next) {
     console.log('start vpn2')
     console.log(req.body)
 
-    var home  = "/d3ck.html"
+    var home  = "/"
 
     var ip_addr = req.body.ip_addr
 
@@ -1975,7 +1988,7 @@ function put_d3ck(req, res, next) {
 
 function back_to_home (res) {
     console.log('on my way home')
-    var home = "/d3ck.html"
+    var home = "/"
     res.redirect(302, home)
 }
 
@@ -2040,7 +2053,6 @@ function formDelete(req, res, next) {
 
 
 }
-
 
 function sping_get(url, all_ips, d3ckid, n) {
 
@@ -2410,10 +2422,10 @@ function formCreate(req, res, next) {
                             data.all_ips[all_client_ips.length] = ip_addr
                         }
 
-                        // console.log(data);
+                        console.log(data);
 
+                        // self added
                         d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: bwana_d3ck.name }
-
                         console.log('adding from: ' + bwana_d3ck.name)
 
                         create_d3ck_key_store(data)
