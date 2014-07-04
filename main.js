@@ -332,7 +332,6 @@ while (init) {
 
             if (body.indexOf("was not found") != -1) {
                 console.log('no woman no d3ck: ' + body)
-                // trytryagain(options, callback);
             }
             else {
                 console.log('d3ckarrific!')
@@ -2549,7 +2548,7 @@ function SSSUp () {
 
     var WebSocketServer = require('websocket').server;
 
-    var wss_d3cky = https.createServer(credentials, function (request, response) {
+    var wss_d3cky = https.createServer(server_options, function (request, response) {
         request.addListener('end', function () {
             file.serve(request, response);
         }).resume();
@@ -2655,7 +2654,18 @@ var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key")
 var cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt")
 var ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
 
-var credentials = {key: key, cert: cert, ca: ca}
+// var credentials = {key: key, cert: cert, ca: ca}
+
+var server_options = {
+    key: key, 
+    cert: cert, 
+    ca: ca,
+    requestCert: true,
+    rejectUnauthorized: false
+}
+
+
+
 var server      = express()
 
 // various helpers
@@ -2691,6 +2701,16 @@ server.use(auth)
 
 // always serve up the install page
 // server.use(express.static(d3ck_public + '/qs'))
+
+server.get('/aaa', function(req, res) {
+
+    console.log('aaa ')
+    console.log(req.client)
+    req.client.authorized ? 
+        res.json({"status":"approved"}) : 
+        res.json({"status":"denied"}, 401);
+});
+
 
 // initial starting form - no auth
 server.post('/quik', quikStart)
@@ -2821,6 +2841,7 @@ function fire_up_server_routes() {
         })
     )
 
+
     // Ping another
     server.get('/ping/:key', auth, echoStatus)
     
@@ -2887,7 +2908,7 @@ function fire_up_server_routes() {
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
 //
-var d3cky = https.createServer(credentials, server)
+var d3cky = https.createServer(server_options, server)
 
 // socket signal server
 SSSUp()

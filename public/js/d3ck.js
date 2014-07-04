@@ -456,10 +456,6 @@ function event_hang_up() {
 //
 function get_ip(element) {
 
-    return
-
-// brokez
-
     var url = "/getip"
     var jqXHR_getIP = $.ajax({
         url: url,
@@ -470,7 +466,7 @@ function get_ip(element) {
         console.log('jxq getIP wootz')
         console.log(data)
         browser_ip = data.ip
-        $('#ip_diddy').prepend("Your IP address is: " + browser_ip + " ... ");
+        $('#ip_diddy').prepend("[" + browser_ip + "] ");
     }).fail(function(err) {
         console.log('errz on getIP' + err)
     })

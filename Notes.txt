@@ -1,3 +1,20 @@
+extended key usage cert
+
+
+Critical
+Signing
+Non-repudiation
+Key Encipherment
+If you are using extended key usage, check for
+
+Not Critical
+TLS Web Client Authentication
+E-mail protection
+
+
+
+
+
 
 poker cards 3.5 x 2.5
 
