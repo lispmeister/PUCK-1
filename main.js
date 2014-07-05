@@ -2666,7 +2666,7 @@ var server_options = {
 
 
 
-var server      = express()
+var server = express()
 
 // various helpers
 server.use(cors());
@@ -2709,6 +2709,7 @@ server.get('/aaa', function(req, res) {
     req.client.authorized ? 
         res.json({"status":"approved"}) : 
         res.json({"status":"denied"}, 401);
+
 });
 
 

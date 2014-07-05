@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 #
 #   A haiku to openssl:
@@ -27,11 +27,11 @@ rm -f ca.* d3ck.* vpn_client.*
 echo Key size will be $KEY_SIZE bits
 
 # randomish CN for CA
-# tmp=$KEY_CN
-# KEY_CN=$bits_o_128
+tmp=$KEY_CN
+KEY_CN=$bits_o_128
 
 # create CA
-openssl req -batch -days $KEY_LIFE -nodes -new -newkey rsa:$KEY_SIZE -x509 -keyout ca.key -out ca.crt -config stupid.cnf
+openssl req -batch -days $KEY_LIFE -nodes -subject -subj /C=$KEY_COUNTRY/CN=$KEY_CN -new -newkey rsa:$KEY_SIZE -x509 -keyout ca.key -out ca.crt -config stupid.cnf
 
 # server
 openssl req $magic -batch -days $KEY_LIFE -nodes -new -newkey rsa:$KEY_SIZE -keyout d3ck.key -out d3ck.csr -extensions server -config stupid.cnf

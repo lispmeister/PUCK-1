@@ -250,7 +250,7 @@ $(document).ready(function () {
                               '<div class="thumbnail" style="background-color: #eaf1f1" id="{{d3ckid}}">'              +
                                  '<a href="/d3ck_details.html?d3ckid={{d3ckid}}">'                                     +
                                  // '<img id="{{d3ckid}}" width=128 style="padding: 4;" src="public/img/' + d3ckid + '.png"></a> <br />' +
-                                 '<img id="{{d3ckid}}" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
+                                 '<img id="{{d3ckid}}" class="d3ck_img" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
                                  '<div class="caption">'                                                               +
                                     '<span>D3CK: </span><span class="d3ckname"><b>{{name}}</b></span> <br />'          +
                                     '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +

@@ -13,6 +13,7 @@
     "connect-flash": "0.1.x",
     "ctype": "latest",
     "ejs": "latest",
+    "execSync": "latest",
     "express": "3.1.0",
     "formidable": "latest",
     "moment": "latest",
