@@ -1533,17 +1533,16 @@ function get_d3ck(req, res, next) {
                 console.log("Value retrieved: " + reply.toString());
                 var obj_reply = JSON.parse(reply)
 
-                console.log('\n\n\nbefore...')
-                console.log(obj_reply.vpn.key)
+                // console.log('\n\n\nbefore...')
+                // console.log(obj_reply.vpn.key)
 
                 // kill things you don't want others knowing
-                obj_reply.vpn.key = obj_reply.vpn_client.key
-                obj_reply.vpn.crt = obj_reply.vpn_client.crt
+                // obj_reply.vpn.key = obj_reply.vpn_client.key
+                // obj_reply.vpn.crt = obj_reply.vpn_client.crt
 
-                console.log('\n\nafter...')
-                console.log(obj_reply.vpn.key)
-                console.log('\n\n\n')
-
+                // console.log('\n\nafter...')
+                // console.log(obj_reply.vpn.key)
+                // console.log('\n\n\n')
                 res.send(200, JSON.stringify(obj_reply))
             }
         }
