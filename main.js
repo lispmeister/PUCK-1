@@ -2296,6 +2296,7 @@ function quikStart(req, res, next) {
     // grab the file from whereever it's stashed, write it
     // if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
     if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
+
         msg = ""
         if (req.files.d3ck_image.type != 'image/png' && req.files.d3ck_image.type != 'image/jpeg' && req.files.d3ck_image.type != 'image/gif') {
             msg = 'Invalid image format (' + req.files.d3ck_image.type + '), only accept: GIF, JPG, and PNG'
@@ -2307,50 +2308,51 @@ function quikStart(req, res, next) {
 
         else {
 
-        // just stick to one ending please....
-        req.files.d3ck_image.name.replace('jpeg$','jpg')
+            // just stick to one ending please....
+            req.files.d3ck_image.name.replace('jpeg$','jpg')
 
-        if (msg == "") {
-            var iname  = req.files.d3ck_image.name
-            var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
+            if (msg == "") {
+                var iname  = req.files.d3ck_image.name
+                var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
 
-            d3ck_image      = '/img/' + d3ck_id + suffix
-            full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
+                d3ck_image      = '/img/' + d3ck_id + suffix
+                full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
 
-            var data = fs.readFileSync(req.files.d3ck_image.path)
-            var image_b64 = b64_encode(data)
+                var data = fs.readFileSync(req.files.d3ck_image.path)
+                var image_b64 = b64_encode(data)
 
-            // in case someone tries some monkey biz...
-            if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
-                console.log('err: filename suffix borked: ' + suffix)
+                // in case someone tries some monkey biz...
+                if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
+                    console.log('err: filename suffix borked: ' + suffix)
+                }
+                else {
+                    console.log('trying to write... ' + d3ck_image)
+                    // weirdness... writefile returns nada
+                    try {
+                        fs.writeFileSync(full_d3ck_image, data, 'utf8')
+                        console.log('updating d3ck json')
+
+                        bwana_d3ck.image     = d3ck_image
+                        bwana_d3ck.image_b64 = image_b64
+
+                        console.log(JSON.stringify(bwana_d3ck))
+
+                    }
+                    catch (err) {
+                        console.log('error writing image file "' + full_d3ck_image + '": ' + JSON.stringify(err))
+                    }
+                }
             }
             else {
-                console.log('trying to write... ' + d3ck_image)
-                // weirdness... writefile returns nada
-                try {
-                    fs.writeFileSync(full_d3ck_image, data, 'utf8')
-                    console.log('updating d3ck json')
-
-                    bwana_d3ck.image     = d3ck_image
-                    bwana_d3ck.image_b64 = image_b64
-
-                    console.log(JSON.stringify(bwana_d3ck))
-
-                }
-                catch (err) {
-                    console.log('error writing image file "' + full_d3ck_image + '": ' + JSON.stringify(err))
-                }
+                console.log('error uploading: ' + msg)
             }
-        }
-        else {
-            console.log('error uploading: ' + msg)
-        }
         }
     }
 
 
-    if (typeof bwana_d3ck.image = undefined || bwana_d3ck.image = "") {
-        bwana_d3ck.image = "/img/d3ck.png"
+    if (typeof bwana_d3ck.image == undefined || bwana_d3ck.image == "" || bwana_d3ck.image == "img") {
+        console.log('no image found... setting it to the default')
+        bwana_d3ck.image = '/img/d3ck.png'
     }
 
     rclient.set(d3ck_id, JSON.stringify(bwana_d3ck), function(err) {
