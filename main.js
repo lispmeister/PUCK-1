@@ -2301,9 +2301,11 @@ function quikStart(req, res, next) {
             msg = 'Invalid image format (' + req.files.d3ck_image.type + '), only accept: GIF, JPG, and PNG'
         }
 
-        if (req.files.d3ck_image.size > MAX_IMAGE_SIZE) {
+        else if (req.files.d3ck_image.size > MAX_IMAGE_SIZE) {
             msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.d3ck_image.size
         }
+
+        else {
 
         // just stick to one ending please....
         req.files.d3ck_image.name.replace('jpeg$','jpg')
@@ -2343,7 +2345,10 @@ function quikStart(req, res, next) {
         else {
             console.log('error uploading: ' + msg)
         }
+        }
     }
+
+
     if (typeof bwana_d3ck.image = undefined || bwana_d3ck.image = "") {
         bwana_d3ck.image = "/img/d3ck.png"
     }
