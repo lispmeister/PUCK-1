@@ -488,8 +488,6 @@ passport.use(new l_Strategy(
 
 ))
 
-
-
 //
 // send a message out that things are different
 //
@@ -1012,12 +1010,19 @@ function create_d3ck_key_store(data) {
         data = JSON.parse(data)
     }
 
-    var ca   = data.vpn_client.ca.join('\n')
-    var key  = data.vpn_client.key.join('\n')
-    var cert = data.vpn_client.cert.join('\n')
+    // var ca   = data.vpn_client.ca.join('\n')
+    // var key  = data.vpn_client.key.join('\n')
+    // var cert = data.vpn_client.cert.join('\n')
+
+    var ca   = data.vpn.ca.join('\n')
+    var key  = data.vpn.key.join('\n')
+    var cert = data.vpn.cert.join('\n')
     var tls  = data.vpn.tlsauth.join('\n')
 
     var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
+
+    console.log('Californiastic: ' + d3ck_dir)
+    console.log(ca)
 
     // has to exist before the below will work...
     mkdirp.sync(d3ck_dir, function () {
@@ -2373,12 +2378,10 @@ function formCreate(req, res, next) {
                 // console.log(data)
 
                 console.log('starting... writing...')
-                // make the d3ck's dir... should not exist!
 
                 data = JSON.parse(data)
-                // now get remote information
-                url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/d3ck/' + data.pid
 
+                // make the d3ck's dir... should not exist!
                 var d3ck_dir = config.D3CK.keystore + '/' + data.pid
 
                 mkdirp.sync(d3ck_dir, function () {
@@ -2387,6 +2390,9 @@ function formCreate(req, res, next) {
                         console.log(err);
                     }
                 })
+
+                // now get remote information
+                url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/d3ck/' + data.pid
 
                 // if ping is successful, rustle up and write appropriate data
                 var req = https.get(url, function(response) {
