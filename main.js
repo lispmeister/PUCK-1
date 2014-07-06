@@ -1165,6 +1165,7 @@ function create_d3ck_image(data) {
     var image = b64_decode(data.image_b64)
 
     console.log('trying to decode: ' + data.image)
+    console.log(data.image_b64)
 
     if (image == "") {
         console.log("Couldn't decode " + data.image)
@@ -1175,11 +1176,10 @@ function create_d3ck_image(data) {
 
     if (image.size > MAX_IMAGE_SIZE) {
         msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + image.size
-    }
-    else  {
         image = b64_decode(default_image)
     }
-        
+
+    console.log('image is ' + image.size + ' bytes')
 
     // just stick to one ending please....
     data.image.replace('jpeg$','jpg')
