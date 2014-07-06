@@ -443,7 +443,7 @@ passport.deserializeUser(function(id, done) {
 // return hash of password on N rounds
 function hashit(password, N_ROUNDS) {
 
-    console.log('hashing ' + password)
+    // console.log('hashing ' + password)
 
     var hash = bcrypt.hashSync(password, N_ROUNDS, function(err, _hash) { 
         if (err) {
@@ -451,7 +451,7 @@ function hashit(password, N_ROUNDS) {
             return("")
         }
         else {
-            console.log('hashing ' + password + ' => ' + _hash); 
+            // console.log('hashing ' + password + ' => ' + _hash); 
             return(_hash)
         }
     })
@@ -466,7 +466,7 @@ passport.use(new l_Strategy(
         // var _hash = hashit(password, N_ROUNDS)
 
         // XXXXXX - uncomment this if you want to see what the user typed for a password!
-        console.log('checking password ' + password + ' for user ' + name)
+        // console.log('checking password ' + password + ' for user ' + name)
 
         process.nextTick(function () {
             findByUsername(name, function(err, user) {
@@ -2290,7 +2290,7 @@ function quikStart(req, res, next) {
         stance = req.body.radio_free_d3ck
     }
 
-    console.log(name, email, d3ck, password, stance)
+    // console.log(name, email, d3ck, password, stance)
 
     bwana_d3ck.name        = d3ck
     bwana_d3ck.owner.name  = name
@@ -2330,6 +2330,7 @@ function quikStart(req, res, next) {
 
         if (msg) {
             data = fs.readFileSync(default_image)
+            console.log('reading... ' + default_image)
         }
         else {
             data = fs.readFileSync(req.files.d3ck_image.path)
@@ -2345,7 +2346,7 @@ function quikStart(req, res, next) {
             console.log('trying to write... ' + d3ck_image)
             // weirdness... writefile returns nada
             try {
-                fs.writeFileSync(full_d3ck_image, data, 'utf8')
+                fs.writeFileSync(d3ck_public + '/' + full_d3ck_image, data, 'utf8')
                 console.log('updating d3ck json')
 
                 bwana_d3ck.image     = d3ck_image
@@ -2391,7 +2392,7 @@ function quikStart(req, res, next) {
 
     secretz.hash     = hashit(password, N_ROUNDS)
 
-    console.log(name, email, d3ck, stance, password, secretz.hash, d3ck_image)
+    // console.log(name, email, d3ck, stance, password, secretz.hash, d3ck_image)
 
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
