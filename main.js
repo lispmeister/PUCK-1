@@ -464,7 +464,7 @@ passport.use(new l_Strategy(
         // var _hash = hashit(password, N_ROUNDS)
 
         // XXXXXX - uncomment this if you want to see what the user typed for a password!
-        // console.log('checking password ' + password + ' for user ' + name)
+        console.log('checking password ' + password + ' for user ' + name)
 
         process.nextTick(function () {
             findByUsername(name, function(err, user) {
@@ -472,19 +472,16 @@ passport.use(new l_Strategy(
                 if (!user) { console.log("unknown user: " + name); return done(null, false, { message: 'Unknown user ' + name }); }
 
                 // if (_hash == d3ck_owners[0].hash) {
-                bcrypt.compare(password, d3ck_owners[0].hash, function(err, res) {
-                    if (err) {
-                        console.log('password failzor')
-                        return done(null, false)
+                console.log(d3ck_owners[0].hash)
+
+                if (bcrypt.compareSync(password, d3ck_owners[0].hash)) {
+                    console.log('password matches, successsssss....!')
+                    return done(null, user)
                     }
-                    else {
-                        console.log('password matches, successsssss....!')
-                        return done(null, user)
-                    }
-                });
-                // if (_hash == d3ck_owners[0].hash) {
-                //     return done(null, false, { message: 'Invalid password' });
-                // }
+                else {
+                    console.log('password failzor')
+                    return done(null, false)
+                }
             })
         })
     }
@@ -1031,11 +1028,11 @@ function create_d3ck_key_store(data) {
     })
 
     // xxx - errs to user!
-    _write2File(d3ck_dir + '/d3ck.pid', data.D3CK_ID)
+    _write2File(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
     _write2File(d3ck_dir + '/d3ckroot.crt', ca)
-    _write2File(d3ck_dir + '/d3ck.key', key)
-    _write2File(d3ck_dir + '/d3ck.crt', cert)
-    _write2File(d3ck_dir + '/ta.key', tls)
+    _write2File(d3ck_dir + '/d3ck.key',     key)
+    _write2File(d3ck_dir + '/d3ck.crt',     cert)
+    _write2File(d3ck_dir + '/ta.key',       tls)
 
 }
 
@@ -2393,13 +2390,13 @@ function formCreate(req, res, next) {
 
                 // if ping is successful, rustle up and write appropriate data
                 var req = https.get(url, function(response) {
-                    var data = ''
+                    var r_data = ''
                     response.on('data', function(chunk) {
-                        data += chunk
+                        r_data += chunk
                     })
                     response.on('end', function() {
 
-                        data = JSON.parse(data)
+                        r_data = JSON.parse(r_data)
                         console.log('remote d3ck info in...!')
 
                         // if the IP we get the add from isn't in the ips the other d3ck
@@ -2409,8 +2406,8 @@ function formCreate(req, res, next) {
 
                         // if you're coming from a NAT or someplace weird...
                         var found = false
-                        for (var i = 0; i < data.all_ips.length; i++) {
-                            if (data.all_ips[i] == ip_addr) {
+                        for (var i = 0; i < r_data.all_ips.length; i++) {
+                            if (r_data.all_ips[i] == ip_addr) {
                                 console.log('remote ip found in d3ck data')
                                 found = true
                                 break
@@ -2418,16 +2415,16 @@ function formCreate(req, res, next) {
                         }
                         if (! found) {
                             console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
-                            data.all_ips[all_client_ips.length] = ip_addr
+                            r_data.all_ips[all_client_ips.length] = ip_addr
                         }
 
-                        console.log(data);
+                        console.log(r_data);
 
                         // self added
-                        d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: bwana_d3ck.name }
+                        d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: r_data.name }
                         console.log('adding from: ' + bwana_d3ck.name)
 
-                        create_d3ck_key_store(data)
+                        create_d3ck_key_store(r_data)
 
                         //
                         // execute a shell script with appropriate args to create a d3ck.
@@ -2445,17 +2442,17 @@ function formCreate(req, res, next) {
 
                         // this simply takes the pwd and finds the exe area...
                         var cmd  = d3ck_bin + '/create_d3ck.sh'
-                        var argz = [data.D3CK_ID, data.image, data.ip_addr, "\"all_ips\": [\"" + data.all_ips + "\"]", data.owner.name, data.owner.email]
+                        var argz = [r_data.D3CK_ID, r_data.image, r_data.ip_addr, "\"all_ips\": [\"" + r_data.all_ips + "\"]", r_data.owner.name, r_data.owner.email]
                         d3ck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
-                        _write2File(d3ck_public + data.image         , b64_decode(data.image_b64))
-                        _write2File(d3ck_public + data.image + ".b64", data.image_b64)
+                        _write2File(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
+                        _write2File(d3ck_public + r_data.image + ".b64", r_data.image_b64)
 
                         console.log(bwana_d3ck)
                         console.log(typeof bwana_d3ck)
 
-                        if (d3ck_id != data.D3CK_ID && !isEmpty(bwana_d3ck)) {
+                        if (d3ck_id != r_data.D3CK_ID) {
                             console.log("posting our d3ck data to the d3ck we just added....")
                             argz = [d3ck_id, bwana_d3ck.image, bwana_d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_d3ck.owner.name, bwana_d3ck.owner.email, ip_addr]
 

@@ -19,6 +19,7 @@ video {
 
 img d3ck_img {
     display: block;
+    /* cards are about 3.5 x 2.25 (2.5 for poker) */
     max-width:230px;
     max-height:95px;
     width: auto;

@@ -117,7 +117,7 @@ function cert_validate (req, cert) {
     console.log('executing... openssl fu')
     // openssl verify -purpose sslclient -CAfile ca.crt client.crt 
 
-    var result = sh.exec('openssl verify -purpose sslclient -CAfile bad.crt client.crt')
+    var result = sh.exec('openssl verify -purpose sslclient -CAfile ca.crt client.crt')
     console.log('return code ' + result.code);
     console.log('stdout + stderr ' + result.stdout);
 
