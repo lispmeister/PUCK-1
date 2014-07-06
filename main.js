@@ -2515,7 +2515,12 @@ function formCreate(req, res, next) {
                         d3ck_spawn(cmd, argz)
 
                         // now write the image data for the d3ck in question
+                        console.log('just about to keel over')
+                        console.log(d3ck_public)
+                        console.log(r_data)
+
                         _write2File(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
+
                         _write2File(d3ck_public + r_data.image + ".b64", r_data.image_b64)
 
                         console.log(bwana_d3ck)
