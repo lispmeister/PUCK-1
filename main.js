@@ -2344,7 +2344,7 @@ function quikStart(req, res, next) {
             console.log('error uploading: ' + msg)
         }
     }
-    else {
+    if (typeof bwana_d3ck.image = undefined || bwana_d3ck.image = "") {
         bwana_d3ck.image = "/img/d3ck.png"
     }
 
