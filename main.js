@@ -9,6 +9,7 @@ var Tail       = require('tail').Tail,
     crypto     = require('crypto'),
     express    = require('express'),
     flash      = require('connect-flash'),
+    sh         = require('execSync'),
     fs         = require('fs'),
     formidable = require('formidable'),
     https      = require('https'),
@@ -1529,7 +1530,21 @@ function get_d3ck(req, res, next) {
             } 
             else {
                 // console.log("Value retrieved: " + reply.toString());
-                res.send(200, reply);
+                console.log("Value retrieved: " + reply.toString());
+                var obj_reply = JSON.parse(reply)
+
+                console.log('\n\n\nbefore...')
+                console.log(obj_reply.vpn.key)
+
+                // kill things you don't want others knowing
+                obj_reply.vpn.key = obj_reply.vpn_client.key
+                obj_reply.vpn.crt = obj_reply.vpn_client.crt
+
+                console.log('\n\nafter...')
+                console.log(obj_reply.vpn.key)
+                console.log('\n\n\n')
+
+                res.send(200, JSON.stringify(obj_reply))
             }
         }
         else {
@@ -1840,6 +1855,32 @@ function d3ck_spawn(command, argz) {
     }
     catch (e) {
         console.log("exec error with " + command + ' => ' + e.message)
+    }
+
+}
+
+//
+// execute a command SYNCHRONOUSLY (blocking!), log stuff
+//
+function d3ck_spawn_sync(command, argz) {
+
+    console.log('a sync spawn o d3ck emerges... ' + ' (' + command + ')\n\n\t')
+
+    var cmd_string = command + ' ' + argz.join(' ')
+
+    console.log("-->" + cmd_string + "<---\n\n\n")
+
+    var result = sh.exec(cmd_string)
+
+    console.log('return code ' + result.code);
+    console.log('stdout + stderr ' + result.stdout);
+
+    try {
+        out = fs.writeFileSync(d3ck_logs + '/' + command + '.out.log', 'a+')
+        err = fs.writeFileSync(d3ck_logs + '/' + command + '.err.log', 'a+')
+    }
+    catch (e) {
+        console.log("error writing log file with " + command + ' => ' + e.message)
     }
 
 }
@@ -2460,7 +2501,7 @@ function formCreate(req, res, next) {
 
                         if (d3ck_id != r_data.D3CK_ID) {
                             console.log("posting our d3ck data to the d3ck we just added....")
-                            argz = [d3ck_id, bwana_d3ck.image, bwana_d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_d3ck.owner.name, bwana_d3ck.owner.email, ip_addr]
+                            argz = [d3ck_id, bwana_d3ck.image, bwana_d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_d3ck.owner.name, bwana_d3ck.owner.email, ip_addr, r_data.D3CK_ID]
 
                             d3ck_spawn(cmd, argz)
                         }

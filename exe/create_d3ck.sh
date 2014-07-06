@@ -2,7 +2,7 @@
 #
 # create a new d3ck via curl
 #
-# Usage: $0 d3ck-id picture IP-addr 'ints-n-ips-in-json' owner email [d3ck-ip]
+# Usage: $0 d3ck-id picture IP-addr 'ints-n-ips-in-json' owner email [d3ck-ip remote-d3ck-id]
 #
 
 . /etc/d3ck/config.sh
@@ -26,10 +26,11 @@ if [ $# -lt 6 ] ; then
 fi
 
 d3ck_ip="@"
-if [ $# -eq 7 ] ; then
+if [ $# -eq 8 ] ; then
     echo creating d3ck on remote host
     d3ck_ip=$7
     d3ck_host=$7
+    r_d3ck_id=$8
 fi
 
 d3ck_url="https://$d3ck_host:$d3ck_port/d3ck"
@@ -74,6 +75,15 @@ v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json,
 v_key="{}"
 if [ "$d3ck_ip" = "@" ] ; then
     v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.key)
+
+else
+
+    echo generating new keys
+    $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
+
+    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/d3ck.key)
+    v_cert=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/d3ck.crt)
+
 fi
 
 v_dh="{}"
