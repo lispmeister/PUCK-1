@@ -60,6 +60,7 @@ var d3ck_bin          = d3ck_home + config.D3CK.bin
 var d3ck_logs         = d3ck_home + config.D3CK.logs
 var d3ck_public       = d3ck_home + config.D3CK.pub
 var d3ck_secretz      = d3ck_home + config.D3CK.secretz
+var default_image     = d3ck_home + config.D3CK.default_image
 
 // oh, the tangled web we weave... "we"?  Well, I.
 var d3ck_port_int     = config.D3CK.d3ck_port_int
@@ -1175,6 +1176,10 @@ function create_d3ck_image(data) {
     if (image.size > MAX_IMAGE_SIZE) {
         msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + image.size
     }
+    else  {
+        image = b64_decode(default_image)
+    }
+        
 
     // just stick to one ending please....
     data.image.replace('jpeg$','jpg')
@@ -2300,53 +2305,63 @@ function quikStart(req, res, next) {
         msg = ""
         if (req.files.d3ck_image.type != 'image/png' && req.files.d3ck_image.type != 'image/jpeg' && req.files.d3ck_image.type != 'image/gif') {
             msg = 'Invalid image format (' + req.files.d3ck_image.type + '), only accept: GIF, JPG, and PNG'
+
         }
 
-        else if (req.files.d3ck_image.size > MAX_IMAGE_SIZE) {
+        if (req.files.d3ck_image.size > MAX_IMAGE_SIZE) {
             msg += 'maximum file size is ' + MAX_IMAGE_SIZE + ', upload image size was ' + req.files.d3ck_image.size
         }
 
+        if (msg) {
+            req.files.d3ck_image.type = "image/png"
+            req.files.d3ck_image.name = "d3ck.png"
+        }
+
+        // just stick to one ending please....
+        req.files.d3ck_image.name.replace('jpeg$','jpg')
+
+        var iname  = req.files.d3ck_image.name
+        var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
+
+        d3ck_image      = '/img/' + d3ck_id + suffix
+        full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
+
+        var data = ""
+
+        if (msg) {
+            data = fs.readFileSync(default_image)
+        }
         else {
+            data = fs.readFileSync(req.files.d3ck_image.path)
+        }
 
-            // just stick to one ending please....
-            req.files.d3ck_image.name.replace('jpeg$','jpg')
+        var image_b64 = b64_encode(data)
 
-            if (msg == "") {
-                var iname  = req.files.d3ck_image.name
-                var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
+        // in case someone tries some monkey biz...
+        if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
+            console.log('err: filename suffix borked: ' + suffix)
+        }
+        else {
+            console.log('trying to write... ' + d3ck_image)
+            // weirdness... writefile returns nada
+            try {
+                fs.writeFileSync(full_d3ck_image, data, 'utf8')
+                console.log('updating d3ck json')
 
-                d3ck_image      = '/img/' + d3ck_id + suffix
-                full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
+                bwana_d3ck.image     = d3ck_image
+                bwana_d3ck.image_b64 = image_b64
 
-                var data = fs.readFileSync(req.files.d3ck_image.path)
-                var image_b64 = b64_encode(data)
+                console.log(JSON.stringify(bwana_d3ck))
 
-                // in case someone tries some monkey biz...
-                if (suffix != '.png' && suffix != '.gif' && suffix != '.jpg') {
-                    console.log('err: filename suffix borked: ' + suffix)
-                }
-                else {
-                    console.log('trying to write... ' + d3ck_image)
-                    // weirdness... writefile returns nada
-                    try {
-                        fs.writeFileSync(full_d3ck_image, data, 'utf8')
-                        console.log('updating d3ck json')
-
-                        bwana_d3ck.image     = d3ck_image
-                        bwana_d3ck.image_b64 = image_b64
-
-                        console.log(JSON.stringify(bwana_d3ck))
-
-                    }
-                    catch (err) {
-                        console.log('error writing image file "' + full_d3ck_image + '": ' + JSON.stringify(err))
-                    }
-                }
             }
-            else {
-                console.log('error uploading: ' + msg)
+            catch (err) {
+                console.log('error writing image file "' + full_d3ck_image + '": ' + JSON.stringify(err))
             }
         }
+
+    }
+    else {
+        console.log('error uploading: ' + msg)
     }
 
 

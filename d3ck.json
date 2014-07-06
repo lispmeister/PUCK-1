@@ -11,7 +11,8 @@
         "d3ck_port_ext"      : "8080",
         "d3ck_port_signal"   : "12034",
         "d3ck_proto_signal"  : "tcp",
-        "d3ck_port_forward"  : "5555"
+        "d3ck_port_forward"  : "5555",
+        "default_image"      : "/public/img/d3ck.png"
         },
 
     "fri3nd_find3r" : {
