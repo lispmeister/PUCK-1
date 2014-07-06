@@ -2368,7 +2368,15 @@ function quikStart(req, res, next) {
 
     if (typeof bwana_d3ck.image == undefined || bwana_d3ck.image == "" || bwana_d3ck.image == "img") {
         console.log('no image found... setting it to the default')
-        bwana_d3ck.image = '/img/d3ck.png'
+
+        var data             = fs.readFileSync(default_image)
+        var image_b64        = b64_encode(data)
+
+        bwana_d3ck.image     = d3ck_image
+        bwana_d3ck.image_b64 = image_b64
+
+        fs.writeFileSync(full_d3ck_image, data, 'utf8')
+
     }
 
     rclient.set(d3ck_id, JSON.stringify(bwana_d3ck), function(err) {
