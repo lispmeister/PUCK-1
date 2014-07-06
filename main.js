@@ -2346,7 +2346,7 @@ function quikStart(req, res, next) {
             console.log('trying to write... ' + d3ck_image)
             // weirdness... writefile returns nada
             try {
-                fs.writeFileSync(d3ck_public + '/' + full_d3ck_image, data, 'utf8')
+                fs.writeFileSync(full_d3ck_image, data, 'utf8')
                 console.log('updating d3ck json')
 
                 bwana_d3ck.image     = d3ck_image
