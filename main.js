@@ -2302,6 +2302,9 @@ function quikStart(req, res, next) {
     // if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
     if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
 
+        data.image.replace('jpeg$','jpg')
+
+
         msg = ""
         if (req.files.d3ck_image.type != 'image/png' && req.files.d3ck_image.type != 'image/jpeg' && req.files.d3ck_image.type != 'image/gif') {
             msg = 'Invalid image format (' + req.files.d3ck_image.type + '), only accept: GIF, JPG, and PNG'
