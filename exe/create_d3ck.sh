@@ -80,8 +80,8 @@ if [ "$d3ck_ip" = "@" ] ; then
 else
     echo generating new keys
     $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
-    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/d3ck.key)
-    v_cert=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/d3ck.crt)
+    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.key)
+    v_cert=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.crt)
 fi
 
 v_dh="{}"

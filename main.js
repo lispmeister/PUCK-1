@@ -2293,7 +2293,7 @@ function quikStart(req, res, next) {
     // console.log(name, email, d3ck, password, stance)
 
     bwana_d3ck.name        = d3ck
-    bwana_d3ck.owner.name  = name
+    bwana_d3ck.owner.name  = name.replace('jpeg$','jpg')
     bwana_d3ck.owner.email = email
     bwana_d3ck.stance      = stance
 
@@ -2301,9 +2301,6 @@ function quikStart(req, res, next) {
     // grab the file from whereever it's stashed, write it
     // if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
     if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
-
-        data.image.replace('jpeg$','jpg')
-
 
         msg = ""
         if (req.files.d3ck_image.type != 'image/png' && req.files.d3ck_image.type != 'image/jpeg' && req.files.d3ck_image.type != 'image/gif') {
