@@ -1114,7 +1114,8 @@ function create_d3ck(req, res, next) {
     // TODO: Check if d3ck exists using EXISTS and fail if it does
 
     console.log("key: " + d3ck.key);
-    console.log("value: " + d3ck.value);
+
+    // console.log("value: " + d3ck.value);
 
     rclient.set(d3ck.key, d3ck.value, function(err) {
         if (err) {

@@ -33,7 +33,7 @@ cd /etc/d3ck/f-u-openssl
 . d3ck-vars
 
 d3ck_home="$keystore/$1"
-d3ck="$d3ck_home/$1"
+d3ck="$d3ck_home/cli3nt"
 
 mkdir "$d3ck_home" 2> /dev/null
 
