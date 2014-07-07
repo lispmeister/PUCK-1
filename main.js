@@ -1012,6 +1012,8 @@ function create_d3ck_key_store(data) {
         data = JSON.parse(data)
     }
 
+    console.log(data.vpn)
+
     // var ca   = data.vpn_client.ca.join('\n')
     // var key  = data.vpn_client.key.join('\n')
     // var cert = data.vpn_client.cert.join('\n')
@@ -1545,6 +1547,8 @@ function get_d3ck(req, res, next) {
                 // kill things you don't want others knowing
                 // obj_reply.vpn.key = obj_reply.vpn_client.key
                 // obj_reply.vpn.crt = obj_reply.vpn_client.crt
+
+                console.log(obj_reply.vpn)
 
                 // console.log('\n\nafter...')
                 // console.log(obj_reply.vpn.key)
@@ -2365,7 +2369,6 @@ function quikStart(req, res, next) {
     else {
         console.log('error uploading: ' + msg)
     }
-
 
     if (typeof bwana_d3ck.image == undefined || bwana_d3ck.image == "" || bwana_d3ck.image == "img") {
         console.log('no image found... setting it to the default')
