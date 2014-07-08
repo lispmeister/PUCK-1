@@ -48,6 +48,7 @@
     },
 
     "public_routes": [
+        "d3ck",
         "css",
         "favicon.ico",
         "img",
