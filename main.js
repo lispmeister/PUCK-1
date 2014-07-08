@@ -2663,7 +2663,7 @@ function onRequest(socket) {
                 onMessage(JSON.parse(message.utf8Data), websocket);
             }
             catch (e) {
-                console.log('malformed websocket message: ' + JSON.stringify(e)
+                console.log('malformed websocket message: ' + JSON.stringify(e))
             }
         }
     });
