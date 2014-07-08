@@ -53,22 +53,11 @@ server.get('/*', function(req, res){
 
         var subject = req.connection.getPeerCertificate().subject;
     
-//          { subject: 
-//              { C: 'AQ',
-//                  ST: 'White',
-//                  L: 'D3cktown',
-//                  O: 'D3ckasaurusRex',
-//                  CN: '*' },
-//              issuer: 
-//              { C: 'AQ',
-//                  ST: 'White',
-//                  L: 'D3cktown',
-//                  O: 'D3ckasaurusRex',
-//                  CN: '*' },
-//          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
+        //          { subject: 
+        //              { C: 'AQ',
+        // [...]
+        //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
 
-        // Render the authorized template, providing
-        // the user information found on the certificate
         res.send('authorized', 
         { title:        'Authorized!',
         user:         subject.CN,

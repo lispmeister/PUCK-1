@@ -1,7 +1,8 @@
 
-var __ = require('underscore');   // note; not one, two _'s, just for node
-
 var user_archtypes = ['paranoid', 'moderate', 'trusting']
+
+// for auth/salting/hashing
+var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 
 //
 // authorization stuff
@@ -69,7 +70,141 @@ function init_capabilities(capabilities) {
 
 }
 
-module.exports = {
-    init_capabilities: init_capabilities
+//
+// auth/passport stuff
+//
+function findById(id, fn) {
+    if (d3ck_owners[id]) {
+        // console.log('found....')
+        // console.log(d3ck_owners)
+        // console.log(d3ck_owners[0])
+        fn(null, d3ck_owners[id]);
+    } else {
+        // console.log('User ' + id + ' does not exist');
+        // console.log(d3ck_owners)
+        // console.log(d3ck_owners[0])
+        return fn(null, null);
+    }
 }
+
+function findByUsername(name, fn) {
+  for (var i = 0, len = d3ck_owners.length; i < len; i++) {
+    var user = d3ck_owners[i];
+    if (user.name === name) {
+      return fn(null, user);
+    }
+  }
+  return fn(null, null);
+}
+
+
+var last_public_url = ""
+
+// authenticated or no?
+function auth(req, res, next) {
+
+    var url_bits = req.path.split('/')
+    if (__.contains(public_routes, url_bits[1])) {
+        if (redirect_to_quickstart && url_bits[1] == "login.html") {
+            console.log('almost let you go to login.html, but nothing to login to')
+        }
+        else {
+
+            // just to cut down messages...
+            if (last_public_url != req.path)
+                console.log('public: ' + req.path)
+
+            last_public_url = req.path
+
+            return next();
+        }
+    }
+
+    // I don't care if you are auth'd or not, you don't get much but quickstart until
+    // you've set up your d3ck....
+    if (redirect_to_quickstart) {
+        console.log('redirecting to qs')
+        res.redirect(302, '/quikstart.html')
+        return
+        // return next({ redirecting: 'quikstart.html'});
+    }
+
+    if (req.isAuthenticated()) { 
+        // console.log('already chex')
+        return next(); 
+    }
+
+    console.log('authentication check for... ' + req.path)
+
+    if (req.body.ip_addr == '127.0.0.1') {
+        console.log('pass... localhost')
+        return next();
+    }
+
+    console.log('bad luck, off to dancing school')
+    res.redirect(302, '/login.html')
+
+}
+
+// Passport session setup.
+passport.serializeUser(function(user, done) {
+    done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+    findById(id, function (err, user) {
+        done(err, user);
+    });
+});
+
+// return hash of password on N rounds
+function hashit(password, N_ROUNDS) {
+
+    // console.log('hashing ' + password)
+
+    var hash = bcrypt.hashSync(password, N_ROUNDS, function(err, _hash) { 
+        if (err) {
+            console.log("hash error: " + err)
+            return("")
+        }
+        else {
+            // console.log('hashing ' + password + ' => ' + _hash); 
+            return(_hash)
+        }
+    })
+
+    return(hash)
+}
+
+// Use the LocalStrategy within Passport.
+passport.use(new l_Strategy(
+
+    function(name, password, done) {
+        // var _hash = hashit(password, N_ROUNDS)
+
+        // XXXXXX - uncomment this if you want to see what the user typed for a password!
+        // console.log('checking password ' + password + ' for user ' + name)
+
+        process.nextTick(function () {
+            findByUsername(name, function(err, user) {
+                if (err)   { console.log("erzz in pass: " + err);  return done(err); }
+                if (!user) { console.log("unknown user: " + name); return done(null, false, { message: 'Unknown user ' + name }); }
+
+                // if (_hash == d3ck_owners[0].hash) {
+                console.log(d3ck_owners[0].hash)
+
+                if (bcrypt.compareSync(password, d3ck_owners[0].hash)) {
+                    console.log('password matches, successsssss....!')
+                    return done(null, user)
+                    }
+                else {
+                    console.log('password failzor')
+                    return done(null, false)
+                }
+            })
+        })
+    }
+
+))
+
 
