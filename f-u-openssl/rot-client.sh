@@ -40,8 +40,8 @@ mkdir "$d3ck_home" 2> /dev/null
 echo Client key size will be $KEY_SIZE bits
 
 # client
-openssl req $magic -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $d3ck.key -out $d3ck.csr -config stupid.cnf
+openssl req $magic -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $d3ck.key -out $d3ck.csr -config stupid.conf
 
-openssl ca $magic -cert ca.crt -batch -keyfile ca.key -days $KEY_LIFE -out $d3ck.crt -in $d3ck.csr -config stupid.cnf
+openssl ca $magic -cert ca.crt -batch -keyfile ca.key -days $KEY_LIFE -out $d3ck.crt -in $d3ck.csr -config stupid.conf
 
 chmod -R 755 /etc/d3ck/f-u-openssl/keys

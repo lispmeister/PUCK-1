@@ -2658,7 +2658,13 @@ function onRequest(socket) {
 
     websocket.on('message', function (message) {
         if (message.type === 'utf8') {
-            onMessage(JSON.parse(message.utf8Data), websocket);
+
+            try {
+                onMessage(JSON.parse(message.utf8Data), websocket);
+            }
+            catch (e) {
+                console.log('malformed websocket message: ' + JSON.stringify(e)
+            }
         }
     });
 
