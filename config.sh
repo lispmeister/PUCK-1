@@ -15,6 +15,7 @@ PATH=$PATH:/usr/local/bin:/usr/local/nodey/bin
 #
 export KEY_SIZE=1024
 export KEY_LIFE=365
+export CRL_LIFE=$KEY_LIFE
 
 export bits_o_128=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
 
@@ -46,7 +47,7 @@ export d3ck_auth="SHA1"
 
 export d3ck_url="$d3ck_proto://$d3ck_host:$d3ck_port"
 
-export client_keys="/etc/d3ck/vpn_client"
+export client_keys="$D3CK_HOME/vpn_client"
 
 # for Certs
 export KEY_COUNTRY="AQ"             # country

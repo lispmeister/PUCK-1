@@ -48,7 +48,7 @@ var Tail       = require('tail').Tail,
 //
 
 // simple conf file...
-var config = JSON.parse(fs.readFileSync('/etc/d3ck/d3ck.json').toString())
+var config = JSON.parse(fs.readFileSync('/etc/d3ck/D3CK.json').toString())
 console.log(config);
 
 console.log(config.D3CK)
@@ -2499,7 +2499,13 @@ function formCreate(req, res, next) {
                             r_data.all_ips[all_client_ips.length] = ip_addr
                         }
 
-                        console.log(r_data);
+                        console.log('vpn-ify...!')
+                        console.log('vpn-ify...!')
+                        console.log('vpn-ify...!')
+                        console.log(JSON.stringify(r_data.vpn));
+                        console.log('vpn-ify...!')
+                        console.log('vpn-ify...!')
+                        console.log('vpn-ify...!')
 
                         // self added
                         d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: r_data.name }

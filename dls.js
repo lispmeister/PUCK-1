@@ -22,7 +22,7 @@ var cors     = require('cors'),
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 // simple conf file...
-var config = JSON.parse(fs.readFileSync('/etc/d3ck/d3ck.json').toString())
+var config = JSON.parse(fs.readFileSync('/etc/d3ck/D3CK.json').toString())
 console.log(config);
 
 console.log(config.D3CK)
