@@ -2220,13 +2220,7 @@ function formDelete(req, res, next) {
 
 function sping_get(url, all_ips, d3ckid, n) {
 
-    var cops = c_options
-
-    cops.url = url
-
-    // var request = https.get(url, function(resp) {
-
-    var request = https.get(cops, function(resp) {
+    var request = https.get(url, function(resp) {
         console.log('trying.... ' + url)
         resp.setEncoding('utf8');
         resp.on("data", function(d) {
@@ -2553,11 +2547,7 @@ function formCreate(req, res, next) {
     console.log('ping get_https ' + url)
 
     // is it a d3ck?
-    var cops = c_options
-    cops.url = url
-
-    // var req = https.get(url, function(response) {
-    var req = https.get(cops, function(response) {
+    var req = https.get(url, function(response) {
         var data = ''
         response.on('data', function(chunk) {
             data += chunk
@@ -2592,12 +2582,8 @@ function formCreate(req, res, next) {
                 // now get remote information
                 url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/d3ck/' + data.pid
 
-                var cops = c_options
-                cops.url = url
-
                 // if ping is successful, rustle up and write appropriate data
-                // var req = https.get(url, function(response) {
-                var req = https.get(cops, function(response) {
+                var req = https.get(url, function(response) {
                     var r_data = ''
                     response.on('data', function(chunk) {
                         r_data += chunk
@@ -2875,16 +2861,6 @@ function truncateChannels(websocket) {
 var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key")
 var cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt")
 var ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
-
-// actually... steal these for client https gets as well
-var c_options = {
-    key: key,
-    cert: cert,
-    ca: ca,
-    strictSSL:false
-}
-
-
 
 // var credentials = {key: key, cert: cert, ca: ca}
 
