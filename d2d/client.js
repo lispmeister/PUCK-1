@@ -3,14 +3,12 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 var constants = require('constants');
 
 var https = require('https');
-var fs = require("fs");
+var fs    = require("fs");
 
 https.globalAgent.options.secureProtocol = 'SSLv3_method'
 
 var options = {
-    host: 'localhost',
-    port: 8000,
-    path: process.argv[1],
+    url: process.argv[1],
     method: 'GET',
     key: fs.readFileSync("c.key"),
     cert: fs.readFileSync("c.crt"),
