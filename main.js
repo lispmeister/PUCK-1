@@ -1917,7 +1917,7 @@ function uploadSchtuff(req, res, next) {
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
 
-                    restler.post("https://" + upload_target + ":8080/up/local", {
+                    restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local', {
                         multipart: true,
                         data: { "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg") }
                     }).on("complete", function(data) {
@@ -2652,7 +2652,7 @@ function formCreate(req, res, next) {
 
                         _write2File(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
 
-                        _write2File(d3ck_public + r_data.image + ".b64", r_data.image_b64)
+                        // _write2File(d3ck_public + r_data.image + ".b64", r_data.image_b64)
 
                         console.log(bwana_d3ck)
                         console.log(typeof bwana_d3ck)
@@ -2763,95 +2763,92 @@ function SSSUp () {
     }).on('request', onRequest);
 
 
-// from signaler.js in WebRTC-Experiment/MultiRTC
-function onRequest(socket) {
-    var origin = socket.origin + socket.resource;
+    // from signaler.js in WebRTC-Experiment/MultiRTC
+    function onRequest(socket) {
+        var origin = socket.origin + socket.resource;
 
-    var websocket = socket.accept(null, origin);
+        var websocket = socket.accept(null, origin);
 
-    websocket.on('message', function (message) {
-        if (message.type === 'utf8') {
+        websocket.on('message', function (message) {
+            if (message.type === 'utf8') {
 
-            try {
-                onMessage(JSON.parse(message.utf8Data), websocket);
+                try {
+                    onMessage(JSON.parse(message.utf8Data), websocket);
+                }
+                catch (e) {
+                    console.log('malformed websocket message: ' + JSON.stringify(e))
+                }
             }
-            catch (e) {
-                console.log('malformed websocket message: ' + JSON.stringify(e))
+        });
+
+        websocket.on('close', function () {
+            truncateChannels(websocket);
+        });
+    }
+
+    function onMessage(message, websocket) {
+        if (message.checkPresence)
+            checkPresence(message, websocket);
+        else if (message.open)
+            onOpen(message, websocket);
+        else
+            sendMessage(message, websocket);
+    }
+
+    function onOpen(message, websocket) {
+        var channel = CHANNELS[message.channel];
+
+        if (channel)
+            CHANNELS[message.channel][channel.length] = websocket;
+        else
+            CHANNELS[message.channel] = [websocket];
+    }
+
+    function sendMessage(message, websocket) {
+        message.data = JSON.stringify(message.data);
+        var channel = CHANNELS[message.channel];
+        if (!channel) {
+            console.error('no such channel exists');
+            return;
+        }
+
+        for (var i = 0; i < channel.length; i++) {
+            if (channel[i] && channel[i] != websocket) {
+                try {
+                    channel[i].sendUTF(message.data);
+                } catch (e) {}
             }
         }
-    });
-
-    websocket.on('close', function () {
-        truncateChannels(websocket);
-    });
-}
-
-function onMessage(message, websocket) {
-    if (message.checkPresence)
-        checkPresence(message, websocket);
-    else if (message.open)
-        onOpen(message, websocket);
-    else
-        sendMessage(message, websocket);
-}
-
-function onOpen(message, websocket) {
-    var channel = CHANNELS[message.channel];
-
-    if (channel)
-        CHANNELS[message.channel][channel.length] = websocket;
-    else
-        CHANNELS[message.channel] = [websocket];
-}
-
-function sendMessage(message, websocket) {
-    message.data = JSON.stringify(message.data);
-    var channel = CHANNELS[message.channel];
-    if (!channel) {
-        console.error('no such channel exists');
-        return;
     }
 
-    for (var i = 0; i < channel.length; i++) {
-        if (channel[i] && channel[i] != websocket) {
-            try {
-                channel[i].sendUTF(message.data);
-            } catch (e) {}
+    function checkPresence(message, websocket) {
+        websocket.sendUTF(JSON.stringify({
+            isChannelPresent: !! CHANNELS[message.channel]
+        }));
+    }
+
+    function swapArray(arr) {
+        var swapped = [],
+            length = arr.length;
+        for (var i = 0; i < length; i++) {
+            if (arr[i])
+                swapped[swapped.length] = arr[i];
+        }
+        return swapped;
+    }
+
+    function truncateChannels(websocket) {
+        for (var channel in CHANNELS) {
+            var _channel = CHANNELS[channel];
+            for (var i = 0; i < _channel.length; i++) {
+                if (_channel[i] == websocket)
+                    delete _channel[i];
+            }
+            CHANNELS[channel] = swapArray(_channel);
+            if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
+                delete CHANNELS[channel];
         }
     }
-}
-
-function checkPresence(message, websocket) {
-    websocket.sendUTF(JSON.stringify({
-        isChannelPresent: !! CHANNELS[message.channel]
-    }));
-}
-
-function swapArray(arr) {
-    var swapped = [],
-        length = arr.length;
-    for (var i = 0; i < length; i++) {
-        if (arr[i])
-            swapped[swapped.length] = arr[i];
-    }
-    return swapped;
-}
-
-function truncateChannels(websocket) {
-    for (var channel in CHANNELS) {
-        var _channel = CHANNELS[channel];
-        for (var i = 0; i < _channel.length; i++) {
-            if (_channel[i] == websocket)
-                delete _channel[i];
-        }
-        CHANNELS[channel] = swapArray(_channel);
-        if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
-            delete CHANNELS[channel];
-    }
-}
-
-
-
 
 }
 
@@ -2864,13 +2861,49 @@ var ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
 
 // var credentials = {key: key, cert: cert, ca: ca}
 
+
+//
+// Ciphers... is a bit mysterious.
+//
+// I've cobbled together what I think is a reasonable set of
+// options from a variety of sources. Having ECDHE enabled
+// seems to be a key.  I'm not even sure what the below options
+// do, but testing by hand with openssl, ala:
+//
+//      http://baudehlo.com/2013/06/24/setting-up-perfect-forward-secrecy-for-nginx-or-stud/
+//
+// via:
+//
+//      openssl s_client -connect 127.0.0.1:8080 -cipher AES256-SHA256:RC4-SHA
+//
+// returns a bunch of stuff, including the line:
+//
+//      Secure Renegotiation IS supported
+//
+// which appears to be the magic phrase.
+//
+// TBD - still need to test with qualys openssl labs - https://www.ssllabs.com/ssltest/
+//
+// Some additional info from https://github.com/joyent/node/issues/2727,
+// https://github.com/joyent/node/commit/f41924354a99448f0ee678e0be77fedfab988ad2,
+// and other places ;(
+//
+// Why do crypto people hate us?  Just tell me what to put there for reasonable
+// security... or make it the default ;(
+//
+
 var server_options = {
-    key: key, 
-    cert: cert, 
-    ca: ca,
-    requestCert: true,
-    rejectUnauthorized: false,
-    strictSSL          : false
+    key                 : key, 
+    cert                : cert, 
+    ca                  : ca,
+    //ciphers:            : 'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
+    // ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
+    ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
+    secureOptions       : require('constants').SSL_OP_CIPHER_SERVER_PREFERENCE,
+    honorCipherOrder    : true,
+    requestCert         : true,
+    rejectUnauthorized  : false,
+    strictSSL           : false
 }
 
 var server = express()
@@ -3120,6 +3153,22 @@ var d3cky = https.createServer(server_options, server)
 
 // socket signal server
 SSSUp()
+
+
+var PeerServer = require('peer').PeerServer;
+
+var server = new PeerServer({
+    key: 'mysupersecretkey',
+    port: 9000,
+    ssl: {
+        key: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.key'),
+        certificate: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.crt')
+    }
+})
+
+
+
+
 
 // fire up web sockets
 var sockjs = require('sockjs')

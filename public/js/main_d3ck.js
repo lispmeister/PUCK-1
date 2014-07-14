@@ -2,6 +2,8 @@
 // after all is said and done... let the JS fur fly
 //
 
+SIGNALING_SERVER = 'wss://' + location.hostname + ':5555';
+
 // poll until we get something, then stop polling
 var vault_poll     = 1000
 var already_polled = false
@@ -306,8 +308,6 @@ $(document).ready(function () {
         })
     })
 
-    detect_webRTC('d3ck_rtc_health_check')
-
     // message data
     list_events()
     
@@ -338,6 +338,11 @@ $(document).ready(function () {
             $(this).removeClass('open');
         });                         
     }); 
+
+    // fire_up_rtc()
+
+    detect_webRTC('d3ck_rtc_health_check')
+
 
 })
 
