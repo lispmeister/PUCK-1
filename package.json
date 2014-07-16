@@ -14,7 +14,6 @@
       "ctype": "latest",
       "ejs": "latest",
       "execSync": "latest",
-      "express": "3.1.0",
       "formidable": "latest",
       "http-proxy": "latest",
       "mkdirp": "latest",
@@ -32,6 +31,11 @@
       "rest": "latest",
       "restler": "latest",
       "sleep": "latest",
+
+      "socket.io": "0.9.x",
+      "easyrtc"   : "git+https://github.com/priologic/easyrtc.git#beta",
+      "express"   : "3.7.x",
+
       "sockjs": "latest",
       "tail": "latest",
       "tcp-proxy": "latest",

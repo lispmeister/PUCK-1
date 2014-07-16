@@ -1,3 +1,11 @@
+"Please make sure that Skype or other programs aren't using your webcam before starting the video chat demos."
+
+
+
+
+
+
+
 extended key usage cert
 
 

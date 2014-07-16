@@ -3,6 +3,11 @@
 
 .nav .active a { background:#blue!important }
 
+.navbar-brand {
+    margin-left: 80px;
+}
+
+
 /* boot blue => 2b94ea */
 
 #remote_videos video {

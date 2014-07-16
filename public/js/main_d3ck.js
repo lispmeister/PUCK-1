@@ -134,7 +134,7 @@ $(document).ready(function () {
     // pleased to meet me, whomever I am
     $.get('/ping', function(d3ck) {
         my_d3ck = d3ck
-    
+
         console.log('my name/id/status are: ', my_d3ck.name, my_d3ck.pid, my_d3ck.status)
     
         my_d3ck_status = 'Name: ' + my_d3ck.name + '<br />Status: ' + my_d3ck.status + '<br />ID: ' + my_d3ck.pid
@@ -302,6 +302,10 @@ $(document).ready(function () {
                     else {
                         my_d3ck = d3ckinfo
                         print_d3ck(d3ckinfo.D3CK_ID, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
+
+                        $('#title_name').append(d3ckinfo.owner.name)
+
+                        ezrtc_connect()
                     }
                 })
             })
@@ -320,15 +324,6 @@ $(document).ready(function () {
     setTimeout(get_status,PREGNANT_PAUSE)
 
     setInterval(check_sock,SOCK_CHECK)
-
-    // hack attack, look out... this had better be temporary, lol
-    // var hack_rl = 'https://' + location.hostname + ':5555/rtc.html'
-    // $("#rtc_hack").attr("href", hack_rl)
-
-    // $('#rtc_hack').click(function(){
-    //     window.open(hack_rl, 'insecure')
-    //     return false;
-    // })
 
     // http://stackoverflow.com/questions/16214326/bootstrap-dropdown-with-hover
     $(function(){               

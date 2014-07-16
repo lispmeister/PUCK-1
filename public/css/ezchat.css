@@ -1,0 +1,63 @@
+
+/*
+    General CSS for easyrtc local landing site.
+    Only general layout is here.
+    Any CSS related directly to the operation of a demo is kept in another file.
+*/
+
+#logo_easyrtc {
+    margin-top:5px;
+    margin-left:5px;
+}
+#logo_priologic {
+    margin-top:5px;
+    margin-right:5px;
+}
+
+.demo_table {
+    border-collapse:collapse;
+    border:1px solid gray;
+}
+.demo_table  th{
+    padding:3px;
+    text-align:left;
+}
+.demo_table  td{
+    border-top:1px solid gray;
+    padding:3px;
+}
+.demo_table  #browser_note{
+    text-align:center;
+    font-size: smaller;
+    color: gray;
+}
+
+#demoContainer {
+    position:relative;
+}
+#connectControls {
+    float:left;
+    width:250px;
+    text-align:center;
+    border: 2px solid black;
+}
+#otherClients {
+    height:200px;
+    overflow-y:scroll;
+}
+#selfVideo {
+    height:225px;
+    width:300px;
+    float:left;
+    border:1px solid gray;
+    margin-left:10px;
+}
+
+#callerVideo {
+    height:225px;
+    width:300px;
+    border:1px solid gray;
+    margin-left:10px;
+}
+
+

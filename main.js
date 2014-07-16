@@ -962,7 +962,7 @@ function cat_power(msg) {
     if (msg.type != "openvpn_server") {
         try {
             console.log('catpower writez!  ' + JSON.stringify(msg))
-            cat_sock.write(JSON.stringify(msg))
+            cat_sock.emit('fax', JSON.stringify(msg))
         }
         catch (e) {
             // need a browser...
@@ -1055,7 +1055,7 @@ function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    if (typeof ios == "object") { 
+    if (typeof io == "object") { 
         // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
         var msg = {type: "status", status: d3ck_status}
         cat_power(msg)
@@ -1661,7 +1661,7 @@ function get_d3ck(req, res, next) {
                 // obj_reply.vpn.key = obj_reply.vpn_client.key
                 // obj_reply.vpn.crt = obj_reply.vpn_client.crt
 
-                console.log(obj_reply.vpn)
+                // console.log(obj_reply.vpn)
 
                 // console.log('\n\nafter...')
                 // console.log(obj_reply.vpn.key)
@@ -2912,7 +2912,7 @@ var server = express()
 server.use(cors());
 server.use(response());
 
-server.use(express.limit('1gb'))
+// server.use(express.limit('1gb'))
 
 // server.use(express.logger());
 server.use(express.compress());
@@ -2920,16 +2920,19 @@ server.use(express.methodOverride());
 
 server.use(express.json());
 server.use(express.urlencoded());
-server.use(express.multipart());
+
+//server.use(express.multipart());
 
 server.use(express.methodOverride());
 
 // passport/auth stuff
 server.use(express.cookieParser());
+// xxxxxx!!!!
 server.use(express.session({ secret: 'kittykittykittycat' }));
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
+
 server.use(server.router);
 
 // passport auth
@@ -2939,17 +2942,12 @@ server.use(auth)
 // actual routes n stuff
 //
 
-// always serve up the install page
-// server.use(express.static(d3ck_public + '/qs'))
-
 server.get('/aaa', function(req, res) {
-
     console.log('aaa ')
     console.log(req.client)
     req.client.authorized ? 
         res.json({"status":"approved"}) : 
         res.json({"status":"denied"}, 401);
-
 });
 
 
@@ -3021,10 +3019,10 @@ function fire_up_server_routes() {
     server.get('/d3ck/:key', auth, get_d3ck);
 
     // Delete a d3ck by key
-    server.del('/d3ck/:key', auth, delete_d3ck);
+    server.delete('/d3ck/:key', auth, delete_d3ck);
 
     // Destroy everything
-    server.del('/d3ck', auth, deleteAll, function respond(req, res, next) {
+    server.delete('/d3ck', auth, deleteAll, function respond(req, res, next) {
         res.send(204);
     });
 
@@ -3154,26 +3152,30 @@ var d3cky = https.createServer(server_options, server)
 // socket signal server
 SSSUp()
 
-
-var PeerServer = require('peer').PeerServer;
-
-var server = new PeerServer({
-    key: 'mysupersecretkey',
-    port: 9000,
-    ssl: {
-        key: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.key'),
-        certificate: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.crt')
-    }
-})
-
-
-
-
-
 // fire up web sockets
-var sockjs = require('sockjs')
-var ios = sockjs.createServer()
-ios.installHandlers(d3cky, {prefix: '/pux'})
+var io      = require("socket.io")
+var easyrtc = require("easyrtc")
+
+
+// Start Socket.io so it attaches itself to Express server
+var socketServer = io.listen(d3cky, {"log level":1});
+
+// Start EasyRTC server
+
+// var d3ck_ice = [ { url:"ice:192.168.0.250:8080" } ];
+var d3ck_ice = [ { url: 'stun:stun.l.google.com:19302' }]
+
+
+var ez_config = { 
+    // demosEnable: false,
+    appIceServers: d3ck_ice,
+    logLevel:"debug", 
+    logDateEnable:true
+}
+
+console.log('firing up the ez-rtc listener')
+
+var rtc = easyrtc.listen(server, socketServer, ez_config)
 
 //
 // socket time
@@ -3182,25 +3184,10 @@ var d3ck_users      = {},
     cat_sock        = {},
     all_cats        = []
 
-ios.on('connection', function (sock_puppet) {
 
-    console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
-
-    cat_sock = sock_puppet
-
-    // a friendly cat fact
-    var cool_cat_fact = random_cat_fact(cat_facts)
-
-    var msg = {type: "cat_fact", fact: cool_cat_fact}
-
-    cat_power(msg)
-
-    sock_puppet.on('data', function(res) {
-        console.log('data received ')
-        console.log(res)
-    })
-})
-
+// usernames connected to chat
+var usernames = {};
+var numUsers = 0;
 
 //
 //
