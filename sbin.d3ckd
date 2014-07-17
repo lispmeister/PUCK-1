@@ -133,7 +133,8 @@ if [ "X$vpn_ip" = "X" ]; then
     echo "WARNING!  No IP picked up for OpenVPN"
     echo "WARNING!  No IP picked up for OpenVPN"
 else
-    $D3CK_BIN/forward_port.sh up 5555 $vpn_ip 12034 tcp
+    # $D3CK_BIN/forward_port.sh up 5555 $vpn_ip 12034 tcp
+    $D3CK_BIN/forward_port.sh up 5555 $vpn_ip 8080 tcp
 fi
 
 
