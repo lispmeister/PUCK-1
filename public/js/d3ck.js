@@ -635,7 +635,7 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
 //
 function get_status() {
 
-    console.log('get STATUS')
+    // console.log('get STATUS')
 
     var url = "/status"
 
@@ -644,7 +644,7 @@ function get_status() {
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
 
         if (data == old_file_status) {
-            console.log('n/c')
+            // console.log('n/c')
         }
 
         else {

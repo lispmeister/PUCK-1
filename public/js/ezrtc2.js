@@ -1,6 +1,9 @@
 var selfEasyrtcid = "";
 
 function ezrtc_connect() {
+
+    easyrtc.setSocketUrl(":5555")
+
     easyrtc.setRoomOccupantListener(convertListToButtons);
 
     console.log(my_d3ck)

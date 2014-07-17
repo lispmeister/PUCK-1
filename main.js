@@ -2,7 +2,8 @@
 // d3ck server
 //
 
-var Tail       = require('tail').Tail,
+// var Tail       = require('tail').Tail,
+var Tail       = require('./tail').Tail,
     async      = require('async'),
     bcrypt     = require('bcrypt'),
     cors       = require('cors'),
