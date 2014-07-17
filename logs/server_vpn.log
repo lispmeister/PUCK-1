@@ -1,23 +1,23 @@
-Thu Jul 17 13:27:54 2014 OpenVPN 2.1_rc11 i486-pc-linux-gnu [SSL] [LZO2] [EPOLL] [PKCS11] built on Mar  9 2009
-Thu Jul 17 13:27:54 2014 MANAGEMENT: TCP Socket listening on 127.0.0.1:6666
-Thu Jul 17 13:27:54 2014 NOTE: your local LAN uses the extremely common subnet address 192.168.0.x or 192.168.1.x.  Be aware that this might create routing conflicts if you connect to the VPN server from public locations such as internet cafes that use the same subnet.
-Thu Jul 17 13:27:54 2014 NOTE: the current --script-security setting may allow this configuration to call user-defined scripts
-Thu Jul 17 13:27:54 2014 Diffie-Hellman initialized with 1024 bit key
-Thu Jul 17 13:27:54 2014 WARNING: file '/etc/d3ck/d3cks/D3CK/d3ck.key' is group or others accessible
-Thu Jul 17 13:27:54 2014 /usr/bin/openssl-vulnkey -q -b 1024 -m <modulus omitted>
-Thu Jul 17 13:27:54 2014 Control Channel Authentication: using '/etc/d3ck/d3cks/D3CK/ta.key' as a OpenVPN static key file
-Thu Jul 17 13:27:54 2014 Outgoing Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
-Thu Jul 17 13:27:54 2014 Incoming Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
-Thu Jul 17 13:27:54 2014 TLS-Auth MTU parms [ L:1558 D:166 EF:66 EB:0 ET:0 EL:0 ]
-Thu Jul 17 13:27:54 2014 ROUTE default_gateway=192.168.0.1
-Thu Jul 17 13:27:54 2014 TUN/TAP device tun0 opened
-Thu Jul 17 13:27:54 2014 TUN/TAP TX queue length set to 100
-Thu Jul 17 13:27:54 2014 /sbin/ifconfig tun0 10.34.168.1 pointopoint 10.34.168.2 mtu 1500
-Thu Jul 17 13:27:54 2014 /sbin/route add -net 10.34.168.0 netmask 255.255.255.248 gw 10.34.168.2
-Thu Jul 17 13:27:54 2014 Data Channel MTU parms [ L:1558 D:1450 EF:58 EB:135 ET:0 EL:0 AF:3/1 ]
-Thu Jul 17 13:27:54 2014 Socket Buffers: R=[111616->131072] S=[111616->131072]
-Thu Jul 17 13:27:54 2014 UDPv4 link local (bound): [undef]:8080
-Thu Jul 17 13:27:54 2014 UDPv4 link remote: [undef]
-Thu Jul 17 13:27:54 2014 MULTI: multi_init called, r=256 v=256
-Thu Jul 17 13:27:54 2014 IFCONFIG POOL: base=10.34.168.4 size=1
-Thu Jul 17 13:27:54 2014 Initialization Sequence Completed
+Thu Jul 17 13:51:50 2014 OpenVPN 2.1_rc11 i486-pc-linux-gnu [SSL] [LZO2] [EPOLL] [PKCS11] built on Mar  9 2009
+Thu Jul 17 13:51:50 2014 MANAGEMENT: TCP Socket listening on 127.0.0.1:6666
+Thu Jul 17 13:51:50 2014 NOTE: your local LAN uses the extremely common subnet address 192.168.0.x or 192.168.1.x.  Be aware that this might create routing conflicts if you connect to the VPN server from public locations such as internet cafes that use the same subnet.
+Thu Jul 17 13:51:50 2014 NOTE: the current --script-security setting may allow this configuration to call user-defined scripts
+Thu Jul 17 13:51:50 2014 Diffie-Hellman initialized with 1024 bit key
+Thu Jul 17 13:51:50 2014 WARNING: file '/etc/d3ck/d3cks/D3CK/d3ck.key' is group or others accessible
+Thu Jul 17 13:51:50 2014 /usr/bin/openssl-vulnkey -q -b 1024 -m <modulus omitted>
+Thu Jul 17 13:51:50 2014 Control Channel Authentication: using '/etc/d3ck/d3cks/D3CK/ta.key' as a OpenVPN static key file
+Thu Jul 17 13:51:50 2014 Outgoing Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
+Thu Jul 17 13:51:50 2014 Incoming Control Channel Authentication: Using 160 bit message hash 'SHA1' for HMAC authentication
+Thu Jul 17 13:51:50 2014 TLS-Auth MTU parms [ L:1558 D:166 EF:66 EB:0 ET:0 EL:0 ]
+Thu Jul 17 13:51:50 2014 ROUTE default_gateway=192.168.0.1
+Thu Jul 17 13:51:50 2014 TUN/TAP device tun0 opened
+Thu Jul 17 13:51:50 2014 TUN/TAP TX queue length set to 100
+Thu Jul 17 13:51:50 2014 /sbin/ifconfig tun0 10.121.202.1 pointopoint 10.121.202.2 mtu 1500
+Thu Jul 17 13:51:50 2014 /sbin/route add -net 10.121.202.0 netmask 255.255.255.248 gw 10.121.202.2
+Thu Jul 17 13:51:50 2014 Data Channel MTU parms [ L:1558 D:1450 EF:58 EB:135 ET:0 EL:0 AF:3/1 ]
+Thu Jul 17 13:51:50 2014 Socket Buffers: R=[111616->131072] S=[111616->131072]
+Thu Jul 17 13:51:50 2014 UDPv4 link local (bound): [undef]:8080
+Thu Jul 17 13:51:50 2014 UDPv4 link remote: [undef]
+Thu Jul 17 13:51:50 2014 MULTI: multi_init called, r=256 v=256
+Thu Jul 17 13:51:50 2014 IFCONFIG POOL: base=10.121.202.4 size=1
+Thu Jul 17 13:51:50 2014 Initialization Sequence Completed
