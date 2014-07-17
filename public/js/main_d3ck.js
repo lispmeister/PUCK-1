@@ -306,7 +306,8 @@ $(document).ready(function () {
                         $('#title_name').append(d3ckinfo.owner.name)
 
                         // after we know our name, connect
-                        ezrtc_connect()
+                        // ezrtc_connect()
+                        ezrtc_button()
                     }
                 })
             })

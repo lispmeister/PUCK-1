@@ -1,5 +1,23 @@
 var selfEasyrtcid = "";
 
+// create a button
+function ezrtc_button() {
+
+    var ez_button = document.createElement('button');
+
+    ez_button.onclick = function() {
+        return function() {
+            ezrtc_connect();
+        }
+    }();
+
+    label = document.createTextNode('buzz');
+    ez_button.appendChild(label);
+    iam.appendChild(ez_button);
+
+}
+
+
 function ezrtc_connect() {
 
     easyrtc.setSocketUrl(":5555")
