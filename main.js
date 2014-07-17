@@ -3224,7 +3224,20 @@ var ez_config = {
 
 console.log('firing up the ez-rtc listener')
 
-var rtc = easyrtc.listen(server, io, ez_config)
+var ez_server_options = {
+    key                 : key, 
+    cert                : cert, 
+    ca                  : ca,
+    ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
+}
+
+var ez_server = express()
+
+var ez_web  = https.createServer(ez_server_options, ez_server).listen(d3ck_port_signal);
+var ez_sock = require("socket.io").listen(ez_web, { "log level":2, "transports" : ['websocket'] });
+var rtc     = easyrtc.listen(ez_server, ez_sock, ez_config)
+
+// var rtc = easyrtc.listen(server, io, ez_config)
 
 //
 //
