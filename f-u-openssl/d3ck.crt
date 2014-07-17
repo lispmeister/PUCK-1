@@ -2,26 +2,26 @@ Certificate:
     Data:
         Version: 3 (0x2)
         Serial Number:
-            e0:47:da:9a:b2:db:09:d6:ed:ee:da:40:73:4a:bd:8b
+            a0:01:c3:fe:1f:3a:e3:82:47:fb:3c:0a:38:15:bd:ed
         Signature Algorithm: sha256WithRSAEncryption
         Issuer: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=*
         Validity
-            Not Before: Jul 17 19:15:07 2014 GMT
-            Not After : Jul 17 19:15:07 2015 GMT
+            Not Before: Jul 17 20:27:53 2014 GMT
+            Not After : Jul 17 20:27:53 2015 GMT
         Subject: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=*
         Subject Public Key Info:
             Public Key Algorithm: rsaEncryption
             RSA Public Key: (1024 bit)
                 Modulus (1024 bit):
-                    00:c4:20:98:05:46:78:f1:1c:46:81:e9:dc:73:e3:
-                    ed:39:28:80:df:dd:47:03:15:c3:92:2b:67:23:11:
-                    af:cd:6c:18:43:ac:0f:c3:3e:fa:8b:cf:58:98:8b:
-                    45:2f:6d:55:76:2d:63:78:a8:0c:46:b9:ae:6f:b0:
-                    62:2b:f3:89:51:92:b2:42:3d:79:5d:23:86:f8:9f:
-                    73:e5:aa:7a:72:26:22:35:f3:13:ca:71:25:29:aa:
-                    8e:00:99:7c:9d:0e:a3:3c:15:97:6d:fa:9d:93:d7:
-                    09:7c:be:ab:f6:aa:35:37:f2:26:8d:cf:f0:95:ce:
-                    fc:92:68:b5:b3:d5:ea:58:0d
+                    00:ac:6a:6f:c6:f0:84:db:0a:f7:1f:5b:f4:ca:46:
+                    6c:78:11:97:29:12:26:b5:06:e2:70:c9:ea:ca:f5:
+                    3d:a9:7b:12:53:36:bf:bd:15:dc:a7:b9:3c:33:91:
+                    48:9b:9f:79:76:4a:d3:f7:d1:17:11:78:b2:f4:8c:
+                    3a:74:c3:28:26:79:dd:5c:f3:3f:45:49:64:37:45:
+                    0c:2f:32:bc:ea:0f:70:0c:14:80:9a:c5:c9:17:94:
+                    85:a3:50:66:ad:c0:12:6c:8b:75:75:14:ee:5d:eb:
+                    01:0b:88:46:20:c0:18:22:93:a4:5a:4b:8e:5b:90:
+                    21:92:56:ab:aa:22:db:3f:17
                 Exponent: 65537 (0x10001)
         X509v3 extensions:
             X509v3 Basic Constraints: 
@@ -29,37 +29,37 @@ Certificate:
             Netscape Comment: 
                 d3ck certz with retsin
             X509v3 Subject Key Identifier: 
-                5B:F9:8E:69:61:5C:BB:57:C1:F6:1A:8C:BC:00:12:CA:02:ED:C0:3F
+                31:35:00:90:83:A8:F4:95:5E:A8:2D:06:EC:45:CD:34:EF:17:FC:50
             X509v3 Authority Key Identifier: 
-                keyid:BA:0A:31:79:CB:15:1A:44:2F:3F:46:40:64:30:70:31:BC:CE:38:49
+                keyid:2E:94:8C:93:74:FD:6E:05:CB:CE:2A:42:53:40:DC:98:59:40:C5:53
                 DirName:/C=AQ/ST=White/L=D3cktown/O=D3ckasaurusRex/CN=*
-                serial:BA:3D:23:26:E4:FE:30:5A
+                serial:DA:60:63:72:D2:88:B4:24
 
     Signature Algorithm: sha256WithRSAEncryption
-        07:36:29:c6:bc:d4:2f:fa:a3:c9:c6:6b:1d:1c:82:b1:97:8c:
-        91:7a:b6:b6:55:5f:01:d6:5c:e9:19:60:cf:39:2b:b3:90:04:
-        08:f1:71:54:a7:e6:05:fc:e7:bc:4f:7e:2a:60:03:c0:b5:ca:
-        02:7f:9f:60:01:96:dd:ee:24:04:75:d4:b9:6a:39:24:c9:01:
-        86:77:64:a9:6f:00:ef:35:d1:87:15:9e:96:6a:63:09:d3:d9:
-        4f:ac:04:91:b3:da:25:c0:b3:0a:53:bb:fb:7d:fa:fc:a5:d0:
-        6c:7e:de:56:b2:6f:b0:7d:e0:d8:1d:f6:f8:59:7e:44:f7:25:
-        3d:f4
+        9d:e3:14:4b:b6:ca:86:81:16:22:30:aa:1f:67:95:e2:91:72:
+        1b:2d:a6:1a:d5:4f:c1:a1:c5:cf:f2:73:0c:1e:9a:07:15:f7:
+        18:0e:bf:b3:65:3e:7d:4c:84:4d:28:78:5a:33:2e:eb:05:3c:
+        2c:b7:e2:de:a5:19:1e:26:da:4a:49:50:fb:7b:2b:99:87:6b:
+        d5:aa:35:17:dd:13:32:8d:2d:65:a8:83:57:d0:fc:6a:58:09:
+        4d:48:56:b0:7c:84:af:e6:fd:bb:43:2a:00:83:b9:00:17:39:
+        dc:cf:42:68:35:67:6d:31:9b:7e:c7:22:a9:d3:be:c3:b2:00:
+        03:59
 -----BEGIN CERTIFICATE-----
-MIIDDTCCAnagAwIBAgIRAOBH2pqy2wnW7e7aQHNKvYswDQYJKoZIhvcNAQELBQAw
+MIIDDTCCAnagAwIBAgIRAKABw/4fOuOCR/s8CjgVve0wDQYJKoZIhvcNAQELBQAw
 VTELMAkGA1UEBhMCQVExDjAMBgNVBAgTBVdoaXRlMREwDwYDVQQHEwhEM2NrdG93
 bjEXMBUGA1UEChMORDNja2FzYXVydXNSZXgxCjAIBgNVBAMUASowHhcNMTQwNzE3
-MTkxNTA3WhcNMTUwNzE3MTkxNTA3WjBVMQswCQYDVQQGEwJBUTEOMAwGA1UECBMF
+MjAyNzUzWhcNMTUwNzE3MjAyNzUzWjBVMQswCQYDVQQGEwJBUTEOMAwGA1UECBMF
 V2hpdGUxETAPBgNVBAcTCEQzY2t0b3duMRcwFQYDVQQKEw5EM2NrYXNhdXJ1c1Jl
-eDEKMAgGA1UEAxQBKjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAxCCYBUZ4
-8RxGgencc+PtOSiA391HAxXDkitnIxGvzWwYQ6wPwz76i89YmItFL21Vdi1jeKgM
-Rrmub7BiK/OJUZKyQj15XSOG+J9z5ap6ciYiNfMTynElKaqOAJl8nQ6jPBWXbfqd
-k9cJfL6r9qo1N/Imjc/wlc78kmi1s9XqWA0CAwEAAaOB3DCB2TAJBgNVHRMEAjAA
+eDEKMAgGA1UEAxQBKjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEArGpvxvCE
+2wr3H1v0ykZseBGXKRImtQbicMnqyvU9qXsSUza/vRXcp7k8M5FIm595dkrT99EX
+EXiy9Iw6dMMoJnndXPM/RUlkN0UMLzK86g9wDBSAmsXJF5SFo1BmrcASbIt1dRTu
+XesBC4hGIMAYIpOkWkuOW5AhklarqiLbPxcCAwEAAaOB3DCB2TAJBgNVHRMEAjAA
 MCUGCWCGSAGG+EIBDQQYFhZkM2NrIGNlcnR6IHdpdGggcmV0c2luMB0GA1UdDgQW
-BBRb+Y5pYVy7V8H2Goy8ABLKAu3APzCBhQYDVR0jBH4wfIAUugoxecsVGkQvP0ZA
-ZDBwMbzOOEmhWaRXMFUxCzAJBgNVBAYTAkFRMQ4wDAYDVQQIEwVXaGl0ZTERMA8G
+BBQxNQCQg6j0lV6oLQbsRc007xf8UDCBhQYDVR0jBH4wfIAULpSMk3T9bgXLzipC
+U0DcmFlAxVOhWaRXMFUxCzAJBgNVBAYTAkFRMQ4wDAYDVQQIEwVXaGl0ZTERMA8G
 A1UEBxMIRDNja3Rvd24xFzAVBgNVBAoTDkQzY2thc2F1cnVzUmV4MQowCAYDVQQD
-FAEqggkAuj0jJuT+MFowDQYJKoZIhvcNAQELBQADgYEABzYpxrzUL/qjycZrHRyC
-sZeMkXq2tlVfAdZc6Rlgzzkrs5AECPFxVKfmBfznvE9+KmADwLXKAn+fYAGW3e4k
-BHXUuWo5JMkBhndkqW8A7zXRhxWelmpjCdPZT6wEkbPaJcCzClO7+336/KXQbH7e
-VrJvsH3g2B32+Fl+RPclPfQ=
+FAEqggkA2mBjctKItCQwDQYJKoZIhvcNAQELBQADgYEAneMUS7bKhoEWIjCqH2eV
+4pFyGy2mGtVPwaHFz/JzDB6aBxX3GA6/s2U+fUyETSh4WjMu6wU8LLfi3qUZHiba
+SklQ+3srmYdr1ao1F90TMo0tZaiDV9D8algJTUhWsHyEr+b9u0MqAIO5ABc53M9C
+aDVnbTGbfsciqdO+w7IAA1k=
 -----END CERTIFICATE-----

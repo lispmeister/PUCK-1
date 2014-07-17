@@ -1297,10 +1297,8 @@ function create_d3ck_image(data) {
         image = b64_decode(default_image)
     }
 
-    console.log('image is ' + image.size + ' bytes')
-
     // just stick to one ending please....
-    data.image.replace('jpeg$','jpg')
+    data.image = data.image.replace('jpeg$','jpg')
 
     var iname  = data.image
     var suffix = data.image.substr(iname.length-4, data.image.length).toLowerCase()
@@ -2437,7 +2435,7 @@ function quikStart(req, res, next) {
         }
 
         // just stick to one ending please....
-        req.files.d3ck_image.name.replace('jpeg$','jpg')
+        req.files.d3ck_image.name = req.files.d3ck_image.name.replace('jpeg$','jpg')
 
         var iname  = req.files.d3ck_image.name
         var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
