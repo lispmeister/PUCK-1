@@ -302,6 +302,7 @@ $(document).ready(function () {
                     else {
                         my_d3ck = d3ckinfo
                         print_d3ck(d3ckinfo.D3CK_ID, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
+                        $('#title_name').append(d3ckinfo.owner.name)
                     }
                 })
             })
