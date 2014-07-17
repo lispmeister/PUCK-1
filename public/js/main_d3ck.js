@@ -320,8 +320,9 @@ $(document).ready(function () {
     // sow the seed o' doubt
     get_status()
 
-    // setInterval(get_status,PREGNANT_PAUSE)
-    setTimeout(get_status,PREGNANT_PAUSE)
+
+    setInterval(get_status,SOCK_CHECK)
+    // setTimeout(get_status,PREGNANT_PAUSE)
 
     setInterval(check_sock,SOCK_CHECK)
 

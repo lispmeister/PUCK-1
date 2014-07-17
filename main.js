@@ -630,15 +630,17 @@ function change_status() {
     // xxx - errs to user!
     _writeObj2File(d3ck_status_file, d3ck_status)
 
+    cat_power(d3ck_status)
+
     console.log('end status')
 
     // reset/clear
-    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    d3ck_events                = {"new_d3ck":""}
-    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-    d3ck_status.events         = d3ck_events
-    d3ck_status.file_events    = file_magic
-    d3ck_status.browser_events = browser_magic
+//  file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+//  d3ck_events                = {"new_d3ck":""}
+//  browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+//  d3ck_status.events         = d3ck_events
+//  d3ck_status.file_events    = file_magic
+//  d3ck_status.browser_events = browser_magic
 
 }
 
@@ -966,7 +968,7 @@ function cat_power(msg) {
         }
         catch (e) {
             // need a browser...
-            // console.log('channel not up yet....? ' + e)
+            console.log('channel not up yet....? ' + e)
         }
     }
 
@@ -2742,6 +2744,8 @@ function serverRestart(req, res, next) {
 //
 function SSSUp () {
 
+    return
+
     console.log('Socket Signal Server!')
 
     var file = new _static.Server('./public');
@@ -3150,19 +3154,63 @@ function fire_up_server_routes() {
 var d3cky = https.createServer(server_options, server)
 
 // socket signal server
-SSSUp()
+// SSSUp()
 
-// fire up web sockets
-var io      = require("socket.io")
 var easyrtc = require("easyrtc")
 
+//
+// socket time
+//
+var d3ck_users      = {},
+    cat_sock        = {},
+    all_cats        = []
+
+// usernames connected to chat
+var usernames = {};
+var numUsers = 0;
 
 // Start Socket.io so it attaches itself to Express server
-var socketServer = io.listen(d3cky, {"log level":1});
+
+// var io = require("socket.io").listen(d3cky, {"log level":1});
+var io = require("socket.io").listen(d3cky, {
+    "log level":2,
+    // "match origin protocol" : true,
+    "transports" : ['websocket']
+});
+
+io.sockets.on('connection', function (socket) {
+    console.log('connection:')
+
+    console.log('[+] NEW connext from...')
+    console.log(socket)
+
+    // cat_sock = socket
+    cat_sock = io.sockets
+
+    // a friendly cat fact
+    var cool_cat_fact = random_cat_fact(cat_facts)
+
+    var msg = {type: "cat_fact", fact: cool_cat_fact}
+
+    cat_power(msg)
+
+    socket.on('data', function(res) {
+        console.log('data received ')
+        console.log(res)
+    })
+
+//  socket.on('send', function (data) {
+//      io.sockets.emit('message', data);
+//  });
+
+})
+
+// cat_sock = socketServer.sockets
 
 // Start EasyRTC server
 
 // var d3ck_ice = [ { url:"ice:192.168.0.250:8080" } ];
+// xxxxxxxxxxxx
 var d3ck_ice = [ { url: 'stun:stun.l.google.com:19302' }]
 
 
@@ -3175,19 +3223,7 @@ var ez_config = {
 
 console.log('firing up the ez-rtc listener')
 
-var rtc = easyrtc.listen(server, socketServer, ez_config)
-
-//
-// socket time
-//
-var d3ck_users      = {},
-    cat_sock        = {},
-    all_cats        = []
-
-
-// usernames connected to chat
-var usernames = {};
-var numUsers = 0;
+var rtc = easyrtc.listen(server, io, ez_config)
 
 //
 //
