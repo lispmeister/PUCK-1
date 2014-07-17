@@ -35,9 +35,6 @@ var sock = null
 
 var socket_addr = "/pux"
 
-
-var old_file_status = ""
-
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
 
@@ -642,20 +639,9 @@ function get_status() {
     var jqXHR_get_status = $.ajax({ url: url, })
 
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
-
-        if (data == old_file_status) {
-            // console.log('n/c')
-        }
-
-        else {
-            old_file_status = data
-            d3ck_status     = JSON.parse(data)
-            console.log("NEW STATUS via file: " + JSON.stringify(d3ck_status))
-            status_or_die()
-        }
-
         // console.log('status wootz\n' + data)
-
+        d3ck_status = JSON.parse(data)
+        console.log("INITIAL STATUS: " + JSON.stringify(d3ck_status))
     }).fail(ajaxError);
 
 }
@@ -955,10 +941,11 @@ function drag_and_d3ck(other_d3ck) {
 // try to get web sockets going
 //
 
+// according to socksjs - "Current state of the connection: 0-connecting, 1-open, 2-closing, 3-closed"
 function check_sock () {
 
     try {
-        var state = socket._transport.ws.readyState
+        var state = local_socket._transport.ws.readyState
     }
     catch (e) {
         // console.log('not connected')
@@ -970,19 +957,19 @@ function check_sock () {
 
     if (state == 0) {
         $('#socket_wrench').addClass("amber")
-        console.log('[>] sock connecting...')
+        console.log('[>] sockjs connecting...')
     }
     else if (state == 1) {
         $('#socket_wrench').addClass("green")
-        // console.log('[+] sock good...')
+        // console.log('[+] sockjs good...')
     }
     else if (state == 2) {
         $('#socket_wrench').addClass("amber")
-        console.log('[<] sock closing...')
+        console.log('[<] sockjs closing...')
     }
     else if (state == 3) {
         $('#socket_wrench').addClass("red")
-        console.log('[.] sock closed...')
+        console.log('[.] sockjs closed...')
     }
     else {
         console.log('UNKNOWN SOCKJS status: ' + state)
@@ -990,85 +977,142 @@ function check_sock () {
 }
 
 //
-// dont just think websockets... be the sock.
+// enter the socket loop!
 //
-socket = null
+local_socket = null
 connectRetry = null
 
 function socket_looping() {
 
     console.log('trying to do a socket connect')
 
-    socket = io.connect()
+    var recInterval  = null;
+    var socket       = null;
 
-    socket.on('data', function (data) {
-        console.log('[+++] data from sox')
-        console.log(data);
-    });
+    (function() {
 
-    socket.on('error', function (e){
-        console.error('[:(]Unable to connect socket.io', e);
-    });
+        // Initialize the socket & handlers
+        var connect2server = function() {
+            local_socket = new SockJS(socket_addr, null, {
+                'protocols_whitelist': [
+                    'websocket',          'xdr-streaming',      'xhr-streaming', 
+                    'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
+                    'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
+                 ]
+            });
 
-    socket.on('connection', function (old_sock){
-        console.log('[****] successfully established connection');
+            local_socket.onopen = function() {
+                console.log('[*] socksjs open... sez a me... clearing the retry d3cks')
+                clearInterval(connectRetry)
+            }
+     
+            // hoop, skip, jump
+            local_socket.onclose = function() {
+                console.log('[-] sockjs closed')
+                clearInterval(connectRetry)
+                // keep going back for more
+                connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY)
+            }
+     
+            local_socket.onmessage = function(d3ck_message) {
+                // console.log('[@] messages or cat facts!')
+                // console.log(d3ck_message)
 
-        console.log(old_sock)
+                d3ck_message = JSON.parse(d3ck_message.data)
 
-        old_sock.on('data', function (data) {
-            console.log('datum...')
-            console.log(data)
-        })
+                if (d3ck_message.type == "status") {
+                    // console.log('processing status message')
 
-        old_sock.on('fax', function (data) {
-            console.log('[@] CAT FAX!!!!!')
-            console.log(data)
+                    d3ck_status = d3ck_message.status
 
-            d3ck_message = JSON.parse(data)
-
-            console.log(d3ck_message)
-
-            if (d3ck_message.type == "status") {
-                // console.log('processing status message')
-
-                d3ck_status = d3ck_message.status
-
-                // if something is new, do something!
-                if (! _.isEqual(old_d3ck_status, d3ck_status)) {
-                    console.log('something new in the state of denmark!')
-                    old_d3ck_status = d3ck_status
-                    status_or_die()
+                    // if something is new, do something!
+                    if (! _.isEqual(old_d3ck_status, d3ck_status)) {
+                        console.log('something new in the state of denmark!')
+                        old_d3ck_status = d3ck_status
+                        status_or_die()
+                    }
+                    else {
+                        // console.log('same ol, same ol')
+                    }
+                }
+                // OVPN logs for client/server
+                else if (d3ck_message.type == "openvpn_server") {
+                    console.log('ovpn server logz')
+                    // console.log('server: ' + data.line)
+                    $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
+                    $("#ovpn_server_infinity").mCustomScrollbar("update")
+                    $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+                }
+                else if (d3ck_message.type == "openvpn_client") {
+                    console.log('ovpn client logz')
+                    $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
+                    $("#ovpn_client_infinity").mCustomScrollbar("update")
+                    $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+                }
+                else if (d3ck_message.type == "cat_fact") {
+                    console.log('incoming cat fact!')
+                    console.log(d3ck_message.fact)
+                     $('#d3ck_footy').append('<br />' + d3ck_message.fact)
                 }
                 else {
-                    // console.log('same ol, same ol')
+                   console.log('UNRECOGNIZED message type')
+                   console.log(d3ck_message.type)
                 }
             }
-            // OVPN logs for client/server
-            else if (d3ck_message.type == "openvpn_server") {
-                console.log('ovpn server logz')
-                // console.log('server: ' + data.line)
-                $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-                $("#ovpn_server_infinity").mCustomScrollbar("update")
-                $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        };
+
+        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
+
+    })();
+
+}
+
+//
+// magic time, courtesy of rtc.. many of the RTC functions below
+// taken from the marvelous https://github.com/muaz-khan demos;
+//
+
+rtc_peer       = {}
+local_connect  = false
+remote_connect = false
+
+function getUserMedia(callback) {
+
+    var hints = {
+        audio: true,
+        video:{
+            optional: [],
+            mandatory: {
+                minWidth: 1280,
+                minHeight: 720,
+                maxWidth: 1920,
+                maxHeight: 1080,
+                minAspectRatio: 1.77
+                // minWidth: 640,
+                // minHeight: 380,
+                // maxWidth: 1024,
+                // maxHeight: 1024,
+                // minAspectRatio: 1.77
             }
-            else if (d3ck_message.type == "openvpn_client") {
-                console.log('ovpn client logz')
-                $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-                $("#ovpn_client_infinity").mCustomScrollbar("update")
-                $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-            }
-            else if (d3ck_message.type == "cat_fact") {
-                console.log('incoming cat fact!')
-                console.log(d3ck_message.fact)
-                 $('#d3ck_footy').append('<br />' + d3ck_message.fact)
-            }
-            else {
-               console.log('UNRECOGNIZED message type')
-               console.log(d3ck_message.type)
-            }
+        }
+    }
+
+    navigator.getUserMedia(hints,function(stream) {
+
+        var video      = document.createElement('video')
+        video.src      = URL.createObjectURL(stream);
+        video.controls = true
+        video.muted    = true
+
+        rtc_peer.onStreamAdded({
+            mediaElement: video,
+            userid: 'self',
+            stream: stream
         })
 
-    });
+        callback(stream)
+
+    })
 
 }
 

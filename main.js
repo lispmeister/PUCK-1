@@ -2,8 +2,7 @@
 // d3ck server
 //
 
-// var Tail       = require('tail').Tail,
-var Tail       = require('./tail').Tail,
+var Tail       = require('tail').Tail,
     async      = require('async'),
     bcrypt     = require('bcrypt'),
     cors       = require('cors'),
@@ -631,17 +630,15 @@ function change_status() {
     // xxx - errs to user!
     _writeObj2File(d3ck_status_file, d3ck_status)
 
-    cat_power(d3ck_status)
-
     console.log('end status')
 
     // reset/clear
-//  file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-//  d3ck_events                = {"new_d3ck":""}
-//  browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-//  d3ck_status.events         = d3ck_events
-//  d3ck_status.file_events    = file_magic
-//  d3ck_status.browser_events = browser_magic
+    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+    d3ck_events                = {"new_d3ck":""}
+    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+    d3ck_status.events         = d3ck_events
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
 
 }
 
@@ -965,11 +962,11 @@ function cat_power(msg) {
     if (msg.type != "openvpn_server") {
         try {
             console.log('catpower writez!  ' + JSON.stringify(msg))
-            cat_sock.emit('fax', JSON.stringify(msg))
+            cat_sock.write(JSON.stringify(msg))
         }
         catch (e) {
             // need a browser...
-            console.log('channel not up yet....? ' + e)
+            // console.log('channel not up yet....? ' + e)
         }
     }
 
@@ -1058,7 +1055,7 @@ function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    if (typeof io == "object") { 
+    if (typeof ios == "object") { 
         // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
         var msg = {type: "status", status: d3ck_status}
         cat_power(msg)
@@ -1664,7 +1661,7 @@ function get_d3ck(req, res, next) {
                 // obj_reply.vpn.key = obj_reply.vpn_client.key
                 // obj_reply.vpn.crt = obj_reply.vpn_client.crt
 
-                // console.log(obj_reply.vpn)
+                console.log(obj_reply.vpn)
 
                 // console.log('\n\nafter...')
                 // console.log(obj_reply.vpn.key)
@@ -2745,8 +2742,6 @@ function serverRestart(req, res, next) {
 //
 function SSSUp () {
 
-    return
-
     console.log('Socket Signal Server!')
 
     var file = new _static.Server('./public');
@@ -2917,7 +2912,7 @@ var server = express()
 server.use(cors());
 server.use(response());
 
-// server.use(express.limit('1gb'))
+server.use(express.limit('1gb'))
 
 // server.use(express.logger());
 server.use(express.compress());
@@ -2925,19 +2920,16 @@ server.use(express.methodOverride());
 
 server.use(express.json());
 server.use(express.urlencoded());
-
-//server.use(express.multipart());
+server.use(express.multipart());
 
 server.use(express.methodOverride());
 
 // passport/auth stuff
 server.use(express.cookieParser());
-// xxxxxx!!!!
 server.use(express.session({ secret: 'kittykittykittycat' }));
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
-
 server.use(server.router);
 
 // passport auth
@@ -2947,12 +2939,17 @@ server.use(auth)
 // actual routes n stuff
 //
 
+// always serve up the install page
+// server.use(express.static(d3ck_public + '/qs'))
+
 server.get('/aaa', function(req, res) {
+
     console.log('aaa ')
     console.log(req.client)
     req.client.authorized ? 
         res.json({"status":"approved"}) : 
         res.json({"status":"denied"}, 401);
+
 });
 
 
@@ -3024,10 +3021,10 @@ function fire_up_server_routes() {
     server.get('/d3ck/:key', auth, get_d3ck);
 
     // Delete a d3ck by key
-    server.delete('/d3ck/:key', auth, delete_d3ck);
+    server.del('/d3ck/:key', auth, delete_d3ck);
 
     // Destroy everything
-    server.delete('/d3ck', auth, deleteAll, function respond(req, res, next) {
+    server.del('/d3ck', auth, deleteAll, function respond(req, res, next) {
         res.send(204);
     });
 
@@ -3155,9 +3152,28 @@ function fire_up_server_routes() {
 var d3cky = https.createServer(server_options, server)
 
 // socket signal server
-// SSSUp()
+SSSUp()
 
-var easyrtc = require("easyrtc")
+
+var PeerServer = require('peer').PeerServer;
+
+var server = new PeerServer({
+    key: 'mysupersecretkey',
+    port: 9000,
+    ssl: {
+        key: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.key'),
+        certificate: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.crt')
+    }
+})
+
+
+
+
+
+// fire up web sockets
+var sockjs = require('sockjs')
+var ios = sockjs.createServer()
+ios.installHandlers(d3cky, {prefix: '/pux'})
 
 //
 // socket time
@@ -3166,27 +3182,11 @@ var d3ck_users      = {},
     cat_sock        = {},
     all_cats        = []
 
-// usernames connected to chat
-var usernames = {};
-var numUsers = 0;
+ios.on('connection', function (sock_puppet) {
 
-// Start Socket.io so it attaches itself to Express server
+    console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
 
-// var io = require("socket.io").listen(d3cky, {"log level":1});
-var io = require("socket.io").listen(d3cky, {
-    "log level":2,
-    // "match origin protocol" : true,
-    "transports" : ['websocket']
-});
-
-io.sockets.on('connection', function (socket) {
-    console.log('connection:')
-
-    console.log('[+] NEW connext from...')
-    console.log(socket)
-
-    // cat_sock = socket
-    cat_sock = io.sockets
+    cat_sock = sock_puppet
 
     // a friendly cat fact
     var cool_cat_fact = random_cat_fact(cat_facts)
@@ -3195,59 +3195,12 @@ io.sockets.on('connection', function (socket) {
 
     cat_power(msg)
 
-    socket.on('data', function(res) {
+    sock_puppet.on('data', function(res) {
         console.log('data received ')
         console.log(res)
     })
-
-//  socket.on('send', function (data) {
-//      io.sockets.emit('message', data);
-//  });
-
 })
 
-// cat_sock = socketServer.sockets
-
-// Start EasyRTC server
-
-// var d3ck_ice = [ { url:"ice:192.168.0.250:8080" } ];
-// xxxxxxxxxxxx
-var d3ck_ice = [ { url: 'stun:stun.l.google.com:19302' }]
-
-
-var ez_config = { 
-    // demosEnable: false,
-    appIceServers: d3ck_ice,
-    logLevel:"debug", 
-    logDateEnable:true
-}
-
-console.log('firing up the ez-rtc listener')
-
-var ez_server_options = {
-    key                 : key, 
-    cert                : cert, 
-    ca                  : ca,
-    ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
-}
-
-var ez_server = express()
-// various helpers
-ez_server.use(cors());
-ez_server.use(response());
-// server.use(express.compress());
-// server.use(express.methodOverride());
-// server.use(express.json());
-// server.use(express.urlencoded());
-// server.use(express.multipart());
-// server.use(express.methodOverride());
-
-
-var ez_web  = https.createServer(ez_server_options, ez_server).listen(d3ck_port_signal);
-var ez_sock = require("socket.io").listen(ez_web, { "log level":2, "transports" : ['websocket'] });
-var rtc     = easyrtc.listen(ez_server, ez_sock, ez_config)
-
-// var rtc = easyrtc.listen(server, io, ez_config)
 
 //
 //

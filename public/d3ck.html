@@ -44,7 +44,10 @@
 <!-- css animation -->
 <link href="/css/animate.css" rel="stylesheet">
 
-<link rel="stylesheet" type="text/css" href="/css/easyrtc.css" />
+<!-- RTC-stylesheet -->
+<link href="/css/rtc_style.css" rel="stylesheet">
+<link href="/css/rtc_scroll.css" rel="stylesheet">
+
 
 <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
@@ -97,10 +100,6 @@
                 <li> <a href="#rtc_hack" data-toggle="tab"><span id="d3ck_video" title="VPN" data-content="Video - new page!" class="glyphicon glyphicon-facetime-video"></span></a></li>
 
                 </ul>
-
-            <ul class="nav nav-tabs navbar-nav navbar-brand">
-                <li><b><a href="#" style="color: #357ebd" id="title_name"></a></b></li>
-            </ul>
 
             <ul class="nav nav-tabs navbar-nav navbar-right">
 
@@ -300,6 +299,12 @@
 
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
+                    <div id="videos-container">... videos....</div>
+
+                    <div><strong id="unique-token">#123456789</strong></div>
+
+                    <table id="rooms-list" style="width: 100%;"></table>
+
                     <div id="videos-container"></div>
                     <div id="d3ck_vid_notes">... notes....</div>
                     <div id="d3ck_users">... users....</div>
@@ -307,6 +312,13 @@
                     <span>If connected to another D3CK and you don't see video... something is wrong!</span>
                     <button id="orson_wells" class="local" class="setup">Broadcast!</button>
 
+                    <!-- <div class="col-md-4" style="clear:both">
+                        <h4> remote </h4>
+                        <span>If connected to another D3CK and you don't see video... something is wrong!</span>
+                        <div style="width:300px" id="remote_videos"></div>
+                    <input type="text" id="your-name" placeholder="your-name">
+                    <button id="start-broadcasting" class="setup">Engage Transmissions</button> -->
+                
                     <div class="col-md-2"></div>
 
                     <div class="col-md-4">
@@ -315,9 +327,14 @@
                             <b>Cat Chat!</b> <span class="muted small">instant messaging, D3CK style</span><br />
                         </div>
 
-
-
-
+                        <div>
+                            <div style="width:300px">
+                                <div id="conversation"></div>
+                                <input class="meow" id="meow" style="width:200px;" />
+                                <input type="button" class="datasend" id="datasend" value="send" />
+                            </div>
+                            <div id="cat_chat" class="content"></div>
+                        </div>
 
                     </div> <!-- col-md-4 -->
 
@@ -537,58 +554,35 @@
                 <div class="spacer30"></div>
                 <div id="event_messages"> 
 
-<!--                        <div id="otherClients"> </div>
-                            <video  style="float:left" id="d3ck_vid" width="300" height="200"></video>
-                        <div style="position:relative;float:left;width:300px">
-                            <video id="remote_vid" width="300" height="200"></video>
-                        </div>
+                    <!-- this section is part of a modified version of:
+
+                        // Muaz Khan         - www.MuazKhan.com
+                        // MIT License       - www.WebRTC-Experiment.com/licence
+                        // Experiments       - github.com/muaz-khan/WebRTC-Experiment
+
+                    -->
+
+                   <div class="controls">
+                       <button id="allow-webcam" class="icon" disabled></button>
+                       <button id="share-files" class="icon" disabled></button>
+                   </div>
+
+                   <div id="video_one"></div>
+                   <div id="video_two"></div>
+
                    <div class="users-list">
                        <span>Users: </span><span class="numbers-of-users">0</span>
                    </div>
             
-                    <ul class="pages">
-                        <li class="chat page">
-                        <div class="chatArea">
-                            <ul class="messages"></ul>
-                        </div>
-                        <input class="inputMessage" placeholder="...type your blah blahs out..."/>
-                        </li>
-                        <li class="login page">
-                        <div class="form">
-                            <h3 class="title">What's your nickname?</h3>
-                            <input class="usernameInput" type="text" maxlength="14" />
-                        </div>
-                        </li>
-                    </ul>
-
--->
-                    <div id="connectControls">
-                        <div id="iam">Not yet connected...</div>
-                        <br />
-                        <strong>Connected users:</strong>
-                        <div id="otherClients"></div>
-                    </div>
-                    <div id="videos">
-                        <video autoplay="autoplay" class="easyrtcMirror" id="self" muted="muted" volume="0" ></video>
-                        <div style="position:relative;float:left;">
-                        <video autoplay="autoplay" id="caller"></video>
-                        </div>
-                        <!-- each caller video needs to be in it's own div so it's close button can be positioned correctly -->
-                    </div>
-
-
-
-<!--
-        <div id="otherClients"> </div>
-        <video style="float:left" id="self" width="300" height="200"></video>
-        <video style="float:left" id="caller" width="300" height="200">/video>
-
+                   <div>
+                       <img style="clear:both; height: 100px; width=1px;" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+                   </div>
 
                    <div class="main-input-box">
                         <textarea placeholder="...type your blah blahs out..."></textarea>
                         <p id="who-is-typing"></p>
                    </div>
--->
+                   
                    <div class="users-container"></div>
             
                    <div class="main">
@@ -639,14 +633,35 @@
 <script type="text/javascript" src='/js/spin.js'></script>
 <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
 
+<!-- put a sock in it -->
+<!-- <script type="text/javascript" src="/socket.io/socket.io.js"></script> -->
+<script type="text/javascript" src="/js/sockjs.min.js"></script>
+<script type="text/javascript" src="/js/sockjs_reconnect.min.js"></script>
+
+<!-- <script type="text/javascript" src="/js/PeerConnection.js"> -->
+
 <!-- RTC -->
 <script type="text/javascript" src='/js/firebase.js'></script>
 
-<!-- put a sock in RTC -->
-<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-<script type="text/javascript" src="/js/easyrtc.js"></script>
-<!-- <script type="text/javascript" src="/js/ezrtc.js"></script> -->
-<script type="text/javascript" src="/js/ezrtc2.js"></script>
+<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
+
+
+
+<!-- <script type="text/javascript" src="/js/RTCMultiConnection-v1.7.js"> </script> -->
+
+<!--
+<script type="text/javascript" src="/js/rtc_ui.peer-connection.js"> </script>
+<script type="text/javascript" src="/js/linkify.js"> </script>
+<script type="text/javascript" src='/js/screenshot.js'></script>
+<script type="text/javascript" src='/js/RecordRTC.js'></script>
+-->
+
+<!-- 
+<script type="text/javascript" src="/js/rtc_ui.main.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.share-files.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.users-list.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.settings.js"> </script> 
+-->
 
 <!-- my stuff -->
 <script type="text/javascript" src="/js/d3ck.js"></script>
