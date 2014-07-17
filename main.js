@@ -3232,6 +3232,16 @@ var ez_server_options = {
 }
 
 var ez_server = express()
+// various helpers
+ez_server.use(cors());
+ez_server.use(response());
+// server.use(express.compress());
+// server.use(express.methodOverride());
+// server.use(express.json());
+// server.use(express.urlencoded());
+// server.use(express.multipart());
+// server.use(express.methodOverride());
+
 
 var ez_web  = https.createServer(ez_server_options, ez_server).listen(d3ck_port_signal);
 var ez_sock = require("socket.io").listen(ez_web, { "log level":2, "transports" : ['websocket'] });
