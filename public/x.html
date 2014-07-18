@@ -1,0 +1,41 @@
+
+<select style="display:none" id="session" title="Session"> <option selected="">audio+video </option> </select>
+<select style="display:none" id="direction" title="Direction"> <option selected="">one-to-one</option> </select>
+
+<button id="setup-new-session" class="setup">Start Audio+Video</button>
+
+<!-- JS below -->
+
+<script type="text/javascript" src="rtc.js"> </script>
+
+<script>
+
+var connection = new RTCMultiConnection();
+
+connection.session = {
+    audio: true,
+    video: true
+};
+
+// on getting local or remote media stream
+connection.onstream = function(e) {
+    document.body.appendChild(e.mediaElement);
+};
+
+// remove if someone leaves
+connection.onstreamended = function(e) {
+    if(e.mediaElement.parentNode) {
+        e.mediaElement.parentNode.removeChild(e.mediaElement);
+    }
+};
+
+// check existing sessions
+connection.connect();
+
+// open new session
+document.getElementById('setup-new-session').onclick = function() {
+    connection.open();
+};
+
+</script>
+

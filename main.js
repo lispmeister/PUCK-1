@@ -2435,7 +2435,7 @@ function quikStart(req, res, next) {
         }
 
         // just stick to one ending please....
-        req.files.d3ck_image.name = req.files.d3ck_image.name.replace('jpeg$','jpg')
+        iname = req.files.d3ck_image.name.replace('jpeg$','jpg')
 
         var iname  = req.files.d3ck_image.name
         var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()

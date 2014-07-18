@@ -344,6 +344,40 @@ $(document).ready(function () {
 
     detect_webRTC('d3ck_rtc_health_check')
 
+    do_that_rtc_thang()
+
 
 })
 
+
+function do_that_rtc_thang() {
+    
+    var connection = new RTCMultiConnection();
+    
+    connection.session = {
+        audio: true,
+        video: true
+    };
+    
+    // on getting local or remote media stream
+    connection.onstream = function(e) {
+        document.body.appendChild(e.mediaElement);
+    };
+    
+    // remove if someone leaves
+    connection.onstreamended = function(e) {
+        if(e.mediaElement.parentNode) {
+            e.mediaElement.parentNode.removeChild(e.mediaElement);
+        }
+    };
+    
+    // check existing sessions
+    connection.connect();
+    
+    // open new session
+    document.getElementById('setup-new-session').onclick = function() {
+        connection.open();
+    };
+    
+    
+}

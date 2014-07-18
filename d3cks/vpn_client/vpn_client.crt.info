@@ -1,8 +1,8 @@
 Signature Algorithm: sha256WithRSAEncryption
 Issuer: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=*
-Not Before: Jul 17 20:51:49 2014 GMT
-Not After : Jul 17 20:51:49 2015 GMT
+Not Before: Jul 17 21:21:47 2014 GMT
+Not After : Jul 17 21:21:47 2015 GMT
 Public Key Algorithm: rsaEncryption
 RSA Public Key: (1024 bit)
 Signature Algorithm: sha256WithRSAEncryption
-SHA1 Fingerprint: 64:84:7F:0B:24:F7:86:D9:E1:14:30:C1:77:90:11:C5:85:A5:5F:43
+SHA1 Fingerprint: 0C:1F:CF:0F:8B:32:68:A1:26:C5:84:A4:3A:FF:25:C2:E5:7D:89:DD
