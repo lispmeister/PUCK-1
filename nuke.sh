@@ -3,6 +3,11 @@
 cd /etc/d3ck
 
 sudo killall redis-server
+better_dead_than=$(ps auxww|grep redis-server|grep -v grep|awk '{print $2}')
+
+if [ "X$better_dead_than" != "X" ] ; then
+    kill -9 $better_dead_than
+fi
 
 sleep 2
 
