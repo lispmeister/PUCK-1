@@ -306,7 +306,7 @@ function state_vpn(state, browser_ip) {
             console.log('\t[+] fire up the outbound signs')
 
             $('#d3ck_video').addClass('green').addClass('pulse')
-            $('button:contains("connecting"),button:contains("Call")').text('Hang Up').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
+            $('button:contains("connecting"),button:contains("Call")').text('End').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
 
             // ... setup bye bye
             $('button:contains("connecting"),button:contains("Call")').click(false)
@@ -1076,7 +1076,7 @@ rtc_peer       = {}
 local_connect  = false
 remote_connect = false
 
-function getUserMedia(callback) {
+function __getUserMedia(callback) {
 
     var hints = {
         audio: true,
@@ -1104,7 +1104,7 @@ function getUserMedia(callback) {
         video.controls = true
         video.muted    = true
 
-        rtc_peer.onStreamAdded({
+        peer.onStreamAdded({
             mediaElement: video,
             userid: 'self',
             stream: stream

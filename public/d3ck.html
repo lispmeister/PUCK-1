@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
 
+<script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
 <!-- A special thanks to the fine folks who did:
 
     jquery
@@ -291,6 +292,10 @@
                 </div>
             </div>  <!-- ewes -->
 
+
+
+
+
             <!-- vpn stuff -->
 
             <div class="tab-pane fade" id="d3ck_vpn">
@@ -299,7 +304,7 @@
 
                     <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
 
-                    <div id="videos-container">... videos....</div>
+                    <!-- <div id="videos-container">... videos....</div>
 
                     <div><strong id="unique-token">#123456789</strong></div>
 
@@ -309,16 +314,11 @@
                     <div id="d3ck_vid_notes">... notes....</div>
                     <div id="d3ck_users">... users....</div>
 
+    -->
+
                     <span>If connected to another D3CK and you don't see video... something is wrong!</span>
                     <button id="orson_wells" class="local" class="setup">Broadcast!</button>
 
-                    <!-- <div class="col-md-4" style="clear:both">
-                        <h4> remote </h4>
-                        <span>If connected to another D3CK and you don't see video... something is wrong!</span>
-                        <div style="width:300px" id="remote_videos"></div>
-                    <input type="text" id="your-name" placeholder="your-name">
-                    <button id="start-broadcasting" class="setup">Engage Transmissions</button> -->
-                
                     <div class="col-md-2"></div>
 
                     <div class="col-md-4">
@@ -561,12 +561,66 @@
                         // Experiments       - github.com/muaz-khan/WebRTC-Experiment
 
                     -->
+                <!-- 
+                <section>
+                    <span>
+                    </span>
+
+                    <button id="start-broadcasting" class="setup">Transmit!</button>
+                </section> 
+
+                 Private ?? <a href="" target="_blank" title="Private"><code><strong id="unique-token">#123456789</strong></code></a>
+
+                <input type="text" id="your-name" placeholder="your-name" class="hidden">
 
 
-                <select style="display:none" id="session" title="Session"> <option selected="">audio+video </option> </select>
-                <select style="display:none" id="direction" title="Direction"> <option selected="">one-to-one</option> </select>
 
-                <button id="setup-new-session" class="setup">Start Audio+Video</button>
+                <video id="video" class="cam_stream" autoplay="autoplay" controls="true"></video>
+
+                <span id="gum-unsupported" class="hidden">API not supported</span>
+
+                <span id="gum-partially-supported" class="hidden">API partially supported (video only)</span>
+
+                -->
+
+
+            <section class="experiment">                
+                <section>
+                    <span>
+                        Private ?? <a href="/websocket/" target="_blank" title="Setup Private Room!"><code><strong id="unique-token">#123456789</strong></code></a>
+                    </span>
+                    <input type="text" id="your-name" placeholder="your-name">
+                    <button id="start-broadcasting" class="setup">Start Transmitting Yourself!</button>
+                </section>
+                
+                <!-- list of all available conferencing rooms -->
+                <table id="rooms-list" style="width: 100%;"></table>
+                
+                <!-- local/remote videos container -->
+                <div id="videos-container"></div>
+            </section>
+
+            
+            <!-- little hack to add some fun -->
+                <div id="video_effect_div" class="hidden">
+                <select id="video_effect" class="textbox">
+                    <option><b>Select an effect</b></option>
+                    <option id="vid-sepia"      value="sepia(1)">          sepia</option>
+                    <option id="vid-blur"       value="blur(3px)">         blur</option>
+                    <option id="vid-grayscale"  value="grayscale(1)">      grayscale</option>
+                    <option id="vid-contrast"   value="contrast(5)">       contrast</option>
+                    <option id="vid-hue-rotate" value="hue-rotate(125deg)">hue-rotate</option>
+                    <option id="vid-invert"     value="invert(1)">         invert</option>
+                    <option id="vid-saturate"   value="saturate(3)">       saturate</option>
+                    <option id="vid-opacity"    value="opacity(0.3)">      opacity</option>
+                    <option id="vid-clear"      value="clear">             <span id="cleary">clear effects</span></option>
+                </select>
+                </div>
+
+
+        </article>
+        
+
 
                 </div>
             </div>
@@ -603,7 +657,7 @@
 <script type="text/javascript" src='/js/jquery.avgrund.js'></script>
 <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
 <script type="text/javascript" src="/js/jquery.filer.js"></script>
-<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+<!-- <script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script> -->
 
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
@@ -617,8 +671,26 @@
 <script type="text/javascript" src="/js/sockjs_reconnect.min.js"></script>
 
 <!-- RTC -->
-<script type="text/javascript" src='/js/firebase.js'></script>
-<script type="text/javascript" src="/js/RTC.js"> </script>
+
+<!-- <script type="text/javascript" src='/js/firebase.js'></script> -->
+<!-- <script type="text/javascript" src="/js/RTC.js"> </script> -->
+
+<script type="text/javascript" src="/js/PeerConnection.js"> </script>
+
+
+<!--
+<script type="text/javascript" src="/js/R.js"> </script>
+<script type="text/javascript" src="/js/RTCMultiConnection-v1.7.js"> </script>
+<script type="text/javascript" src="/js/linkify.js"> </script>
+<script type="text/javascript" src='/js/screenshot.js'></script>
+<script type="text/javascript" src='/js/RecordRTC.js'></script>
+<script type="text/javascript" src="/js/rtc_ui.main.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.peer-connection.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.share-files.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.users-list.js"> </script>
+<script type="text/javascript" src="/js/rtc_ui.settings.js"> </script>
+-->
+
 
 <!-- my stuff -->
 <script type="text/javascript" src="/js/d3ck.js"></script>

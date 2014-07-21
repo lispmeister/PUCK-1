@@ -1,10 +1,3 @@
-//
-// very slightly modified by zen, Thu Jul 17 17:17:55 PDT 2014
-//
-
-
-
-
 // Last time updated at June 28, 2014, 08:32:23
 
 // Latest file can be found here: https://www.rtcmulticonnection.org/latest.js
@@ -4187,12 +4180,25 @@ connection.DetectRTC.MediaDevices.forEach(function(device) {
 
         var iceServers = [];
 
-        /* taken out - zen 
-        iceServers.push({ url: 'stun:stun.l.google.com:19302' });
-        iceServers.push({ url: 'stun:stun.anyfirewall.com:3478' });
-        iceServers.push({ url: 'turn:turn.bistri.com:80', credential: 'homeo', username: 'homeo' });
-        iceServers.push({ url: 'turn:turn.anyfirewall.com:443?transport=tcp', credential: 'webrtc', username: 'webrtc' }); 
-        */
+        iceServers.push({
+            url: 'stun:stun.l.google.com:19302'
+        });
+        
+        iceServers.push({
+            url: 'stun:stun.anyfirewall.com:3478'
+        });
+
+        iceServers.push({
+            url: 'turn:turn.bistri.com:80',
+            credential: 'homeo',
+            username: 'homeo'
+        });
+
+        iceServers.push({
+            url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+            credential: 'webrtc',
+            username: 'webrtc'
+        });
 
         connection.iceServers = iceServers;
 

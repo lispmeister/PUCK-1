@@ -231,16 +231,15 @@ function get_d3ck_vital_bits () {
     // if we don't see d3ck owner data, push the user to the install page
     //
     if (fs.existsSync(d3ck_secretz)) {
-        console.log('\n\n\nSECRETZ!!!!\n\n\nfound secret file... does it check out?\n\n\n')
+        console.log('\nSECRETZ!!!!  Found secret file... does it check out?')
         secretz = JSON.parse(fs.readFileSync(d3ck_secretz).toString())
         console.log(JSON.stringify(secretz))
-        console.log('\n\n\n')
+        console.log('\n')
     
         // should be a single user, but keep this code in case we support more in future
         secretz.id = 0
         d3ck_owners[0] = secretz
     }
-    
 
 }
     
@@ -407,8 +406,10 @@ function auth(req, res, next) {
         else {
 
             // just to cut down messages...
-            if (last_public_url != req.path)
-                console.log('public: ' + req.path)
+
+// xxxx?
+//          if (last_public_url != req.path)
+//              console.log('public: ' + req.path)
 
             last_public_url = req.path
 
@@ -1659,8 +1660,7 @@ function get_d3ck(req, res, next) {
                 // kill things you don't want others knowing
                 // obj_reply.vpn.key = obj_reply.vpn_client.key
                 // obj_reply.vpn.crt = obj_reply.vpn_client.crt
-
-                console.log(obj_reply.vpn)
+                // console.log(obj_reply.vpn)
 
                 // console.log('\n\nafter...')
                 // console.log(obj_reply.vpn.key)
@@ -2706,7 +2706,10 @@ function serverDie(req, res, next) {
 
     console.log('et tu, zen?')
 
-    process.exit(code=666)
+    var command = "/etc/init.d/d3ck"
+    var argz    = ["stop"]
+
+    d3ck_spawn(command, argz)
 
     // presumably never get here ;)
     var response = {status: "I'm not dead yet... just a flesh wound"}
@@ -2722,14 +2725,10 @@ function serverRestart(req, res, next) {
 
     console.log('laying my hands upon the server, killin it, and bringing it back from the abys')
 
-    var exec    = require('child_process').exec;
-    // this works if using auto-restart on touch...
-    // var command = 'touch /etc/d3ck/main.js';
-
     var cmd  = "/etc/init.d/d3ck"
-    var args = ["restart"]
+    var argz = ["restart"]
 
-    d3ck_spawn(cmd, args)
+    d3ck_spawn(cmd, argz)
 
 }
 
@@ -2743,32 +2742,39 @@ function SSSUp () {
 
     console.log('Socket Signal Server!')
 
-    var file = new _static.Server('./public');
-
-    var CHANNELS = {};
+    var sig_clients      = {};
+    var CHANNELS         = {};
 
     var WebSocketServer = require('websocket').server;
+    var file = new(_static.Server)();
 
     var wss_d3cky = https.createServer(server_options, function (request, response) {
         request.addListener('end', function () {
+            console.log('... wss... ')
             file.serve(request, response);
         }).resume();
+    }).listen(d3ck_port_signal, function() {
         console.log('[+] wss/https server listening at %s', d3ck_port_signal)
-    }).listen(d3ck_port_signal);
+    })
 
     new WebSocketServer({
         httpServer: wss_d3cky,
         autoAcceptConnections: false
     }).on('request', onRequest);
 
-
     // from signaler.js in WebRTC-Experiment/MultiRTC
     function onRequest(socket) {
+
         var origin = socket.origin + socket.resource;
 
         var websocket = socket.accept(null, origin);
 
+        console.log('[+] sig open by ' + socket.remoteAddress)
+
         websocket.on('message', function (message) {
+
+            console.log('[-->] msg: ' + JSON.stringify(message))
+
             if (message.type === 'utf8') {
 
                 try {
@@ -2786,15 +2792,25 @@ function SSSUp () {
     }
 
     function onMessage(message, websocket) {
-        if (message.checkPresence)
+        console.log('[>] msg: ' + JSON.stringify(message))
+
+        if (message.checkPresence) {
+            console.log('[>] check presence ')
             checkPresence(message, websocket);
-        else if (message.open)
+        }
+        else if (message.open) {
+            console.log('[>] open ')
             onOpen(message, websocket);
-        else
+        }
+        else {
+            console.log('[>] ... default...?')
             sendMessage(message, websocket);
+        }
     }
 
     function onOpen(message, websocket) {
+        console.log('[o] open: ' + JSON.stringify(message))
+
         var channel = CHANNELS[message.channel];
 
         if (channel)
@@ -2804,8 +2820,23 @@ function SSSUp () {
     }
 
     function sendMessage(message, websocket) {
+
+        console.log('[<-] send: ' + JSON.stringify(message))
+
         message.data = JSON.stringify(message.data);
+
+        if (typeof message.channel == "undefined") {
+            console.log('no message.channel defined, using default (d3ck)')
+            message.channel = "d3ck"
+        }
+
+        if (typeof CHANNELS[message.channel] == "undefined") {
+            console.log('no CHANNEL defined, using default (d3ck)')
+            CHANNELS[message.channel] = "d3ck"
+        }
+
         var channel = CHANNELS[message.channel];
+
         if (!channel) {
             console.error('no such channel exists');
             return;
@@ -2821,6 +2852,9 @@ function SSSUp () {
     }
 
     function checkPresence(message, websocket) {
+
+        console.log('[?] checkp: ' + JSON.stringify(message))
+
         websocket.sendUTF(JSON.stringify({
             isChannelPresent: !! CHANNELS[message.channel]
         }));
@@ -2966,7 +3000,7 @@ server.get('/loginFailure', function(req, res, next) {
 
 // before this really don't answer to much other than the user startup
 console.log('adding routes')
-fire_up_server_routes()
+//fire_up_server_routes()
 
 
 //
@@ -3007,7 +3041,7 @@ async.whilst(
     }
 )
 
-function fire_up_server_routes() {
+// function fire_up_server_routes() {
 
     // Ping action - no auth
     server.get('/ping', echoReply)
@@ -3077,7 +3111,8 @@ function fire_up_server_routes() {
     server.post('/login',
         passport.authenticate('local', {
             successRedirect: '/',
-            failureRedirect: '/loginFailure'
+            failureRedirect: '/loginFailure',
+            failureFlash: true
         })
     )
 
@@ -3139,7 +3174,7 @@ function fire_up_server_routes() {
 
     // console.log('rtz')
     // console.log(server.routes)
-}
+// }
  
 //
 // after all that, start firing up the engines
@@ -3152,22 +3187,6 @@ var d3cky = https.createServer(server_options, server)
 
 // socket signal server
 SSSUp()
-
-
-var PeerServer = require('peer').PeerServer;
-
-var server = new PeerServer({
-    key: 'mysupersecretkey',
-    port: 9000,
-    ssl: {
-        key: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.key'),
-        certificate: fs.readFileSync('/etc/d3ck/d3cks/D3CK/d3ck.crt')
-    }
-})
-
-
-
-
 
 // fire up web sockets
 var sockjs = require('sockjs')

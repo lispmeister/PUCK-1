@@ -370,36 +370,33 @@ function do_that_rtc_thang(host) {
         console.log('selected: ' + val)
 
         if (val == "clear") {
-            $('video').css({'-webkit-filter': ""})
+            $('.cam_stream').css({'-webkit-filter': ""})
         }
         else {
-            $('video').css({'-webkit-filter': val})
+            $('.cam_stream').css({'-webkit-filter': val})
         }
     });
 
 
+//  document.querySelector('#rtc_nowz').onclick = function() 
+
     var url     = 'wss://' + window.location.hostname + ':3000/signalz'
 
-    // from here plus some bugs I surely introduced:
+    console.log('firing up rtc to ' + url)
 
-    // Muaz Khan     - https://github.com/muaz-khan
-    // MIT License   - https://www.webrtc-experiment.com/licence/
-    // Documentation - https://github.com/muaz-khan/WebRTC-Experiment/tree/master/websocket
-
-    // var url     = 'wss://' + window.location.hostname + ':3000/signalz'
-    var url     = 'wss://' + '54.203.255.17' + ':3000/signalz'
-
-    var channel = url.replace( /\/|:|#|%|\.|\[|\]/g , '');
+    var channel = url.replace(/\/|:|#|%|\.|\[|\]/g, '');
     var websocket = new WebSocket(url)
+
+    console.log('channel ' + channel)
 
 
     // to see what's going on....
     websocket.onclose = function ()      { console.log("wss closed") }
+
     websocket.onmessage = function (evt) { console.log("wss received "+evt.data) }
+
     websocket.onerror = function (e)     { console.log("wss Error") ;console.log(e) }
 
-
-    // var websocket = new WebSocket('wss://www.webrtc-experiment.com:8563');
     websocket.onopen = function() {
         console.log("wss opened, sending channel to server")
         websocket.push(JSON.stringify({
@@ -407,25 +404,34 @@ function do_that_rtc_thang(host) {
             channel: channel
         }));
     };
+
     websocket.push = websocket.send;
+
     websocket.send = function(data) {
+
         if (websocket.readyState != 1) {
-            console.warn('websocket connection is not opened yet.');
+            console.log('no-go on websocket connection: ' + websocket.readyState)
             return setTimeout(function() {
+                console.log('... retrying websocket...')
                 websocket.send(data);
             }, 1000);
         }
-            
+    
         websocket.push(JSON.stringify({
             data: data,
             channel: channel
         }));
+
     };
-    
-    var peer = new PeerConnection(websocket);
+        
+    peer = new PeerConnection(websocket);
 
     peer.onUserFound = function(userid) {
+
+        console.log('[+p] user found')
+
         if (document.getElementById(userid)) return;
+
         var tr = document.createElement('tr');
 
         var td1 = document.createElement('td');
@@ -434,6 +440,7 @@ function do_that_rtc_thang(host) {
         td1.innerHTML = userid + ' has camera. Are you interested in video chat?';
 
         var button = document.createElement('button');
+
         button.innerHTML = 'Join';
         button.id = userid;
         button.style.float = 'right';
@@ -444,10 +451,6 @@ function do_that_rtc_thang(host) {
                 peer.sendParticipationRequest(button.id);
             });
             button.disabled = true;
-
-            // show the effects only after video is up
-            $('#video_effect_div').removeClass()
-
         };
         td2.appendChild(button);
 
@@ -457,6 +460,9 @@ function do_that_rtc_thang(host) {
     };
 
     peer.onStreamAdded = function(e) {
+
+        console.log('[+s] stream added')
+
         if (e.type == 'local') document.querySelector('#start-broadcasting').disabled = false;
         var video = e.mediaElement;
 
@@ -471,6 +477,8 @@ function do_that_rtc_thang(host) {
     };
 
     peer.onStreamEnded = function(e) {
+        console.log('[-s] stream ended')
+
         var video = e.mediaElement;
         if (video) {
             video.style.opacity = 0;
@@ -482,18 +490,19 @@ function do_that_rtc_thang(host) {
         }
     };
 
-    document.querySelector('#start-broadcasting').onclick = function() {
-        this.disabled = true;
-        getUserMedia(function(stream) {
-            peer.addStream(stream);
-            peer.startBroadcasting();
-            // show the effects only after video is up
-            $('#video_effect_div').removeClass()
-        });
-    };
+    getUserMedia(function(stream) {
+        console.log('adding peer stream')
+        peer.addStream(stream);
+        console.log('shout it to the world')
+        peer.startBroadcasting();
+    });
 
     document.querySelector('#your-name').onchange = function() {
-        peer.userid = this.value;
+        // if (this.value == "") this.value = userid
+        // peer.userid = this.value;
+        if (userid == "") userid = psuedo_r_string()
+        peer.userid = userid
+        console.log('[u] u r: ' + userid)
     };
 
     var videosContainer = document.getElementById('videos-container') || document.body;
@@ -540,34 +549,71 @@ function do_that_rtc_thang(host) {
     }
 
     window.onresize = scaleVideos;
-        
-        // you need to capture getUserMedia yourself!
-    function getUserMedia(callback) {
-        var hints = {audio:true,video:{
-            optional: [],
-            mandatory: {
-                minWidth: 1280,
-                minHeight: 720,
-                maxWidth: 1920,
-                maxHeight: 1080,
-                minAspectRatio: 1.77
-            }
-        }};
-        navigator.getUserMedia(hints,function(stream) {
-            var video = document.createElement('video');
-            video.src = URL.createObjectURL(stream);
-            video.controls = true;
-            video.muted = true;
-            
-            peer.onStreamAdded({
-                mediaElement: video,
-                userid: 'self',
-                stream: stream
-            });
-            
-            callback(stream);
-        });
+}
+
+function getUserMedia(callback) {
+
+    console.log('getting... user... media....')
+
+    var videoStream = null;
+
+    var video = document.getElementById("video");
+
+    // Test browser support
+    window.navigator = window.navigator || {};
+    navigator.getUserMedia = navigator.getUserMedia       ||
+                               navigator.webkitGetUserMedia ||
+                               navigator.mozGetUserMedia    ||
+                               null;
+ 
+    if (navigator.getUserMedia === null) {
+        document.getElementById('gum-unsupported').classList.remove('hidden');
+        alert("my video conferencing won't work on your platform/browswer")
+    } else {
+    // Opera <= 12.16 accepts the direct stream.
+    // More on this here: http://dev.opera.com/articles/view/playing-with-html5-video-and-getusermedia-support/
+    var createSrc = window.URL ? window.URL.createObjectURL : function(stream) {return stream;};
+ 
+    // Opera <= 12.16 support video only.
+    var audioContext = window.AudioContext       ||
+                       window.webkitAudioContext ||
+                       null;
+    if (audioContext === null) {
+      document.getElementById('gum-partially-supported').classList.remove('hidden');
     }
+ 
+    // document.getElementById('button-play-gum').addEventListener('click', function() {
+    // Capture user's audio and video source
+    navigator.getUserMedia({
+        video: true,
+        audio: true
+    },
+    function(stream) {
+        videoStream = stream;
+        // Stream the data
+        video.src = createSrc(stream);
+        video.play();
+    },
+    function(error) {
+        console.log("Video capture error: ", error.code);
+    });
+        // });
+        // document.getElementById('button-stop-gum').addEventListener('click', function() {
+          // Pause the video
+        //   video.pause();
+          // Stop the stream
+        //   videoStream.stop();
+        // });
+      }
 
 }
+
+
+(function() {
+    var uniqueToken = document.getElementById('unique-token');
+    if (uniqueToken)
+        if (location.hash.length > 2) uniqueToken.parentNode.parentNode.parentNode.innerHTML = '<h2 style="text-align:center;"><a href="' + location.href + '" target="_blank">Share this link</a></h2>';
+        else uniqueToken.innerHTML = uniqueToken.parentNode.parentNode.href = '#' + (Math.random() * new Date().getTime()).toString(36).toUpperCase().replace( /\./g , '-');
+})();
+
 
