@@ -32,6 +32,10 @@ export D3CK_PUBLIC="$D3CK_HOME/public"
 export D3CK_UPLOADS="$D3CK_HOME/public/uploads"
 export D3CK_BIN="$D3CK_HOME/exe"
 
+# stupid stupid stupid
+export RANDFILE="$D3CK_HOME/.rnd"
+
+
 export hell="$D3CK_HOME/f-u-openssl"
 
 export keystore="$D3CK_HOME/d3cks"

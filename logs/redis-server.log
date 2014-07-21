@@ -218,3 +218,13 @@
 [30109] 20 Jul 20:45:02.048 * DB saved on disk
 [30109] 20 Jul 20:45:02.048 * RDB: 0 MB of memory used by copy-on-write
 [14667] 20 Jul 20:45:02.139 * Background saving terminated with success
+[14667] 20 Jul 21:00:03.047 * 1 changes in 900 seconds. Saving...
+[14667] 20 Jul 21:00:03.048 * Background saving started by pid 30516
+[30516] 20 Jul 21:00:03.058 * DB saved on disk
+[30516] 20 Jul 21:00:03.059 * RDB: 0 MB of memory used by copy-on-write
+[14667] 20 Jul 21:00:03.157 * Background saving terminated with success
+[14667] 20 Jul 21:15:37.266 * 1 changes in 900 seconds. Saving...
+[14667] 20 Jul 21:15:37.267 * Background saving started by pid 30824
+[30824] 20 Jul 21:15:37.278 * DB saved on disk
+[30824] 20 Jul 21:15:37.278 * RDB: 0 MB of memory used by copy-on-write
+[14667] 20 Jul 21:15:37.376 * Background saving terminated with success

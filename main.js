@@ -1299,7 +1299,7 @@ function create_d3ck_image(data) {
     }
 
     // just stick to one ending please....
-    data.image = data.image.replace('jpeg$','jpg')
+    data.image = data.image.replace(new RegExp("jpeg$"),'jpg')
 
     var iname  = data.image
     var suffix = data.image.substr(iname.length-4, data.image.length).toLowerCase()
@@ -2410,7 +2410,7 @@ function quikStart(req, res, next) {
     // console.log(name, email, d3ck, password, stance)
 
     bwana_d3ck.name        = d3ck
-    bwana_d3ck.owner.name  = name.replace('jpeg$','jpg')
+    bwana_d3ck.owner.name  = name.replace(new RegExp("jpeg$"),'jpg')
     bwana_d3ck.owner.email = email
     bwana_d3ck.stance      = stance
 
@@ -2435,7 +2435,7 @@ function quikStart(req, res, next) {
         }
 
         // just stick to one ending please....
-        iname = req.files.d3ck_image.name.replace('jpeg$','jpg')
+        iname = req.files.d3ck_image.name.replace(new RegExp("jpeg$"),'jpg')
 
         var iname  = req.files.d3ck_image.name
         var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()

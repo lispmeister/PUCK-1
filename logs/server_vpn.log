@@ -89,3 +89,22 @@ Sun Jul 20 20:41:47 2014 _/54.203.255.17:58675 MULTI: Learn: 10.246.48.6 -> _/54
 Sun Jul 20 20:41:47 2014 _/54.203.255.17:58675 MULTI: primary virtual IP for _/54.203.255.17:58675: 10.246.48.6
 Sun Jul 20 20:41:49 2014 _/54.203.255.17:58675 PUSH: Received control message: 'PUSH_REQUEST'
 Sun Jul 20 20:41:49 2014 _/54.203.255.17:58675 SENT CONTROL [_]: 'PUSH_REPLY,persist-key,persist-tun,explicit-exit-notify 3,route 10.246.48.1,topology net30,ping 5,ping-restart 30,ifconfig 10.246.48.6 10.246.48.5' (status=1)
+Sun Jul 20 20:47:40 2014 _/54.203.255.17:58675 SIGTERM[soft,remote-exit] received, client-instance exiting
++ echo Client Disconnect : 10.246.48.6
+Client Disconnect : 10.246.48.6
++ echo VPN IP : 10.246.48.5
+VPN IP : 10.246.48.5
++ echo proto/port : /
+proto/port : /
++ echo Device : tun0
+Device : tun0
++ echo Bytes received : 20001
+Bytes received : 20001
++ echo Bytes sent : 23983
+Bytes sent : 23983
+Mon Jul 21 08:00:05 2014 event_wait : Interrupted system call (code=4)
+Mon Jul 21 08:00:05 2014 TCP/UDP: Closing socket
+Mon Jul 21 08:00:05 2014 /sbin/route del -net 10.246.48.0 netmask 255.255.255.248
+Mon Jul 21 08:00:05 2014 Closing TUN/TAP interface
+Mon Jul 21 08:00:05 2014 /sbin/ifconfig tun0 0.0.0.0
+Mon Jul 21 08:00:05 2014 SIGTERM[hard,] received, process exiting

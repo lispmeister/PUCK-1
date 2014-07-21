@@ -386,12 +386,8 @@ function do_that_rtc_thang(host) {
     // MIT License   - https://www.webrtc-experiment.com/licence/
     // Documentation - https://github.com/muaz-khan/WebRTC-Experiment/tree/master/websocket
 
-    // var url     = 'wss://' + window.location.hostname + ':3000/signalz'
-    var url     = 'wss://' + '54.203.255.17' + ':3000/signalz'
-
     var channel = url.replace( /\/|:|#|%|\.|\[|\]/g , '');
     var websocket = new WebSocket(url)
-
 
     // to see what's going on....
     websocket.onclose = function ()      { console.log("wss closed") }
