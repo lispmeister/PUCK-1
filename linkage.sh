@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+me=$(who am i | awk '{print $1}')
+
 if [ $(pwd) = "/etc/d3ck" ] ; then
     echo cannot run this script while in /etc/d3ck
     exit 1
@@ -44,7 +46,7 @@ touch /etc/d3ck/logs/server_vpn.log
 chmod 777 /etc/d3ck/logs/client_vpn.log
 chmod 777 /etc/d3ck/logs/server_vpn.log
 
-sudo chown -R pi /etc/d3ck
+sudo chown -R $me /etc/d3ck
 sudo chown -R redis /etc/d3ck/redis
 sudo chmod 755 /etc/d3ck
 sudo chmod 777 /etc/d3ck/tmp
