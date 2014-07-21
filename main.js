@@ -2435,10 +2435,12 @@ function quikStart(req, res, next) {
         }
 
         // just stick to one ending please....
-        iname = req.files.d3ck_image.name.replace(new RegExp("jpeg$"),'jpg')
-
-        var iname  = req.files.d3ck_image.name
+        var iname = req.files.d3ck_image.name.replace(new RegExp("jpeg$"),'jpg')
         var suffix = iname.substr(iname.length-4, iname.length).toLowerCase()
+
+        console.log('real img name: ' + req.files.d3ck_image.name + '<-')
+        console.log('new  img name: ' + iname + '<-')
+        console.log('suffix       : ' + suffix + '<-')
 
         d3ck_image      = '/img/' + d3ck_id + suffix
         full_d3ck_image = d3ck_public + '/img/' + d3ck_id + suffix
