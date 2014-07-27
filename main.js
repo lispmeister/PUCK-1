@@ -43,7 +43,7 @@ var Tail       = require('./tail').Tail,
 //
 // ... followed by the server start...
 //
-  
+
 
 //
 // init
@@ -151,9 +151,9 @@ catch (e) {
     console.log(e)
     process.exit(2)
 }
-    
+
 // suck up our own d3ck
-    
+
 rclient.get(d3ck_id, function (err, reply) {
     console.log('bwana!')
     console.log(d3ck_id)
@@ -235,14 +235,14 @@ function get_d3ck_vital_bits () {
         secretz = JSON.parse(fs.readFileSync(d3ck_secretz).toString())
         console.log(JSON.stringify(secretz))
         console.log('\n')
-    
+
         // should be a single user, but keep this code in case we support more in future
         secretz.id = 0
         d3ck_owners[0] = secretz
     }
 
 }
-    
+
 //
 // pick up cat facts!
 //
@@ -1245,7 +1245,7 @@ function create_d3ck(req, res, next) {
             //
             // if it's from a remote system, wake up local UI and tell user
             //
-            
+
             // garrr... openvpn breaks this too... 
             console.log('adding from: ' + req.body.value.name)
 
@@ -2734,159 +2734,6 @@ function serverRestart(req, res, next) {
 
 }
 
-//
-// setup signal socket server - almost all from https://github.com/muaz-khan/WebRTC-Experiment
-//
-// In production/whatever, BLOCK THE PORT FROM THE WORLD
-// if it's even running - ONLY expose it to the VPN or local
-//
-function SSSUp () {
-
-    console.log('Socket Signal Server!')
-
-    var sig_clients      = {};
-    var CHANNELS         = {};
-
-    var WebSocketServer = require('websocket').server;
-    var file = new(_static.Server)();
-
-    var wss_d3cky = https.createServer(server_options, function (request, response) {
-        request.addListener('end', function () {
-            console.log('... wss... ')
-            file.serve(request, response);
-        }).resume();
-    }).listen(d3ck_port_signal, function() {
-        console.log('[+] wss/https server listening at %s', d3ck_port_signal)
-    })
-
-    new WebSocketServer({
-        httpServer: wss_d3cky,
-        autoAcceptConnections: false
-    }).on('request', onRequest);
-
-    // from signaler.js in WebRTC-Experiment/MultiRTC
-    function onRequest(socket) {
-
-        var origin = socket.origin + socket.resource;
-
-        var websocket = socket.accept(null, origin);
-
-        console.log('[+] sig open by ' + socket.remoteAddress)
-
-        websocket.on('message', function (message) {
-
-            console.log('[-->] msg: ' + JSON.stringify(message))
-
-            if (message.type === 'utf8') {
-
-                try {
-                    onMessage(JSON.parse(message.utf8Data), websocket);
-                }
-                catch (e) {
-                    console.log('malformed websocket message: ' + JSON.stringify(e))
-                }
-            }
-        });
-
-        websocket.on('close', function () {
-            truncateChannels(websocket);
-        });
-    }
-
-    function onMessage(message, websocket) {
-        console.log('[>] msg: ' + JSON.stringify(message))
-
-        if (message.checkPresence) {
-            console.log('[>] check presence ')
-            checkPresence(message, websocket);
-        }
-        else if (message.open) {
-            console.log('[>] open ')
-            onOpen(message, websocket);
-        }
-        else {
-            console.log('[>] ... default...?')
-            sendMessage(message, websocket);
-        }
-    }
-
-    function onOpen(message, websocket) {
-        console.log('[o] open: ' + JSON.stringify(message))
-
-        var channel = CHANNELS[message.channel];
-
-        if (channel)
-            CHANNELS[message.channel][channel.length] = websocket;
-        else
-            CHANNELS[message.channel] = [websocket];
-    }
-
-    function sendMessage(message, websocket) {
-
-        console.log('[<-] send: ' + JSON.stringify(message))
-
-        message.data = JSON.stringify(message.data);
-
-        if (typeof message.channel == "undefined") {
-            console.log('no message.channel defined, using default (d3ck)')
-            message.channel = "d3ck"
-        }
-
-        if (typeof CHANNELS[message.channel] == "undefined") {
-            console.log('no CHANNEL defined, using default (d3ck)')
-            CHANNELS[message.channel] = "d3ck"
-        }
-
-        var channel = CHANNELS[message.channel];
-
-        if (!channel) {
-            console.error('no such channel exists');
-            return;
-        }
-
-        for (var i = 0; i < channel.length; i++) {
-            if (channel[i] && channel[i] != websocket) {
-                try {
-                    channel[i].sendUTF(message.data);
-                } catch (e) {}
-            }
-        }
-    }
-
-    function checkPresence(message, websocket) {
-
-        console.log('[?] checkp: ' + JSON.stringify(message))
-
-        websocket.sendUTF(JSON.stringify({
-            isChannelPresent: !! CHANNELS[message.channel]
-        }));
-    }
-
-    function swapArray(arr) {
-        var swapped = [],
-            length = arr.length;
-        for (var i = 0; i < length; i++) {
-            if (arr[i])
-                swapped[swapped.length] = arr[i];
-        }
-        return swapped;
-    }
-
-    function truncateChannels(websocket) {
-        for (var channel in CHANNELS) {
-            var _channel = CHANNELS[channel];
-            for (var i = 0; i < _channel.length; i++) {
-                if (_channel[i] == websocket)
-                    delete _channel[i];
-            }
-            CHANNELS[channel] = swapArray(_channel);
-            if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
-                delete CHANNELS[channel];
-        }
-    }
-
-}
-
 ///--- Server
 
 // Cert stuff
@@ -2894,7 +2741,7 @@ var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key")
 var cert = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.crt")
 var ca   = fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt")
 
-// var credentials = {key: key, cert: cert, ca: ca}
+var credentials = {key: key, cert: cert, ca: ca}
 
 
 //
@@ -3025,7 +2872,7 @@ async.whilst(
         }
 
         return true
-        
+
     },
 
     function (callback) {
@@ -3121,16 +2968,16 @@ async.whilst(
 
     // Ping another
     server.get('/ping/:key', auth, echoStatus)
-    
+
     // cuz ajax doesn't like to https other sites...
     server.get('/sping/:key1/:key2', auth, function (req, res, next) {
         // console.log('spinging')
         httpsPing(req.params.key1, req.params.key2, res, next)
     })
-    
+
     // send me anything... I'll give you a chicken.  Or... status.
     server.get("/status", auth, d3ckStatus)
-    
+
     //
     // send any actions done on client... like ringing a phone or whatever
     // this is to help keep state in case of moving off web page, browser
@@ -3170,14 +3017,14 @@ async.whilst(
         ];
         res.send(200, routes);
     });
-    
+
     // if all else fails... serve up an index or public
     server.use(express.static(d3ck_public))
 
     // console.log('rtz')
     // console.log(server.routes)
 // }
- 
+
 //
 // after all that, start firing up the engines
 //
@@ -3187,39 +3034,212 @@ async.whilst(
 //
 var d3cky = https.createServer(server_options, server)
 
-// socket signal server
-SSSUp()
 
+
+
+//
 // fire up web sockets
-var sockjs = require('sockjs')
-var ios = sockjs.createServer()
+//
+var sockjs  = require('sockjs')
+var ios     = sockjs.createServer()
+var rtc_ios = sockjs.createServer()
+
 ios.installHandlers(d3cky, {prefix: '/pux'})
+rtc_ios.installHandlers(d3cky, {prefix: '/rtc'})
+
+var d3ck_users  = {},
+    cat_sock    = {},
+    all_cats    = []
+
+var CHANNEL     = {};
+
+var sock_user   = ""
+
+var size = 0, key;
+
+
+CHANNELS = {}
 
 //
-// socket time
+// socket chatter
 //
-var d3ck_users      = {},
-    cat_sock        = {},
-    all_cats        = []
-
 ios.on('connection', function (sock_puppet) {
-
+    d3ck_users[sock_puppet.id] = sock_puppet;
     console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
-
     cat_sock = sock_puppet
-
     // a friendly cat fact
     var cool_cat_fact = random_cat_fact(cat_facts)
-
     var msg = {type: "cat_fact", fact: cool_cat_fact}
-
     cat_power(msg)
-
-    sock_puppet.on('data', function(res) {
-        console.log('data received ')
-        console.log(res)
-    })
 })
+
+
+//
+// web socket signal server
+//
+
+function make_it_dance(chunk, conn) {
+    console.log('another... ' + chunk)
+
+    var datum = JSON.parse(chunk)
+
+    var msg   = datum.data
+
+    // overkill... but check if channel is there....
+    try {
+        if (typeof datum.channel != "undefined") {
+            onOpen(datum, conn)
+        }
+    }
+    catch (e) { }
+
+    try {
+        if (msg.whoisonline) {
+            console.log('who who, who are you?')
+            onMessage(msg, conn)
+            return
+        }
+    }
+    catch (e) { }
+
+    try {
+        if (msg.open) {
+            console.log('open da door!')
+            onOpen(msg, conn)
+            return
+        }
+    }
+    catch (e) { }
+
+    sendMessage(chunk, conn)
+
+}
+
+rtc_ios.on('connection', function (rtc_puppet) {
+    console.log('[+] new WSS connext from ' + rtc_puppet.remoteAddress)
+
+    rtc_puppet.on('data', function(chunk) {
+        make_it_dance(chunk, rtc_puppet);
+    });
+});
+
+
+//  rtc_puppet.on('request', onRequest)
+//  rtc_puppet.on('message', onMessage)
+//  rtc_puppet.on('open',    onOpen)
+//  rtc_puppet.on('close',   truncateChannels)
+
+
+function onRequest(socket) {
+    console.log('[r] new request...')
+
+    var origin = socket.origin + socket.resource;
+
+    var websocket = socket.accept(null, origin);
+
+    websocket.on('message', function(message) {
+        if (message.type === 'utf8') {
+            onMessage(JSON.parse(message.utf8Data), websocket);
+        }
+    });
+
+    websocket.on('close', function() {
+        truncateChannels(websocket);
+    });
+}
+
+function onMessage(message, websocket) {
+    console.log('[>] message...')
+    if (message.checkPresence)
+        checkPresence(message, websocket);
+    else if (message.open)
+        onOpen(message, websocket);
+    else
+        sendMessage(message, websocket);
+}
+
+function onOpen(message, websocket) {
+    console.log('[o] open...?')
+    console.log(message);
+
+    var channel = CHANNELS[message.channel];
+
+    if (channel)
+        CHANNELS[message.channel][channel.length] = websocket;
+    else
+        CHANNELS[message.channel] = [websocket];
+}
+
+function sendMessage(message, websocket) {
+    console.log('[<] send...')
+    console.log(message);
+
+    // message.data = JSON.stringify(message.data);
+
+    var channel = CHANNELS[message.channel];
+
+    if (!channel) {
+        // console.error('no such channel exists');
+        // return;
+        channel = 'd3ck'
+    }
+
+    try {
+        websocket.write(JSON.stringify(message));
+    } catch(e) {
+        console.log("couldn't send....")
+    }
+
+}
+
+function checkPresence(message, websocket) {
+    console.log('[?] anyone out there...?')
+    console.log(message);
+
+    // websocket.sendUTF(JSON.stringify({
+    websocket.write(JSON.stringify({
+        isChannelPresent: !!CHANNELS[message.channel]
+    }));
+}
+
+function swapArray(arr) {
+    var swapped = [],
+        length = arr.length;
+    for (var i = 0; i < length; i++) {
+        if (arr[i])
+            swapped[swapped.length] = arr[i];
+    }
+    return swapped;
+}
+
+function truncateChannels(websocket) {
+    for (var channel in CHANNELS) {
+        var _channel = CHANNELS[channel];
+        for (var i = 0; i < _channel.length; i++) {
+            if (_channel[i] == websocket)
+                delete _channel[i];
+        }
+        CHANNELS[channel] = swapArray(_channel);
+        if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
+            delete CHANNELS[channel];
+    }
+}
+
+
+
+
+
+
+// http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+}
+
+
 
 
 //
