@@ -13,3 +13,8 @@
 [23122] 21 Jul 19:10:11.069 * DB saved on disk
 [23122] 21 Jul 19:10:11.069 * RDB: 0 MB of memory used by copy-on-write
 [12625] 21 Jul 19:10:11.156 * Background saving terminated with success
+[12625] 27 Jul 11:08:04.387 * 1 changes in 900 seconds. Saving...
+[12625] 27 Jul 11:08:04.389 * Background saving started by pid 24437
+[24437] 27 Jul 11:08:04.480 * DB saved on disk
+[24437] 27 Jul 11:08:04.481 * RDB: 0 MB of memory used by copy-on-write
+[12625] 27 Jul 11:08:04.496 * Background saving terminated with success
