@@ -14,7 +14,7 @@
       "ctype": "latest",
       "ejs": "latest",
       "execSync": "latest",
-      "express": "<= 3.5.0",
+      "express": "3.5.0",
       "formidable": "latest",
       "http-proxy": "latest",
       "mkdirp": "latest",
