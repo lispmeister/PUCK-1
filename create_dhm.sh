@@ -9,8 +9,8 @@
 
 . /etc/d3ck/config.sh
 
-keyfile="$keystore/D3CK/dh$KEY_SIZE.params"
-vpn_keyfile="$keystore/D3CK/dh.params"
+keyfile="$d3ck_keystore/dh$KEY_SIZE.params"
+vpn_keyfile="$d3ck_keystore/dh.params"
 
 if [ -f $keyfile -o -f $vpn_keyfile ] ; then
     echo "Not going to overwrite existing DH key with same name ($keyfile or $vpn_keyfile)"
