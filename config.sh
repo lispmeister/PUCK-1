@@ -39,7 +39,7 @@ export RANDFILE="$D3CK_HOME/.rnd"
 export hell="$D3CK_HOME/f-u-openssl"
 
 export keystore="$D3CK_HOME/d3cks"
-export d3ck_keystore="$keystore/D3CK"
+export d3ck_keystore="$D3CK_HOME/d3cks/D3CK"
 
 export d3ck_proto="https"
 export d3ck_host="localhost"
