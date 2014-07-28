@@ -15,6 +15,7 @@ var Tail       = require('./tail').Tail,
     fs         = require('fs'),
     formidable = require('formidable'),
     https      = require('https'),
+    methodO    = require('method-override'),
     mkdirp     = require('mkdirp'),
     moment     = require('moment'),
     _static    = require('node-static'),
@@ -631,7 +632,7 @@ function change_status() {
     cat_power(msg)
 
     // xxx - errs to user!
-    _writeObj2File(d3ck_status_file, d3ck_status)
+    write2file(d3ck_status_file, d3ck_status)
 
     console.log('end status')
 
@@ -675,7 +676,7 @@ for (var dev in ifaces) {
 cat_fact_server = my_devs["tun0"]
 
 // write the IP addr to a file
-_write2File(d3ck_remote_vpn, cat_fact_server)
+write2file(d3ck_remote_vpn, cat_fact_server)
 
 // console.log(my_ips)
 
@@ -689,7 +690,7 @@ function watch_logs(logfile, log_type) {
     // create if doesn't exist...?
     if (!fs.existsSync(logfile)) {
         console.log('creating ' + logfile)
-        _write2File(logfile, "")
+        write2file(logfile, "")
     }
     else {
         console.log('watching ' + logfile)
@@ -862,7 +863,7 @@ function watch_logs(logfile, log_type) {
                 cat_fact_server = my_devs["tun0"]
 
                 // write the IP addr to a file
-                _write2File(d3ck_remote_vpn, cat_fact_server)
+                write2file(d3ck_remote_vpn, cat_fact_server)
 
                 change_status() // make sure everyone hears the news
 
@@ -1013,7 +1014,7 @@ function pollStatus(file) {
     if (d3ck_status == {}) {
         if (!fs.existsSync(d3ck_status_file)) {
             console.log('creating ' + d3ck_status_file)
-            _writeObj2File(d3ck_status_file, d3ck_status)
+            write2file(d3ck_status_file, d3ck_status)
         }
     }
     fs.readFile(d3ck_status_file, function (err, data) {
@@ -1154,11 +1155,11 @@ function create_d3ck_key_store(data) {
     })
 
     // xxx - errs to user!
-    _write2File(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
-    _write2File(d3ck_dir + '/d3ckroot.crt', ca)
-    _write2File(d3ck_dir + '/d3ck.key',     key)
-    _write2File(d3ck_dir + '/d3ck.crt',     cert)
-    _write2File(d3ck_dir + '/ta.key',       tls)
+    write2file(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
+    write2file(d3ck_dir + '/d3ckroot.crt', ca)
+    write2file(d3ck_dir + '/d3ck.key',     key)
+    write2file(d3ck_dir + '/d3ck.crt',     cert)
+    write2file(d3ck_dir + '/ta.key',       tls)
 
 }
 
@@ -1317,40 +1318,29 @@ function create_d3ck_image(data) {
         console.log('err in processing remote image: ' + msg)
     }
     else {
-        _write2File(full_d3ck_image, image)
+        write2file(full_d3ck_image, image)
     }
 
 
 }
 
-// a few useful snippets
+// a few snippets
 
+//
 // the pi's storage media can take awhile to register a
 // write... so I'm using sync'd writes, where I don't have
 // to on other systems. At least... that's what seems to
 // be happening... so that's my story and I'm sticking to it!
+//
+function write2file(file, stringy) {
 
-// assumes data is an object
-function _writeObj2File(file, obj) {
+    // object or no?
 
-    var stringy = JSON.stringify(obj)
+    if (typeof stringy == 'object') {
+        stringy = JSON.stringify(stringy)
+    }
 
     console.log('trying to write ' + stringy.length + ' bytes to ' + file)
-
-    try {
-        fs.writeFileSync(file, stringy)
-        console.log('...success...')
-    }
-    catch (e) {
-        console.log('err writing to ' + file + '...' + stringy)
-    }
-
-}
-
-// non-obj version
-function _write2File(file, stringy) {
-
-    console.log('trying to write string ' + stringy.length + ' bytes to ' + file)
 
     try {
         fs.writeFileSync(file, stringy)
@@ -2524,7 +2514,7 @@ function quikStart(req, res, next) {
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
-    _writeObj2File(d3ck_secretz, secretz)
+    write2file(d3ck_secretz, secretz)
 
     // no longer go here
     redirect_to_quickstart = false
@@ -2652,9 +2642,9 @@ function formCreate(req, res, next) {
                         console.log(d3ck_public)
                         console.log(r_data)
 
-                        _write2File(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
+                        write2file(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
 
-                        // _write2File(d3ck_public + r_data.image + ".b64", r_data.image_b64)
+                        // write2file(d3ck_public + r_data.image + ".b64", r_data.image_b64)
 
                         console.log(bwana_d3ck)
                         console.log(typeof bwana_d3ck)

@@ -18,6 +18,7 @@
       "express": "3.5.0",
       "formidable": "latest",
       "http-proxy": "latest",
+      "method-override" : "latest",
       "mkdirp": "latest",
       "moment": "latest",
       "nodemon": "latest",
