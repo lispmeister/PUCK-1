@@ -49,6 +49,8 @@
 <link href="/css/rtc_style.css" rel="stylesheet">
 <link href="/css/rtc_scroll.css" rel="stylesheet">
 
+<!-- messi, popup thingee -->
+<link href="/css/messi.min.css" rel="stylesheet">
 
 <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
@@ -62,7 +64,7 @@
 <!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
 
 <!-- RTC -->
-<script type="text/javascript" src="/js/R.js"> </script>
+<script type="text/javascript" src="/js/RTC.js"> </script>
 <script type="text/javascript" src="/js/conversation.js"> </script>
 
 </head>
@@ -104,6 +106,11 @@
                 <li> <a href="#rtc_hack" data-toggle="tab"><span id="d3ck_video" title="VPN" data-content="Video - new page!" class="glyphicon glyphicon-facetime-video"></span></a></li>
 
                 </ul>
+
+            <ul class="nav nav-tabs navbar-nav navbar-brand">
+                <!-- <li><b><a href="#" style="color: #357ebd" id="title_name"></a></b></li> -->
+                <li><b><a href="#" class="text-success" id="title_name"></a></b></li>
+            </ul>
 
             <ul class="nav nav-tabs navbar-nav navbar-right">
 
@@ -194,6 +201,9 @@
                     <div id="d3ck_loading" class="spinner">
                         <div class="double-bounce1"></div>
                         <div class="double-bounce2"></div>
+                    </div>
+
+                    <div id="d3ck_cors">
                     </div>
     
                 </div>
@@ -542,7 +552,6 @@
 
 
              <div class="tab-pane fade" id="rtc_hack">
-                <div class="spacer30"></div>
                 <div id="event_messages"> 
 
         <article>
@@ -556,207 +565,34 @@
                     -->
 
     
-    <label for="your-username">Your UserName:</label>
-    <input type="text" id="your-username"><br />
+    <span type="text" id="your-username"></span><br />
 
-    <label for="target-username">Target UserName:</label>
-    <input type="text" id="target-username" placeholder="Required"><br />
+    <label for="target-username">Other d3ck:</label>
+    <input type="text" id="target-username" placeholder="not connected (yet) - no one to talk to"><br />
 
-    <button id="start-signaler">Start Signaler</button>
-    <button id="call" disabled>Call</button>
+    <div><span class="spacer10"></span></div>
+
+    <button id="start-signaler">RTC not seen, trouble!</button>
+    <button id="rtc_call" disabled>Start the Conversation!</button>
     
-    <button id="enable-microphone" disabled>Enable Microphone</button>
-    <button id="enable-camera" disabled>Enable Camera</button>
-    <button id="enable-screen" disabled>Enable Screen</button>
+    <div class="hidden" id="control-div">
+        <button id="enable-microphone" disabled>Enable Microphone</button><br />
+        <button id="enable-camera" disabled>Enable Camera</button><br />
+        <button id="enable-screen" disabled>Enable Screen</button><br />
+    </div>
 
     <hr /><br /><br />
 
     <ol></ol>
-    <label for="chat-message">Type Your Message:</label>
-    <input type="text" id="chat-message" disabled>
+
+    <div class="hidden" id="chat-message-div">
+        <label for="chat-message">Type Your Message:</label>
+        <input type="text" id="chat-message" disabled>
+    <div>
     
-    <input type="file" disabled multiple>
-
-    <script>
-
-        var user = new User({
-            status: 'online',
-            // username: 'google',
-            email: 'whoami@example.com'
-        });
-        
-        document.querySelector('#your-username').value = user.username;
-        document.querySelector('#your-username').onkeyup = function() {
-            user.username = this.value;
-        };
-
-        document.querySelector('#start-signaler').onclick = function() {
-            this.disabled = true;
-            
-            user.emit('signaler', 'start');
-        };
-
-        user.on('signaler-connected', function() {
-            document.querySelector('#call').disabled = false;
-            document.querySelector('#start-signaler').disabled = true;
-        });
-        
-        user.on('friend-request', function(request) {
-            return request.accept();
-            
-            if(window.confirm('Do you want to accept friend-request made by ' + request.sender + '?')) {
-                request.accept();
-            }
-            else {
-                request.reject();
-            }
-        });
-                
-        user.on('request-status', function(request) {
-            return;
-            if(request.status == 'accepted') {
-                alert(request.sender + ' accepted your request.');
-            }
-            if(request.status == 'rejected') {
-                alert(request.sender + ' rejected your request.');
-            }
-        });
-
-        document.querySelector('#call').onclick = function () {
-
-            console.log('clickity click!')
-
-            var targetuser = document.querySelector('#target-username').value;
-            
-            document.querySelector('#target-username').disabled = true;
-            document.querySelector('#call').disabled = true;
-
-            console.log('... open conv... with ' + targetuser)
-
-            user.openconversationwith(targetuser);
-        }
-        
-        user.on('conversation-opened', function (conversation) {
-            document.querySelector('#target-username').disabled = false;
-            document.querySelector('#call').disabled = false;
-            document.querySelector('#target-username').value = '';
-            
-            document.querySelector('#enable-microphone').disabled = false;
-            document.querySelector('#enable-camera').disabled = false;
-            document.querySelector('#enable-screen').disabled = false;
-            document.querySelector('#chat-message').disabled = false;
-            document.querySelector('input[type=file]').disabled = false;
-            
-            appendmessage('System Message', 'conversation has been started between you and ' + conversation.target.username);
-
-            conversation.on('message', function (event) {
-                appendmessage(event.userid, event.data);
-            });
-            
-            // if someone enabled microphone or camera or screen
-            conversation.on('media-enabled', function (media) {
-                // media.type == 'audio' || 'video' || 'screen'
-                // media.hasmicrophone == true || null
-                // media.hascamera == true || null
-                // media.hasscreen == true || null
-                // media.sender == 'string'
-                // media.staticdata == custom object
-                
-                var mediatype = '';
-                if(media.hasmicrophone) {
-                    mediatype = 'only microphone';
-                }
-                
-                if(media.hascamera) {
-                    mediatype = 'microphone and camera';
-                }
-                
-                if(media.hasscreen) {
-                    mediatype = 'only screen';
-                }
-                
-                var join = prompt(media.sender + ' enabled ' + mediatype + '. You can preview it by typing "preview" or join with microphone by typing "joinwithmicrophone" and join with camera by typing "joinwithcamera" or join with screen by typing "joinwithscreen".', 'preview');
-                
-                if(join == 'preview') {
-                    media.emit('join-with', 'nothing');
-                }
-                
-                if(join == 'joinwithmicrophone') {
-                    media.emit('join-with', 'microphone');
-                }
-                
-                if(join == 'joinwithcamera') {
-                    media.emit('join-with', 'camera');
-                }
-                
-                if(join == 'joinwithscreen') {
-                    media.emit('join-with', 'screen');
-                }
-            });
-            
-            conversation.on('add-file', function(file) {
-                file.download();
-            });
-            
-            conversation.on('file-progress', function(progress) {
-                console.log('percentage %', progress.percentage);
-                // progress.file.name
-                // progress.sender
-            });
-            
-            conversation.on('file-downloaded', function(file) {
-                // file.sender
-                file.savetodisk();
-            });
-            
-            conversation.on('file-sent', function(file) {
-                // file.sender
-                console.log(file.name, 'sent.');
-            });
-            
-            conversation.on('file-cancelled', function(file) {
-                // file.sender
-                console.log(file.name, 'cancelled.');
-            });
-        });
-        
-        document.querySelector('#chat-message').onkeyup = function (event) {
-            if (event.keyCode != 13 || !this.value || !this.value.length) return;
-            
-            user.peers.emit('message', this.value);
-            
-            appendmessage(user.username, this.value);
-            this.value = '';
-        };
-        
-        document.querySelector('#enable-microphone').onclick = function() {
-            user.peers.emit('enable', 'microphone');
-            this.disabled = true;
-        };
-            
-        document.querySelector('#enable-camera').onclick = function() {
-            user.peers.emit('enable', 'camera');
-            this.disabled = true;
-        };
-        
-        document.querySelector('#enable-screen').onclick = function() {
-            user.peers.emit('enable', 'screen');
-            this.disabled = true;
-        };
-       
-        var ol = document.querySelector('ol');
-        function appendmessage(sender, message) {
-            ol.innerHTML += '<li>' + sender + ':- ' + message + '</li>';
-        }
-        
-        document.querySelector('input[type=file]').onchange = function() {
-            user.peers.emit('add-file', this.files);
-        };
-    </script>
-
-
-
-
+    <div class="hidden" id="file-div">
+        <input type="file" disabled multiple>
+    </div>
 
             <!-- little hack to add some fun -->
                 <div id="video_effect_div" class="hidden">
@@ -800,6 +636,7 @@
     </div>
 
 <script type="text/javascript" src="/js/jquery-2.1.0.min.js"></script>
+
 <script type="text/javascript" src='/js/jquery-ui.1.9.2.min.js'></script>
 
 <script type="text/javascript" src='/js/jquery.adipoli.min.js'></script>
@@ -807,9 +644,16 @@
 <script type="text/javascript" src='/js/jquery.inputmask.js'></script>
 <script type="text/javascript" src='/js/jquery.blockUI.js'></script>
 <script type="text/javascript" src='/js/jquery.avgrund.js'></script>
+
+<!-- apple growl-like messages for user alerts -->
 <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
+
 <script type="text/javascript" src="/js/jquery.filer.js"></script>
-<!-- <script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script> -->
+<script type="text/javascript" src="/js/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" src="/js/jquery.mCustomScrollbar.concat.js"></script>
+
+<!-- messi, popup thingee -->
+<script type="text/javascript" src="/js/messi.js"></script>
 
 <script type="text/javascript" src='/js/bootstrap.js'></script>
 <script type="text/javascript" src='/js/moustache.js'></script>
@@ -821,26 +665,6 @@
 <!-- put a sock in it -->
 <script type="text/javascript" src="/js/sockjs.min.js"></script>
 <script type="text/javascript" src="/js/sockjs_reconnect.min.js"></script>
-
-<!-- <script type="text/javascript" src='/js/firebase.js'></script> -->
-<!-- <script type="text/javascript" src="/js/RTC.js"> </script> 
-
-<script type="text/javascript" src="/js/PeerConnection.js"> </script>-->
-
-<!--
-<script type="text/javascript" src="/js/rtc_ui.main.js"> </script>
-<script type="text/javascript" src="/js/rtc_ui.peer-connection.js"> </script>
-<script type="text/javascript" src="/js/rtc_ui.share-files.js"> </script>
-<script type="text/javascript" src="/js/rtc_ui.users-list.js"> </script>
-
-
-<script type="text/javascript" src="/js/rtc_ui.settings.js"> </script>
-<script type="text/javascript" src="/js/RTCMultiConnection-v1.7.js"> </script>
-<script type="text/javascript" src="/js/linkify.js"> </script>
-<script type="text/javascript" src='/js/screenshot.js'></script>
-<script type="text/javascript" src='/js/RecordRTC.js'></script>
--->
-
 
 <!-- my stuff -->
 <script type="text/javascript" src="/js/d3ck.js"></script>

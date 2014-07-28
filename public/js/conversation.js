@@ -7,42 +7,34 @@
 // ____________________
 // Conversation-v1.0.js
 
-
-// SIGNALING_SERVER = 'wss://wsnodejs.nodejitsu.com:443/websocket';
-SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8080/rtc/websocket';
-
+// zen
 function psuedo_r_string() {
     var val = (Math.random() * new Date().getTime()).toString(36).replace(/\./g, '')
     console.log("YOU R: " + val)
     return val
 }
+currentUserUUID = psuedo_r_string()
 
 function User(config) {
     var user = this;
 
-    currentUserUUID = psuedo_r_string()
+    user.randomstring = function () {
+        return new RTCMultiConnection().token();
+    };
 
-    config.SIGNALING_SERVER = SIGNALING_SERVER
 
     user.staticdata = {};
+    user.username = user.randomstring();
+
+
+    // zen
     user.username = currentUserUUID
+
     user.status = 'online';
     
-    if (typeof config.SIGNALING_SERVER != "undefined") {
-        user.signalingurl = config.SIGNALING_SERVER
-    }
-    else {
-        console.log('NEVER FUCKING NEVER')
-        throw 'bad'
-        // user.signalingurl = 'wss://wsnodejs.nodejitsu.com:443/';
-    }
-
-    console.log('setting signalz server to be ' + user.signalingurl)
+    user.signalingurl = 'wss://wsnodejs.nodejitsu.com:443/';
 
     user.openconversationwith = function (targetuser) {
-
-        console.log('opening... conv... with...')
-
         var conversation = new Conversation(user, targetuser);
 
         // check who is online
@@ -53,21 +45,11 @@ function User(config) {
     };
 
     function startsignaler() {
-
-        console.log('firing up siggy')
-
         var websocket = new WebSocket(user.signalingurl);
-
         websocket.onmessagecallbacks = {};
 
         websocket.onmessage = function (e) {
-
-            console.log('on-message...')
-
-            console.log(e)
-            console.log(typeof e)
-
-            data = e.data
+            data = JSON.parse(e.data);
 
             if (data.sender == user.username) return;
 
@@ -81,8 +63,6 @@ function User(config) {
         };
 
         websocket.onopen = function () {
-            console.log('--signaler-connected');
-
             user.emit('--signaler-connected');
             websocket.send({
                 open: true
@@ -91,9 +71,6 @@ function User(config) {
 
         websocket.push = websocket.send;
         websocket.send = function (data) {
-            console.log('... trying... to... send...');
-            console.log(data)
-
             if (websocket.readyState != 1) {
                     console.warn('websocket connection is not opened yet.');
                     return setTimeout(function() {
@@ -113,33 +90,19 @@ function User(config) {
 
             data.sender = user.username;
             data.staticdata = user.staticdata;
-            // data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
-            data.channel = 'd3ck'
-
+            data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
             websocket.push(JSON.stringify(data));
-            console.log('push it... push it good... ' + JSON.stringify(data))
-
         };
 
         user.websocket = websocket;
     }
 
     function customSignalingMessages(message) {
-
-        console.log('custom, baby!')
-        console.log(message)
-
         if (message.whoisonline && message.responsefor == user.username && user.status == 'online') {
-            console.log('--friend-request')
-            console.log(JSON.stringify(message))
-            console.log(user.peers)
-            console.log(JSON.stringify(user))
-
             user.emit('--friend-request', {
                 accept: function() {
                     if (!user.peers[message.sender]) {
-                        // var randomchannel = user.randomstring();
-                        var randomchannel = 'd3ck'
+                        var randomchannel = user.randomstring();
                         user.websocket.send({
                             iamonline: true,
                             responsefor: message.sender,
@@ -262,7 +225,6 @@ function User(config) {
     });
     
     user.on('friend-request', function(request) {
-        console.log('... will... you marry me?')
         request.accept();
     });
     
@@ -280,9 +242,6 @@ function User(config) {
 }
 
 function Conversation(user, targetuser) {
-
-    console.log('starring... gene hackman...')
-
     var conversation = this;
     var websocket = user.websocket;
 
@@ -291,14 +250,8 @@ function Conversation(user, targetuser) {
     }
     
     function enablemicrophone() {
-
-        console.log('mik ...?')
-
         if(user.localstreams.microphone) return;
-
         conversation.peer.captureUserMedia(function(stream) {
-
-            console.log('m-up!')
             user.localstreams.microphone = stream;
             
             conversation.peer.peers[targetuser].peer.connection.addStream(stream);
@@ -315,14 +268,9 @@ function Conversation(user, targetuser) {
     }
     
     function enablecamera() {
-
-        console.log('camera...')
-
         if(user.localstreams.camera) return;
         
         conversation.peer.captureUserMedia(function(stream) {
-            console.log('c-up!')
-
             user.localstreams.camera = stream;
             
             conversation.peer.peers[targetuser].peer.connection.addStream(stream);
@@ -363,9 +311,6 @@ function Conversation(user, targetuser) {
     };
 
     conversation.addnewrtcmulticonnectionpeer = function (args) {
-
-        console.log('but... Im peerless... impossible!')
-
         var connection = new RTCMultiConnection(args.channel);
 
         connection.userid = user.username;
@@ -376,9 +321,6 @@ function Conversation(user, targetuser) {
         };
 
         connection.onopen = function () {
-
-            console.log('[+] open connection')
-
             conversation.target = {
                 username: args.targetuser,
                 staticdata: args.staticdata
@@ -387,16 +329,10 @@ function Conversation(user, targetuser) {
         };
 
         connection.onmessage = function (event) {
-
-            console.log('[>] inbound!')
-
             if(event.data.signalingmessage) {
                 var data = event.data;
-
-                console.log('data... ' + JSON.stringify(data))
                 
                 if(data.streamavailable) {
-
                     data.emit = function(first, second) {
                         if(first == 'join-with' && second == 'nothing') {
                             preview();

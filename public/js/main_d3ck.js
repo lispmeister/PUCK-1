@@ -2,7 +2,7 @@
 // after all is said and done... let the JS fur fly
 //
 
-// SIGNALING_SERVER = 'wss://' + window.location.hostname + ':5555/signalz';
+SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
 
 // poll until we get something, then stop polling
 var vault_poll     = 1000
@@ -28,6 +28,9 @@ var all_d3ck_ids = {}
 ring = new Audio("media/ringring.mp3") // load it up
 
 $(document).ready(function () {
+
+    // using this to ensure browser trusts rtc port as well as web port
+    rtc_haxx0r_trick()
 
     var image     = ""
     // var d3ck_id   = ""
@@ -303,6 +306,9 @@ $(document).ready(function () {
                         my_d3ck = d3ckinfo
                         print_d3ck(d3ckinfo.D3CK_ID, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
                         $('#title_name').append(d3ckinfo.owner.name)
+
+                        do_that_RTC_thang()     // load lib stuff
+                        set_up_RTC()            // actually start it
                     }
                 })
             })

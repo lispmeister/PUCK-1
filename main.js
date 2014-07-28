@@ -2791,7 +2791,6 @@ var server_options = {
 var server = express()
 
 // various helpers
-server.use(cors());
 server.use(response());
 
 server.use(express.limit('1gb'))
@@ -2805,6 +2804,13 @@ server.use(express.urlencoded());
 server.use(express.multipart());
 
 server.use(express.methodOverride());
+
+server.use(cors());
+
+var cors_opts = { origin:"https://192.168.0.250:8081", credentials:true }
+
+// server.options(cors_opts, cors())
+
 
 // passport/auth stuff
 server.use(express.cookieParser());
@@ -3051,12 +3057,7 @@ var d3ck_users  = {},
     cat_sock    = {},
     all_cats    = []
 
-var CHANNEL     = {};
-
 var sock_user   = ""
-
-var size = 0, key;
-
 
 CHANNELS = {}
 
@@ -3077,44 +3078,6 @@ ios.on('connection', function (sock_puppet) {
 //
 // web socket signal server
 //
-
-function make_it_dance(chunk, conn) {
-    console.log('another... ' + chunk)
-
-    var datum = JSON.parse(chunk)
-
-    var msg   = datum.data
-
-    // overkill... but check if channel is there....
-    try {
-        if (typeof datum.channel != "undefined") {
-            onOpen(datum, conn)
-        }
-    }
-    catch (e) { }
-
-    try {
-        if (msg.whoisonline) {
-            console.log('who who, who are you?')
-            onMessage(msg, conn)
-            return
-        }
-    }
-    catch (e) { }
-
-    try {
-        if (msg.open) {
-            console.log('open da door!')
-            onOpen(msg, conn)
-            return
-        }
-    }
-    catch (e) { }
-
-    sendMessage(chunk, conn)
-
-}
-
 rtc_ios.on('connection', function (rtc_puppet) {
     console.log('[+] new WSS connext from ' + rtc_puppet.remoteAddress)
 
@@ -3123,12 +3086,47 @@ rtc_ios.on('connection', function (rtc_puppet) {
     });
 });
 
+function make_it_dance(chunk, conn) {
+    console.log('another chunk in the wall... ' + chunk)
 
-//  rtc_puppet.on('request', onRequest)
-//  rtc_puppet.on('message', onMessage)
-//  rtc_puppet.on('open',    onOpen)
-//  rtc_puppet.on('close',   truncateChannels)
+    var datum = JSON.parse(chunk)
+    var msg   = datum.data
 
+    // ... check if channel is there... just trying to understand....
+    try {
+        if (typeof datum.channel != "undefined") {
+            console.log('... channel exists... opening...')
+            onOpen(datum, conn)
+        }
+    } catch (e) { console.log(' channel UNDEF') }
+
+    try {
+        if (msg.whoisonline) {
+            console.log('who who, who are you?')
+            onMessage(msg, conn)
+            return
+        }
+    } catch (e) { }
+
+    try {
+        if (msg.open) {
+            console.log('open da door!')
+            onOpen(msg, conn)
+            return
+        }
+    } catch (e) { }
+
+    try {
+        if (msg.clear) {
+            console.log('clearing channel')
+            CHANNELS = {}
+            return
+        }
+    } catch (e) { }
+
+    sendMessage(chunk, conn)
+
+}
 
 function onRequest(socket) {
     console.log('[r] new request...')
@@ -3227,9 +3225,6 @@ function truncateChannels(websocket) {
 
 
 
-
-
-
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
     var size = 0, key;
@@ -3238,8 +3233,6 @@ Object.size = function(obj) {
     }
     return size;
 }
-
-
 
 
 //

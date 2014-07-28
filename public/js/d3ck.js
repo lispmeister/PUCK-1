@@ -1006,11 +1006,6 @@ function socket_looping() {
             local_socket.onopen = function() {
                 console.log('[*] socksjs open... sez a me... clearing the retry d3cks')
                 clearInterval(connectRetry)
-
-                // fire up the rtc magic
-//              do_that_rtc_thang()
-                // start_rtc()
-
             }
      
             // hoop, skip, jump
@@ -1124,46 +1119,6 @@ function socket_looping() {
 rtc_peer       = {}
 local_connect  = false
 remote_connect = false
-
-function __getUserMedia(callback) {
-
-    var hints = {
-        audio: true,
-        video:{
-            optional: [],
-            mandatory: {
-                minWidth: 1280,
-                minHeight: 720,
-                maxWidth: 1920,
-                maxHeight: 1080,
-                minAspectRatio: 1.77
-                // minWidth: 640,
-                // minHeight: 380,
-                // maxWidth: 1024,
-                // maxHeight: 1024,
-                // minAspectRatio: 1.77
-            }
-        }
-    }
-
-    navigator.getUserMedia(hints,function(stream) {
-
-        var video      = document.createElement('video')
-        video.src      = URL.createObjectURL(stream);
-        video.controls = true
-        video.muted    = true
-
-        peer.onStreamAdded({
-            mediaElement: video,
-            userid: 'self',
-            stream: stream
-        })
-
-        callback(stream)
-
-    })
-
-}
 
 //
 // print out an indented list from an object
@@ -1314,4 +1269,265 @@ function detect_webRTC(element) {
     });
 
 }
+
+
+//
+// function almost all from https://github.com/muaz-khan/WebRTC-Experiment/blob/master/Conversation.js/demos/all-in-one.html, plus some errors introduced by me
+//
+
+//
+// fire up the rtc magic
+//
+function set_up_RTC() {
+
+    var user = new User({
+        status: 'online',
+        username: my_d3ck.owner.name,
+        email: my_d3ck.owner.email
+    });
+    
+    // user.username = my_d3ck.owner.name
+    user.username = currentUserUUID
+
+    document.querySelector('#start-signaler').onclick = function() {
+        this.disabled = true;
+        user.emit('signaler', 'start');
+    };
+
+    user.on('signaler-connected', function() {
+        document.querySelector('#rtc_call').disabled = false;
+        document.querySelector('#start-signaler').disabled = true;
+        $('#start-signaler').toggleClass("hidden")
+    });
+    
+    user.on('friend-request', function(request) {
+        return request.accept();
+        
+        if(window.confirm('Do you want to accept friend-request made by ' + request.sender + '?')) {
+            request.accept();
+        }
+        else {
+            request.reject();
+        }
+    });
+            
+    user.on('request-status', function(request) {
+        return;
+        if(request.status == 'accepted') {
+            alert(request.sender + ' accepted your request.');
+        }
+        if(request.status == 'rejected') {
+            alert(request.sender + ' rejected your request.');
+        }
+    });
+
+    document.querySelector('#rtc_call').onclick = function () {
+
+        console.log('clickity click!')
+
+        var targetuser = document.querySelector('#target-username').value;
+        
+        document.querySelector('#target-username').disabled = true;
+        document.querySelector('#rtc_call').disabled = true;
+
+        console.log('... open conv... with ' + targetuser)
+
+        user.openconversationwith(targetuser);
+    }
+    
+    user.on('conversation-opened', function (conversation) {
+        document.querySelector('#target-username').disabled = false;
+        document.querySelector('#rtc_call').disabled = false;
+        document.querySelector('#target-username').value = '';
+        
+        document.querySelector('#enable-microphone').disabled = false;
+        document.querySelector('#enable-camera').disabled = false;
+        document.querySelector('#chat-message').disabled = false;
+        document.querySelector('input[type=file]').disabled = false;
+
+        $('#chat-message-div').toggleClass("hidden")
+        $('#file-div').toggleClass("hidden")
+        $('#control-div').toggleClass("hidden")
+        
+        appendmessage('System Message', 'conversation has been started between you and ' + conversation.target.username);
+
+        conversation.on('message', function (event) {
+            appendmessage(event.userid, event.data);
+        });
+        
+        // if someone enabled microphone or camera or screen
+        conversation.on('media-enabled', function (media) {
+            // media.type == 'audio' || 'video' || 'screen'
+            // media.hasmicrophone == true || null
+            // media.hascamera == true || null
+            // media.hasscreen == true || null
+            // media.sender == 'string'
+            // media.staticdata == custom object
+            
+            var mediatype = '';
+            if(media.hasmicrophone) {
+                mediatype = 'only microphone';
+            }
+            
+            if(media.hascamera) {
+                mediatype = 'microphone and camera';
+            }
+            
+            if(media.hasscreen) {
+                mediatype = 'only screen';
+            }
+            
+            var join = prompt(media.sender + ' enabled ' + mediatype + '. You can preview it by typing "preview" or join with microphone by typing "joinwithmicrophone" and join with camera by typing "joinwithcamera" or join with screen by typing "joinwithscreen".', 'preview');
+            
+            if(join == 'preview') {
+                media.emit('join-with', 'nothing');
+            }
+            
+            if(join == 'joinwithmicrophone') {
+                media.emit('join-with', 'microphone');
+            }
+            
+            if(join == 'joinwithcamera') {
+                media.emit('join-with', 'camera');
+            }
+            
+            if(join == 'joinwithscreen') {
+                media.emit('join-with', 'screen');
+            }
+        });
+        
+        conversation.on('add-file', function(file) {
+            file.download();
+        });
+        
+        conversation.on('file-progress', function(progress) {
+            console.log('percentage %', progress.percentage);
+            // progress.file.name
+            // progress.sender
+        });
+        
+        conversation.on('file-downloaded', function(file) {
+            // file.sender
+            file.savetodisk();
+        });
+        
+        conversation.on('file-sent', function(file) {
+            // file.sender
+            console.log(file.name, 'sent.');
+        });
+        
+        conversation.on('file-cancelled', function(file) {
+            // file.sender
+            console.log(file.name, 'cancelled.');
+        });
+    });
+    
+    document.querySelector('#chat-message').onkeyup = function (event) {
+        if (event.keyCode != 13 || !this.value || !this.value.length) return;
+        
+        user.peers.emit('message', this.value);
+        
+        appendmessage(user.username, this.value);
+        this.value = '';
+    };
+    
+    document.querySelector('#enable-microphone').onclick = function() {
+        user.peers.emit('enable', 'microphone');
+        this.disabled = true;
+    };
+        
+    document.querySelector('#enable-camera').onclick = function() {
+        user.peers.emit('enable', 'camera');
+        this.disabled = true;
+    };
+    
+    var ol = document.querySelector('ol');
+    function appendmessage(sender, message) {
+        ol.innerHTML += '<li>' + sender + ':- ' + message + '</li>';
+    }
+    
+    document.querySelector('input[type=file]').onchange = function() {
+        user.peers.emit('add-file', this.files);
+    };
+
+}
+
+
+// to try and ensure browser trusts rtc port as well as web port
+
+//
+// so it seems as though browsers need to talk to a port before
+// they trust it, even if from the same server; to combat this
+// I'll try to see if I get anything from the server on that
+// port, and if not pop up a window on that port
+//
+//
+//
+
+function rtc_haxx0r_trick() {
+
+    console.log('trying to pop up a window, rtc haxx0r style')
+
+    // might want to use the signaling server location for now, 'cuz
+    // it might point to new server... may have to fuxx0r with that
+    // as well... testing, testin....
+    // SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
+    // SIGNALING_SERVER.substring(3)  -> rips off wss
+
+    var messi_url          = 'https://' + window.location.hostname + ':8081/popup.html'
+    var messi_url_fallback = '/popup_fallback.html'  // no cors detected
+
+    var request = createCORSRequest( "get", messi_url)
+
+    var final_url = messi_url
+
+    // firefox... you seem to suck... and lie... and suck some more....
+    if (!request || navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        console.log('falling back... and its not even spring...')
+
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) console.log('sure, sure, you say you support it... but I dont trust you...')
+
+        // when it shows up do something about it; give them a pointer to the alternate URL
+        console.log('... waiting to switch urls on em... ')
+
+        $('body').on('update', '#d3ck_hackasaurus', function() {
+            console.log('a new kid in town, eh? Let me help you out')
+            this.attr("href", messi_url)
+        })
+
+        final_url = messi_url_fallback
+
+    }
+
+
+    // $.get(cors_url, function( data ) {
+    //     alert( 'Successful cross-domain AJAX, baby' );
+    //     $('#d3ck_cors').append(data)
+    // });
+
+    Messi.load(final_url, {modal: true, width: 500, buttons: [{id: 0, label: 'close', val: 'X'}]})
+
+
+}
+
+// from http://jquery-howto.blogspot.com/2013/09/jquery-cross-domain-ajax-request.html
+
+function createCORSRequest(method, url){
+
+    var xhr = new XMLHttpRequest();
+    if ("withCredentials" in xhr){
+        console.log('yez, time to pop open a cors and relax')
+        xhr.open(method, url, true);
+    } else if (typeof XDomainRequest != "undefined"){ // if IE use XDR
+        console.log('ummm... ok... xdr, anyone?')
+        xhr = new XDomainRequest();
+        xhr.open(method, url);
+    } else {
+        console.log('alas, poor server, I never knew her')
+        xhr = null;
+    }
+    return xhr;
+
+}
+
 
