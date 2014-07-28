@@ -6,6 +6,7 @@
 var Tail       = require('./tail').Tail,
     async      = require('async'),
     bcrypt     = require('bcrypt'),
+    compress   = require('compression'),
     cors       = require('cors'),
     crypto     = require('crypto'),
     express    = require('express'),
@@ -2796,7 +2797,8 @@ server.use(response());
 server.use(express.limit('1gb'))
 
 // server.use(express.logger());
-server.use(express.compress());
+server.use(compress());
+
 server.use(express.methodOverride());
 
 server.use(express.json());
