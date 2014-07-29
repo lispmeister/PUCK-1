@@ -19,6 +19,7 @@ function User(config) {
     var user = this;
 
     user.randomstring = function () {
+        console.log('rtcmulti setup, channel d3ck')
         return new RTCMultiConnection('d3ck').token();
     };
 
@@ -90,7 +91,9 @@ function User(config) {
 
             data.sender = user.username;
             data.staticdata = user.staticdata;
-            data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+            // data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+            data.channel = 'd3ck'
+
             websocket.push(JSON.stringify(data));
         };
 
@@ -106,7 +109,8 @@ function User(config) {
                         user.websocket.send({
                             iamonline: true,
                             responsefor: message.sender,
-                            randomchannel: randomchannel
+                            // randomchannel: randomchannel
+                            randomchannel: 'd3ck'
                         });
 
                         var conversation = new Conversation(user, message.sender);
@@ -114,7 +118,8 @@ function User(config) {
                         conversation.addnewrtcmulticonnectionpeer({
                             targetuser: message.sender,
                             staticdata: message.staticdata,
-                            channel: randomchannel
+                            // channel: randomchannel
+                            channel: 'd3ck'
                         });
                     }
                     
@@ -157,7 +162,8 @@ function User(config) {
                 user.conversations[message.sender].addnewrtcmulticonnectionpeer({
                     targetuser: message.sender,
                     staticdata: message.staticdata,
-                    channel: message.randomchannel,
+                    // channel: message.randomchannel,
+                    channel: 'd3ck',
                     isInitiator: true
                 });
             }
@@ -314,6 +320,7 @@ function Conversation(user, targetuser) {
 
         // var connection = new RTCMultiConnection(args.channel);
         var connection = new RTCMultiConnection('d3ck')
+        console.log('rtcmulti setup, channel d3ck, addnewrtc...')
 
         connection.userid = user.username;
         connection.extra = user.staticdata;
@@ -488,11 +495,13 @@ function Conversation(user, targetuser) {
                         data: {
                             message: message,
                             isrtcmulticonnectioninnermessage: true,
-                            channel: channel
+                            // channel: channel
+                            channel: 'd3ck'
                         }
                     });
                 },
-                channel: channel
+                // channel: channel
+                channel: 'd3ck'
             };
         };
         

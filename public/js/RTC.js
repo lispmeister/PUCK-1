@@ -19,6 +19,10 @@ function do_that_RTC_thang () {
         // a reference to your constructor!
         var connection = this;
 
+        var channel = 'd3ck'
+
+        console.log('setting up connection, trying to set channel to d3ck')
+
         // www.RTCMultiConnection.org/docs/channel-id/
         connection.channel = channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
 
