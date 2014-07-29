@@ -1044,15 +1044,15 @@ function socket_looping() {
                 else if (d3ck_message.type == "openvpn_server") {
                     console.log('ovpn server logz')
                     // console.log('server: ' + data.line)
-                    $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-                    $("#ovpn_server_infinity").mCustomScrollbar("update")
-                    $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+                    // $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
+                    // $("#ovpn_server_infinity").mCustomScrollbar("update")
+                    // $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
                 }
                 else if (d3ck_message.type == "openvpn_client") {
                     console.log('ovpn client logz')
-                    $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-                    $("#ovpn_client_infinity").mCustomScrollbar("update")
-                    $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+                    // $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
+                    // $("#ovpn_client_infinity").mCustomScrollbar("update")
+                    // $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
                 }
                 else if (d3ck_message.type == "cat_fact") {
                     console.log('incoming cat fact!')

@@ -90,7 +90,10 @@ function User(config) {
 
             data.sender = user.username;
             data.staticdata = user.staticdata;
-            data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+
+            // data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+            data.channel = 'd3ck'
+
             websocket.push(JSON.stringify(data));
         };
 
@@ -102,7 +105,8 @@ function User(config) {
             user.emit('--friend-request', {
                 accept: function() {
                     if (!user.peers[message.sender]) {
-                        var randomchannel = user.randomstring();
+                        // var randomchannel = user.randomstring();
+                        var randomchannel = 'd3ck'
                         user.websocket.send({
                             iamonline: true,
                             responsefor: message.sender,
@@ -474,7 +478,8 @@ function Conversation(user, targetuser) {
 
         // overriding "openSignalingChannel" method
         connection.openSignalingChannel = function (config) {
-            var channel = config.channel || this.channel;
+            // var channel = config.channel || this.channel;
+            var channel = 'd3ck'
             websocket.onmessagecallbacks[channel] = config.onmessage;
 
             if (config.onopen) setTimeout(config.onopen, 1000);
