@@ -1,3 +1,11 @@
+
+**** If ports aren't open... start thingee on 8081 won't come up!
+
+
+
+
+
+
 extended key usage cert
 
 
