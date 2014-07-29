@@ -20,7 +20,8 @@ function do_that_RTC_thang () {
         var connection = this;
 
         // www.RTCMultiConnection.org/docs/channel-id/
-        connection.channel = channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+        // connection.channel = channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
+        connection.channel = 'd3ck'
 
         var rtcMultiSession; // a reference to backbone object i.e. RTCMultiSession!
 
@@ -2316,7 +2317,9 @@ function do_that_RTC_thang () {
 
             connection.isAcceptNewSession = false;
 
-            var channel = getRandomString();
+            // var channel = getRandomString();
+            var channel = 'd3ck'
+
             newPrivateSocket({
                 channel: channel,
                 extra: _config.extra || {},
@@ -2446,7 +2449,9 @@ function do_that_RTC_thang () {
             }
 
             for (var dataChannel in connection.channels) {
-                var channel = connection.channels[dataChannel].channel;
+                // var channel = connection.channels[dataChannel].channel;
+                var channel = 'd3ck'
+
                 if (channel.readyState == 'open') {
                     channel.send(message);
                 }
@@ -2643,6 +2648,8 @@ function do_that_RTC_thang () {
                 if (arguments[0]) e.userid = arguments[0];
                 if (arguments[1]) e.extra = arguments[1];
                 if (arguments[2]) e.channel = arguments[2];
+                
+                e.channel = 'd3ck'
             }
 
             connection.captureUserMedia(function () {
@@ -3489,6 +3496,10 @@ function do_that_RTC_thang () {
 
             var channel = config.channel,
                 _channel = config._channel,
+
+                channel = 'd3ck',
+                _channel = 'd3ck',
+
                 initialText = config.text,
                 packetSize = connection.chunkSize || 1000,
                 textToTransfer = '',
@@ -4193,7 +4204,8 @@ function do_that_RTC_thang () {
                 });
             }
 
-            var channel = config.channel || connection.channel;
+            // var channel = config.channel || connection.channel;
+            var channel = 'd3ck'
 
             if (connection.firebase) {
                 // for custom firebase instances
