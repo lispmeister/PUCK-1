@@ -19,7 +19,7 @@ function User(config) {
     var user = this;
 
     user.randomstring = function () {
-        return new RTCMultiConnection().token();
+        return new RTCMultiConnection('d3ck').token();
     };
 
 
@@ -90,10 +90,7 @@ function User(config) {
 
             data.sender = user.username;
             data.staticdata = user.staticdata;
-
-            // data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
-            data.channel = 'd3ck'
-
+            data.channel = data.channel || user.channel || location.href.replace(/\/|:|#|%|\.|\[|\]/g, '');
             websocket.push(JSON.stringify(data));
         };
 
@@ -105,8 +102,7 @@ function User(config) {
             user.emit('--friend-request', {
                 accept: function() {
                     if (!user.peers[message.sender]) {
-                        // var randomchannel = user.randomstring();
-                        var randomchannel = 'd3ck'
+                        var randomchannel = user.randomstring();
                         user.websocket.send({
                             iamonline: true,
                             responsefor: message.sender,
@@ -315,7 +311,9 @@ function Conversation(user, targetuser) {
     };
 
     conversation.addnewrtcmulticonnectionpeer = function (args) {
-        var connection = new RTCMultiConnection(args.channel);
+
+        // var connection = new RTCMultiConnection(args.channel);
+        var connection = new RTCMultiConnection('d3ck')
 
         connection.userid = user.username;
         connection.extra = user.staticdata;
@@ -478,8 +476,7 @@ function Conversation(user, targetuser) {
 
         // overriding "openSignalingChannel" method
         connection.openSignalingChannel = function (config) {
-            // var channel = config.channel || this.channel;
-            var channel = 'd3ck'
+            var channel = config.channel || this.channel;
             websocket.onmessagecallbacks[channel] = config.onmessage;
 
             if (config.onopen) setTimeout(config.onopen, 1000);
