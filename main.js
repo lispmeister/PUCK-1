@@ -2525,7 +2525,7 @@ function quikStart(req, res, next) {
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
-    write_2_file(d3ck_secretz, secretz)
+    write_O2_file(d3ck_secretz, secretz)
 
     // no longer go here
     redirect_to_quickstart = false
