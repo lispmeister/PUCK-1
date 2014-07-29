@@ -631,7 +631,7 @@ function change_status() {
     cat_power(msg)
 
     // xxx - errs to user!
-    write2file(d3ck_status_file, d3ck_status)
+    write_O2_file(d3ck_status_file, d3ck_status)
 
     console.log('end status')
 
@@ -675,7 +675,7 @@ for (var dev in ifaces) {
 cat_fact_server = my_devs["tun0"]
 
 // write the IP addr to a file
-write2file(d3ck_remote_vpn, cat_fact_server)
+write_2_file(d3ck_remote_vpn, cat_fact_server)
 
 // console.log(my_ips)
 
@@ -689,7 +689,7 @@ function watch_logs(logfile, log_type) {
     // create if doesn't exist...?
     if (!fs.existsSync(logfile)) {
         console.log('creating ' + logfile)
-        write2file(logfile, "")
+        write_2_file(logfile, "")
     }
     else {
         console.log('watching ' + logfile)
@@ -862,7 +862,7 @@ function watch_logs(logfile, log_type) {
                 cat_fact_server = my_devs["tun0"]
 
                 // write the IP addr to a file
-                write2file(d3ck_remote_vpn, cat_fact_server)
+                write_2_file(d3ck_remote_vpn, cat_fact_server)
 
                 change_status() // make sure everyone hears the news
 
@@ -1013,7 +1013,7 @@ function pollStatus(file) {
     if (d3ck_status == {}) {
         if (!fs.existsSync(d3ck_status_file)) {
             console.log('creating ' + d3ck_status_file)
-            write2file(d3ck_status_file, d3ck_status)
+            write_O2_file(d3ck_status_file, d3ck_status)
         }
     }
     fs.readFile(d3ck_status_file, function (err, data) {
@@ -1154,11 +1154,11 @@ function create_d3ck_key_store(data) {
     })
 
     // xxx - errs to user!
-    write2file(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
-    write2file(d3ck_dir + '/d3ckroot.crt', ca)
-    write2file(d3ck_dir + '/d3ck.key',     key)
-    write2file(d3ck_dir + '/d3ck.crt',     cert)
-    write2file(d3ck_dir + '/ta.key',       tls)
+    write_2_file(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
+    write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
+    write_2_file(d3ck_dir + '/d3ck.key',     key)
+    write_2_file(d3ck_dir + '/d3ck.crt',     cert)
+    write_2_file(d3ck_dir + '/ta.key',       tls)
 
 }
 
@@ -1232,7 +1232,7 @@ function create_d3ck(req, res, next) {
 
     // TODO: Check if d3ck exists using EXISTS and fail if it does
 
-    console.log("key: " + d3ck.key);
+    // console.log("key: " + d3ck.key);
 
     // console.log("value: " + d3ck.value);
 
@@ -1285,7 +1285,7 @@ function create_d3ck_image(data) {
     var image = b64_decode(data.image_b64)
 
     console.log('trying to decode: ' + data.image)
-    console.log(data.image_b64)
+    // console.log(data.image_b64)
 
     if (image == "") {
         console.log("Couldn't decode " + data.image)
@@ -1310,14 +1310,14 @@ function create_d3ck_image(data) {
         msg = 'Invalid suffix (' + suffix + '), only accept: GIF, JPG, and PNG'
     }
 
-    d3ck_image      = '/img/' + data.D3CK_ID + suffix
+    d3ck_image      =               '/img/' + data.D3CK_ID + suffix
     full_d3ck_image = d3ck_public + '/img/' + data.D3CK_ID + suffix
 
     if (msg) {
         console.log('err in processing remote image: ' + msg)
     }
     else {
-        write2file(full_d3ck_image, image)
+        write_2_file(full_d3ck_image, image)
     }
 
 
@@ -1331,15 +1331,27 @@ function create_d3ck_image(data) {
 // to on other systems. At least... that's what seems to
 // be happening... so that's my story and I'm sticking to it!
 //
-function write2file(file, stringy) {
+// assumes data is an object
+function write_O2_file(file, obj) {
 
-    // object or no?
-
-    if (typeof stringy == 'object') {
-        stringy = JSON.stringify(stringy)
-    }
+    var stringy = JSON.stringify(obj)
 
     console.log('trying to write ' + stringy.length + ' bytes to ' + file)
+
+    try {
+        fs.writeFileSync(file, stringy)
+        console.log('...success...')
+    }
+    catch (e) {
+        console.log('err writing to ' + file + '...' + stringy)
+    }
+
+}
+
+// non-obj version
+function write_2_file(file, stringy) {
+
+    console.log('trying to write string ' + stringy.length + ' bytes to ' + file)
 
     try {
         fs.writeFileSync(file, stringy)
@@ -2513,7 +2525,7 @@ function quikStart(req, res, next) {
     console.log('SZ: ' + JSON.stringify(secretz))
     console.log(secretz.hash)
 
-    write2file(d3ck_secretz, secretz)
+    write_2_file(d3ck_secretz, secretz)
 
     // no longer go here
     redirect_to_quickstart = false
@@ -2641,9 +2653,9 @@ function formCreate(req, res, next) {
                         console.log(d3ck_public)
                         console.log(r_data)
 
-                        write2file(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
+                        write_2_file(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
 
-                        // write2file(d3ck_public + r_data.image + ".b64", r_data.image_b64)
+                        // write_2_file(d3ck_public + r_data.image + ".b64", r_data.image_b64)
 
                         console.log(bwana_d3ck)
                         console.log(typeof bwana_d3ck)
