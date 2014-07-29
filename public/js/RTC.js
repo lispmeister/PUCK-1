@@ -294,6 +294,7 @@ function do_that_RTC_thang () {
 
             // if custom video device is selected
             if (connection._mediaSources.video) {
+                console.log('custom video... mmm...')
                 constraints.video = {
                     optional: [{
                         sourceId: connection._mediaSources.video
@@ -303,6 +304,7 @@ function do_that_RTC_thang () {
 
             // for connection.session = {};
             if(!session.screen && !constraints.audio && !constraints.video) {
+                console.log('calling and falling back')
                 return callback();
             }
 
@@ -413,6 +415,8 @@ function do_that_RTC_thang () {
                 var _isFirstSession = isFirstSession;
 
                 _captureUserMedia(screen_constraints, constraints.audio || constraints.video ? function () {
+
+                    console.log('_capture... media _')
 
                     if (_isFirstSession) isFirstSession = true;
 
@@ -585,6 +589,8 @@ function do_that_RTC_thang () {
                             connection.onMediaError(mediaStreamError);
 
                             if (isChrome && (session.audio || session.video)) {
+                                console.log('want the car with the chromey wheels....')
+
                                 // todo: this snippet fails if user has two or more 
                                 // microphone/webcam attached.
                                 DetectRTC.load(function () {
@@ -699,6 +705,9 @@ function do_that_RTC_thang () {
 
         // www.RTCMultiConnection.org/docs/renegotiate/
         connection.renegotiate = function (stream, session) {
+
+            console.log('that last deal... forget it. I want more now.')
+
             rtcMultiSession.addStream({
                 renegotiate: session || {
                     oneway: true,
@@ -888,6 +897,9 @@ function do_that_RTC_thang () {
                 },
                 onmessage: onDataChannelMessage,
                 onaddstream: function (stream, session) {
+
+                    console.log('add a stream... a gulf stream....')
+
                     session = session || _config.renegotiate || connection.session;
 
                     // if it is Firefox; then return.
@@ -1722,6 +1734,9 @@ function do_that_RTC_thang () {
                 // remote video failed either out of ICE gathering process or ICE connectivity check-up
                 // or IceAgent was unable to locate valid candidates/ports.
                 if (response.failedToReceiveRemoteVideo) {
+
+                    console.log('failzor... no remote vid...')
+
                     log('Remote peer hasn\'t received stream: ' + response.streamid + '. Renegotiating...');
                     if (connection.peers[response.userid]) {
                         connection.peers[response.userid].renegotiate();
@@ -2513,6 +2528,7 @@ function do_that_RTC_thang () {
                     // if(isFirefox) peer.connection.removeStream(e.stream);
 
                     if (isChrome || (isFirefox && !peer.connection.getLocalStreams().length)) {
+                        console.log('... adding... peer connection...?')
                         peer.connection.addStream(e.stream);
                     }
                 }
@@ -2569,6 +2585,10 @@ function do_that_RTC_thang () {
 
             // check how participant is willing to join
             if (response.offers) {
+
+                console.log('ready and willing?')
+                console.log(response.offers.audio,response.offers.video)
+
                 if(response.offers.audio && response.offers.video) {
                     log('target user has both audio/video streams.');
                 }
@@ -3093,6 +3113,9 @@ function do_that_RTC_thang () {
     };
 
     function getUserMedia(options) {
+
+        console.log('\nMEDIA!!!\n')
+
         if (currentUserMediaRequest.mutex === true) {
             currentUserMediaRequest.queueRequests.push(options);
             return;
@@ -3755,6 +3778,10 @@ function do_that_RTC_thang () {
     var iceFrame, loadedIceFrame;
 
     function loadIceFrame(callback, skip) {
+
+        // no ice for now
+        return
+
         if (loadedIceFrame) return;
         if (!skip) return loadIceFrame(callback, true);
 
@@ -4394,7 +4421,8 @@ function do_that_RTC_thang () {
             username: 'webrtc'
         });
 
-        connection.iceServers = iceServers;
+        // connection.iceServers = iceServers;
+        connection.iceServers = [{}]
 
         // www.RTCMultiConnection.org/docs/preferSCTP/
         connection.preferSCTP = isFirefox || chromeVersion >= 32 ? true : false;
