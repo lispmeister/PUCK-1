@@ -1345,7 +1345,7 @@ function set_up_RTC() {
     var peer = new Peer(my_d3ck.D3CK_ID, { 
         iceServers: [{}],
         debug: 3, 
-        url: server
+        url: SIGNALING_SERVER
     })
 
 
