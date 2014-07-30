@@ -2974,6 +2974,11 @@ async.whilst(
         })
     )
 
+    // get peerjs peers
+    server.get('/p33rs', auth, function(req, res, next) {
+        console.log('returning peers...')
+        return res.json(all_p33rs);
+    })
 
     // Ping another
     server.get('/ping/:key', auth, echoStatus)
@@ -3010,6 +3015,7 @@ async.whilst(
             'PUT     /d3ck/:key',
             'GET     /d3ck/:key',
             'DELETE  /d3ck/:key',
+            'GET     /p33rs',
             'GET     /ping',
             'GET     /ping/:key',
             'GET     /server',
@@ -3078,153 +3084,43 @@ ios.on('connection', function (sock_puppet) {
 })
 
 
-//
-// web socket signal server
-//
-rtc_ios.on('connection', function (rtc_puppet) {
-    console.log('[+] new WSS connext from ' + rtc_puppet.remoteAddress)
 
-    rtc_puppet.on('data', function(chunk) {
-        make_it_dance(chunk, rtc_puppet);
-    });
+// peerjs
+
+var PeerServer = require('peer').PeerServer;
+
+var all_p33rs = [];
+
+
+var server = new PeerServer({
+  port: 9000,
+  ssl: {
+    key         : key,
+    certificate : cert
+  }
 });
 
-function make_it_dance(chunk, conn) {
-    console.log('another chunk in the wall... ' + chunk)
+console.log( 'Started PeerServer, port: 9000');
 
-    var datum = JSON.parse(chunk)
-    var msg   = datum.data
+server.on('uncaughtException', function(e) {
+  console.error('Error: ' + e);
+});
 
-    // ... check if channel is there... just trying to understand....
-    try {
-        if (typeof datum.channel != "undefined") {
-            console.log('... channel exists... opening...')
-            onOpen(datum, conn)
-        }
-    } catch (e) { console.log(' channel UNDEF') }
+server.on('connection', function(id) { 
+    console.log('connex... adding: ' + console.log(id))
+    all_p33rs.push(id);
+})
 
-    try {
-        if (msg.whoisonline) {
-            console.log('who who, who are you?')
-            onMessage(msg, conn)
-            return
-        }
-    } catch (e) { }
+server.on('disconnect', function(id) { 
+    console.log('disconnect... removing: ' + console.log(id))
 
-    try {
-        if (msg.open) {
-            console.log('open da door!')
-            onOpen(msg, conn)
-            return
-        }
-    } catch (e) { }
+    var index = array.indexOf(id);
 
-    try {
-        if (msg.clear) {
-            console.log('clearing channel')
-            CHANNELS = {}
-            return
-        }
-    } catch (e) { }
-
-    sendMessage(chunk, conn)
-
-}
-
-function onRequest(socket) {
-    console.log('[r] new request...')
-
-    var origin = socket.origin + socket.resource;
-
-    var websocket = socket.accept(null, origin);
-
-    websocket.on('message', function(message) {
-        if (message.type === 'utf8') {
-            onMessage(JSON.parse(message.utf8Data), websocket);
-        }
-    });
-
-    websocket.on('close', function() {
-        truncateChannels(websocket);
-    });
-}
-
-function onMessage(message, websocket) {
-    console.log('[>] message...')
-    if (message.checkPresence)
-        checkPresence(message, websocket);
-    else if (message.open)
-        onOpen(message, websocket);
-    else
-        sendMessage(message, websocket);
-}
-
-function onOpen(message, websocket) {
-    console.log('[o] open...?')
-    console.log(message);
-
-    var channel = CHANNELS[message.channel];
-
-    if (channel)
-        CHANNELS[message.channel][channel.length] = websocket;
-    else
-        CHANNELS[message.channel] = [websocket];
-}
-
-function sendMessage(message, websocket) {
-    console.log('[<] send...')
-    console.log(message);
-
-    // message.data = JSON.stringify(message.data);
-
-    var channel = CHANNELS[message.channel];
-
-    if (!channel) {
-        // console.error('no such channel exists');
-        // return;
-        channel = 'd3ck'
+    if (index > -1) {
+        all_p33rs.splice(index, 1);
     }
+})
 
-    try {
-        websocket.write(JSON.stringify(message));
-    } catch(e) {
-        console.log("couldn't send....")
-    }
-
-}
-
-function checkPresence(message, websocket) {
-    console.log('[?] anyone out there...?')
-    console.log(message);
-
-    // websocket.sendUTF(JSON.stringify({
-    websocket.write(JSON.stringify({
-        isChannelPresent: !!CHANNELS[message.channel]
-    }));
-}
-
-function swapArray(arr) {
-    var swapped = [],
-        length = arr.length;
-    for (var i = 0; i < length; i++) {
-        if (arr[i])
-            swapped[swapped.length] = arr[i];
-    }
-    return swapped;
-}
-
-function truncateChannels(websocket) {
-    for (var channel in CHANNELS) {
-        var _channel = CHANNELS[channel];
-        for (var i = 0; i < _channel.length; i++) {
-            if (_channel[i] == websocket)
-                delete _channel[i];
-        }
-        CHANNELS[channel] = swapArray(_channel);
-        if (CHANNELS && CHANNELS[channel] && !CHANNELS[channel].length)
-            delete CHANNELS[channel];
-    }
-}
 
 
 

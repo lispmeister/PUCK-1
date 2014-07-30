@@ -702,7 +702,7 @@ function status_or_die() {
     // and hopefully won't fuck up anything you're doing
 
     if (d3ck_status.events.new_d3ck.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
-        var remote_ip   = d3ck_status.events.new_d3ck   // no longer valid with openvpn intercepting
+        var remote_ip   = d3ck_status.events.new_d3ck
         var remote_name = d3ck_status.events.new_d3ck_name
         console.log(remote_ip + ' added as friend')
 
@@ -1281,23 +1281,48 @@ function detect_webRTC(element) {
 //
 // fire up the rtc magic
 //
-function set_up_RTC() {
+function set_up_RTC(server) {
 
-    function psuedo_r_string() {
-        var val = (Math.random() * new Date().getTime()).toString(36).replace(/\./g, '')
-        console.log("U R: " + val)
-        return val
+    // can't do nothin' until get my p33rs
+    var jqXHR_list = $.ajax({
+        url: '/p33rs',          // ... must ask the right server...!
+        async:false,
+        dataType: 'json'
+    })
+
+    jqXHR_list.done(function (data, textStatus, jqXHR) {
+        console.log('\n\njxq p33r list wootz\n\n')
+        console.log(data)
+    })
+
+    return
+
+
+    var remote_d3ck = ""
+
+    if (d3ck_status.openvpn_server.vpn_status == "up") {
+        console.log("PEEEEER js: server up")
+        remote_d3ck = d3ck_status.openvpn_server.client_pid
+    }
+
+    else if (d3ck_status.openvpn_client.vpn_status == "up") {
+        console.log("PEEEEER js: client up")
+        remote_d3ck = d3ck_status.openvpn_client.server_pid
+    }
+    else {
+        alert('hmmm... are you connected...?')
+        return
     }
     
-    var peer = new Peer('zenfoolery', { 
+    var peer = new Peer(my_d3ck.D3CK_ID, { 
         iceServers: [{}],
         debug: 3, 
-        url: 'https://192.168.0.250:9000/' 
+        url: server
     })
-    
+
+
     // xxx - puckid, name, etc....
-    var conn = peer.connect('one')
-    
+    var conn = peer.connect(remote_d3ck)
 
     // Compatibility shim
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
@@ -1401,7 +1426,7 @@ function rtc_haxx0r_trick() {
     // SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
     // SIGNALING_SERVER.substring(3)  -> rips off wss
 
-    var messi_url          = 'https://' + window.location.hostname + ':8081/popup.html'
+    var messi_url          = 'https://' + window.location.hostname + ':9000/popup.html'
     var messi_url_fallback = '/popup_fallback.html'  // no cors detected
 
     var request = createCORSRequest( "get", messi_url)
