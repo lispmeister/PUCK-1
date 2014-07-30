@@ -2,7 +2,12 @@
 // after all is said and done... let the JS fur fly
 //
 
-SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
+// xxx - obv need to read this from conf, etc.
+D3CK_PORT        = 8080
+D3CK_SIG_PORT    = 8081
+
+
+SIGNALING_SERVER = 'wss://' + window.location.hostname + ':' + D3CK_SIG_PORT
 
 // poll until we get something, then stop polling
 var vault_poll     = 1000
@@ -306,8 +311,6 @@ $(document).ready(function () {
                         my_d3ck = d3ckinfo
                         print_d3ck(d3ckinfo.D3CK_ID, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
                         $('#title_name').append(d3ckinfo.owner.name)
-
-                        set_up_RTC() // fly free, web RTC!
                     }
                 })
             })

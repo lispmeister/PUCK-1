@@ -23,6 +23,7 @@ var incoming_ip = "?"
 var ring = ""
 
 var browser_ip = ""
+var remote_ip  = ""
 
 var poll = 500  // 2x a second
 var poll = 1000  // once a second
@@ -265,6 +266,8 @@ function state_vpn(state, browser_ip) {
     if (state == "incoming") {
         console.log('incoming call')
 
+        set_up_RTC() // fly free, web RTC!
+
         console.log(d3ck_status.browser_events[browser_ip].notify_ring)
 
         // is anything else going on?  If so, for now dont do anything
@@ -301,6 +304,9 @@ function state_vpn(state, browser_ip) {
     if (state == "outgoing") {
 
         console.log('outgoing call is up')
+
+        set_up_RTC() // fly free, web RTC!
+
 
         if (! d3ck_current.busy) {
             console.log('\t[+] fire up the outbound signs')
@@ -702,7 +708,7 @@ function status_or_die() {
     // and hopefully won't fuck up anything you're doing
 
     if (d3ck_status.events.new_d3ck.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
-        var remote_ip   = d3ck_status.events.new_d3ck
+        remote_ip   = d3ck_status.events.new_d3ck
         var remote_name = d3ck_status.events.new_d3ck_name
         console.log(remote_ip + ' added as friend')
 
@@ -1281,7 +1287,37 @@ function detect_webRTC(element) {
 //
 // fire up the rtc magic
 //
-function set_up_RTC(server) {
+function set_up_RTC() {
+
+    var remote_d3ck = ""        // pid of other d3ck
+    var p33r_url    = "/p33rs"  // url of server currently connected to - local or remote?
+
+    // someone connected to us
+    if (d3ck_status.openvpn_server.vpn_status == "up") {
+        console.log("PEEEEER js: server up")
+        remote_d3ck = d3ck_status.openvpn_server.client_pid
+    }
+
+    // we're connected to them
+    else if (d3ck_status.openvpn_client.vpn_status == "up") {
+        console.log("PEEEEER js: client up")
+        remote_d3ck = d3ck_status.openvpn_client.server_pid
+        //
+        // need to reset after hangup...!
+        // xxxxx!!!!
+        //
+        SIGNALING_SERVER = 'wss://' + remote_ip + ':' + D3CK_SIG_PORT
+        console.log('changing signaling server to: ' + SIGNALING_SERVER)
+        p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
+
+    }
+
+    // ... wtf, as they say...?
+    else {
+        alert('hmmm... are you connected...?')
+        return
+    }
+
 
     // can't do nothin' until get my p33rs
     var jqXHR_list = $.ajax({
@@ -1293,27 +1329,19 @@ function set_up_RTC(server) {
     jqXHR_list.done(function (data, textStatus, jqXHR) {
         console.log('\n\njxq p33r list wootz\n\n')
         console.log(data)
+
+        // should do some length checking as well
+        for (var i = 0; i < data.length; i++) {
+            var d = data[i]
+            console.log('d3ck: ' + d)
+            if (d != my_d3ck.D3CK_ID) {
+                console.log('!!!!')
+                console.log('someone new is here! ' + d)
+                remote_d3ck = d
+            }
+        }
     })
 
-    return
-
-
-    var remote_d3ck = ""
-
-    if (d3ck_status.openvpn_server.vpn_status == "up") {
-        console.log("PEEEEER js: server up")
-        remote_d3ck = d3ck_status.openvpn_server.client_pid
-    }
-
-    else if (d3ck_status.openvpn_client.vpn_status == "up") {
-        console.log("PEEEEER js: client up")
-        remote_d3ck = d3ck_status.openvpn_client.server_pid
-    }
-    else {
-        alert('hmmm... are you connected...?')
-        return
-    }
-    
     var peer = new Peer(my_d3ck.D3CK_ID, { 
         iceServers: [{}],
         debug: 3, 
@@ -1417,6 +1445,8 @@ function set_up_RTC(server) {
 //
 
 function rtc_haxx0r_trick() {
+    
+    return
 
     console.log('trying to pop up a window, rtc haxx0r style')
 
