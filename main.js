@@ -185,7 +185,7 @@ rclient.get(d3ck_id, function (err, reply) {
 
 // status and other bits
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
-    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, 
+    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_pid":"unknown"}, 
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
     d3ck_events     = {"new_d3ck":""},
     browser_magic   = {}

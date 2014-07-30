@@ -307,8 +307,7 @@ $(document).ready(function () {
                         print_d3ck(d3ckinfo.D3CK_ID, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
                         $('#title_name').append(d3ckinfo.owner.name)
 
-                        do_that_RTC_thang()     // load lib stuff
-                        set_up_RTC()            // actually start it
+                        set_up_RTC() // fly free, web RTC!
                     }
                 })
             })

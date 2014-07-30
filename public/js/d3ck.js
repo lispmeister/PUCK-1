@@ -1275,7 +1275,7 @@ function detect_webRTC(element) {
 
 
 //
-// function almost all from https://github.com/muaz-khan/WebRTC-Experiment/blob/master/Conversation.js/demos/all-in-one.html, plus some errors introduced by me
+// function almost all from http://peerjs.com/, plus some errors introduced by me
 //
 
 //
@@ -1283,178 +1283,102 @@ function detect_webRTC(element) {
 //
 function set_up_RTC() {
 
-    var user = new User({
-        status: 'online',
-        username: my_d3ck.owner.name,
-        email: my_d3ck.owner.email
-    });
-    
-    // user.username = my_d3ck.owner.name
-    user.username = currentUserUUID
-
-    document.querySelector('#start-signaler').onclick = function() {
-        this.disabled = true;
-        user.emit('signaler', 'start');
-    };
-
-    user.on('signaler-connected', function() {
-        document.querySelector('#rtc_call').disabled = false;
-        document.querySelector('#start-signaler').disabled = true;
-        $('#start-signaler').toggleClass("hidden")
-    });
-    
-    user.on('friend-request', function(request) {
-        return request.accept();
-        
-        if(window.confirm('Do you want to accept friend-request made by ' + request.sender + '?')) {
-            request.accept();
-        }
-        else {
-            request.reject();
-        }
-    });
-            
-    user.on('request-status', function(request) {
-        return;
-        if(request.status == 'accepted') {
-            alert(request.sender + ' accepted your request.');
-        }
-        if(request.status == 'rejected') {
-            alert(request.sender + ' rejected your request.');
-        }
-    });
-
-    document.querySelector('#rtc_call').onclick = function () {
-
-        console.log('clickity click!')
-
-        var targetuser = document.querySelector('#target-username').value;
-        
-        document.querySelector('#target-username').disabled = true;
-        document.querySelector('#rtc_call').disabled = true;
-
-        console.log('... open conv... with ' + targetuser)
-
-        user.openconversationwith(targetuser);
+    function psuedo_r_string() {
+        var val = (Math.random() * new Date().getTime()).toString(36).replace(/\./g, '')
+        console.log("U R: " + val)
+        return val
     }
     
-    user.on('conversation-opened', function (conversation) {
-        document.querySelector('#target-username').disabled = false;
-        document.querySelector('#rtc_call').disabled = false;
-        document.querySelector('#target-username').value = '';
-        
-        document.querySelector('#enable-microphone').disabled = false;
-        document.querySelector('#enable-camera').disabled = false;
-        document.querySelector('#chat-message').disabled = false;
-        document.querySelector('input[type=file]').disabled = false;
+    var peer = new Peer('zenfoolery', { 
+        iceServers: [{}],
+        debug: 3, 
+        url: 'https://192.168.0.250:9000/' 
+    })
+    
+    // xxx - puckid, name, etc....
+    var conn = peer.connect('one')
+    
 
-        $('#chat-message-div').toggleClass("hidden")
-        $('#file-div').toggleClass("hidden")
-        $('#control-div').toggleClass("hidden")
-        
-        appendmessage('System Message', 'conversation has been started between you and ' + conversation.target.username);
-
-        conversation.on('message', function (event) {
-            appendmessage(event.userid, event.data);
-        });
-        
-        // if someone enabled microphone or camera or screen
-        conversation.on('media-enabled', function (media) {
-            // media.type == 'audio' || 'video' || 'screen'
-            // media.hasmicrophone == true || null
-            // media.hascamera == true || null
-            // media.hasscreen == true || null
-            // media.sender == 'string'
-            // media.staticdata == custom object
-            
-            var mediatype = '';
-            if(media.hasmicrophone) {
-                mediatype = 'only microphone';
-            }
-            
-            if(media.hascamera) {
-                mediatype = 'microphone and camera';
-            }
-            
-            if(media.hasscreen) {
-                mediatype = 'only screen';
-            }
-            
-            var join = prompt(media.sender + ' enabled ' + mediatype + '. You can preview it by typing "preview" or join with microphone by typing "joinwithmicrophone" and join with camera by typing "joinwithcamera" or join with screen by typing "joinwithscreen".', 'preview');
-            
-            if(join == 'preview') {
-                media.emit('join-with', 'nothing');
-            }
-            
-            if(join == 'joinwithmicrophone') {
-                media.emit('join-with', 'microphone');
-            }
-            
-            if(join == 'joinwithcamera') {
-                media.emit('join-with', 'camera');
-            }
-            
-            if(join == 'joinwithscreen') {
-                media.emit('join-with', 'screen');
-            }
-        });
-        
-        conversation.on('add-file', function(file) {
-            file.download();
-        });
-        
-        conversation.on('file-progress', function(progress) {
-            console.log('percentage %', progress.percentage);
-            // progress.file.name
-            // progress.sender
-        });
-        
-        conversation.on('file-downloaded', function(file) {
-            // file.sender
-            file.savetodisk();
-        });
-        
-        conversation.on('file-sent', function(file) {
-            // file.sender
-            console.log(file.name, 'sent.');
-        });
-        
-        conversation.on('file-cancelled', function(file) {
-            // file.sender
-            console.log(file.name, 'cancelled.');
-        });
+    // Compatibility shim
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    
+    peer.on('open', function(){
+        $('#my-id').text(peer.id);
     });
     
-    document.querySelector('#chat-message').onkeyup = function (event) {
-        if (event.keyCode != 13 || !this.value || !this.value.length) return;
-        
-        user.peers.emit('message', this.value);
-        
-        appendmessage(user.username, this.value);
-        this.value = '';
-    };
+    // Receiving a call
+    peer.on('call', function(call){
+      // Answer the call automatically (instead of prompting user) for demo purposes
+      call.answer(window.localStream);
+      step3(call);
+    });
+    peer.on('error', function(err){
+       console.log(err.message);
+      // Return to step 2 if error occurs
+      step2();
+    });
     
-    document.querySelector('#enable-microphone').onclick = function() {
-        user.peers.emit('enable', 'microphone');
-        this.disabled = true;
-    };
-        
-    document.querySelector('#enable-camera').onclick = function() {
-        user.peers.emit('enable', 'camera');
-        this.disabled = true;
-    };
+    // Click handlers setup
+    $(function(){
+      $('#make-call').click(function(){
+        // Initiate a call!
+        var call = peer.call($('#callto-id').val(), window.localStream);
     
-    var ol = document.querySelector('ol');
-    function appendmessage(sender, message) {
-        ol.innerHTML += '<li>' + sender + ':- ' + message + '</li>';
+        step3(call);
+      });
+    
+      $('#end-call').click(function(){
+        window.existingCall.close();
+        step2();
+      });
+    
+      // Retry if getUserMedia fails
+      $('#step1-retry').click(function(){
+        $('#step1-error').hide();
+        step1();
+      });
+    
+      // Get things started
+      step1();
+    });
+    
+    function step1 () {
+      // Get audio/video stream
+      navigator.getUserMedia({audio: true, video: true}, function(stream){
+        // Set your video displays
+        $('#my-video').prop('src', URL.createObjectURL(stream));
+    
+        window.localStream = stream;
+        step2();
+      }, function(){ $('#step1-error').show(); });
     }
     
-    document.querySelector('input[type=file]').onchange = function() {
-        user.peers.emit('add-file', this.files);
-    };
+    function step2 () {
+      $('#step1, #step3').hide();
+      $('#step2').show();
+    }
+    
+    function step3 (call) {
+      // Hang up on an existing call if present
+      if (window.existingCall) {
+        window.existingCall.close();
+      }
+    
+      // Wait for stream on the call, then set peer video display
+      call.on('stream', function(stream){
+        $('#their-video').prop('src', URL.createObjectURL(stream));
+      });
+    
+      // UI stuff
+      window.existingCall = call;
+      $('#their-id').text(call.peer);
+      call.on('close', step2);
+      $('#step1, #step2').hide();
+      $('#step3').show();
+    }
+
 
 }
-
 
 // to try and ensure browser trusts rtc port as well as web port
 
