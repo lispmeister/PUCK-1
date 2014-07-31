@@ -963,6 +963,8 @@ function getIP(req, res, next) {
 //
 haxx0r_srvr = {}
 
+haxx0r_up = false
+
 function haxx0r(req, res, next) {
 
     console.log('server up, server down')
@@ -973,6 +975,13 @@ function haxx0r(req, res, next) {
 
         console.log('up up and away')
 
+        if (haxx0r_up) {
+            console.log('.. hmm... server already running... chickening out...')
+            res.send(200, { "odd dog": "haxx0r server already up" })
+            return
+        }
+
+
         haxx0r_srvr = https.createServer(server_options, server)
 
         haxx0r_srvr.listen(d3ck_port_haxx0r, function() {
@@ -980,19 +989,30 @@ function haxx0r(req, res, next) {
             console.log('[+] server listening at %s', d3ck_port_haxx0r)
         })
 
+        haxx0r_up = true
+
         res.send(200, { "good dog": "haxx0r server up" })
 
     }
     else if (request == "down") {
         console.log('the bigger they come...')
 
+        if (!haxx0r_up) {
+            console.log('.. hmm... server isnt running... chickening out...')
+            res.send(200, { "odd dog": "haxx0r server already down" })
+            return
+        }
+
         haxx0r_srvr.close(function() {
             console.log('...the harder they fall')
+
+            haxx0r_up = false
 
             // once this is down, start up the peerjs stuff
             fire_up_peerjs()
 
         })
+
 
         res.send(200, { "good dog": "haxx0r server down" })
 
