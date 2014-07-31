@@ -981,7 +981,6 @@ function haxx0r(req, res, next) {
             return
         }
 
-
         haxx0r_srvr = https.createServer(server_options, server)
 
         haxx0r_srvr.listen(d3ck_port_haxx0r, function() {
@@ -1010,9 +1009,7 @@ function haxx0r(req, res, next) {
 
             // once this is down, start up the peerjs stuff
             fire_up_peerjs()
-
         })
-
 
         res.send(200, { "good dog": "haxx0r server down" })
 
@@ -2927,11 +2924,6 @@ server.use(express.multipart());
 server.use(express.methodOverride());
 
 server.use(cors());
-
-var cors_opts = { origin:"https://192.168.0.250:8081", credentials:true }
-
-// server.options(cors_opts, cors())
-
 
 // passport/auth stuff
 server.use(express.cookieParser());

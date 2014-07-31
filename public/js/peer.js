@@ -1416,7 +1416,6 @@ console.log('stock options...')
 console.log(options)
 
 
-
   // Set a custom log function if present
   if (options.logFunction) {
     util.setLogFunction(options.logFunction);
