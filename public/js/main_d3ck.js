@@ -6,7 +6,6 @@
 D3CK_PORT        = 8080
 D3CK_SIG_PORT    = 8081
 
-
 SIGNALING_SERVER = 'wss://' + window.location.hostname + ':' + D3CK_SIG_PORT
 
 // poll until we get something, then stop polling
@@ -33,6 +32,8 @@ var all_d3ck_ids = {}
 ring = new Audio("media/ringring.mp3") // load it up
 
 $(document).ready(function () {
+
+    haxx0r_server('up')
 
     // using this to ensure browser trusts rtc port as well as web port
     rtc_haxx0r_trick()

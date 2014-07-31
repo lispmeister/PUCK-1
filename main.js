@@ -70,6 +70,7 @@ var d3ck_port_int     = config.D3CK.d3ck_port_int
 var d3ck_port_ext     = config.D3CK.d3ck_port_ext
 var d3ck_port_forward = config.D3CK.d3ck_port_forward
 var d3ck_port_signal  = config.D3CK.d3ck_port_signal
+var d3ck_port_haxx0r  = config.D3CK.d3ck_port_haxx0r
 var d3ck_proto_signal = config.D3CK.d3ck_proto_signal
 
 // capabilities...
@@ -954,6 +955,103 @@ function getIP(req, res, next) {
 
     res.send(200, '{"ip" : "' + ip + '"}');
 }
+
+
+//
+// ... well... bring up or bring down temp https server
+// on an alternate port....
+//
+haxx0r_srvr = {}
+
+function haxx0r(req, res, next) {
+
+    console.log('server up, server down')
+
+    var request     = req.params.key
+
+    if (request == "up") {
+
+        console.log('up up and away')
+
+        haxx0r_srvr = https.createServer(server_options, server)
+
+        haxx0r_srvr.listen(d3ck_port_haxx0r, function() {
+            console.log('... in my beaoootiful baloonz')
+            console.log('[+] server listening at %s', d3ck_port_haxx0r)
+        })
+
+        res.send(200, { "good dog": "haxx0r server up" })
+
+    }
+    else if (request == "down") {
+        console.log('the bigger they come...')
+
+        haxx0r_srvr.close(function() {
+            console.log('...the harder they fall')
+
+            // once this is down, start up the peerjs stuff
+            fire_up_peerjs()
+
+        })
+
+        res.send(200, { "good dog": "haxx0r server down" })
+
+    }
+
+    else {
+        console.log('dont understand that option....' + request)
+        res.send(400, { "bad dog": "no bone" })
+    }
+
+
+}
+
+
+function fire_up_peerjs() {
+
+    console.log('starting up peerjs')
+
+    var PeerServer = require('peer').PeerServer;
+    
+    var all_p33rs = [];
+    
+    var p33r_server = new PeerServer({
+      port: d3ck_port_haxx0r,
+      ssl: {
+        key         : key,
+        certificate : cert
+      }
+    });
+    
+    console.log( 'Started PeerServer, port: ' + d3ck_port_haxx0r);
+    
+    p33r_server.on('uncaughtException', function(e) {
+      console.error('Error: ' + e);
+    });
+    
+    p33r_server.on('connection', function(id) { 
+        console.log('connex... adding: ' + id)
+        all_p33rs.push(id);
+    })
+    
+    p33r_server.on('disconnect', function(id) { 
+    
+        if (typeof id == "undefined") {
+            console.log('no one to disconnect... returning...')
+            return
+        }
+    
+        console.log('disconnect... removing: ' + id)
+    
+        var index = all_p33rs.indexOf(id);
+    
+        if (index > -1) {
+            all_p33rs.splice(index, 1);
+        }
+    })
+
+}
+
 
 //
 // send a note to a sockio channel ... channel broadcast == broadcast
@@ -2790,7 +2888,7 @@ var server_options = {
     strictSSL           : false
 }
 
-var server = express()
+server = express()
 
 // various helpers
 server.use(response());
@@ -2925,6 +3023,13 @@ async.whilst(
     // get your ip addr(s)
     server.get('/getip', auth, getIP);
 
+
+    // to talk to another port... long story
+    server.get('/haxx0r/:key', auth, haxx0r)
+
+    // Ping another
+    server.get('/ping/:key', auth, echoStatus)
+
     // knock knock proto to request access to a system that doesn't trust you
     server.post('/knock', auth, knockKnock);
 
@@ -3015,6 +3120,7 @@ async.whilst(
             'PUT     /d3ck/:key',
             'GET     /d3ck/:key',
             'DELETE  /d3ck/:key',
+            'GET     /haxx0r/:key',
             'GET     /p33rs',
             'GET     /ping',
             'GET     /ping/:key',
@@ -3051,7 +3157,6 @@ var d3cky = https.createServer(server_options, server)
 
 
 
-
 //
 // fire up web sockets
 //
@@ -3081,44 +3186,6 @@ ios.on('connection', function (sock_puppet) {
     var cool_cat_fact = random_cat_fact(cat_facts)
     var msg = {type: "cat_fact", fact: cool_cat_fact}
     cat_power(msg)
-})
-
-
-
-// peerjs
-
-var PeerServer = require('peer').PeerServer;
-
-var all_p33rs = [];
-
-
-var server = new PeerServer({
-  port: 9000,
-  ssl: {
-    key         : key,
-    certificate : cert
-  }
-});
-
-console.log( 'Started PeerServer, port: 9000');
-
-server.on('uncaughtException', function(e) {
-  console.error('Error: ' + e);
-});
-
-server.on('connection', function(id) { 
-    console.log('connex... adding: ' + console.log(id))
-    all_p33rs.push(id);
-})
-
-server.on('disconnect', function(id) { 
-    console.log('disconnect... removing: ' + console.log(id))
-
-    var index = array.indexOf(id);
-
-    if (index > -1) {
-        all_p33rs.splice(index, 1);
-    }
 })
 
 

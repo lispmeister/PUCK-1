@@ -257,7 +257,12 @@ jQuery.extend(Messi, {
 
     console.log('.... trying... cors or cors lite.... ' + url)
     options = jQuery.extend(options || {}, {show: true, unload: true, params: {}});
+
+    var count = 0
+    var n_times = 10
     
+    function load_Massi() {
+
     var request = {
       url: url,
 
@@ -269,16 +274,29 @@ jQuery.extend(Messi, {
       dataType: 'html',
       cache: false,
       error: function (request, status, error) {
-        console.log(request.responseText);
+        console.log('messi died...')
+
+        count = count + 1
+
+        if (count < n_times) {
+            setTimeout(load_Massi, 1000);
+        }
+
       },
+
       success: function(html) {
-        //html = jQuery(html);
+        console.log('massi url grab worked!')
         new Messi(html, options);
       }
     };
     
     jQuery.ajax(request);
       
-  }
+    }
+
+    load_Massi()
+
+
+    }
   
 });

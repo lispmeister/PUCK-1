@@ -29,6 +29,9 @@ var poll = 500  // 2x a second
 var poll = 1000  // once a second
 var poll = 5000  // every 5 secs
 
+var SHORT_WAIT = 1000  // 1 sec
+
+
 var D3CK_SOCK_RETRY   = 3000
 var LOCAL_VIDEO_WIDTH = 480
 
@@ -1318,6 +1321,16 @@ function set_up_RTC() {
         return
     }
 
+    console.log('setting up signaling server: ' + SIGNALING_SERVER)
+
+    var peer = new Peer(my_d3ck.D3CK_ID, { 
+        iceServers: [{}],
+        debug: 4, 
+        url: SIGNALING_SERVER
+    })
+
+
+// until .... do:
 
     // can't do nothin' until get my p33rs
     var jqXHR_list = $.ajax({
@@ -1342,13 +1355,7 @@ function set_up_RTC() {
         }
     })
 
-    var peer = new Peer(my_d3ck.D3CK_ID, { 
-        iceServers: [{}],
-        debug: 3, 
-        url: SIGNALING_SERVER
-    })
-
-
+    console.log('actually trying to connect to ' + remote_d3ck)
     // xxx - puckid, name, etc....
     var conn = peer.connect(remote_d3ck)
 
@@ -1441,14 +1448,50 @@ function set_up_RTC() {
 // I'll try to see if I get anything from the server on that
 // port, and if not pop up a window on that port
 //
+
+
 //
+// since peerjs doesn't seem to want to speak https, bring up
+// and down a https server on the same port to convince the
+// browser I'm really an ok guy
 //
+function haxx0r_server(direction) {
+
+    console.log('togging haxx0r server')
+
+    var url = '/haxx0r/'
+
+    if (direction == "up") {
+        console.log('[+] turning on haxx0r server')
+    }
+    else if (direction == "down") {
+        console.log('[-] turning off haxx0r server')
+    }
+    else {
+        console.log("don't recognize that server command")
+        return
+    }
+
+    var jqXHR_haxx0r = $.ajax({
+        url: url + direction,
+        dataType: 'json'
+    })
+
+    jqXHR_haxx0r.done(function (data, textStatus, jqXHR) {
+        console.log('jxq haxx0r server w00tz')
+        console.log(data)
+    }).fail(function(err) {
+        console.log('events errz on hangup' + err)
+    })
+
+}
 
 function rtc_haxx0r_trick() {
     
-    return
-
     console.log('trying to pop up a window, rtc haxx0r style')
+
+    var n_times = 10;   // try this many times before bailing
+    var count   = 0;
 
     // might want to use the signaling server location for now, 'cuz
     // it might point to new server... may have to fuxx0r with that
@@ -1481,14 +1524,14 @@ function rtc_haxx0r_trick() {
 
     }
 
+    console.log('trying to get massi up and running....')
 
-    // $.get(cors_url, function( data ) {
-    //     alert( 'Successful cross-domain AJAX, baby' );
-    //     $('#d3ck_cors').append(data)
-    // });
+    Messi.load(final_url, {modal: true, width: 500, buttons: [{id: 0, label: 'close', val: 'X'}], callback: mess_done})
 
-    Messi.load(final_url, {modal: true, width: 500, buttons: [{id: 0, label: 'close', val: 'X'}]})
-
+    function mess_done() {
+        console.log('messi up, server down')
+        haxx0r_server('down')
+    }
 
 }
 
