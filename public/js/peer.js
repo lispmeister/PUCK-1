@@ -1,5 +1,9 @@
 /*! peerjs.js build:0.3.8, development. Copyright(c) 2013 Michelle Bu <michelle@michellebu.com> */
 (function(exports){
+
+D3CK_SIG_PORT = 8081
+
+
 var binaryFeatures = {};
 binaryFeatures.useBlobBuilder = (function(){
   try {
@@ -1063,7 +1067,7 @@ var util = {
 
   // CLOUD_HOST: '0.peerjs.com',
   CLOUD_HOST: '192.168.0.250',
-  CLOUD_PORT: 9000,
+  CLOUD_PORT: D3CK_SIG_PORT,
 
   // Browsers that need chunking:
   chunkedBrowsers: {'Chrome': 1},

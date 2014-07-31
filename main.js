@@ -969,6 +969,9 @@ function haxx0r(req, res, next) {
 
     console.log('server up, server down')
 
+    console.log('up? ' + haxx0r_up)
+
+
     var request     = req.params.key
 
     if (request == "up") {
@@ -1033,7 +1036,7 @@ function fire_up_peerjs() {
     var PeerServer = require('peer').PeerServer;
     
     var p33r_server = new PeerServer({
-      port: d3ck_port_haxx0r,
+      port: d3ck_port_forward,
       ssl: {
         key         : key,
         certificate : cert
@@ -3167,17 +3170,13 @@ async.whilst(
 //
 var d3cky = https.createServer(server_options, server)
 
-
-
 //
 // fire up web sockets
 //
 var sockjs  = require('sockjs')
 var ios     = sockjs.createServer()
-var rtc_ios = sockjs.createServer()
 
 ios.installHandlers(d3cky, {prefix: '/pux'})
-rtc_ios.installHandlers(d3cky, {prefix: '/rtc'})
 
 var d3ck_users  = {},
     cat_sock    = {},
@@ -3199,8 +3198,6 @@ ios.on('connection', function (sock_puppet) {
     var msg = {type: "cat_fact", fact: cool_cat_fact}
     cat_power(msg)
 })
-
-
 
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array

@@ -258,6 +258,7 @@ jQuery.extend(Messi, {
     console.log('.... trying... cors or cors lite.... ' + url)
     options = jQuery.extend(options || {}, {show: true, unload: true, params: {}});
 
+    // added loop - zen
     var count = 0
     var n_times = 10
     

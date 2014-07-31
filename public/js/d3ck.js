@@ -1295,6 +1295,8 @@ function set_up_RTC() {
     var remote_d3ck = ""        // pid of other d3ck
     var p33r_url    = "/p33rs"  // url of server currently connected to - local or remote?
 
+    var ip          = window.location.hostname
+
     // someone connected to us
     if (d3ck_status.openvpn_server.vpn_status == "up") {
         console.log("PEEEEER js: server up")
@@ -1313,6 +1315,8 @@ function set_up_RTC() {
         console.log('changing signaling server to: ' + SIGNALING_SERVER)
         p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
 
+        ip = remote_ip
+
     }
 
     // ... wtf, as they say...?
@@ -1325,8 +1329,10 @@ function set_up_RTC() {
 
     var peer = new Peer(my_d3ck.D3CK_ID, { 
         iceServers: [{}],
-        debug: 4, 
-        url: SIGNALING_SERVER
+        secure: true,
+        debug: 3, 
+        url: SIGNALING_SERVER,
+        host: ip
     })
 
 
@@ -1356,6 +1362,7 @@ function set_up_RTC() {
     })
 
     console.log('actually trying to connect to ' + remote_d3ck)
+
     // xxx - puckid, name, etc....
     var conn = peer.connect(remote_d3ck)
 
@@ -1499,7 +1506,7 @@ function rtc_haxx0r_trick() {
     // SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
     // SIGNALING_SERVER.substring(3)  -> rips off wss
 
-    var messi_url          = 'https://' + window.location.hostname + ':9000/popup.html'
+    var messi_url          = 'https://' + window.location.hostname + ':' + D3CK_SIG_PORT + '/popup.html'
     var messi_url_fallback = '/popup_fallback.html'  // no cors detected
 
     var request = createCORSRequest( "get", messi_url)
