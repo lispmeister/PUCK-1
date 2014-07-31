@@ -1027,13 +1027,13 @@ function haxx0r(req, res, next) {
 }
 
 
+all_p33rs = [];
+
 function fire_up_peerjs() {
 
     console.log('starting up peerjs')
 
     var PeerServer = require('peer').PeerServer;
-    
-    var all_p33rs = [];
     
     var p33r_server = new PeerServer({
       port: d3ck_port_haxx0r,
