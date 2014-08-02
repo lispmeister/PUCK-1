@@ -1,45 +1,16 @@
-#!/usr/bin/env node
-
-var port        = 8080,
-    fs          = require('fs'),
-    https       = require('https'),
-    static      = require('node-static'),
-    file        = new static.Server('.'),
-    home        = "/etc/d3ck/d3cks/D3CK",
-    key         = fs.readFileSync(home + "/d3ck.key"),
-    cert        = fs.readFileSync(home + "/d3ck.crt"),
-    ca          = fs.readFileSync(home + "/ca.crt"),
+/*global console*/
+var yetify = require('yetify'),
+    config = require('getconfig'),
     uuid = require('node-uuid'),
     crypto = require('crypto'),
-    credentials = {key: key, cert: cert, ca: ca};
+    // port = parseInt(process.env.PORT || config.server.port, 10),
+    port = 8081
+    io = require('socket.io').listen(port);
 
-// HTTPs server
-server = require('https').createServer({
-    key                 : key, 
-    cert                : cert, 
-    ca                  : ca,
-    ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
-    secureOptions       : require('constants').SSL_OP_CIPHER_SERVER_PREFERENCE,
-    honorCipherOrder    : true,
-    requestCert         : true,
-    rejectUnauthorized  : false,
-    strictSSL           : false
-    }, function (request, response) {
-
-    server.on('upgrade', function (req, socket, head) {
-        server.handleUpgrade(req, socket, head);
-    });
-
-
-    request.addListener('end', function () {
-        // Serve files!
-        file.serve(request, response);
-    }).resume();
-})
-
-io  = require('socket.io').listen(server);
-
-io.set('log level', 4)
+if (config.logLevel) {
+    // https://github.com/Automattic/socket.io/wiki/Configuring-Socket.IO
+    io.set('log level', config.logLevel);
+}
 
 function describeRoom(name) {
     var clients = io.sockets.clients(name);
@@ -61,9 +32,6 @@ function safeCb(cb) {
 }
 
 io.sockets.on('connection', function (client) {
-
-    console.log('a user connected... well, a browser, actually')
-
     client.resources = {
         screen: false,
         video: true,
@@ -161,14 +129,6 @@ io.sockets.on('connection', function (client) {
     client.emit('turnservers', credentials);
 });
 
+if (config.uid) process.setuid(config.uid);
 
-
-server.listen(port, function () {
-    console.log('listening to https://0.0.0.0:' + port)
-})
-
-
-server.on('error', function (e) {
-    console.log('Server error: ' + JSON.stringify(e))
-})
-
+console.log(yetify.logo() + ' -- signal master is running at: http://localhost:' + port);

