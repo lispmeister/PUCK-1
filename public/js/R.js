@@ -8,7 +8,7 @@ var mockconsole = require('mockconsole');
 var io = require('socket.io-client');
 
 // var SIGNALING_SERVER = 'ws://' + window.location.hostname + ':8080'
-var SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8080'
+var SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081'
 
 function SimpleWebRTC(opts) {
     var self = this;

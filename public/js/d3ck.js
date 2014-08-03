@@ -589,17 +589,14 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
     jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
         var ret = data
-        console.log("pingzor " + JSON.stringify(data))
+        // console.log("pingzor " + JSON.stringify(data))
 
         // make the button clickable and green
         if (data.status == "OK") {
-            console.log('success with ' + ping_url)
-            // console.log('ok...')
+            // console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
-
             // change IP address to the one who answered
             $('#'+element_id).parent().closest('div').find('.remote_ip strong').html('<strong>' + data.ip + '</strong>')
-
         }
         else {
             console.log('not ok...')
@@ -1314,15 +1311,16 @@ function set_up_RTC(remote) {
     else if (d3ck_status.openvpn_client.vpn_status == "up") {
         console.log("PEEEEER js: client up")
         remote_d3ck = d3ck_status.openvpn_client.server_pid
+
         //
         // need to reset after hangup...!
         // xxxxx!!!!
         //
-        SIGNALING_SERVER = 'wss://' + remote_ip + ':' + D3CK_SIG_PORT
-        console.log('changing signaling server to: ' + SIGNALING_SERVER)
-        p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
+//      SIGNALING_SERVER = 'wss://' + remote_ip + ':' + D3CK_SIG_PORT
+//      console.log('changing signaling server to: ' + SIGNALING_SERVER)
+//      p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
 
-        ip = remote
+//      ip = remote
 
     }
 

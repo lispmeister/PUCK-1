@@ -9,9 +9,9 @@
         "logs"               : "/logs",
         "d3ck_port_int"      : "8080",
         "d3ck_port_ext"      : "8080",
-        "d3ck_port_signal"   : "8080",
+        "d3ck_port_signal"   : "8081",
         "d3ck_proto_signal"  : "tcp",
-        "d3ck_port_forward"  : "8888",
+        "d3ck_port_forward"  : "8881",
         "d3ck_port_haxx0r"   : "8081",
         "default_image"      : "/public/img/d3ck.png"
         },
