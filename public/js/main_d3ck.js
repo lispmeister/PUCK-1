@@ -33,11 +33,6 @@ ring = new Audio("media/ringring.mp3") // load it up
 
 $(document).ready(function () {
 
-    haxx0r_server('up')
-
-    // using this to ensure browser trusts rtc port as well as web port
-    rtc_haxx0r_trick()
-
     var image     = ""
     // var d3ck_id   = ""
 
@@ -85,6 +80,7 @@ $(document).ready(function () {
     //
     // user clicks call and...
     //
+
     // ring them gongs
     $('body').on('click', '.d3ck_vpn', function(e) {
         e.preventDefault()
@@ -265,7 +261,7 @@ $(document).ready(function () {
                                  '<div class="caption">'                                                               +
                                     '<span>D3CK: </span><span class="d3ckname"><b>{{name}}</b></span> <br />'          +
                                     '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +
-                                    '<span id="{{ipaddr}}">Server: <strong>{{ipaddr}}</strong> </span> <br />'         +
+                                    '<span class="remote_ip">Server: <strong>{{ipaddr}}</strong> </span> <br />'         +
                                     '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                                     '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
                                     '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                       +
@@ -331,15 +327,6 @@ $(document).ready(function () {
 
     setInterval(check_sock,SOCK_CHECK)
 
-    // hack attack, look out... this had better be temporary, lol
-    // var hack_rl = 'https://' + location.hostname + ':5555/rtc.html'
-    // $("#rtc_hack").attr("href", hack_rl)
-
-    // $('#rtc_hack').click(function(){
-    //     window.open(hack_rl, 'insecure')
-    //     return false;
-    // })
-
     // http://stackoverflow.com/questions/16214326/bootstrap-dropdown-with-hover
     $(function(){               
         $('.dropdown').hover(function() {
@@ -365,7 +352,7 @@ peer    = {}
 onMessageCallbacks = {};
 connection = {}
 
-function do_that_rtc_thang(host) {
+function _do_that_rtc_thang(host) {
 
 //  document.getElementById('rtc_nowz').onclick = function()
 
@@ -442,11 +429,6 @@ function do_that_rtc_thang(host) {
         connection.connect('d3ck');
 
         connection.open();
-
-//      document.getElementById('start-broadcasting').onclick = function() {
-//          console.log('click... trying to open...')
-//          connection.open();
-//      }
 
 }
 

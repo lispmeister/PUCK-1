@@ -2337,54 +2337,6 @@ function formDelete(req, res, next) {
 
 }
 
-function sping_get(url, all_ips, d3ckid, n) {
-
-    var request = https.get(url, function(resp) {
-        console.log('trying.... ' + url)
-        resp.setEncoding('utf8');
-        resp.on("data", function(d) {
-
-            console.log('data!')
-            // console.log(d)
-
-            d = JSON.parse(d)
-
-            if (d.pid != d3ckid) {
-                    console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
-                    console.log(d.pid + ' != ' + d3ckid)
-                    response = {status: "mismatch", "name": 'mismatched PID'}
-                    // xxx - need to squawk, but return isnt the way... sock.io?
-                    // res.send(420, response) // enhance your calm!
-            }
-            else {
-                    ping_done = true
-                    console.log('sping worked - ' + all_ips[n])
-                    d3ck2ip[d3ckid] = all_ips[n]
-                    ip2d3ck[all_ips[n]] = d3ckid
-                    return(d)
-            }
-
-        })
-
-        if (n == all_ips.length && !ping_done) {
-            console.log('no response, ping failure!')
-            response = {status: "ping failure", "name": 'unknown problem'}
-            res.send(408, response)
-        }
-
-    })
-    .on('error', function(e) {
-        console.log("Got error: " + e.message);
-        if (responses == all_ips.length) {
-            console.log('no response, ping failure!')
-            response = {status: "ping failure", "name": 'unknown problem'}
-            res.send(408, response)
-        }
-    })
-
-
-
-}
 
 //
 // https ping a remote d3ck... it can have multiple
@@ -2432,6 +2384,8 @@ function httpsPing(d3ckid, ipaddr, res, next) {
                 // console.log('+++ someday has come for ' + ip + ' ... ping worked')
                 // console.log(data)
                 data = JSON.parse(data)
+
+                data.ip = ip
 
                 if (data.pid != d3ckid) {
                     console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
@@ -3203,7 +3157,7 @@ ios.on('connection', function (sock_puppet) {
 
 io = require('socket.io').listen(d3cky);
 
-io.set('log level', 4)
+io.set('log level', 1)
 
 function describeRoom(name) {
     var clients = io.sockets.clients(name);

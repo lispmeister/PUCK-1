@@ -567,26 +567,6 @@
 
 
 
-<script>
-
-var webrtc = new SimpleWebRTC({
-    localVideoEl: 'localVideo',
-    remoteVideosEl: 'remoteVideos',
-    autoRequestMedia: true
-});
-
-// we have to wait until it's ready
-webrtc.on('readyToCall', function () {
-    webrtc.joinRoom('d3ck')
-});
-
-</script>
-
-
-
-
-
-
 
             <!-- little hack to add some fun -->
                 <div id="video_effect_div" class="hidden">

@@ -308,7 +308,10 @@ function state_vpn(state, browser_ip) {
 
         console.log('outgoing call is up')
 
-        set_up_RTC() // fly free, web RTC!
+
+        remote_ip = d3ck_status.openvpn_client.server
+
+        set_up_RTC(remote_ip) // fly free, web RTC!
 
 
         if (! d3ck_current.busy) {
@@ -586,13 +589,17 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
     jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
         var ret = data
-        // console.log("pingzor " + JSON.stringify(ret))
+        console.log("pingzor " + JSON.stringify(data))
 
         // make the button clickable and green
         if (data.status == "OK") {
             console.log('success with ' + ping_url)
             // console.log('ok...')
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
+
+            // change IP address to the one who answered
+            $('#'+element_id).parent().closest('div').find('.remote_ip strong').html('<strong>' + data.ip + '</strong>')
+
         }
         else {
             console.log('not ok...')
@@ -711,7 +718,7 @@ function status_or_die() {
     // and hopefully won't fuck up anything you're doing
 
     if (d3ck_status.events.new_d3ck.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
-        remote_ip   = d3ck_status.events.new_d3ck
+        remote_ip       = d3ck_status.events.new_d3ck
         var remote_name = d3ck_status.events.new_d3ck_name
         console.log(remote_ip + ' added as friend')
 
@@ -962,7 +969,7 @@ function check_sock () {
         var state = local_socket._transport.ws.readyState
     }
     catch (e) {
-        console.log('not connected')
+        // console.log('not connected')
         return
     }
 
@@ -1290,7 +1297,7 @@ function detect_webRTC(element) {
 //
 // fire up the rtc magic
 //
-function set_up_RTC() {
+function set_up_RTC(remote) {
 
     var remote_d3ck = ""        // pid of other d3ck
     var p33r_url    = "/p33rs"  // url of server currently connected to - local or remote?
@@ -1315,7 +1322,7 @@ function set_up_RTC() {
         console.log('changing signaling server to: ' + SIGNALING_SERVER)
         p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
 
-        ip = remote_ip
+        ip = remote
 
     }
 
@@ -1325,250 +1332,138 @@ function set_up_RTC() {
         return
     }
 
-    console.log('setting up signaling server: ' + SIGNALING_SERVER)
 
-    var peer = new Peer(my_d3ck.D3CK_ID, { 
-        iceServers: [{}],
-        secure: true,
-        debug: 3, 
-        url: SIGNALING_SERVER,
-        host: ip
-    })
+    console.log('setting up RTC: ' + SIGNALING_SERVER)
+
+    var webrtc = new SimpleWebRTC({
+        localVideoEl: 'localVideo',
+        remoteVideosEl: 'remoteVideos',
+        autoRequestMedia: true
+    });
+
+    // we have to wait until it's ready
+    webrtc.on('readyToCall', function () {
+        webrtc.joinRoom('d3ck')
+    });
+
+
+//  var peer = new Peer(my_d3ck.D3CK_ID, { 
+//      iceServers: [{}],
+//      secure: true,
+//      debug: 3, 
+//      url: SIGNALING_SERVER,
+//      host: ip
+//  })
 
 
 // until .... do:
 
-    // can't do nothin' until get my p33rs
-    var jqXHR_list = $.ajax({
-        url: '/p33rs',          // ... must ask the right server...!
-        async:false,
-        dataType: 'json'
-    })
-
-    jqXHR_list.done(function (data, textStatus, jqXHR) {
-        console.log('\n\njxq p33r list wootz\n\n')
-        console.log(data)
-
-        // should do some length checking as well
-        for (var i = 0; i < data.length; i++) {
-            var d = data[i]
-            console.log('d3ck: ' + d)
-            if (d != my_d3ck.D3CK_ID) {
-                console.log('!!!!')
-                console.log('someone new is here! ' + d)
-                remote_d3ck = d
-            }
-        }
-    })
-
-    console.log('actually trying to connect to ' + remote_d3ck)
-
-    // xxx - puckid, name, etc....
-    var conn = peer.connect(remote_d3ck)
-
-    // Compatibility shim
-    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-    
-    peer.on('open', function(){
-        $('#my-id').text(peer.id);
-    });
-    
-    // Receiving a call
-    peer.on('call', function(call){
-      // Answer the call automatically (instead of prompting user) for demo purposes
-      call.answer(window.localStream);
-      step3(call);
-    });
-    peer.on('error', function(err){
-       console.log(err.message);
-      // Return to step 2 if error occurs
-      step2();
-    });
-    
-    // Click handlers setup
-    $(function(){
-      $('#make-call').click(function(){
-        // Initiate a call!
-        var call = peer.call($('#callto-id').val(), window.localStream);
-    
-        step3(call);
-      });
-    
-      $('#end-call').click(function(){
-        window.existingCall.close();
-        step2();
-      });
-    
-      // Retry if getUserMedia fails
-      $('#step1-retry').click(function(){
-        $('#step1-error').hide();
-        step1();
-      });
-    
-      // Get things started
-      step1();
-    });
-    
-    function step1 () {
-      // Get audio/video stream
-      navigator.getUserMedia({audio: true, video: true}, function(stream){
-        // Set your video displays
-        $('#my-video').prop('src', URL.createObjectURL(stream));
-    
-        window.localStream = stream;
-        step2();
-      }, function(){ $('#step1-error').show(); });
-    }
-    
-    function step2 () {
-      $('#step1, #step3').hide();
-      $('#step2').show();
-    }
-    
-    function step3 (call) {
-      // Hang up on an existing call if present
-      if (window.existingCall) {
-        window.existingCall.close();
-      }
-    
-      // Wait for stream on the call, then set peer video display
-      call.on('stream', function(stream){
-        $('#their-video').prop('src', URL.createObjectURL(stream));
-      });
-    
-      // UI stuff
-      window.existingCall = call;
-      $('#their-id').text(call.peer);
-      call.on('close', step2);
-      $('#step1, #step2').hide();
-      $('#step3').show();
-    }
+//  // can't do nothin' until get my p33rs
+//    var jqXHR_list = $.ajax({
+//        url: '/p33rs',          // ... must ask the right server...!
+//        async:false,
+//        dataType: 'json'
+//    })
+//
+//    jqXHR_list.done(function (data, textStatus, jqXHR) {
+//        console.log('\n\njxq p33r list wootz\n\n')
+//        console.log(data)
+//
+//        // should do some length checking as well
+//        for (var i = 0; i < data.length; i++) {
+//            var d = data[i]
+//            console.log('d3ck: ' + d)
+//            if (d != my_d3ck.D3CK_ID) {
+//                console.log('!!!!')
+//                console.log('someone new is here! ' + d)
+//                remote_d3ck = d
+//            }
+//        }
+//    })
+//
+//    console.log('actually trying to connect to ' + remote_d3ck)
+//
+//    // xxx - puckid, name, etc....
+//    var conn = peer.connect(remote_d3ck)
+//
+//    // Compatibility shim
+//    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+//    
+//    peer.on('open', function(){
+//        $('#my-id').text(peer.id);
+//    });
+//    
+//    // Receiving a call
+//    peer.on('call', function(call){
+//      // Answer the call automatically (instead of prompting user) for demo purposes
+//      call.answer(window.localStream);
+//      step3(call);
+//    });
+//    peer.on('error', function(err){
+//       console.log(err.message);
+//      // Return to step 2 if error occurs
+//      step2();
+//    });
+//    
+//    // Click handlers setup
+//    $(function(){
+//      $('#make-call').click(function(){
+//        // Initiate a call!
+//        var call = peer.call($('#callto-id').val(), window.localStream);
+//    
+//        step3(call);
+//      });
+//    
+//      $('#end-call').click(function(){
+//        window.existingCall.close();
+//        step2();
+//      });
+//    
+//      // Retry if getUserMedia fails
+//      $('#step1-retry').click(function(){
+//        $('#step1-error').hide();
+//        step1();
+//      });
+//    
+//      // Get things started
+//      step1();
+//    });
+//    
+//    function step1 () {
+//      // Get audio/video stream
+//      navigator.getUserMedia({audio: true, video: true}, function(stream){
+//        // Set your video displays
+//        $('#my-video').prop('src', URL.createObjectURL(stream));
+//    
+//        window.localStream = stream;
+//        step2();
+//      }, function(){ $('#step1-error').show(); });
+//    }
+//    
+//    function step2 () {
+//      $('#step1, #step3').hide();
+//      $('#step2').show();
+//    }
+//    
+//    function step3 (call) {
+//      // Hang up on an existing call if present
+//      if (window.existingCall) {
+//        window.existingCall.close();
+//      }
+//    
+//      // Wait for stream on the call, then set peer video display
+//      call.on('stream', function(stream){
+//        $('#their-video').prop('src', URL.createObjectURL(stream));
+//      });
+//    
+//      // UI stuff
+//      window.existingCall = call;
+//      $('#their-id').text(call.peer);
+//      call.on('close', step2);
+//      $('#step1, #step2').hide();
+//      $('#step3').show();
+//    }
 
 
 }
-
-// to try and ensure browser trusts rtc port as well as web port
-
-//
-// so it seems as though browsers need to talk to a port before
-// they trust it, even if from the same server; to combat this
-// I'll try to see if I get anything from the server on that
-// port, and if not pop up a window on that port
-//
-
-
-//
-// since peerjs doesn't seem to want to speak https, bring up
-// and down a https server on the same port to convince the
-// browser I'm really an ok guy
-//
-function haxx0r_server(direction) {
-
-    console.log('togging haxx0r server')
-
-    var url = '/haxx0r/'
-
-    if (direction == "up") {
-        console.log('[+] turning on haxx0r server')
-    }
-    else if (direction == "down") {
-        console.log('[-] turning off haxx0r server')
-    }
-    else {
-        console.log("don't recognize that server command")
-        return
-    }
-
-    var jqXHR_haxx0r = $.ajax({
-        url: url + direction,
-        dataType: 'json'
-    })
-
-    jqXHR_haxx0r.done(function (data, textStatus, jqXHR) {
-        console.log('jxq haxx0r server w00tz')
-        console.log(data)
-    }).fail(function(err) {
-        console.log('events errz on hangup' + err)
-    })
-
-}
-
-function rtc_haxx0r_trick() {
-    
-    console.log('trying to pop up a window, rtc haxx0r style')
-
-    var n_times = 10;   // try this many times before bailing
-    var count   = 0;
-
-    // might want to use the signaling server location for now, 'cuz
-    // it might point to new server... may have to fuxx0r with that
-    // as well... testing, testin....
-    // SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
-    // SIGNALING_SERVER.substring(3)  -> rips off wss
-
-    var messi_url          = 'https://' + window.location.hostname + ':' + D3CK_SIG_PORT + '/popup.html'
-    var messi_url_fallback = '/popup_fallback.html'  // no cors detected
-
-    var request = createCORSRequest( "get", messi_url)
-
-    var final_url = messi_url
-
-    // firefox... you seem to suck... and lie... and suck some more....
-    if (!request || navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
-        console.log('falling back... and its not even spring...')
-
-        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) console.log('sure, sure, you say you support it... but I dont trust you...')
-
-        // when it shows up do something about it; give them a pointer to the alternate URL
-        console.log('... waiting to switch urls on em... ')
-
-        $('body').on('update', '#d3ck_hackasaurus', function() {
-            console.log('a new kid in town, eh? Let me help you out')
-            this.attr("href", messi_url)
-        })
-
-        final_url = messi_url_fallback
-
-    }
-
-    console.log('trying to get massi up and running....')
-
-    Messi.load(final_url, {
-        // modal: true, 
-        // width: 500,
-        autoclose:  1,
-        width:      "1px",
-        height:     "1px",
-        viewport:   {top: '1px', left: '1px'},
-        // buttons:    [{id: 0, label: 'close', val: 'X'}], 
-        callback:   mess_done
-    })
-
-    function mess_done() {
-        console.log('messi up, server down')
-        haxx0r_server('down')
-    }
-
-}
-
-// from http://jquery-howto.blogspot.com/2013/09/jquery-cross-domain-ajax-request.html
-
-function createCORSRequest(method, url){
-
-    var xhr = new XMLHttpRequest();
-    if ("withCredentials" in xhr){
-        console.log('yez, time to pop open a cors and relax')
-        xhr.open(method, url, true);
-    } else if (typeof XDomainRequest != "undefined"){ // if IE use XDR
-        console.log('ummm... ok... xdr, anyone?')
-        xhr = new XDomainRequest();
-        xhr.open(method, url);
-    } else {
-        console.log('alas, poor server, I never knew her')
-        xhr = null;
-    }
-    return xhr;
-
-}
-
 
