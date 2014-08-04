@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var port        = 8080,
+var port        = 8081,
     fs          = require('fs'),
     https       = require('https'),
     static      = require('node-static'),

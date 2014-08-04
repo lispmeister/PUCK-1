@@ -70,7 +70,6 @@ var d3ck_port_int     = config.D3CK.d3ck_port_int
 var d3ck_port_ext     = config.D3CK.d3ck_port_ext
 var d3ck_port_forward = config.D3CK.d3ck_port_forward
 var d3ck_port_signal  = config.D3CK.d3ck_port_signal
-var d3ck_port_haxx0r  = config.D3CK.d3ck_port_haxx0r
 var d3ck_proto_signal = config.D3CK.d3ck_proto_signal
 
 // capabilities...
@@ -957,121 +956,7 @@ function getIP(req, res, next) {
 }
 
 
-//
-// ... well... bring up or bring down temp https server
-// on an alternate port....
-//
-haxx0r_srvr = {}
-
-haxx0r_up = false
-
-function haxx0r(req, res, next) {
-
-    console.log('server up, server down')
-
-    console.log('up? ' + haxx0r_up)
-
-
-    var request     = req.params.key
-
-    if (request == "up") {
-
-        console.log('up up and away')
-
-        if (haxx0r_up) {
-            console.log('.. hmm... server already running... chickening out...')
-            res.send(200, { "odd dog": "haxx0r server already up" })
-            return
-        }
-
-        haxx0r_srvr = https.createServer(server_options, server)
-
-        haxx0r_srvr.listen(d3ck_port_haxx0r, function() {
-            console.log('... in my beaoootiful baloonz')
-            console.log('[+] server listening at %s', d3ck_port_haxx0r)
-        })
-
-        haxx0r_up = true
-
-        res.send(200, { "good dog": "haxx0r server up" })
-
-    }
-    else if (request == "down") {
-        console.log('the bigger they come...')
-
-        if (!haxx0r_up) {
-            console.log('.. hmm... server isnt running... chickening out...')
-            res.send(200, { "odd dog": "haxx0r server already down" })
-            return
-        }
-
-        haxx0r_srvr.close(function() {
-            console.log('...the harder they fall')
-
-            haxx0r_up = false
-
-            // once this is down, start up the peerjs stuff
-            fire_up_peerjs()
-        })
-
-        res.send(200, { "good dog": "haxx0r server down" })
-
-    }
-
-    else {
-        console.log('dont understand that option....' + request)
-        res.send(400, { "bad dog": "no bone" })
-    }
-
-
-}
-
-
 all_p33rs = [];
-
-function fire_up_peerjs() {
-
-    console.log('starting up peerjs')
-
-    var PeerServer = require('peer').PeerServer;
-    
-    var p33r_server = new PeerServer({
-      port: d3ck_port_forward,
-      ssl: {
-        key         : key,
-        certificate : cert
-      }
-    });
-    
-    console.log( 'Started PeerServer, port: ' + d3ck_port_haxx0r);
-    
-    p33r_server.on('uncaughtException', function(e) {
-      console.error('Error: ' + e);
-    });
-    
-    p33r_server.on('connection', function(id) { 
-        console.log('connex... adding: ' + id)
-        all_p33rs.push(id);
-    })
-    
-    p33r_server.on('disconnect', function(id) { 
-    
-        if (typeof id == "undefined") {
-            console.log('no one to disconnect... returning...')
-            return
-        }
-    
-        console.log('disconnect... removing: ' + id)
-    
-        var index = all_p33rs.indexOf(id);
-    
-        if (index > -1) {
-            all_p33rs.splice(index, 1);
-        }
-    })
-
-}
-
 
 //
 // send a note to a sockio channel ... channel broadcast == broadcast
@@ -2240,6 +2125,10 @@ function forward_port(req, res, next) {
 //
 function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 
+    console.log('\n\n\n\n\nNULL\n\n\n\n\n')
+    return
+
+
     console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
@@ -2993,9 +2882,6 @@ async.whilst(
     server.get('/getip', auth, getIP);
 
 
-    // to talk to another port... long story
-    server.get('/haxx0r/:key', auth, haxx0r)
-
     // Ping another
     server.get('/ping/:key', auth, echoStatus)
 
@@ -3089,7 +2975,6 @@ async.whilst(
             'PUT     /d3ck/:key',
             'GET     /d3ck/:key',
             'DELETE  /d3ck/:key',
-            'GET     /haxx0r/:key',
             'GET     /p33rs',
             'GET     /ping',
             'GET     /ping/:key',
