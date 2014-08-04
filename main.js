@@ -3125,6 +3125,15 @@ async.whilst(
 var d3cky = https.createServer(server_options, server)
 
 
+
+
+
+
+
+
+
+
+
 //
 // fire up web sockets
 //
@@ -3287,7 +3296,5 @@ Object.size = function(obj) {
 d3cky.listen(d3ck_port_int, function() {
         console.log('[+] server listening at %s', d3ck_port_int)
 })
-
-
 
 

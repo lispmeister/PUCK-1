@@ -18,7 +18,7 @@ if (process.argv.length != 4) {
     process.exit(code=1)
 }
 
-var proxy_port  = 7778,
+var proxy_port  = 8081,
     remote_host = process.argv[2],
     remote_port = process.argv[3]
 
