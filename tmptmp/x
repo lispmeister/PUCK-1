@@ -1,0 +1,69 @@
+
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+
+var https  = require('https'), http   = require('http'), static = require('node-static'), file   = new static.Server('.'), util   = require('util'), path   = require('path'), fs     = require('fs'), colors = require('colors'), httpProxy = require('http-proxy')
+
+var home = "/etc/d3ck/d3cks/D3CK"
+
+var key         = fs.readFileSync(home + "/d3ck.key"),
+    cert        = fs.readFileSync(home + "/d3ck.crt"),
+    ca          = fs.readFileSync(home + "/ca.crt")
+
+var proxy_target = 'https://192.168.0.250:8080'
+var proxy_port   = 8081
+
+// io.configure(function () { 
+//   io.set("transports", ["xhr-polling"]); 
+//     io.set("polling duration", 10); 
+//     });
+
+var home = "/etc/d3ck/d3cks/D3CK"
+
+var https_opts = {
+    key  : fs.readFileSync(home + "/d3ck.key"),
+    cert : fs.readFileSync(home + "/d3ck.crt"),
+    ca   : fs.readFileSync(home + "/ca.crt"),
+    ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
+    secureOptions       : require('constants').SSL_OP_CIPHER_SERVER_PREFERENCE,
+    honorCipherOrder    : true,
+    requestCert         : true,
+    rejectUnauthorized  : false,
+    strictSSL           : false
+}
+
+var proxy = httpProxy.createServer({
+    ssl:    https_opts,
+    wss:    true,
+    target: proxy_target,
+    secure: false
+}).listen(proxy_port)
+
+
+
+util.puts('https proxy server'.blue + ' started '.green.bold + 'on port '.blue + '8081'.yellow);
+
+
+/*
+  Copyright (c) Nodejitsu 2013
+
+  Permission is hereby granted, free of charge, to any person obtaining
+  a copy of this software and associated documentation files (the
+  "Software"), to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify, merge, publish,
+  distribute, sublicense, and/or sell copies of the Software, and to
+  permit persons to whom the Software is furnished to do so, subject to
+  the following conditions:
+
+  The above copyright notice and this permission notice shall be
+  included in all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+  NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+  LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+  OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+  WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+*/
+

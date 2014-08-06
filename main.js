@@ -384,8 +384,6 @@ function findByUsername(name, fn) {
 }
 
 
-var last_public_url = ""
-
 //
 //
 //
@@ -405,15 +403,6 @@ function auth(req, res, next) {
             console.log('almost let you go to login.html, but nothing to login to')
         }
         else {
-
-            // just to cut down messages...
-
-// xxxx?
-//          if (last_public_url != req.path)
-//              console.log('public: ' + req.path)
-
-            last_public_url = req.path
-
             return next();
         }
     }
@@ -2125,10 +2114,6 @@ function forward_port(req, res, next) {
 //
 function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 
-    console.log('\n\n\n\n\nNULL\n\n\n\n\n')
-    return
-
-
     console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
@@ -2786,16 +2771,34 @@ server.use(auth)
 // actual routes n stuff
 //
 
-// always serve up the install page
-// server.use(express.static(d3ck_public + '/qs'))
+
+// have we seen them before this login session?  True/false
+cookie = ""
 
 server.get('/aaa', function(req, res) {
 
-    console.log('aaa ')
-    console.log(req.client)
-    req.client.authorized ? 
-        res.json({"status":"approved"}) : 
-        res.json({"status":"denied"}, 401);
+    console.log('AAA? ')
+
+    rclient.get('session_cookie', function (err, scookie) {
+        if (err) {
+            console.log(err, 'no cookie, no fun');
+            next(err);
+            // res.send(200, {session_cookie: req.client._httpMessage.req.sessionID})
+            cookie = req.client._httpMessage.req.sessionID
+            res.send(200, {session_cookie: false })
+        }
+        else {
+            if (cookie == scookie) {
+                console.log('seen this cookie before... stale!')
+                res.send(200, { session_cookie: true } )
+            }
+            else {
+                cookie = scookie
+                console.log('fresh cookie, mon: ', cookie)
+                res.send(200, { session_cookie: false } )
+            }
+        }
+    });
 
 });
 
@@ -2926,13 +2929,27 @@ async.whilst(
     // get a url from wherever the d3ck is
     server.all('/url', auth, webProxy)
 
-    server.post('/login',
-        passport.authenticate('local', {
-            successRedirect: '/',
-            failureRedirect: '/loginFailure',
-            failureFlash: true
-        })
+    server.post('/login', 
+        passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
+        function(req, res) {
+            // set a cookie so wont show the same intro page always
+            cookie = ""
+
+            rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
+                if (err) {
+                    console.log(err, 'session cookie crumbled: ' + JSON.stringify(err));
+                    return(err);
+                } else {
+                    console.log('cookie baking complete')
+                    // console.log('houston, we have a go, prepare for liftoff')
+                    // these aren't the droids you're looking for
+                    // console.log("these *are* the droids you're looking for, arrest them!")
+                }
+            })
+            res.redirect('/');
+        }
     )
+
 
     // get peerjs peers
     server.get('/p33rs', auth, function(req, res, next) {
