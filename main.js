@@ -3062,6 +3062,10 @@ ios.on('connection', function (sock_puppet) {
 
 
 io = require('socket.io').listen(d3cky);
+
+// io.set('transports',['websocket'])
+io.set('transports',['xhr-polling'])
+
 //
 //
 // and... relax and listen....

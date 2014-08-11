@@ -7,8 +7,8 @@ var attachMediaStream = require('attachmediastream');
 var mockconsole = require('mockconsole');
 var io = require('socket.io-client');
 
-// var SIGNALING_SERVER = 'ws://' + window.location.hostname + ':8080'
-var SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081'
+// var SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081'
+var SIGNALING_SERVER = 'https://' + window.location.hostname + ':8081'
 
 function SimpleWebRTC(opts) {
     var self = this;
@@ -2135,7 +2135,8 @@ var io = ('undefined' === typeof module ? {} : module.exports);
     var options = this.socket.options;
 
     // return this.scheme() + '://'
-    return 'wss' + '://'
+    // return 'wss' + '://'
+    return 'https' + '://'
       + options.host + ':' + options.port + '/'
       + options.resource + '/' + io.protocol
       + '/' + this.name + '/' + this.sessid;
@@ -3127,7 +3128,8 @@ var io = ('undefined' === typeof module ? {} : module.exports);
    * @api private
    */
   WS.prototype.scheme = function () {
-    return this.socket.options.secure ? 'wss' : 'ws';
+    // return this.socket.options.secure ? 'wss' : 'ws';
+    return this.socket.options.secure ? 'https' : 'ws';
   };
 
   /**

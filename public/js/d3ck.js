@@ -534,6 +534,8 @@ function d3ck_create(element, ip_addr) {
     console.log('touch the hand of ... ')
     console.log('ip addr: ' + ip_addr)
 
+    // if (ip_addr
+
     var post_data         = {}
     post_data.ip_addr     = ip_addr
     post_data.d3ck_action = "CREATE"
@@ -1012,12 +1014,16 @@ function socket_looping() {
         // Initialize the socket & handlers
         var connect2server = function() {
             local_socket = new SockJS(socket_addr, null, {
-                'protocols_whitelist': [
-                    'websocket',          'xdr-streaming',      'xhr-streaming', 
-                    'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
-                    'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
-                 ]
+                'protocols_whitelist': [ 'xhr-polling' ]
             });
+
+            // local_socket = new SockJS(socket_addr, null, {
+            //     'protocols_whitelist': [
+            //         'websocket',          'xdr-streaming',      'xhr-streaming', 
+            //         'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
+            //         'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
+            //      ]
+            // });
 
             local_socket.onopen = function() {
                 console.log('[*] socksjs open... sez a me... clearing the retry d3cks')
@@ -1121,8 +1127,7 @@ function socket_looping() {
 
         }
 
-        // var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
-        var connectRetry = setInterval(connect2server, 100000000);
+        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
 
     })();
 
