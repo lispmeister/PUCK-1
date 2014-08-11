@@ -120,10 +120,6 @@ var d3ck_owners = []
    'login.html',
    'loginFailure',
    'quikstart.html',// no logins have been created yet, so... ;)
-   'quik',          // post
-   'qs',            // post
-   'js',            // hmm....
-   'css'            //
 */
 public_routes = config.public_routes
 
@@ -2931,7 +2927,7 @@ async.whilst(
     server.all('/url', auth, webProxy)
 
     server.post('/login', 
-        passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }),
+        passport.authenticate('local', { failureRedirect: '/loginFailure', failureFlash: true }),
         function(req, res) {
             // set a cookie so wont show the same intro page always
             cookie = ""
@@ -3051,13 +3047,17 @@ CHANNELS = {}
 // socket chatter
 //
 ios.on('connection', function (sock_puppet) {
-    d3ck_users[sock_puppet.id] = sock_puppet;
-    console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
-    cat_sock = sock_puppet
-    // a friendly cat fact
-    var cool_cat_fact = random_cat_fact(cat_facts)
-    var msg = {type: "cat_fact", fact: cool_cat_fact}
-    cat_power(msg)
+
+    if (typeof d3ck_users[sock_puppet.remoteAddress] === "undefined") {
+        d3ck_users[sock_puppet.remoteAddress] = sock_puppet.remoteAddress;
+        console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
+        cat_sock = sock_puppet
+        // a friendly cat fact
+        var cool_cat_fact = random_cat_fact(cat_facts)
+        var msg = {type: "cat_fact", fact: cool_cat_fact}
+        cat_power(msg)
+    }
+
 })
 
 

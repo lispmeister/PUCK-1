@@ -1,0 +1,96 @@
+
+#
+# HAProxy conf for d3ck
+#
+
+global
+    maxconn 99                                      # got 99 problems, but connections ain't one
+    debug
+    ssl-server-verify none
+
+#
+# seem reasonable, from various net examples
+#
+defaults
+    timeout server  5s
+    timeout connect 5s
+    timeout client  5s
+    timeout tunnel  1h
+    mode http
+
+#
+# webby front end
+#
+frontend webProx
+    reqadd X-Forwarded-Proto:\ https
+    option http-pretend-keepalive
+
+    # bind :8080 ssl crt d3ck.pem                     #   use proper cert
+
+    # xxx need to create this on the fly, not hardcode!
+    bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all  #   use proper cert
+
+    acl is_websocket hdr(Upgrade) -i WebSocket        #   soXXetz
+
+    use_backend back_web  if { path_beg /pux       }
+    use_backend back_sock if { path_beg /socket.io }
+
+#   default
+    use_backend back_web
+
+#   use_backend back_sock if is_websocket
+
+    timeout client 1h
+
+#
+# sockets on another port....
+#
+frontend sockProx
+
+    reqadd X-Forwarded-Proto:\ https
+    option http-pretend-keepalive
+    option http-server-close
+
+    acl is_websocket hdr(Upgrade) -i WebSocket
+
+    use_backend back_sock if { path_beg /socket.io }
+
+    use_backend back_sock if is_websocket
+
+    bind :8081 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
+
+#   use_backend back_sock
+
+    use_backend back_web
+
+    timeout client 1h
+
+#
+# backend stuff
+#
+
+#
+# http webby, translated from https
+#
+backend back_web
+
+    mode http
+    server d3ck 192.168.0.250:5555
+
+#
+# socket.io traffic
+#
+backend back_sock
+
+#   mode http
+
+    option forwardfor
+    option http-server-close
+    option forceclose
+    no option httpclose
+
+    # server other-d3ck 54.203.255.17:443 ssl verify none
+
+    server sock-d3ck 192.168.0.250:5556
+
+
