@@ -1121,7 +1121,8 @@ function socket_looping() {
 
         }
 
-        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
+        // var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
+        var connectRetry = setInterval(connect2server, 100000000);
 
     })();
 

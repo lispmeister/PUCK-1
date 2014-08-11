@@ -14,6 +14,7 @@ var Tail       = require('./tail').Tail,
     sh         = require('execSync'),
     fs         = require('fs'),
     formidable = require('formidable'),
+    http       = require('http'),
     https      = require('https'),
     mkdirp     = require('mkdirp'),
     moment     = require('moment'),
@@ -435,25 +436,25 @@ function auth(req, res, next) {
     //
     // are you CERTIFICATE authenticated?
     //
-    if(req.client.authorized){
-
-        console.log('my cert homie!')
-
-        console.log(req.connection.getPeerCertificate())
-
-        var subject = req.connection.getPeerCertificate().subject;
-
-        //          { subject: 
-        //              { C: 'AQ',
-        // [...]
-        //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
-
-        // organization: subject.O,
-    }
-    else {
-        console.log("hmmm ... let's look at this a min...")
-        console.log(req.connection.getPeerCertificate())
-    }
+//  if(req.client.authorized){
+//
+//      console.log('my cert homie!')
+//
+//      console.log(req.connection.getPeerCertificate())
+//
+//      var subject = req.connection.getPeerCertificate().subject;
+//
+//      //          { subject: 
+//      //              { C: 'AQ',
+//      // [...]
+//      //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
+//
+//      // organization: subject.O,
+//  }
+//  else {
+//      console.log("hmmm ... let's look at this a min...")
+//      console.log(req.connection.getPeerCertificate())
+//  }
 
     console.log('I pity da fool who tries to sneak by me!')
     res.redirect(302, '/login.html')
@@ -2723,17 +2724,17 @@ var credentials = {key: key, cert: cert, ca: ca}
 //
 
 var server_options = {
-    key                 : key, 
-    cert                : cert, 
-    ca                  : ca,
+    // key                 : key, 
+    // cert                : cert, 
+    // ca                  : ca,
     //ciphers:            : 'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
     // ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
-    ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
-    secureOptions       : require('constants').SSL_OP_CIPHER_SERVER_PREFERENCE,
-    honorCipherOrder    : true,
-    requestCert         : true,
-    rejectUnauthorized  : false,
-    strictSSL           : false
+    // ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
+    // secureOptions       : require('constants').SSL_OP_CIPHER_SERVER_PREFERENCE,
+    // honorCipherOrder    : true,
+    // requestCert         : true,
+    // rejectUnauthorized  : false,
+    // strictSSL           : false
 }
 
 server = express()
@@ -3024,13 +3025,7 @@ async.whilst(
 //
 // promise her anything... buy her a chicken.  A json chicken, of course.
 //
-var d3cky = https.createServer(server_options, server)
-
-
-
-
-
-
+var d3cky = http.createServer(server)
 
 
 
@@ -3067,6 +3062,19 @@ ios.on('connection', function (sock_puppet) {
 
 
 io = require('socket.io').listen(d3cky);
+//
+//
+// and... relax and listen....
+//
+//
+
+//
+// promise her anything... buy her a chicken.  A json chicken, of course.
+d3cky.listen(d3ck_port_int, function() {
+        console.log('[+] server listening at %s', d3ck_port_int)
+})
+
+
 
 io.set('log level', 1)
 
@@ -3186,17 +3194,4 @@ Object.size = function(obj) {
     }
     return size;
 }
-
-//
-//
-// and... relax and listen....
-//
-//
-
-//
-// promise her anything... buy her a chicken.  A json chicken, of course.
-d3cky.listen(d3ck_port_int, function() {
-        console.log('[+] server listening at %s', d3ck_port_int)
-})
-
 
