@@ -6,6 +6,9 @@
 global
     maxconn 99                                      # got 99 problems, but connections ain't one
     ssl-server-verify none
+    option httpclose
+    option forwardfor
+
     daemon
 
 #   debug
