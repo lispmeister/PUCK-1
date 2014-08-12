@@ -75,7 +75,7 @@ frontend sockProx
 backend back_web
 
     mode http
-    server d3ck 10.169.213.1:5555
+    server d3ck D3CK_SERVER:5555
 
 #
 # socket.io traffic
@@ -91,6 +91,6 @@ backend back_sock
 
     # server other-d3ck 54.203.255.17:443 ssl verify none
 
-    server sock-d3ck 10.169.213.1:5556
+    server sock-d3ck D3CK_SERVER:5556
 
 
