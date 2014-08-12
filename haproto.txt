@@ -5,8 +5,10 @@
 
 global
     maxconn 99                                      # got 99 problems, but connections ain't one
-#   debug
     ssl-server-verify none
+    daemon
+
+#   debug
 
 #
 # seem reasonable, from various net examples

@@ -136,8 +136,11 @@ if [ "X$vpn_ip" = "X" ]; then
     echo "WARNING!  No IP picked up for OpenVPN"
     echo "WARNING!  No IP picked up for OpenVPN"
 else
+    echo changing haproxy settings....
+    $D3CK_BIN/haproxy_fix.sh
     # $D3CK_BIN/forward_port.sh up 8081 $vpn_ip 8080 tcp
-    echo ...nothing to do...
+    # echo ...nothing to do...
+
 fi
 
 

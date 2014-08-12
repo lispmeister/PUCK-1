@@ -5,8 +5,10 @@
 
 global
     maxconn 99                                      # got 99 problems, but connections ain't one
-#   debug
     ssl-server-verify none
+    daemon
+
+#   debug
 
 #
 # seem reasonable, from various net examples
@@ -75,7 +77,7 @@ frontend sockProx
 backend back_web
 
     mode http
-    server d3ck 10.169.213.1:5555
+    server d3ck 10.7.62.1:5555
 
 #
 # socket.io traffic
@@ -91,6 +93,6 @@ backend back_sock
 
     # server other-d3ck 54.203.255.17:443 ssl verify none
 
-    server sock-d3ck 10.169.213.1:5556
+    server sock-d3ck 10.7.62.1:5556
 
 
