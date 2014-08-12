@@ -85,7 +85,8 @@ init_capabilities(capabilities)
 var secretz = {}
 
 // what the client is using to get to us
-var d3ck_server_ip    = ""
+var d3ck_server_ip = ''
+var client_ip      = ''
 
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
@@ -426,6 +427,12 @@ function auth(req, res, next) {
     // for now... let in localhost... may rethink
     if (req.body.ip_addr == '127.0.0.1') {
         console.log('pass... localhost')
+        return next();
+    }
+
+    // XXXX need to restrict to... only sockets?
+    if (req.body.ip_addr == 'client_ip') {
+        console.log('... if I let you (' + client_ip + ') vpn, I let you...')
         return next();
     }
 
@@ -955,11 +962,9 @@ function cat_power(msg) {
     // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
     if (msg.type != "openvpn_server") {
-
         try {
             console.log('catpower writez!  ' + JSON.stringify(msg))
-            // cat_sock.write(JSON.stringify(msg))
-            cat_sock.emit(JSON.stringify(msg))
+            cat_sock.write(JSON.stringify(msg))
         }
         catch (e) {
             // need a browser...
@@ -3030,20 +3035,16 @@ var d3cky = http.createServer(server)
 //
 // fire up web sockets
 //
+var sockjs  = require('sockjs')
 
-o2 = require('socket.io').listen(d3cky);
-o2.set('transports',['websocket'])
+function sjs_logger(severity, message){
+    console.log(severity + '] ' + message)
+}
+
+var ios = sockjs.createServer({log: sjs_logger})
 
 
-
-
-// var sockjs  = require('sockjs')
-// function sjs_logger(severity, message){
-//  console.log('[sockjs] ' + severity, ': ' , JSON.stringify(message))
-//}
-// var ios = sockjs.createServer( {log: sjs_logger} )
-
-// ios.installHandlers(d3cky, {prefix: '/pux'})
+ios.installHandlers(d3cky, {prefix: '/pux'})
 
 var d3ck_users  = {},
     cat_sock    = {},
@@ -3051,25 +3052,21 @@ var d3ck_users  = {},
 
 var sock_user   = ""
 
+CHANNELS = {}
+
 //
 // socket chatter
 //
-o2.sockets.on('connection', function (client) {
+ios.on('connection', function (sock_puppet) {
 
-    console.log('...connext...')
-
-    var address = socket.handshake.address;
-
-    if (typeof d3ck_users[address] === "undefined") {
-        d3ck_users[address] = address
-        console.log('[+] NEW connext from ' + address)
-        cat_sock = client
-
+    if (typeof d3ck_users[sock_puppet.remoteAddress] === "undefined") {
+        d3ck_users[sock_puppet.remoteAddress] = sock_puppet.remoteAddress;
+        console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
+        cat_sock = sock_puppet
         // a friendly cat fact
         var cool_cat_fact = random_cat_fact(cat_facts)
         var msg = {type: "cat_fact", fact: cool_cat_fact}
         cat_power(msg)
-
     }
 
 })

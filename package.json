@@ -20,6 +20,7 @@
       "http-proxy": "latest",
       "mkdirp": "latest",
       "moment": "latest",
+      "netmask": "latest",
       "nodemon": "latest",
       "node-static": "0.6.9",
       "node-uuid": "latest",
