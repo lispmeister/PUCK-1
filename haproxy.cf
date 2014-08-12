@@ -5,7 +5,7 @@
 
 global
     maxconn 99                                      # got 99 problems, but connections ain't one
-    debug
+#   debug
     ssl-server-verify none
 
 #

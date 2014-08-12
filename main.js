@@ -1198,7 +1198,7 @@ function create_d3ck(req, res, next) {
     // if the IP we get the add from isn't in the ips the other d3ck
     // says it has... add it in; they may be coming from a NAT or
     // something weird
-    console.log('looking to see if your current ip is in your pool')
+    console.log('looking to see if your current ip (' + client_ip  +' is in your pool')
     var found = false
     for (var i = 0; i < all_client_ips.length; i++) {
         if (all_client_ips[i] == client_ip) {
@@ -1208,7 +1208,7 @@ function create_d3ck(req, res, next) {
         }
     }
     if (! found) {
-        console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
+        console.log("[create_d3ck] You're coming from an IP that isn't in your stated IPs... adding [" + client_ip + "] to your IP pool just in case")
         req.body.value.all_ips[all_client_ips.length] = client_ip
     }
 
@@ -2554,7 +2554,7 @@ function formCreate(req, res, next) {
                             }
                         }
                         if (! found) {
-                            console.log("You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case")
+                            console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
                             r_data.all_ips[all_client_ips.length] = ip_addr
                         }
 
@@ -2855,164 +2855,159 @@ async.whilst(
     }
 )
 
-// function fire_up_server_routes() {
+// Ping action - no auth
+server.get('/ping', echoReply)
 
-    // Ping action - no auth
-    server.get('/ping', echoReply)
+// get or list d3cks
+server.post('/d3ck', auth, create_d3ck)
+server.get('/d3ck', auth, list_d3cks)
 
-    // get or list d3cks
-    server.post('/d3ck', auth, create_d3ck)
-    server.get('/d3ck', auth, list_d3cks)
+// Return a d3ck by key
+server.get('/d3ck/:key', auth, get_d3ck);
 
-    // Return a d3ck by key
-    server.get('/d3ck/:key', auth, get_d3ck);
+// Delete a d3ck by key
+server.del('/d3ck/:key', auth, delete_d3ck);
 
-    // Delete a d3ck by key
-    server.del('/d3ck/:key', auth, delete_d3ck);
-
-    // Destroy everything
-    server.del('/d3ck', auth, deleteAll, function respond(req, res, next) {
-        res.send(204);
-    });
+// Destroy everything
+server.del('/d3ck', auth, deleteAll, function respond(req, res, next) {
+    res.send(204);
+});
 
 
-    server.post('/form', auth, handleForm);
+server.post('/form', auth, handleForm);
 
-    // get your ip addr(s)
-    server.get('/getip', auth, getIP);
-
-
-    // Ping another
-    server.get('/ping/:key', auth, echoStatus)
-
-    // knock knock proto to request access to a system that doesn't trust you
-    server.post('/knock', auth, knockKnock);
-
-    server.post('/vpn/start', auth, startVPN);
-
-    // stop
-    server.get('/vpn/stop', auth, stopVPN);
-
-    //
-    // server stuff... start, stop, restart, etc.
-    //
-    server.get('/server',         auth, serverStatus);   // status
-    server.get('/server/stop',    auth, serverDie);      // die, die, die!
-    server.get('/server/restart', auth, serverRestart);  // die and restart
-
-    // setup a tcp proxy
-    server.get('/setproxy', auth, setTCPProxy)
-
-    // forward a port
-    server.get('/forward', auth, forward_port)
-
-    //
-    // events... what's going on?  Maybe should be /marvin?
-    //
-    // list event types
-    server.get('/events',           auth, listEvents);
-    // get elements of a particular kind of event (create, delete, etc.); 
-    server.get('/events/:key',      auth, getEvent);
-
-    //
-    // D3CK filestore - send up and getting down
-    //
-    // send stuff up the pipe....
-    server.post('/up/:key', auth, uploadSchtuff)
-    // get down with what's up
-    server.get('/down', auth, downloadStuff)
+// get your ip addr(s)
+server.get('/getip', auth, getIP);
 
 
-    // get a url from wherever the d3ck is
-    server.all('/url', auth, webProxy)
+// Ping another
+server.get('/ping/:key', auth, echoStatus)
 
-    server.post('/login', 
-        passport.authenticate('local', { failureRedirect: '/loginFailure', failureFlash: true }),
-        function(req, res) {
-            // set a cookie so wont show the same intro page always
-            cookie = ""
+// knock knock proto to request access to a system that doesn't trust you
+server.post('/knock', auth, knockKnock);
 
-            rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
-                if (err) {
-                    console.log(err, 'session cookie crumbled: ' + JSON.stringify(err));
-                    return(err);
-                } else {
-                    console.log('cookie baking complete')
-                    // console.log('houston, we have a go, prepare for liftoff')
-                    // these aren't the droids you're looking for
-                    // console.log("these *are* the droids you're looking for, arrest them!")
-                }
-            })
-            res.redirect('/');
-        }
-    )
+server.post('/vpn/start', auth, startVPN);
+
+// stop
+server.get('/vpn/stop', auth, stopVPN);
+
+//
+// server stuff... start, stop, restart, etc.
+//
+server.get('/server',         auth, serverStatus);   // status
+server.get('/server/stop',    auth, serverDie);      // die, die, die!
+server.get('/server/restart', auth, serverRestart);  // die and restart
+
+// setup a tcp proxy
+server.get('/setproxy', auth, setTCPProxy)
+
+// forward a port
+server.get('/forward', auth, forward_port)
+
+//
+// events... what's going on?  Maybe should be /marvin?
+//
+// list event types
+server.get('/events',           auth, listEvents);
+// get elements of a particular kind of event (create, delete, etc.); 
+server.get('/events/:key',      auth, getEvent);
+
+//
+// D3CK filestore - send up and getting down
+//
+// send stuff up the pipe....
+server.post('/up/:key', auth, uploadSchtuff)
+// get down with what's up
+server.get('/down', auth, downloadStuff)
 
 
-    // get peerjs peers
-    server.get('/p33rs', auth, function(req, res, next) {
-        console.log('returning peers...')
-        return res.json(all_p33rs);
-    })
+// get a url from wherever the d3ck is
+server.all('/url', auth, webProxy)
 
-    // Ping another
-    server.get('/ping/:key', auth, echoStatus)
+server.post('/login', 
+    passport.authenticate('local', { failureRedirect: '/loginFailure', failureFlash: true }),
+    function(req, res) {
+        // set a cookie so wont show the same intro page always
+        cookie = ""
 
-    // cuz ajax doesn't like to https other sites...
-    server.get('/sping/:key1/:key2', auth, function (req, res, next) {
-        // console.log('spinging')
-        httpsPing(req.params.key1, req.params.key2, res, next)
-    })
+        rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
+            if (err) {
+                console.log(err, 'session cookie crumbled: ' + JSON.stringify(err));
+                return(err);
+            } else {
+                console.log('cookie baking complete')
+                // console.log('houston, we have a go, prepare for liftoff')
+                // these aren't the droids you're looking for
+                // console.log("these *are* the droids you're looking for, arrest them!")
+            }
+        })
+        res.redirect('/');
+    }
+)
 
-    // send me anything... I'll give you a chicken.  Or... status.
-    server.get("/status", auth, d3ckStatus)
 
-    //
-    // send any actions done on client... like ringing a phone or whatever
-    // this is to help keep state in case of moving off web page, browser
-    // crashes, etc.
-    //
-    server.post("/status", auth, postStatus)
+// get peerjs peers
+server.get('/p33rs', auth, function(req, res, next) {
+    console.log('returning peers...')
+    return res.json(all_p33rs);
+})
 
-    // XXX - update!
-    server.get('/rest', function root(req, res, next) {
-        var routes = [
-            'GET     /down',
-            'GET     /events',
-            'GET     /events/:key',
-            'GET     /forward',
-            'GET     /logout',
-            'GET     /rest',
-            'GET     /getip',
-            'POST    /d3ck',
-            'GET     /d3ck',
-            'DELETE  /d3ck',
-            'PUT     /d3ck/:key',
-            'GET     /d3ck/:key',
-            'DELETE  /d3ck/:key',
-            'GET     /p33rs',
-            'GET     /ping',
-            'GET     /ping/:key',
-            'GET     /server',
-            'GET     /server/stop',
-            'GET     /server/restart',
-            'GET     /setproxy',
-            'GET     /sping/:key',
-            'GET     /status',
-            'POST    /status',
-            'GET     /up/:key',
-            'GET     /url',
-            'POST    /vpn/start',
-            'GET     /vpn/stop'
-        ];
-        res.send(200, routes);
-    });
+// Ping another
+server.get('/ping/:key', auth, echoStatus)
 
-    // if all else fails... serve up an index or public
-    server.use(express.static(d3ck_public))
+// cuz ajax doesn't like to https other sites...
+server.get('/sping/:key1/:key2', auth, function (req, res, next) {
+    // console.log('spinging')
+    httpsPing(req.params.key1, req.params.key2, res, next)
+})
 
-    // console.log('rtz')
-    // console.log(server.routes)
-// }
+// send me anything... I'll give you a chicken.  Or... status.
+server.get("/status", auth, d3ckStatus)
+
+//
+// send any actions done on client... like ringing a phone or whatever
+// this is to help keep state in case of moving off web page, browser
+// crashes, etc.
+//
+server.post("/status", auth, postStatus)
+
+// XXX - update!
+server.get('/rest', function root(req, res, next) {
+    var routes = [
+        'GET     /down',
+        'GET     /events',
+        'GET     /events/:key',
+        'GET     /forward',
+        'GET     /logout',
+        'GET     /rest',
+        'GET     /getip',
+        'POST    /d3ck',
+        'GET     /d3ck',
+        'DELETE  /d3ck',
+        'PUT     /d3ck/:key',
+        'GET     /d3ck/:key',
+        'DELETE  /d3ck/:key',
+        'GET     /p33rs',
+        'GET     /ping',
+        'GET     /ping/:key',
+        'GET     /server',
+        'GET     /server/stop',
+        'GET     /server/restart',
+        'GET     /setproxy',
+        'GET     /sping/:key',
+        'GET     /status',
+        'POST    /status',
+        'GET     /up/:key',
+        'GET     /url',
+        'POST    /vpn/start',
+        'GET     /vpn/stop'
+    ];
+    res.send(200, routes);
+});
+
+// if all else fails... serve up an index or public
+server.use(express.static(d3ck_public))
+
 
 //
 // after all that, start firing up the engines
