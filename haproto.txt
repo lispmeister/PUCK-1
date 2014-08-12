@@ -15,12 +15,29 @@ global
 # seem reasonable, from various net examples
 #
 defaults
-    timeout server  5s
-    timeout connect 5s
-    timeout client  5s
-    timeout tunnel  1h
+    # timeout server  5s
+    # timeout connect 5s
+    # timeout client  5s
+    # timeout tunnel  1h
 
-    option httpclose
+    timeout client          25s
+    timeout connect          5s
+    timeout server          25s
+# timeout tunnel available in ALOHA 5.5 or HAProxy 1.5-dev10 and higher
+    timeout tunnel        3600s
+    timeout http-keep-alive  1s
+    timeout http-request    15s
+    timeout queue           30s
+    timeout tarpit          60s
+    default-server inter 3s rise 2 fall 3
+    option forwardfor
+
+
+    backlog 10000
+    option  redispatch
+
+
+
     option forwardfor
 
     mode http
@@ -37,10 +54,14 @@ frontend webProx
     # xxx need to create this on the fly, not hardcode!
     bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all  #   use proper cert
 
-    acl is_websocket hdr(Upgrade) -i WebSocket        #   soXXetz
+    acl is_websocket hdr(Upgrade)  -i WebSocket        #   soXXetz
+    acl is_websocket hdr_beg(Host) -i ws
 
-    use_backend back_web  if { path_beg /pux       }
-    use_backend back_sock if { path_beg /socket.io }
+    use_backend back_web if { path_beg /pux       }
+    use_backend back_web if { path_beg /socket.io }
+
+    use_backend back_web if is_websocket
+
 
 #   default
     use_backend back_web

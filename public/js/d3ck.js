@@ -1000,7 +1000,6 @@ function check_sock () {
 // enter the socket loop!
 //
 local_socket = null
-connectRetry = null
 
 function socket_looping() {
 
@@ -1009,36 +1008,30 @@ function socket_looping() {
     var recInterval  = null;
     var socket       = null;
 
-    (function() {
 
         // Initialize the socket & handlers
-        var connect2server = function() {
-            local_socket = new SockJS(socket_addr, null, {
-                'protocols_whitelist': [ 'xhr-polling' ]
-            });
+            local_socket = io.connect('https://' + window.location.hostname + ':8080', {
+                'reconnection delay': 100,
+                'reconnection limit': 100,
+                'max reconnection attempts': Infinity // defaults to 10
+            })
 
-            // local_socket = new SockJS(socket_addr, null, {
-            //     'protocols_whitelist': [
-            //         'websocket',          'xdr-streaming',      'xhr-streaming', 
-            //         'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
-            //         'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
-            //      ]
-            // });
-
-            local_socket.onopen = function() {
-                console.log('[*] socksjs open... sez a me... clearing the retry d3cks')
-                clearInterval(connectRetry)
-            }
+            local_socket.on('open', function() {
+                console.log('[*] sockio open... sez a me... clearing the retry d3cks')
+            })
      
+    // socket.on('event', function(data){});
+
             // hoop, skip, jump
-            local_socket.onclose = function() {
-                console.log('[-] sockjs closed')
-                clearInterval(connectRetry)
-                // keep going back for more
-                connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY)
-            }
+            local_socket.on('disconnect', function() {
+                console.log('[-] sockio disconnect')
+            })
      
-            local_socket.onmessage = function(d3ck_message) {
+            local_socket.on('close', function() {
+                console.log('[-] sockio closed')
+            })
+     
+            local_socket.on('message', function(d3ck_message) {
                 console.log('[@] messages or cat facts!')
                 // console.log(d3ck_message)
 
@@ -1080,56 +1073,15 @@ function socket_looping() {
                 }
 
 
-
-                ///  RTC Stuff
-                ///  RTC Stuff
-                ///  RTC Stuff
+                //
+                // RTC Stuff
+                //
                 else {
-
                    console.log('??? message type... perhaps RTC-land will deal with it?')
                    console.log(JSON.stringify(d3ck_message))
+                }
 
-//                  //  if (typeof d3ck_message.isChannelPresent != 'undefined') {
-//                  local_socket.write(JSON.stringify({
-//                      checkPresence: true,
-//                      channel: 'd3ck'
-//                  }));
-
-
-//                  //  if (d3ck_message.isChannelPresent == false) {
-//                  //      console.log('\t... trying to open...')
-//                  //      connection.open();
-//                  //  } else {
-//                  //      console.log('\t... trying to join...')
-//                  //      connection.join('d3ck');
-//                  //  }
-//                  // }
-
-//                  if (typeof d3ck_message.sender === 'undefined' && ! d3ck_message.checkPresence) {
-//                      console.log('yer not from around here, are ya, boy?')
-//                      return
-//                  }
-
-//                  // if(d3ck_message.sender == currentUserUUID) {
-//                  //     console.log('ignoring myself talk')
-//                  //     return
-//                  // }
-
-//                  if (onMessageCallbacks[d3ck_message.channel]) {
-//                      console.log('cb, rubber ducky....')
-//                      onMessageCallbacks[d3ck_message.channel](d3ck_message);
-
-//                  };
-
-                };
-
-            }
-
-        }
-
-        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
-
-    })();
+            })
 
 }
 

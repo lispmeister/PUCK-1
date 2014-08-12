@@ -22,7 +22,8 @@ if `ifconfig|egrep -q '^tun1'` ; then
 
 elif `ifconfig|egrep -q '^tun0'` ; then
     echo only tun0 exists... assuming we\'re the server
-    vip=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}')
+    # vip=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}')
+    vip=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^eth0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}')
 else
     echo no vpn tunnels spotted... bailin
     exit 1

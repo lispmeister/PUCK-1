@@ -955,9 +955,11 @@ function cat_power(msg) {
     // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
     if (msg.type != "openvpn_server") {
+
         try {
             console.log('catpower writez!  ' + JSON.stringify(msg))
-            cat_sock.write(JSON.stringify(msg))
+            // cat_sock.write(JSON.stringify(msg))
+            cat_sock.emit(JSON.stringify(msg))
         }
         catch (e) {
             // need a browser...
@@ -3028,10 +3030,20 @@ var d3cky = http.createServer(server)
 //
 // fire up web sockets
 //
-var sockjs  = require('sockjs')
-var ios     = sockjs.createServer()
 
-ios.installHandlers(d3cky, {prefix: '/pux'})
+o2 = require('socket.io').listen(d3cky);
+o2.set('transports',['websocket'])
+
+
+
+
+// var sockjs  = require('sockjs')
+// function sjs_logger(severity, message){
+//  console.log('[sockjs] ' + severity, ': ' , JSON.stringify(message))
+//}
+// var ios = sockjs.createServer( {log: sjs_logger} )
+
+// ios.installHandlers(d3cky, {prefix: '/pux'})
 
 var d3ck_users  = {},
     cat_sock    = {},
@@ -3039,21 +3051,25 @@ var d3ck_users  = {},
 
 var sock_user   = ""
 
-CHANNELS = {}
-
 //
 // socket chatter
 //
-ios.on('connection', function (sock_puppet) {
+o2.sockets.on('connection', function (client) {
 
-    if (typeof d3ck_users[sock_puppet.remoteAddress] === "undefined") {
-        d3ck_users[sock_puppet.remoteAddress] = sock_puppet.remoteAddress;
-        console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
-        cat_sock = sock_puppet
+    console.log('...connext...')
+
+    var address = socket.handshake.address;
+
+    if (typeof d3ck_users[address] === "undefined") {
+        d3ck_users[address] = address
+        console.log('[+] NEW connext from ' + address)
+        cat_sock = client
+
         // a friendly cat fact
         var cool_cat_fact = random_cat_fact(cat_facts)
         var msg = {type: "cat_fact", fact: cool_cat_fact}
         cat_power(msg)
+
     }
 
 })
@@ -3078,7 +3094,7 @@ d3cky.listen(d3ck_port_int, function() {
 
 
 
-io.set('log level', 1)
+io.set('log level', 4)
 
 function describeRoom(name) {
     var clients = io.sockets.clients(name);
