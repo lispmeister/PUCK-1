@@ -16,6 +16,10 @@ defaults
     timeout connect 5s
     timeout client  5s
     timeout tunnel  1h
+
+    option httpclose
+    option forwardfor
+
     mode http
 
 #

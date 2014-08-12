@@ -919,7 +919,10 @@ function NotImplementedError() {
 function get_client_ip(req) {
 
     // client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
-    client_ip = req.ip
+    // client_ip = req.ip
+
+    // with HAProxy, it's req.headers['x-forwarded-for']
+    client_ip = req.headers['x-forwarded-for']
 
     // console.log("C-ip: " + client_ip)
 
