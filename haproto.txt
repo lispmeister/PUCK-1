@@ -6,8 +6,6 @@
 global
     maxconn 99                                      # got 99 problems, but connections ain't one
     ssl-server-verify none
-    option httpclose
-    option forwardfor
 
     daemon
 
@@ -21,6 +19,10 @@ defaults
     timeout connect 5s
     timeout client  5s
     timeout tunnel  1h
+
+    option httpclose
+    option forwardfor
+
     mode http
 
 #
