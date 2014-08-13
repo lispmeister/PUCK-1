@@ -2266,13 +2266,17 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 data += chunk
             })
             response.on('end', function() {
-                console.log('+++ someday has come for ' + ip + ' ... ping worked')
+                console.log('+++ someday has come for ' + ip + ' ... ping response back')
                 console.log(data)
                 try {
                     data = JSON.parse(data)
                 }
                 catch (e) { 
                     console.log('errz socket parsing: ' + JSON.stringify(e))
+                    response = {status: "ping failure", "error": e}
+                    // synchronicity... II... shouting above the din of my rice crispies
+                    try { res.send(408, response) }
+                    catch (e) { console.log('sPing error ' + e) }
                     return
                 }
 
@@ -2314,7 +2318,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 ping_done = true
                 response = {status: "ping failure", "error": e}
                 // synchronicity... II... shouting above the din of my rice crispies
-                try { res.send(408, e) }
+                try { res.send(408, response) }
                 catch (e) { console.log('sPing error ' + e) }
             }
         })
