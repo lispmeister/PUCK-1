@@ -2261,15 +2261,15 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
         var req = https.get(url, function(response) {
 
-            var data = ''
+            var ping_data = ''
             response.on('data', function(chunk) {
-                data += chunk
+                ping_data += chunk
             })
             response.on('end', function() {
                 console.log('+++ someday has come for ' + ip + ' ... ping response back')
-                console.log(data)
+                console.log(ping_data)
                 try {
-                    data = JSON.parse(data)
+                    ping_data = JSON.parse(ping_data)
                 }
                 catch (e) { 
                     console.log('errz socket parsing: ' + JSON.stringify(e))
@@ -2281,22 +2281,22 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 }
 
                 // data.ip = ip
-                console.log('ip: ' + ip + ', data: ' + JSON.stringify(data))
+                console.log('ip: ' + ip + ', data: ' + JSON.stringify(ping_data))
 
-                data.ip = ip
+                ping_data.ip = ip
 
-                if (data.pid != ping_d3ckid) {
+                if (ping_data.pid != ping_d3ckid) {
                     console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
-                    console.log(data.pid + ' != ' + ping_d3ckid)
+                    console.log(ping_data.pid + ' != ' + ping_d3ckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     // res.send(420, response) // enhance your calm!
                 }
 
-                else if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
+                else if (typeof ping_data != "undefined" && ping_data.status == "OK" && !ping_done) {
                     ping_done = true
                     d3ck2ip[ping_d3ckid] = all_ips[i]
                     ip2d3ck[all_ips[i]] = ping_d3ckid
-                    res.send(200, data)
+                    res.send(200, ping_data)
                 }
                 responses++
 
