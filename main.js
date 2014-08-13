@@ -3093,10 +3093,13 @@ io.sockets.on('connection', function (client) {
         audio: false
     };
 
+    if (isEmpty(cat_sock)) {
+        cat_sock = client
+    }
+
     if (typeof d3ck_users[address] === "undefined") {
         d3ck_users[address] = address
         console.log('[+] NEW connext from ' + address)
-        cat_sock = client
 
         // a friendly cat fact
         var cool_cat_fact = random_cat_fact(cat_facts)
