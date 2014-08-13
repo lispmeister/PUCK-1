@@ -23,6 +23,8 @@ defaults
     timeout server      30s
     timeout tunnel       1h
 
+    option http-keep-alive
+
 frontend wwws
     bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
     timeout client 1h
@@ -61,8 +63,8 @@ backend www_backend
 backend websocket_backend
     mode http
     option forwardfor
-    option http-server-close
-    option forceclose
+#   option http-server-close
+#   option forceclose
     no option httpclose
  
     server d3ck_sox D3CK_SERVER:5555 weight 1 maxconn 16384 check
@@ -71,8 +73,8 @@ backend websocket_backend
 backend sock_signalz
     mode http
     option forwardfor
-    option http-server-close
-    option forceclose
+#   option http-server-close
+#   option forceclose
     no option httpclose
  
     server d3ck_sox D3CK_SERVER:5556 weight 1 maxconn 16384 check
