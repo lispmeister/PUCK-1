@@ -1009,7 +1009,7 @@ function socket_looping() {
 
         // Initialize the socket & handlers
             // local_socket = io.connect('https://' + window.location.hostname + ':5555', {
-            local_socket = io.connect('http://' + window.location.hostname + ':8080', {
+            local_socket = io.connect('https://' + window.location.hostname + ':8080', {
                 'reconnection delay': 100,
                 'reconnection limit': 100,
                 'max reconnection attempts': Infinity // defaults to 10
@@ -1481,7 +1481,7 @@ function rtc_haxx0r_trick() {
             // SIGNALING_SERVER.substring(3)  -> rips off wss
 
             // var messi_url          = 'https://' + window.location.hostname + ':5555/popup.html'
-            var messi_url          = 'http://' + window.location.hostname + ':8080/popup.html'
+            var messi_url          = 'https://' + window.location.hostname + ':8080/popup.html'
             var messi_url_fallback = '/popup_fallback.html'  // no cors detected
 
             var request = createCORSRequest( "get", messi_url)
