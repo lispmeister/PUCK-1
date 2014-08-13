@@ -2022,8 +2022,8 @@ function startVPN(req, res, next) {
 
     console.log('onto the execution...')
 
-    d3ckid = req.body.d3ckid
-    ipaddr = req.body.ipaddr
+    var d3ckid = req.body.d3ckid
+    var ipaddr = req.body.ipaddr
 
     console.log(d3ckid, ipaddr)
 
@@ -3082,7 +3082,8 @@ function safeCb(cb) {
 
 io.sockets.on('connection', function (client) {
 
-    var address = client.handshake.address;
+    // var address = client.handshake.address;
+    var address = socket.request.connection.remoteAddress
 
     console.log('a user (from ' + address + ') connected... well, a browser, actually')
 
