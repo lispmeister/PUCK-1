@@ -2268,15 +2268,11 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
             response.on('end', function() {
                 // console.log('+++ someday has come for ' + ip + ' ... ping worked')
                 // console.log(data)
-                // if (typeof data == "string") {
-                //     console.log('got this on a web socket... ' + data)
-                // }
-
                 try {
                     data = JSON.parse(data)
                 }
                 catch (e) { 
-                    console.log('socket parsing: ' + JSON.stringify(e))
+                    // console.log('socket parsing: ' + JSON.stringify(e))
                     return
                 }
 
@@ -3103,7 +3099,7 @@ io.sockets.on('connection', function (client) {
         cat_sock = client
     }
 
-    if (typeof d3ck_users[address] === "undefined") {
+//  if (typeof d3ck_users[address] === "undefined") {
         d3ck_users[address] = address
         console.log('[+] NEW connext from ' + address)
 
@@ -3111,11 +3107,14 @@ io.sockets.on('connection', function (client) {
         var cool_cat_fact = random_cat_fact(cat_facts)
         var msg = {type: "cat_fact", fact: cool_cat_fact}
         cat_power(msg)
-    }
+//  }
 
 
     // pass a message to another id
     client.on('message', function (details) {
+        console.log('mess: ' + JSON.stringify(details))
+
+
         if (!details) return;
 
         var otherClient = io.sockets.sockets[details.to];

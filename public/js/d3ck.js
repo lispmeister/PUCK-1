@@ -1022,6 +1022,11 @@ function socket_looping() {
                     ]
     })
 
+    local_socket.on('pong', function(data){
+        console.log('[o] pong... ping...')
+        local_socket.emit('message', '123450');
+    })
+
     local_socket.on('error', function(e){
         console.log('[!!..!!] erroneous rex... ')
         console.log(e)
@@ -1029,7 +1034,7 @@ function socket_looping() {
 
     local_socket.on('connect', function(){
         console.log('[>] hackasaurus rex... ')
-        local_socket.send('123456');
+        local_socket.emit('message', '123456');
     })
 
 
@@ -1054,10 +1059,18 @@ function socket_looping() {
     })
      
     local_socket.on('message', function(d3ck_message) {
-        console.log('[@] messages or cat facts!')
-        // console.log(d3ck_message)
+        console.log('[mmm....] message... ')
+        console.log(JSON.stringify(d3ck_message))
+    })
 
-        d3ck_message = JSON.parse(d3ck_message.data)
+    local_socket.on('catFax', function(d3ck_message){
+    //  console.log('[^..^] cat FAX!!!!')
+    //  console.log(data)
+    //
+    // local_socket.on('message', function(d3ck_message) {
+        console.log('[^..^] messages or cat facts!')
+
+        d3ck_message = JSON.parse(d3ck_message)
 
         if (d3ck_message.type == "status") {
             // console.log('processing status message')
