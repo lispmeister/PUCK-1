@@ -110,7 +110,7 @@ function list_events() {
         //  populate_events(cat)
 
     }).fail(function(err) {
-        console.log('events errz on hangup' + err)
+        console.log('events errz on event listing' + err)
     })
 
 }
@@ -446,7 +446,7 @@ function event_hang_up() {
         console.log('jxq hangup wootz')
         console.log(data)
     }).fail(function(err) {
-        console.log('errz on hangup' + err)
+        console.log('errz on hangup' + JSON.stringify(err))
         alert('error on hangup!')
     })
 
@@ -1007,97 +1007,103 @@ function socket_looping() {
     var socket       = null;
 
 
-        // Initialize the socket & handlers
-            // local_socket = io.connect('https://' + window.location.hostname + ':5555', {
-            local_socket = io.connect('https://' + window.location.hostname + ':8080', {
-                'reconnection delay': 100,
-                'reconnection limit': 100,
-                'max reconnection attempts': Infinity // defaults to 10
-            })
+    // Initialize the socket & handlers
+    // local_socket = io.connect('https://' + window.location.hostname + ':5555', {
+    local_socket = io.connect('https://' + window.location.hostname + ':8080', {
+        'reconnection delay':         100,
+        'reconnection limit':         100,
+        'max reconnection attempts':  Infinity,
+        'transports': [
+                                    'websocket',
+                                    'flashsocket',
+                                    'htmlfile',
+                                    'xhr-polling',
+                                    'jsonp-polling'
+                    ]
+    })
 
-            local_socket.on('error', function(e){
-                console.log('[!!..!!] erroneous rex... ')
-                // sock.send('123456');
-                console.log(e)
-            })
+    local_socket.on('error', function(e){
+        console.log('[!!..!!] erroneous rex... ')
+        console.log(e)
+    })
 
-            local_socket.on('connect', function(sock){
-                console.log('[>] hackasaurus rex... ')
-                // sock.send('123456');
-            })
-
-
-            local_socket.on('reconnection', function() {
-                console.log('[x] sockio ... Ive missed you so!')
-            })
+    local_socket.on('connect', function(){
+        console.log('[>] hackasaurus rex... ')
+        local_socket.send('123456');
+    })
 
 
-            local_socket.on('open', function() {
-                console.log('[*] sockio open... sez a me... clearing the retry d3cks')
-            })
+    local_socket.on('reconnection', function() {
+        console.log('[x] sockio ... Ive missed you so!')
+    })
+
+
+    local_socket.on('open', function() {
+        console.log('[*] sockio open... sez a me... clearing the retry d3cks')
+    })
      
     // socket.on('event', function(data){});
 
-            // hoop, skip, jump
-            local_socket.on('disconnect', function() {
-                console.log('[-] sockio disconnect')
-            })
+    // hoop, skip, jump
+    local_socket.on('disconnect', function() {
+        console.log('[-] sockio disconnect')
+    })
      
-            local_socket.on('close', function() {
-                console.log('[-] sockio closed')
-            })
+    local_socket.on('close', function() {
+        console.log('[-] sockio closed')
+    })
      
-            local_socket.on('message', function(d3ck_message) {
-                console.log('[@] messages or cat facts!')
-                // console.log(d3ck_message)
+    local_socket.on('message', function(d3ck_message) {
+        console.log('[@] messages or cat facts!')
+        // console.log(d3ck_message)
 
-                d3ck_message = JSON.parse(d3ck_message.data)
+        d3ck_message = JSON.parse(d3ck_message.data)
 
-                if (d3ck_message.type == "status") {
-                    // console.log('processing status message')
+        if (d3ck_message.type == "status") {
+            // console.log('processing status message')
 
-                    d3ck_status = d3ck_message.status
+            d3ck_status = d3ck_message.status
 
-                    // if something is new, do something!
-                    if (! _.isEqual(old_d3ck_status, d3ck_status)) {
-                        console.log('something new in the state of denmark!')
-                        old_d3ck_status = d3ck_status
-                        status_or_die()
-                    }
-                    else {
-                        // console.log('same ol, same ol')
-                    }
-                }
-                // OVPN logs for client/server
-                else if (d3ck_message.type == "openvpn_server") {
-                    console.log('ovpn server logz')
-                    // console.log('server: ' + data.line)
-                    // $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-                    // $("#ovpn_server_infinity").mCustomScrollbar("update")
-                    // $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-                }
-                else if (d3ck_message.type == "openvpn_client") {
-                    console.log('ovpn client logz')
-                    // $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-                    // $("#ovpn_client_infinity").mCustomScrollbar("update")
-                    // $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-                }
-                else if (d3ck_message.type == "cat_fact") {
-                    console.log('incoming cat fact!')
-                    console.log(d3ck_message.fact)
-                     $('#d3ck_footy').append('<br />' + d3ck_message.fact)
-                }
+            // if something is new, do something!
+            if (! _.isEqual(old_d3ck_status, d3ck_status)) {
+                console.log('something new in the state of denmark!')
+                old_d3ck_status = d3ck_status
+                status_or_die()
+            }
+            else {
+                // console.log('same ol, same ol')
+            }
+        }
+        // OVPN logs for client/server
+        else if (d3ck_message.type == "openvpn_server") {
+            console.log('ovpn server logz')
+            // console.log('server: ' + data.line)
+            // $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
+            // $("#ovpn_server_infinity").mCustomScrollbar("update")
+            // $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
+        else if (d3ck_message.type == "openvpn_client") {
+            console.log('ovpn client logz')
+            // $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
+            // $("#ovpn_client_infinity").mCustomScrollbar("update")
+            // $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
+        }
+        else if (d3ck_message.type == "cat_fact") {
+            console.log('incoming cat fact!')
+            console.log(d3ck_message.fact)
+             $('#d3ck_footy').append('<br />' + d3ck_message.fact)
+        }
 
 
-                //
-                // RTC Stuff
-                //
-                else {
-                   console.log('??? message type... perhaps RTC-land will deal with it?')
-                   console.log(JSON.stringify(d3ck_message))
-                }
+        //
+        // RTC Stuff
+        //
+        else {
+           console.log('??? message type... perhaps RTC-land will deal with it?')
+           console.log(JSON.stringify(d3ck_message))
+        }
 
-            })
+    })
 
 }
 
