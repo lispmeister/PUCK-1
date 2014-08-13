@@ -2233,7 +2233,7 @@ var ping_done = false
 
 function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
-    // console.log("++++pinging... " + d3ckid + ' / ' + ipaddr)
+    console.log("++++pinging... " + d3ckid + ' / ' + ipaddr)
 
     ping_done = false
 
@@ -2255,7 +2255,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
             return; 
         }
 
-        // console.log('pinging  ' + ip);
+        console.log('pinging  ' + ip);
 
         var url = 'https://' + ip + ':' + d3ck_port_ext + '/ping'
 
@@ -2266,13 +2266,13 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 data += chunk
             })
             response.on('end', function() {
-                // console.log('+++ someday has come for ' + ip + ' ... ping worked')
-                // console.log(data)
+                console.log('+++ someday has come for ' + ip + ' ... ping worked')
+                console.log(data)
                 try {
                     data = JSON.parse(data)
                 }
                 catch (e) { 
-                    // console.log('socket parsing: ' + JSON.stringify(e))
+                    console.log('errz socket parsing: ' + JSON.stringify(e))
                     return
                 }
 
