@@ -2276,6 +2276,9 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     return
                 }
 
+                // data.ip = ip
+                console.log('ip: ' + ip + ', data: ' + JSON.stringify(data))
+
                 data.ip = ip
 
                 if (data.pid != ping_d3ckid) {
@@ -3099,15 +3102,13 @@ io.sockets.on('connection', function (client) {
         cat_sock = client
     }
 
-//  if (typeof d3ck_users[address] === "undefined") {
-        d3ck_users[address] = address
-        console.log('[+] NEW connext from ' + address)
+    d3ck_users[address] = address
+    console.log('[+] NEW connext from ' + address)
 
-        // a friendly cat fact
-        var cool_cat_fact = random_cat_fact(cat_facts)
-        var msg = {type: "cat_fact", fact: cool_cat_fact}
-        cat_power(msg)
-//  }
+    // a friendly cat fact
+    var cool_cat_fact = random_cat_fact(cat_facts)
+    var msg = {type: "cat_fact", fact: cool_cat_fact}
+    cat_power(msg)
 
 
     // pass a message to another id
