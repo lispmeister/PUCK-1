@@ -429,6 +429,12 @@ function auth(req, res, next) {
         return next();
     }
 
+    if (req.body.ip_addr == client_ip) {
+        console.log('... if I let you (' + client_ip + ') vpn, I let you...')
+        return next();
+    }
+
+
     //
     // are you CERTIFICATE authenticated?
     //
