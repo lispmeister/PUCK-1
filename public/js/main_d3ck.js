@@ -6,7 +6,6 @@
 D3CK_PORT        = 8080
 // D3CK_SIG_PORT    = 8081
 D3CK_SIG_PORT    = 8080
-D3CK_PORT        = 5555
 
 //SIGNALING_SERVER = 'wss://' + window.location.hostname + ':' + D3CK_SIG_PORT
 SIGNALING_SERVER = 'https://' + window.location.hostname + ':' + D3CK_SIG_PORT

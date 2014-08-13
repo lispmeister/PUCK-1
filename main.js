@@ -2259,12 +2259,9 @@ function httpsPing(d3ckid, ipaddr, res, next) {
             response.on('end', function() {
                 // console.log('+++ someday has come for ' + ip + ' ... ping worked')
                 // console.log(data)
-                if (typeof data == "string") {
-                    console.log('sent this on a web socket... ' + data)
-                    return
-                }
-
-                if (isEmpty(data)) return
+                // if (typeof data == "string") {
+                //     console.log('got this on a web socket... ' + data)
+                // }
 
                 try {
                     data = JSON.parse(data)
@@ -2273,8 +2270,6 @@ function httpsPing(d3ckid, ipaddr, res, next) {
                     console.log('socket parsing: ' + JSON.stringify(e))
                     return
                 }
-
-
 
                 data.ip = ip
 
