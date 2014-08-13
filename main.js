@@ -2231,7 +2231,7 @@ function formDelete(req, res, next) {
 
 var ping_done = false
 
-function httpsPing(d3ckid, ipaddr, res, next) {
+function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
     // console.log("++++pinging... " + d3ckid + ' / ' + ipaddr)
 
@@ -2282,17 +2282,17 @@ function httpsPing(d3ckid, ipaddr, res, next) {
 
                 data.ip = ip
 
-                if (data.pid != d3ckid) {
+                if (data.pid != ping_d3ckid) {
                     console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
-                    console.log(data.pid + ' != ' + d3ckid)
+                    console.log(data.pid + ' != ' + ping_d3ckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     // res.send(420, response) // enhance your calm!
                 }
 
                 else if (typeof data != "undefined" && data.status == "OK" && !ping_done) {
                     ping_done = true
-                    d3ck2ip[d3ckid] = all_ips[i]
-                    ip2d3ck[all_ips[i]] = d3ckid
+                    d3ck2ip[ping_d3ckid] = all_ips[i]
+                    ip2d3ck[all_ips[i]] = ping_d3ckid
                     res.send(200, data)
                 }
                 responses++
