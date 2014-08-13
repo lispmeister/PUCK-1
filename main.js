@@ -2116,6 +2116,9 @@ function forward_port(req, res, next) {
 //
 function forward_port_and_flush(local_port, remote_ip, remote_port, proto) {
 
+    console.log('... skipping iptables for now... using proxy here instead...')
+    return
+
     console.log('flushing iptables+routes, adding... ', local_port, remote_ip, remote_port, proto)
 
     // flush the past away and then add iptables rules
@@ -3079,15 +3082,15 @@ function safeCb(cb) {
 
 io.sockets.on('connection', function (client) {
 
-    console.log('a user connected... well, a browser, actually')
+    var address = client.handshake.address;
+
+    console.log('a user (from ' + address + ') connected... well, a browser, actually')
 
     client.resources = {
         screen: false,
         video: true,
         audio: false
     };
-
-    var address = client.handshake.address;
 
     if (typeof d3ck_users[address] === "undefined") {
         d3ck_users[address] = address
