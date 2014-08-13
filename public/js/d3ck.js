@@ -37,8 +37,6 @@ var LOCAL_VIDEO_WIDTH = 480
 
 var sock = null
 
-var socket_addr = "/pux"
-
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
 function formatErrorMessage(jqXHR, exception) {
 
@@ -1000,7 +998,6 @@ function check_sock () {
 // enter the socket loop!
 //
 local_socket = null
-connectRetry = null
 
 function socket_looping() {
 
@@ -1009,36 +1006,48 @@ function socket_looping() {
     var recInterval  = null;
     var socket       = null;
 
-    (function() {
 
         // Initialize the socket & handlers
-        var connect2server = function() {
-            local_socket = new SockJS(socket_addr, null, {
-                'protocols_whitelist': [ 'xhr-polling' ]
-            });
+            // local_socket = io.connect('https://' + window.location.hostname + ':5555', {
+            local_socket = io.connect('http://' + window.location.hostname + ':5555', {
+                'reconnection delay': 100,
+                'reconnection limit': 100,
+                'max reconnection attempts': Infinity // defaults to 10
+            })
 
-            // local_socket = new SockJS(socket_addr, null, {
-            //     'protocols_whitelist': [
-            //         'websocket',          'xdr-streaming',      'xhr-streaming', 
-            //         'iframe-eventsource', 'iframe-htmlfile',    'xdr-polling', 
-            //         'xhr-polling',        'iframe-xhr-polling', 'jsonp-polling'
-            //      ]
-            // });
+            local_socket.on('error', function(e){
+                console.log('[!!..!!] erroneous rex... ')
+                // sock.send('123456');
+                console.log(e)
+            })
 
-            local_socket.onopen = function() {
-                console.log('[*] socksjs open... sez a me... clearing the retry d3cks')
-                clearInterval(connectRetry)
-            }
+            local_socket.on('connect', function(sock){
+                console.log('[>] hackasaurus rex... ')
+                // sock.send('123456');
+            })
+
+
+            local_socket.on('reconnection', function() {
+                console.log('[x] sockio ... Ive missed you so!')
+            })
+
+
+            local_socket.on('open', function() {
+                console.log('[*] sockio open... sez a me... clearing the retry d3cks')
+            })
      
+    // socket.on('event', function(data){});
+
             // hoop, skip, jump
-            local_socket.onclose = function() {
-                console.log('[-] sockjs closed')
-                clearInterval(connectRetry)
-                // keep going back for more
-                connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY)
-            }
+            local_socket.on('disconnect', function() {
+                console.log('[-] sockio disconnect')
+            })
      
-            local_socket.onmessage = function(d3ck_message) {
+            local_socket.on('close', function() {
+                console.log('[-] sockio closed')
+            })
+     
+            local_socket.on('message', function(d3ck_message) {
                 console.log('[@] messages or cat facts!')
                 // console.log(d3ck_message)
 
@@ -1088,13 +1097,7 @@ function socket_looping() {
                    console.log(JSON.stringify(d3ck_message))
                 }
 
-            }
-
-        }
-
-        var connectRetry = setInterval(connect2server, D3CK_SOCK_RETRY);
-
-    })();
+            })
 
 }
 
@@ -1477,7 +1480,8 @@ function rtc_haxx0r_trick() {
             // SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
             // SIGNALING_SERVER.substring(3)  -> rips off wss
 
-            var messi_url          = 'https://' + window.location.hostname + ':8081/popup.html'
+            // var messi_url          = 'https://' + window.location.hostname + ':5555/popup.html'
+            var messi_url          = 'http://' + window.location.hostname + ':5555/popup.html'
             var messi_url_fallback = '/popup_fallback.html'  // no cors detected
 
             var request = createCORSRequest( "get", messi_url)

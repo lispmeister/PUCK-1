@@ -85,8 +85,7 @@ init_capabilities(capabilities)
 var secretz = {}
 
 // what the client is using to get to us
-var d3ck_server_ip = ''
-var client_ip      = ''
+var d3ck_server_ip    = ""
 
 //
 // stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
@@ -427,12 +426,6 @@ function auth(req, res, next) {
     // for now... let in localhost... may rethink
     if (req.body.ip_addr == '127.0.0.1') {
         console.log('pass... localhost')
-        return next();
-    }
-
-    // XXXX need to restrict to... only sockets?
-    if (req.body.ip_addr == 'client_ip') {
-        console.log('... if I let you (' + client_ip + ') vpn, I let you...')
         return next();
     }
 
@@ -962,9 +955,11 @@ function cat_power(msg) {
     // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
 
     if (msg.type != "openvpn_server") {
+
         try {
             console.log('catpower writez!  ' + JSON.stringify(msg))
-            cat_sock.write(JSON.stringify(msg))
+            // cat_sock.write(JSON.stringify(msg))
+            cat_sock.emit('catFax', JSON.stringify(msg))
         }
         catch (e) {
             // need a browser...
@@ -1057,7 +1052,7 @@ function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    if (typeof ios == "object") { 
+    if (typeof io == "object") { 
         // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
         var msg = {type: "status", status: d3ck_status}
         cat_power(msg)
@@ -2264,7 +2259,22 @@ function httpsPing(d3ckid, ipaddr, res, next) {
             response.on('end', function() {
                 // console.log('+++ someday has come for ' + ip + ' ... ping worked')
                 // console.log(data)
-                data = JSON.parse(data)
+                if (typeof data == "string") {
+                    console.log('sent this on a web socket... ' + data)
+                    return
+                }
+
+                if (isEmpty(data)) return
+
+                try {
+                    data = JSON.parse(data)
+                }
+                catch (e) { 
+                    console.log('socket parsing: ' + JSON.stringify(e))
+                    return
+                }
+
+
 
                 data.ip = ip
 
@@ -3030,21 +3040,9 @@ var d3cky = http.createServer(server)
 
 
 
-
-
 //
 // fire up web sockets
 //
-var sockjs  = require('sockjs')
-
-function sjs_logger(severity, message){
-    console.log(severity + '] ' + message)
-}
-
-var ios = sockjs.createServer({log: sjs_logger})
-
-
-ios.installHandlers(d3cky, {prefix: '/pux'})
 
 var d3ck_users  = {},
     cat_sock    = {},
@@ -3052,43 +3050,10 @@ var d3ck_users  = {},
 
 var sock_user   = ""
 
-CHANNELS = {}
-
-//
-// socket chatter
-//
-ios.on('connection', function (sock_puppet) {
-
-    if (typeof d3ck_users[sock_puppet.remoteAddress] === "undefined") {
-        d3ck_users[sock_puppet.remoteAddress] = sock_puppet.remoteAddress;
-        console.log('[+] NEW connext from ' + sock_puppet.remoteAddress)
-        cat_sock = sock_puppet
-        // a friendly cat fact
-        var cool_cat_fact = random_cat_fact(cat_facts)
-        var msg = {type: "cat_fact", fact: cool_cat_fact}
-        cat_power(msg)
-    }
-
-})
-
-
 io = require('socket.io').listen(d3cky);
 
+//io.set('transports',['xhr-polling'])
 // io.set('transports',['websocket'])
-io.set('transports',['xhr-polling'])
-
-//
-//
-// and... relax and listen....
-//
-//
-
-//
-// promise her anything... buy her a chicken.  A json chicken, of course.
-d3cky.listen(d3ck_port_int, function() {
-        console.log('[+] server listening at %s', d3ck_port_int)
-})
-
 
 
 io.set('log level', 4)
@@ -3112,6 +3077,11 @@ function safeCb(cb) {
     }
 }
 
+
+//
+// socket chatter
+//
+
 io.sockets.on('connection', function (client) {
 
     console.log('a user connected... well, a browser, actually')
@@ -3121,6 +3091,20 @@ io.sockets.on('connection', function (client) {
         video: true,
         audio: false
     };
+
+    var address = client.handshake.address;
+
+    if (typeof d3ck_users[address] === "undefined") {
+        d3ck_users[address] = address
+        console.log('[+] NEW connext from ' + address)
+        cat_sock = client
+
+        // a friendly cat fact
+        var cool_cat_fact = random_cat_fact(cat_facts)
+        var msg = {type: "cat_fact", fact: cool_cat_fact}
+        cat_power(msg)
+    }
+
 
     // pass a message to another id
     client.on('message', function (details) {
@@ -3209,4 +3193,22 @@ Object.size = function(obj) {
     }
     return size;
 }
+
+
+
+
+
+//
+//
+// and... relax and listen....
+//
+//
+
+//
+// promise her anything... buy her a chicken.  A json chicken, of course.
+d3cky.listen(d3ck_port_int, function() {
+        console.log('[+] server listening at %s', d3ck_port_int)
+})
+
+
 

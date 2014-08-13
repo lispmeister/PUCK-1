@@ -9,116 +9,54 @@ global
 
     daemon
 
-#   debug
+    # debug
 
 #
 # seem reasonable, from various net examples
 #
 defaults
-    # timeout server  5s
-    # timeout connect 5s
-    # timeout client  5s
-    # timeout tunnel  1h
+    timeout client      25s
+    timeout connect      5s
+    timeout server      25s
+    timeout connect      5s
+    timeout queue        5s
+    timeout server      30s
+    timeout tunnel       1h
 
-    timeout client          25s
-    timeout connect          5s
-    timeout server          25s
-# timeout tunnel available in ALOHA 5.5 or HAProxy 1.5-dev10 and higher
-    timeout tunnel        3600s
-    timeout http-keep-alive  1s
-    timeout http-request    15s
-    timeout queue           30s
-    timeout tarpit          60s
-    default-server inter 3s rise 2 fall 3
-    option forwardfor
-
-
-    backlog 10000
-    option  redispatch
-
-
-
-    option forwardfor
-
-    mode http
-
-#
-# webby front end
-#
-frontend webProx
-    reqadd X-Forwarded-Proto:\ https
-    option http-pretend-keepalive
-
-    # bind :8080 ssl crt d3ck.pem                     #   use proper cert
-
-    # xxx need to create this on the fly, not hardcode!
-    bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all  #   use proper cert
-
-    acl is_websocket hdr(Upgrade)  -i WebSocket        #   soXXetz
-    acl is_websocket hdr_beg(Host) -i ws
-
-    use_backend back_web if { path_beg /pux       }
-    use_backend back_web if { path_beg /socket.io }
-
-    use_backend back_web if is_websocket
-
-
-#   default
-    use_backend back_web
-
-#   use_backend back_sock if is_websocket
+frontend wwws
+    bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
 
     timeout client 1h
 
-#
-# sockets on another port....
-#
-frontend sockProx
-
-    reqadd X-Forwarded-Proto:\ https
-    option http-pretend-keepalive
-    option http-server-close
-
+    default_backend www_backend
+ 
     acl is_websocket hdr(Upgrade) -i WebSocket
+    use_backend websocket_backend if is_websocket
+ 
+    tcp-request inspect-delay 500ms
+    tcp-request content accept if HTTP
 
-    use_backend back_sock if { path_beg /socket.io }
-
-    use_backend back_sock if is_websocket
-
-    bind :8081 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
-
-#   use_backend back_sock
-
-    use_backend back_web
-
-    timeout client 1h
-
-#
-# backend stuff
-#
-
-#
-# http webby, translated from https
-#
-backend back_web
-
+#   use_backend flashsocket_backend if !HTTP
+ 
+backend www_backend
     mode http
-    server d3ck D3CK_SERVER:5555
-
-#
-# socket.io traffic
-#
-backend back_sock
-
-#   mode http
-
+    option forwardfor
+    reqadd x-forwarded-proto:\ https
+ 
+    server d3ck_www D3CK_SERVER:5555 weight 1 maxconn 16384 check
+ 
+backend websocket_backend
+    mode http
     option forwardfor
     option http-server-close
     option forceclose
     no option httpclose
+ 
+    server d3ck_sox D3CK_SERVER:5555 weight 1 maxconn 16384 check
+ 
+# backend flashsocket_backend
+#     server server1 socket-backend:3000 weight 1 maxconn 16384 check
 
-    # server other-d3ck 54.203.255.17:443 ssl verify none
 
-    server sock-d3ck D3CK_SERVER:5556
-
+#   server d3ck D3CK_SERVER:5555
 
