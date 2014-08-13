@@ -2233,7 +2233,7 @@ var ping_done = false
 
 function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
-    console.log("++++pinging... " + d3ckid + ' / ' + ipaddr)
+    console.log("++++pinging... " + ping_d3ckid + ' / ' + ipaddr)
 
     ping_done = false
 
