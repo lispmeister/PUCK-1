@@ -655,6 +655,7 @@ function get_status() {
         // console.log('status wootz\n' + data)
         d3ck_status = JSON.parse(data)
         console.log("INITIAL STATUS: " + JSON.stringify(d3ck_status))
+        status_or_die()
     }).fail(ajaxError);
 
 }
