@@ -25,16 +25,29 @@ defaults
 
 frontend wwws
     bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
-
     timeout client 1h
-
     default_backend www_backend
- 
+    # acl is_sox path_dir usermsg
+    # acl is_sig path_dir signal
     acl is_websocket hdr(Upgrade) -i WebSocket
     use_backend websocket_backend if is_websocket
- 
     tcp-request inspect-delay 500ms
     tcp-request content accept if HTTP
+
+#   use_backend flashsocket_backend if !HTTP
+ 
+frontend signalz
+    bind :8081 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
+    timeout client 1h
+    default_backend www_backend
+
+    acl is_websocket hdr(Upgrade) -i WebSocket
+    use_backend sock_signalz if is_websocket
+
+    tcp-request inspect-delay 500ms
+    tcp-request content accept if HTTP
+
+
 
 #   use_backend flashsocket_backend if !HTTP
  
@@ -55,8 +68,12 @@ backend websocket_backend
     server d3ck_sox D3CK_SERVER:5555 weight 1 maxconn 16384 check
  
 # backend flashsocket_backend
-#     server server1 socket-backend:3000 weight 1 maxconn 16384 check
-
-
-#   server d3ck D3CK_SERVER:5555
-
+backend sock_signalz
+    mode http
+    option forwardfor
+    option http-server-close
+    option forceclose
+    no option httpclose
+ 
+    server d3ck_sox D3CK_SERVER:5556 weight 1 maxconn 16384 check
+ 

@@ -3050,8 +3050,8 @@ io = require('socket.io').listen(d3cky);
 //io.set('transports',['xhr-polling'])
 // io.set('transports',['websocket'])
 
+// io.set('log level', 4)
 
-io.set('log level', 4)
 
 function describeRoom(name) {
     var clients = io.sockets.clients(name);

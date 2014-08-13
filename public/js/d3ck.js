@@ -1481,7 +1481,7 @@ function rtc_haxx0r_trick() {
             // SIGNALING_SERVER.substring(3)  -> rips off wss
 
             // var messi_url          = 'https://' + window.location.hostname + ':5555/popup.html'
-            var messi_url          = 'https://' + window.location.hostname + ':8080/popup.html'
+            var messi_url          = 'https://' + window.location.hostname + ':8081/popup.html'
             var messi_url_fallback = '/popup_fallback.html'  // no cors detected
 
             var request = createCORSRequest( "get", messi_url)
