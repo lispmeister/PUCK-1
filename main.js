@@ -2269,8 +2269,8 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 ping_data += chunk
             })
             response.on('end', function() {
-                console.log('+++ someday has come for ' + ip + ' ... ping response back')
-                console.log(ping_data)
+                // console.log('+++ someday has come for ' + ip + ' ... ping response back')
+                // console.log(ping_data)
                 try {
                     ping_data = JSON.parse(ping_data)
                 }
