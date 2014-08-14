@@ -18,19 +18,20 @@
 
 if `ifconfig|egrep -q '^tun1'` ; then
     echo tun1 exists... assuming we\'re a client
-    vip=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun1$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}' | sed 's/6$/1/')
-
+    sig=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun1$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}' | sed 's/6$/1/')
+    web=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}')
 elif `ifconfig|egrep -q '^tun0'` ; then
     echo only tun0 exists... assuming we\'re the server
-    vip=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}')
+    web=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n = 0 }} {if (match($0, "^[^ \t]") && $1 != "lo" && match($1, "^tun0$")) { n = 1; dev = $1; all[dev]="" }} END { for (i in all) print all[i]}')
+    sig=$web
 else
     echo no vpn tunnels spotted... bailin
     exit 1
 fi
 
-echo creating new haproxy conf with $vip
+echo creating new haproxy conf with $web and $sig
 
-sed 's/D3CK_SERVER/'"$vip"'/' haproto.txt > haproxy.cf
+sed -e 's/D3CK_SIG/'"$sig"'/' -e 's/D3CK_WWW/'"$web"'/' haproto.txt > haproxy.cf
 
 echo restarting haproxy
 

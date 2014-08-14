@@ -58,7 +58,7 @@ backend www_backend
     option forwardfor
     reqadd x-forwarded-proto:\ https
  
-    server d3ck_www D3CK_SERVER:5555 weight 1 maxconn 16384 check
+    server d3ck_www D3CK_WEB:5555 weight 1 maxconn 16384 check
  
 backend websocket_backend
     mode http
@@ -67,7 +67,7 @@ backend websocket_backend
 #   option forceclose
     no option httpclose
  
-    server d3ck_sox D3CK_SERVER:5555 weight 1 maxconn 16384 check
+    server d3ck_sox D3CK_WEB:5555 weight 1 maxconn 16384 check
  
 # backend flashsocket_backend
 backend sock_signalz
@@ -77,5 +77,5 @@ backend sock_signalz
 #   option forceclose
     no option httpclose
  
-    server d3ck_sox D3CK_SERVER:5556 weight 1 maxconn 16384 check
+    server d3ck_sox D3CK_SIG:5556 weight 1 maxconn 16384 check
  

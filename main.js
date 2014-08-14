@@ -3046,11 +3046,9 @@ server.use(express.static(d3ck_public))
 var d3cky = http.createServer(server)
 
 
-
 //
 // fire up web sockets
 //
-
 var d3ck_users  = {},
     cat_sock    = {},
     all_cats    = []
@@ -3086,21 +3084,14 @@ function safeCb(cb) {
 
 
 //
-// socket chatter
+// cat fax & status
 //
-
 io.sockets.on('connection', function (client) {
 
     // var address = client.handshake.address;
     var address = client.request.connection.remoteAddress
 
     console.log('a user (from ' + address + ') connected... well, a browser, actually')
-
-    client.resources = {
-        screen: false,
-        video: true,
-        audio: false
-    };
 
     if (isEmpty(cat_sock)) {
         cat_sock = client
@@ -3113,6 +3104,54 @@ io.sockets.on('connection', function (client) {
     var cool_cat_fact = random_cat_fact(cat_facts)
     var msg = {type: "cat_fact", fact: cool_cat_fact}
     cat_power(msg)
+})
+
+
+
+//
+// signaling
+//
+var exp_sig = express()
+exp_sig.use(response());
+exp_sig.use(express.limit('1gb'))
+exp_sig.use(express.logger());
+exp_sig.use(compress());
+exp_sig.use(express.methodOverride());
+exp_sig.use(express.json());
+exp_sig.use(express.urlencoded());
+exp_sig.use(express.multipart());
+exp_sig.use(express.methodOverride());
+exp_sig.use(cors());
+exp_sig.use(express.cookieParser());
+exp_sig.use(express.session({ secret: 'kittykittykittycat' }));
+exp_sig.use(flash());
+exp_sig.use(passport.initialize());
+exp_sig.use(passport.session());
+exp_sig.use(server.router);
+exp_sig.use(auth)
+exp_sig.use(express.static(d3ck_public))
+
+sig_d3cky = http.createServer(exp_sig)
+
+io_sig    = require('sock.old').listen(sig_d3cky, { resource: '/siggy' })
+
+sig_d3cky.listen(d3ck_port_forward)
+
+
+
+// io = require('socket.io').listen(d3cky);
+
+
+
+
+
+io_sig.sockets.on('connection', function (client) {
+
+    client.resources = {
+        screen: false,
+        video: true,
+        audio: false
+    };
 
 
     // pass a message to another id
