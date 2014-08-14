@@ -9,7 +9,7 @@ global
 
     daemon
 
-    # debug
+    debug
 
 #
 # seem reasonable, from various net examples

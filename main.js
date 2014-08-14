@@ -434,7 +434,7 @@ function auth(req, res, next) {
         return next();
     }
     else {
-        console.log('not client ip: ' + client_ip)
+        console.log('not client ip: ' + client_ip + ' != ' + req.body.ip_addr)
     }
 
 
