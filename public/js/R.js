@@ -9,7 +9,7 @@ var io = require('socket.io-client');
 
 // var SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081'
 // var SIGNALING_SERVER = 'https://' + window.location.hostname + ':8081'
-var SIGNALING_SERVER = 'https://' + window.location.hostname + ':8080/siggy'
+var SIGNALING_SERVER = 'https://' + window.location.hostname + ':8080'
 
 function SimpleWebRTC(opts) {
     var self = this;
@@ -17,7 +17,8 @@ function SimpleWebRTC(opts) {
     var config = this.config = {
             // url: 'http://signaling.simplewebrtc.com:8888',
             url: SIGNALING_SERVER,
-            socketio: {/* 'force new connection':true*/},
+            resource: '/sigsig',
+            socketio: { 'force new connection':true },
             debug: false,
             localVideoEl: '',
             remoteVideosEl: '',
@@ -2291,7 +2292,8 @@ var io = ('undefined' === typeof module ? {} : module.exports);
           // 'http' + (options.secure ? 's' : '') + ':/'
           'https:/'
         , options.host + ':' + options.port
-        , options.resource
+        // , options.resource
+        , 'siggy',
         , io.protocol
         , io.util.query(this.options.query, 't=' + +new Date)
       ].join('/');

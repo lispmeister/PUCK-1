@@ -125,7 +125,7 @@ public_routes = config.public_routes
 
 ///--- Redis
 var redis = require("redis"),
-rclient   = redis.createClient();    
+rclient   = redis.createClient();
 
 rclient.on("error", function (err) {
     console.log("Redis client error: " + err);
@@ -143,7 +143,7 @@ try {
     d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.pid')
     d3ck_id = decoder.write(d3ck_id);
     d3ck_id = d3ck_id.replace(/\n/, '');
-} 
+}
 catch (e) {
     console.log("no D3CK ID for this potential D3CK... you won't get anywhere w/o it....\n")
     console.log(e)
@@ -182,7 +182,7 @@ rclient.get(d3ck_id, function (err, reply) {
 
 // status and other bits
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
-    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_pid":"unknown"}, 
+    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_pid":"unknown"},
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
     d3ck_events     = {"new_d3ck":""},
     browser_magic   = {}
@@ -293,8 +293,8 @@ var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 // Pretty simple in theory; there are capabilities that a d3ck has,
 // like video, file transfer, etc.
 //
-// Each other d3ck (lookup by d3ck-ID) you know about has a yes/no/??? for 
-// each potential capability, They try to do something, you look it up, 
+// Each other d3ck (lookup by d3ck-ID) you know about has a yes/no/??? for
+// each potential capability, They try to do something, you look it up,
 // it will pass/fail/need-confirm/etc.
 //
 
@@ -312,7 +312,7 @@ var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 //
 // These may all be overwritten on a d3ck-by-d3ck basis
 //
-// If you are a client d3ck initiating communications with another d3ck then 
+// If you are a client d3ck initiating communications with another d3ck then
 // the 2nd d3ck's capability matrix will be used.
 //
 
@@ -415,12 +415,12 @@ function auth(req, res, next) {
 
     console.log('authentication check for... ' + req.path)
 
-    // 
+    //
     // are you logged in as a user, say, via the web?
     //
-    if (req.isAuthenticated()) { 
-        // console.log('already chex')
-        return next(); 
+    if (req.isAuthenticated()) {
+        console.log('already chex')
+        return next();
     }
 
     // for now... let in localhost... may rethink
@@ -449,7 +449,7 @@ function auth(req, res, next) {
 //
 //      var subject = req.connection.getPeerCertificate().subject;
 //
-//      //          { subject: 
+//      //          { subject:
 //      //              { C: 'AQ',
 //      // [...]
 //      //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
@@ -482,13 +482,13 @@ function hashit(password, N_ROUNDS) {
 
     // console.log('hashing ' + password)
 
-    var hash = bcrypt.hashSync(password, N_ROUNDS, function(err, _hash) { 
+    var hash = bcrypt.hashSync(password, N_ROUNDS, function(err, _hash) {
         if (err) {
             console.log("hash error: " + err)
             return("")
         }
         else {
-            // console.log('hashing ' + password + ' => ' + _hash); 
+            // console.log('hashing ' + password + ' => ' + _hash);
             return(_hash)
         }
     })
@@ -539,7 +539,7 @@ watch_logs("client_vpn", "OpenVPN Client")
 // drag in D3CK data to the server
 //
 // the very first time it's a bit of a chicken and egg thing;
-// how do you get the D3CK data loaded into the server if 
+// how do you get the D3CK data loaded into the server if
 // the client hasn't posted it yet? Wait for the first time
 // something is posted, that should be the one that we can
 // trigger on.
@@ -937,7 +937,7 @@ function get_client_ip(req) {
 
     if (typeof client_ip == "undefined") {
         console.log('no IP here...')
-        return("") 
+        return("")
     }
     else
         return client_ip
@@ -1061,7 +1061,7 @@ function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    if (typeof io == "object") { 
+    if (typeof io == "object") {
         // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
         var msg = {type: "status", status: d3ck_status}
         cat_power(msg)
@@ -1250,7 +1250,7 @@ function create_d3ck(req, res, next) {
             // if it's from a remote system, wake up local UI and tell user
             //
 
-            // garrr... openvpn breaks this too... 
+            // garrr... openvpn breaks this too...
             console.log('adding from: ' + req.body.value.name)
 
             d3ck_events = { new_d3ck : client_ip, new_d3ck_name: req.body.value.name }
@@ -1421,14 +1421,14 @@ function webProxy(req, res, next) {
 //
 //  curl -k 'https://192.168.0.1:8080/setproxy?proxy_remote_host=10.0.0.1&proxy_remote_port=22&proxy_local_port=6666'
 //
-// From now on connections to 192.168.0.1 on port 6666 will be 
+// From now on connections to 192.168.0.1 on port 6666 will be
 // redirected to port 22 on the host 10.0.0.1
 //
 function setTCPProxy(req, res, next) {
 
     console.log('set proxy')
 
-    if (typeof req.query.proxy_remote_host == "undefined" || 
+    if (typeof req.query.proxy_remote_host == "undefined" ||
         typeof req.query.proxy_remote_port == "undefined" ||
         typeof req.query.proxy_local_port  == "undefined") {
             console.log('requires both remote & local ports and remote host to be defined')
@@ -1502,11 +1502,11 @@ function red_getAsync(lists, cb) {
         var data = {}
 
         rclient.lrange(lists[k], 0, -1, function(err, objs) {
-            if (err) { 
-                console.log('listing errz') 
-                console.log(err) 
+            if (err) {
+                console.log('listing errz')
+                console.log(err)
                 cb({})
-            } 
+            }
             else {
                 console.log('all ' + key)
                 console.log(objs)
@@ -1597,7 +1597,7 @@ function getEvent(req, res, next) {
                 // next(new d3ckNotFoundError(req.params.key));
                 next({'error': 'Event Not Found'})
                 res.send(418, replies)  // 418 I'm a teapot (RFC 2324)
-            } 
+            }
             else {
                 // console.log("keys retrieved: ")
                 // console.log(replies)
@@ -1612,7 +1612,7 @@ function getEvent(req, res, next) {
                             // next(new d3ckNotFoundError(req.params.key));
                             next({'error': 'Event data not found'})
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
-                        } 
+                        }
                         else {
                             // console.log("event data retrieved: " + data.toString());
                             jdata = data.toString()
@@ -1654,7 +1654,7 @@ function get_d3ck(req, res, next) {
                 console.log(err, 'get_d3ck: unable to retrieve %s', req.d3ck);
                 // next(new d3ckNotFoundError(req.params.key));
                 next({'error': 'D3CK Not Found'})
-            } 
+            }
             else {
                 // console.log("Value retrieved: " + reply.toString());
                 var obj_reply = JSON.parse(reply)
@@ -1687,7 +1687,7 @@ function list_d3cks(req, res, next) {
     rclient.keys('[A-F0-9]*', function (err, keys) {
         if (err) {
             console.log(err, 'list_d3ck: unable to retrieve all d3cks');
-            next(err);            
+            next(err);
         } else {
             console.log('Number of d3cks found: ', keys.length);
             res.send(200, JSON.stringify(keys));
@@ -1929,7 +1929,7 @@ function uploadSchtuff(req, res, next) {
                         if (data instanceof Error) {
                             console.log('Error:', data.message);
                             res.send(200, {"error" : data.message})
-                        } 
+                        }
                         else {
                             console.log('upload to ' + upload_target + ' complete')
                             createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
@@ -2068,7 +2068,7 @@ function startVPN(req, res, next) {
 //
 // forward or unforward a port to go to your VPN to facilitate web RTC/sockets/etc
 //
-// if we're doing the calling, we want to set it up so that browser web requests 
+// if we're doing the calling, we want to set it up so that browser web requests
 // can go into the tunnel vs. trying to flail at some random IP
 //
 // normally you have something like:
@@ -2080,7 +2080,7 @@ function startVPN(req, res, next) {
 //
 function forward_port(req, res, next) {
 
-    console.log('forwarding portz...') 
+    console.log('forwarding portz...')
 
     if (typeof req.query.direction   == "undefined" ||
         typeof req.query.local_port  == "undefined" ||
@@ -2117,7 +2117,7 @@ function forward_port(req, res, next) {
 //
 // flush all IP tables rules and then add a given forwarding
 //
-// this is done differently because of sync/async... need to absolutely 
+// this is done differently because of sync/async... need to absolutely
 // be sure flushing is done before adding other rules, or they'll simply
 // get tossed
 //
@@ -2218,7 +2218,7 @@ function formDelete(req, res, next) {
     // ... of course... maybe should be done in node/js anyway...
     // have to ponder some imponderables....
     //
-    // this simply takes the pwd and finds the exe area... really 
+    // this simply takes the pwd and finds the exe area... really
     // want to use a reasonable d3ck home here!
     d3ck_spawn(d3ck_bin + '/delete_d3ck.sh', [d3ckid])
 
@@ -2247,15 +2247,15 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
     var err = {}
 
 //  cache results, do that first
-//  if (defined d3ck2ip[ip]) 
+//  if (defined d3ck2ip[ip])
 
     all_ips.forEach(function(ip, i) {
 
         // skip loopback
-        if (ip == "127.0.0.1") { 
-            // console.log('skipping ' + ip); 
+        if (ip == "127.0.0.1") {
+            // console.log('skipping ' + ip);
             responses++
-            return; 
+            return;
         }
 
         console.log('pinging  ' + ip);
@@ -2274,7 +2274,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 try {
                     ping_data = JSON.parse(ping_data)
                 }
-                catch (e) { 
+                catch (e) {
                     console.log('errz socket parsing: ' + JSON.stringify(e))
                     response = {status: "ping failure", "error": e}
                     // synchronicity... II... shouting above the din of my rice crispies
@@ -2750,8 +2750,8 @@ var credentials = {key: key, cert: cert, ca: ca}
 //
 
 var server_options = {
-    // key                 : key, 
-    // cert                : cert, 
+    // key                 : key,
+    // cert                : cert,
     // ca                  : ca,
     //ciphers:            : 'ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH',
     // ciphers             : 'ECDHE-RSA-AES256-SHA384:AES256-SHA256:RC4-SHA:RC4:HIGH:!MD5:!aNULL:!EDH:!AESGCM',
@@ -2851,7 +2851,7 @@ console.log('adding routes')
 // wait until user has run startup
 //
 async.whilst(
-    function () { 
+    function () {
         if (fs.existsSync(d3ck_secretz)) {
             console.log('ready to rock-n-roll')
             // means the startup has run and the D3CK has an ID, which must be done before anything else
@@ -2939,7 +2939,7 @@ server.get('/forward', auth, forward_port)
 //
 // list event types
 server.get('/events',           auth, listEvents);
-// get elements of a particular kind of event (create, delete, etc.); 
+// get elements of a particular kind of event (create, delete, etc.);
 server.get('/events/:key',      auth, getEvent);
 
 //
@@ -2954,7 +2954,7 @@ server.get('/down', auth, downloadStuff)
 // get a url from wherever the d3ck is
 server.all('/url', auth, webProxy)
 
-server.post('/login', 
+server.post('/login',
     passport.authenticate('local', { failureRedirect: '/loginFailure', failureFlash: true }),
     function(req, res) {
         // set a cookie so wont show the same intro page always
@@ -3049,195 +3049,180 @@ server.use(express.static(d3ck_public))
 var d3cky = http.createServer(server)
 
 
-//
-// fire up web sockets
-//
-var d3ck_users  = {},
-    cat_sock    = {},
-    all_cats    = []
+function fire_up_new () {
 
-var sock_user   = ""
+    console.log('\n\nfiring up new sockets......')
 
-io = require('socket.io').listen(d3cky);
+    //
+    // fire up web sockets
+    //
+    var d3ck_users  = {},
+        cat_sock    = {},
+        all_cats    = []
 
-//io.set('transports',['xhr-polling'])
-// io.set('transports',['websocket'])
+    var sock_user   = ""
 
-// io.set('log level', 4)
+    web_io = require('socket.io').listen(d3cky);
 
-
-function describeRoom(name) {
-    var clients = io.sockets.clients(name);
-    var result = {
-        clients: {}
-    };
-    clients.forEach(function (client) {
-        result.clients[client.id] = client.resources;
-    });
-    return result;
-}
-
-function safeCb(cb) {
-    if (typeof cb === 'function') {
-        return cb;
-    } else {
-        return function () {};
-    }
-}
-
-
-//
-// cat fax & status
-//
-io.sockets.on('connection', function (client) {
-
-    // var address = client.handshake.address;
-    var address = client.request.connection.remoteAddress
-
-    console.log('a user (from ' + address + ') connected... well, a browser, actually')
-
-    if (isEmpty(cat_sock)) {
-        cat_sock = client
+    function describeRoom(name) {
+        var clients = web_io.sockets.clients(name);
+        var result = {
+            clients: {}
+        };
+        clients.forEach(function (client) {
+            result.clients[client.id] = client.resources;
+        });
+        return result;
     }
 
-    d3ck_users[address] = address
-    console.log('[+] NEW connext from ' + address)
+    function safeCb(cb) {
+        if (typeof cb === 'function') {
+            return cb;
+        } else {
+            return function () {};
+        }
+    }
 
-    // a friendly cat fact
-    var cool_cat_fact = random_cat_fact(cat_facts)
-    var msg = {type: "cat_fact", fact: cool_cat_fact}
-    cat_power(msg)
-})
 
+    //
+    // cat fax & status
+    //
+
+    web_io.sockets.on('connection', function (client) {
+
+        // var address = client.handshake.address;
+        var address = client.request.connection.remoteAddress
+
+        console.log('a user (from ' + address + ') connected... well, a browser, actually')
+
+        if (isEmpty(cat_sock)) {
+            cat_sock = client
+        }
+
+        d3ck_users[address] = address
+        console.log('[+] NEW connext from ' + address)
+
+        // a friendly cat fact
+        var cool_cat_fact = random_cat_fact(cat_facts)
+        var msg = {type: "cat_fact", fact: cool_cat_fact}
+        cat_power(msg)
+    })
+
+}
 
 
 //
 // signaling
 //
-var exp_sig = express()
-exp_sig.use(response());
-exp_sig.use(express.limit('1gb'))
-exp_sig.use(express.logger());
-exp_sig.use(compress());
-exp_sig.use(express.methodOverride());
-exp_sig.use(express.json());
-exp_sig.use(express.urlencoded());
-exp_sig.use(express.multipart());
-exp_sig.use(express.methodOverride());
-exp_sig.use(cors());
-exp_sig.use(express.cookieParser());
-exp_sig.use(express.session({ secret: 'kittykittykittycat' }));
-exp_sig.use(flash());
-exp_sig.use(passport.initialize());
-exp_sig.use(passport.session());
-exp_sig.use(server.router);
-exp_sig.use(auth)
-exp_sig.use(express.static(d3ck_public))
+function fire_up_old () {
 
-sig_d3cky = http.createServer(exp_sig)
+    console.log('\n\nfiring up old sockets......')
 
-io_sig    = require('sock.old').listen(sig_d3cky, { resource: '/siggy' })
+    console.log('\n\n... trying... to set up... on port ' + d3ck_port_forward + '\n\n')
 
-sig_d3cky.listen(d3ck_port_forward)
+    var _ss        = express()
+    var sig_server = _ss.listen(d3ck_port_forward);
+    var io_sig     = require('sock.old').listen(sig_server, { resource: '/sigsig' })
+
+    //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
+    // app.use(express.static(__dirname + '/public'));
+
+    _ss.use(express.static(__dirname))
 
 
+    io_sig.sockets.on('connection', function (ss_client) {
 
-// io = require('socket.io').listen(d3cky);
-
-
-
-
-
-io_sig.sockets.on('connection', function (client) {
-
-    client.resources = {
-        screen: false,
-        video: true,
-        audio: false
-    };
+        ss_client.resources = {
+            screen: false,
+            video: true,
+            audio: false
+        };
 
 
-    // pass a message to another id
-    client.on('message', function (details) {
-        console.log('mess: ' + JSON.stringify(details))
+        // pass a message to another id
+        ss_client.on('message', function (details) {
+            console.log('mess: ' + JSON.stringify(details))
 
 
-        if (!details) return;
+            if (!details) return;
 
-        var otherClient = io.sockets.sockets[details.to];
-        if (!otherClient) return;
+            var otherClient = io.sockets.sockets[details.to];
+            if (!otherClient) return;
 
-        details.from = client.id;
-        otherClient.emit('message', details);
-    });
+            details.from = ss_client.id;
+            otherClient.emit('message', details);
+        });
 
-    client.on('shareScreen', function () {
-        client.resources.screen = true;
-    });
+        ss_client.on('shareScreen', function () {
+            ss_client.resources.screen = true;
+        });
 
-    client.on('unshareScreen', function (type) {
-        client.resources.screen = false;
-        removeFeed('screen');
-    });
+        ss_client.on('unshareScreen', function (type) {
+            ss_client.resources.screen = false;
+            removeFeed('screen');
+        });
 
-    client.on('join', join);
+        ss_client.on('join', join);
 
-    function removeFeed(type) {
-        if (client.room) {
-            io.sockets.in(client.room).emit('remove', {
-                id: client.id,
-                type: type
-            });
-            if (!type) {
-                client.leave(client.room);
-                client.room = undefined;
+        function removeFeed(type) {
+            if (ss_client.room) {
+                io.sockets.in(ss_client.room).emit('remove', {
+                    id: ss_client.id,
+                    type: type
+                });
+                if (!type) {
+                    ss_client.leave(ss_client.room);
+                    ss_client.room = undefined;
+                }
             }
         }
-    }
 
-    function join(name, cb) {
-        // sanity check
-        if (typeof name !== 'string') return;
-        // leave any existing rooms
-        removeFeed();
-        safeCb(cb)(null, describeRoom(name));
-        client.join(name);
-        client.room = name;
-    }
-
-    // we don't want to pass "leave" directly because the
-    // event type string of "socket end" gets passed too.
-    client.on('disconnect', function () {
-        removeFeed();
-    });
-    client.on('leave', function () {
-        removeFeed();
-    });
-
-    client.on('create', function (name, cb) {
-        if (arguments.length == 2) {
-            cb = (typeof cb == 'function') ? cb : function () {};
-            name = name || uuid();
-        } else {
-            cb = name;
-            name = uuid();
+        function join(name, cb) {
+            // sanity check
+            if (typeof name !== 'string') return;
+            // leave any existing rooms
+            removeFeed();
+            safeCb(cb)(null, describeRoom(name));
+            ss_client.join(name);
+            ss_client.room = name;
         }
-        // check if exists
-        if (io.sockets.clients(name).length) {
-            safeCb(cb)('taken');
-        } else {
-            join(name);
-            safeCb(cb)(null, name);
-        }
+
+        // we don't want to pass "leave" directly because the
+        // event type string of "socket end" gets passed too.
+        ss_client.on('disconnect', function () {
+            removeFeed();
+        });
+        ss_client.on('leave', function () {
+            removeFeed();
+        });
+
+        ss_client.on('create', function (name, cb) {
+            if (arguments.length == 2) {
+                cb = (typeof cb == 'function') ? cb : function () {};
+                name = name || uuid();
+            } else {
+                cb = name;
+                name = uuid();
+            }
+            // check if exists
+            if (io.sockets.ss_clients(name).length) {
+                safeCb(cb)('taken');
+            } else {
+                join(name);
+                safeCb(cb)(null, name);
+            }
+        });
+
+        // ss_client.emit('stunservers', [])
+        // var credentials = [];
+        // ss_client.emit('turnservers', credentials);
+
     });
 
-    // client.emit('stunservers', [])
-    // var credentials = [];
-    // client.emit('turnservers', credentials);
+}
 
-});
-
-
+fire_up_new()
+fire_up_old()
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
@@ -3263,6 +3248,4 @@ Object.size = function(obj) {
 d3cky.listen(d3ck_port_int, function() {
         console.log('[+] server listening at %s', d3ck_port_int)
 })
-
-
 

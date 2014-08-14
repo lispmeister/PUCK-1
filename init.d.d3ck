@@ -35,6 +35,8 @@ fi
 
 # LOCKFILE=/var/lock/d3ck
 
+NUM_PIDS=4
+
 lock_d3ckdate() {
         if [ -x /usr/bin/lockfile-create ]; then
                 lockfile-create $LOCKFILE
@@ -52,7 +54,7 @@ unlock_d3ckdate() {
 
 all_da_ps() {
         # only works on D3CK... will kill others if not careful...!   ;)
-        echo $(ps axuww|egrep 'openv|yate|node main.js'|grep -v grep | awk '{print $2}')
+        echo $(ps axuww|egrep 'haproxy -f|openv|yate|node main.js'|grep -v grep | awk '{print $2}')
 }
 
 case $1 in
@@ -94,8 +96,8 @@ case $1 in
         status)
                 num=$( echo $(all_da_ps) | awk '{print NF}')
 
-                if [ $num != 3 ] ; then
-                    log_success_msg "d3ck is running $num program(s) (should be 3)"
+                if [ $num != $NUM_PIDS ] ; then
+                    log_success_msg "d3ck is running $num program(s) (should be $NUM_PIDS)"
                     exit 3
                 else
                     log_success_msg "d3ck is running"

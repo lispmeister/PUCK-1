@@ -1324,7 +1324,6 @@ function set_up_RTC(remote) {
         return
     }
 
-
     console.log('setting up RTC: ' + SIGNALING_SERVER)
 
     var webrtc = new SimpleWebRTC({
