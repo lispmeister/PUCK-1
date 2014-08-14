@@ -2236,7 +2236,7 @@ var ping_done = false
 
 function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
-    console.log("++++pinging... " + ping_d3ckid + ' / ' + ipaddr)
+    // console.log("++++pinging... " + ping_d3ckid + ' / ' + ipaddr)
 
     ping_done = false
 
@@ -2258,7 +2258,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
             return;
         }
 
-        console.log('pinging  ' + ip);
+        // console.log('pinging  ' + ip);
 
         var url = 'https://' + ip + ':' + d3ck_port_ext + '/ping'
 
@@ -2284,7 +2284,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 }
 
                 // data.ip = ip
-                console.log('ip: ' + ip + ', data: ' + JSON.stringify(ping_data))
+                // console.log('ip: ' + ip + ', data: ' + JSON.stringify(ping_data))
 
                 ping_data.ip = ip
 
