@@ -433,6 +433,9 @@ function auth(req, res, next) {
         console.log('... if I let you (' + client_ip + ') vpn, I let you...')
         return next();
     }
+    else {
+        console.log('not client ip: ' + client_ip)
+    }
 
 
     //
