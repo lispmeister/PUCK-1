@@ -9,7 +9,7 @@ global
 
     daemon
 
-    debug
+    # debug
 
 #
 # seem reasonable, from various net examples
@@ -59,23 +59,33 @@ backend www_backend
 # web sockets
 #
 backend websocket_backend
-    mode http
-    option forwardfor
+#   mode http
+#   option forwardfor
 #   option http-server-close
 #   option forceclose
+#   no option httpclose
+    mode http
+    option forwardfor
+    option http-server-close
+    option forceclose
     no option httpclose
- 
-    server d3ck_sox D3CK_WEB:5555 weight 1 maxconn 16384 check
- 
+
+    server d3ck_sox D3CK_WEB:5555 weight 1 maxconn 999 check
+
 #
 # web RTC, may go local or to a remote d3ck
 #
 backend sock_signalz
-    mode http
-    option forwardfor
+#   mode http
+#   option forwardfor
 #   option http-server-close
 #   option forceclose
+#   no option httpclose
+    mode http
+    option forwardfor
+    option http-server-close
+    option forceclose
     no option httpclose
- 
-    server d3ck_sox D3CK_SIG:5556 weight 1 maxconn 16384 check
+
+    server d3ck_sox D3CK_SIG:5556 weight 1 maxconn 999 check
  
