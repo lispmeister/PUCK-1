@@ -35,7 +35,7 @@ frontend wwws
     # acl is_sox path_dir usermsg
 
     # signals for web RTC
-    acl is_sig path_dir signal
+    acl is_sig path_dir siggy
     use_backend sock_signalz if is_sig
 
     # normal sox stuff
