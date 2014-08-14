@@ -31,7 +31,7 @@ fi
 
 echo creating new haproxy conf with $web and $sig
 
-sed -e 's/D3CK_SIG/'"$sig"'/' -e 's/D3CK_WWW/'"$web"'/' haproto.txt > haproxy.cf
+sed -e 's/D3CK_SIG/'"$sig"'/' -e 's/D3CK_WEB/'"$web"'/' haproto.txt > haproxy.cf
 
 echo restarting haproxy
 
