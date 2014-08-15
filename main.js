@@ -3090,7 +3090,7 @@ function fire_up_local () {
 
     web_io.sockets.on('connection', function (client) {
 
-        var address = client.handshake.address;
+        var address = client.handshake.address.address
         // var address = client.request.connection.remoteAddress
 
         console.log('a user (from ' + address + ') connected... well, a browser, actually')
