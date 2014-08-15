@@ -961,18 +961,18 @@ all_p33rs = [];
 //
 function cat_power(msg) {
 
-    // console.log('channel ' + channel + ' => ' + JSON.stringify(msg))
+    console.log('kitty Powa!  => ' + JSON.stringify(msg))
 
     if (msg.type != "openvpn_server") {
 
         try {
-            console.log('catpower writez!  ' + JSON.stringify(msg))
+            console.log('catpower writez:  catFax, ' + JSON.stringify(msg))
             // cat_sock.write(JSON.stringify(msg))
             cat_sock.emit('catFax', JSON.stringify(msg))
         }
         catch (e) {
             // need a browser...
-            // console.log('channel not up yet....? ' + e)
+            console.log('channel not up yet....? ' + e)
         }
     }
 
@@ -3048,6 +3048,7 @@ server.use(express.static(d3ck_public))
 //
 var d3cky = http.createServer(server)
 
+var cat_sock = {}
 
 function fire_up_new () {
 
@@ -3057,12 +3058,11 @@ function fire_up_new () {
     // fire up web sockets
     //
     var d3ck_users  = {},
-        cat_sock    = {},
         all_cats    = []
 
     var sock_user   = ""
 
-    web_io = require('socket.io').listen(d3cky);
+    var web_io = require('socket.io').listen(d3cky);
 
     function describeRoom(name) {
         var clients = web_io.sockets.clients(name);
@@ -3096,6 +3096,9 @@ function fire_up_new () {
         console.log('a user (from ' + address + ') connected... well, a browser, actually')
 
         if (isEmpty(cat_sock)) {
+            console.log('^..^')
+            console.log('... resetting cat sock to point to ' + address)
+            console.log('^..^')
             cat_sock = client
         }
 
@@ -3132,6 +3135,8 @@ function fire_up_old () {
 
     io_sig.sockets.on('connection', function (ss_client) {
 
+        console.log("CONNEEEEECTION.....!")
+
         ss_client.resources = {
             screen: false,
             video: true,
@@ -3146,7 +3151,7 @@ function fire_up_old () {
 
             if (!details) return;
 
-            var otherClient = io.sockets.sockets[details.to];
+            var otherClient = io_sig.sockets.sockets[details.to];
             if (!otherClient) return;
 
             details.from = ss_client.id;
@@ -3165,8 +3170,9 @@ function fire_up_old () {
         ss_client.on('join', join);
 
         function removeFeed(type) {
+            console.log('ss-remove-feed')
             if (ss_client.room) {
-                io.sockets.in(ss_client.room).emit('remove', {
+                io_sig.sockets.in(ss_client.room).emit('remove', {
                     id: ss_client.id,
                     type: type
                 });
@@ -3190,13 +3196,16 @@ function fire_up_old () {
         // we don't want to pass "leave" directly because the
         // event type string of "socket end" gets passed too.
         ss_client.on('disconnect', function () {
+            console.log('ss-D/C')
             removeFeed();
         });
         ss_client.on('leave', function () {
+            console.log('ss-leave')
             removeFeed();
         });
 
         ss_client.on('create', function (name, cb) {
+            console.log('ss-create')
             if (arguments.length == 2) {
                 cb = (typeof cb == 'function') ? cb : function () {};
                 name = name || uuid();
@@ -3205,7 +3214,7 @@ function fire_up_old () {
                 name = uuid();
             }
             // check if exists
-            if (io.sockets.ss_clients(name).length) {
+            if (io_sig.sockets.ss_clients(name).length) {
                 safeCb(cb)('taken');
             } else {
                 join(name);
@@ -3221,7 +3230,7 @@ function fire_up_old () {
 
 }
 
-fire_up_new()
+// fire_up_new()
 fire_up_old()
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array

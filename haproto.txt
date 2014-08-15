@@ -42,8 +42,8 @@ frontend wwws
     acl is_websocket hdr(Upgrade) -i WebSocket
     use_backend websocket_backend if is_websocket
 
-    tcp-request inspect-delay 500ms
-    tcp-request content accept if HTTP
+#   tcp-request inspect-delay 500ms
+#   tcp-request content accept if HTTP
 
 #
 # web
@@ -59,11 +59,6 @@ backend www_backend
 # web sockets
 #
 backend websocket_backend
-#   mode http
-#   option forwardfor
-#   option http-server-close
-#   option forceclose
-#   no option httpclose
     mode http
     option forwardfor
     option http-server-close
@@ -76,11 +71,6 @@ backend websocket_backend
 # web RTC, may go local or to a remote d3ck
 #
 backend sock_signalz
-#   mode http
-#   option forwardfor
-#   option http-server-close
-#   option forceclose
-#   no option httpclose
     mode http
     option forwardfor
     option http-server-close

@@ -1013,14 +1013,14 @@ function socket_looping() {
     local_socket = io.connect('https://' + window.location.hostname + ':8080', {
         'reconnection delay':         100,
         'reconnection limit':         100,
-        'max reconnection attempts':  Infinity,
-        'transports': [
-                                    'websocket',
-                                    'flashsocket',
-                                    'htmlfile',
-                                    'xhr-polling',
-                                    'jsonp-polling'
-                    ]
+        'max reconnection attempts':  Infinity
+//      'transports': [
+//                                  'websocket',
+//                                  'flashsocket',
+//                                  'htmlfile',
+//                                  'xhr-polling',
+//                                  'jsonp-polling'
+//                  ]
     })
 
     local_socket.on('pong', function(data){
@@ -1065,9 +1065,9 @@ function socket_looping() {
     })
 
     local_socket.on('catFax', function(d3ck_message){
-    //  console.log('[^..^] cat FAX!!!!')
-    //  console.log(data)
-    //
+        console.log('[^..^] cat FAX!!!!')
+        console.log(d3ck_message)
+       
     // local_socket.on('message', function(d3ck_message) {
         console.log('[^..^] messages or cat facts!')
 
