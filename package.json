@@ -36,6 +36,7 @@
       "sleep": "latest",
       "socket.io": "0.9.16",
       "tail": "latest",
+      "timed": "latest",
       "tcp-proxy": "latest",
       "underscore": "latest",
       "when": "latest"
