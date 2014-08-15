@@ -99,7 +99,7 @@ function SimpleWebRTC(opts) {
     var config = this.config = {
             url: SIGNALING_SERVER,
             resource: 'sigsig',
-            socketio: {/* 'force new connection':true*/},
+            socketio: { 'force new connection': true },
             debug: false,
             localVideoEl: '',
             remoteVideosEl: '',

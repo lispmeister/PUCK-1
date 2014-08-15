@@ -34,11 +34,10 @@
       "rest": "latest",
       "restler": "latest",
       "sleep": "latest",
-      "socket.io": "latest",
+      "socket.io": "0.9.16",
       "tail": "latest",
       "tcp-proxy": "latest",
       "underscore": "latest",
-      "websocket": "latest",
       "when": "latest"
   },
   "author": "dan f with some early help from the mighty Markus Fix",

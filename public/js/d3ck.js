@@ -1011,9 +1011,10 @@ function socket_looping() {
     // Initialize the socket & handlers
     // local_socket = io.connect('https://' + window.location.hostname + ':5555', {
     local_socket = io.connect('https://' + window.location.hostname + ':8080', {
-        'reconnection delay':         100,
-        'reconnection limit':         100,
-        'max reconnection attempts':  Infinity
+        'force new connection'      : true,
+        'reconnection delay'        : 100,
+        'reconnection limit'        : 100,
+        'max reconnection attempts' : Infinity
 //      'transports': [
 //                                  'websocket',
 //                                  'flashsocket',

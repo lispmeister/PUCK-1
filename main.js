@@ -3050,9 +3050,9 @@ var d3cky = http.createServer(server)
 
 var cat_sock = {}
 
-function fire_up_new () {
+function fire_up_local () {
 
-    console.log('\n\nfiring up new sockets......')
+    console.log('\n\nfiring up local sockets......')
 
     //
     // fire up web sockets
@@ -3090,8 +3090,8 @@ function fire_up_new () {
 
     web_io.sockets.on('connection', function (client) {
 
-        // var address = client.handshake.address;
-        var address = client.request.connection.remoteAddress
+        var address = client.handshake.address;
+        // var address = client.request.connection.remoteAddress
 
         console.log('a user (from ' + address + ') connected... well, a browser, actually')
 
@@ -3117,21 +3117,20 @@ function fire_up_new () {
 //
 // signaling
 //
-function fire_up_old () {
+function fire_up_remote () {
 
-    console.log('\n\nfiring up old sockets......')
+    console.log('\n\nfiring up remote sockets......')
 
     console.log('\n\n... trying... to set up... on port ' + d3ck_port_forward + '\n\n')
 
     var _ss        = express()
     var sig_server = _ss.listen(d3ck_port_forward);
-    var io_sig     = require('sock.old').listen(sig_server, { resource: '/sigsig' })
+    var io_sig     = require('socket.io').listen(sig_server, { resource: '/sigsig' })
 
     //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
     // app.use(express.static(__dirname + '/public'));
 
     _ss.use(express.static(__dirname))
-
 
     io_sig.sockets.on('connection', function (ss_client) {
 
@@ -3230,8 +3229,8 @@ function fire_up_old () {
 
 }
 
-// fire_up_new()
-fire_up_old()
+fire_up_local()
+fire_up_remote()
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {
