@@ -413,24 +413,24 @@ function auth(req, res, next) {
         // return next({ redirecting: 'quikstart.html'});
     }
 
-    console.log('authentication check for... ' + req.path)
+//  console.log('authentication check for... ' + req.path)
 
     //
     // are you logged in as a user, say, via the web?
     //
     if (req.isAuthenticated()) {
-        console.log('already chex')
+        console.log('already chex: ' + req.path)
         return next();
     }
 
     // for now... let in localhost... may rethink
     if (req.body.ip_addr == '127.0.0.1') {
-        console.log('pass... localhost')
+        console.log('pass... localhost' + req.path)
         return next();
     }
 
     if (req.body.ip_addr == client_ip) {
-        console.log('... if I let you (' + client_ip + ') vpn, I let you...')
+        console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
         return next();
     }
     else {
@@ -461,7 +461,7 @@ function auth(req, res, next) {
 //      console.log(req.connection.getPeerCertificate())
 //  }
 
-    console.log('I pity da fool who tries to sneak by me!')
+    console.log('I pity da fool who tries to sneak by me!  ' + req.path)
     res.redirect(302, '/login.html')
 
 }
@@ -1066,7 +1066,9 @@ function d3ckStatus(req, res, next) {
         var msg = {type: "status", status: d3ck_status}
         cat_power(msg)
     }
-    else { console.log('iOS not ready') }
+    else { 
+        // console.log('kitties not ready')
+    }
 
     res.send(200, JSON.stringify(d3ck_status))
 
