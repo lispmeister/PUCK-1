@@ -3062,7 +3062,8 @@ function fire_up_local () {
 
     var sock_user   = ""
 
-    var web_io = require('socket.io').listen(d3cky);
+    var web_io = require('socket.io').listen(d3cky, { resource: 'catz' });
+    
 
     function describeRoom(name) {
         var clients = web_io.sockets.clients(name);
@@ -3125,7 +3126,7 @@ function fire_up_remote () {
 
     var _ss        = express()
     var sig_server = _ss.listen(d3ck_port_forward);
-    var io_sig     = require('socket.io').listen(sig_server, { resource: '/sigsig' })
+    var io_sig     = require('socket.io').listen(sig_server, { resource: 'sigsig' })
 
     //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
     // app.use(express.static(__dirname + '/public'));
@@ -3229,7 +3230,7 @@ function fire_up_remote () {
 
 }
 
-fire_up_local()
+// fire_up_local()
 fire_up_remote()
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array

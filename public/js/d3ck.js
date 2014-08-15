@@ -654,8 +654,20 @@ function get_status() {
     jqXHR_get_status.done(function (data, textStatus, jqXHR) {
         // console.log('status wootz\n' + data)
         d3ck_status = JSON.parse(data)
-        console.log("INITIAL STATUS: " + JSON.stringify(d3ck_status))
-        status_or_die()
+        // console.log("got status?  " + JSON.stringify(d3ck_status))
+        console.log('got status?')
+        // status_or_die()
+
+        // if something is new, do something!
+        if (! _.isEqual(old_d3ck_status, d3ck_status)) {
+            console.log('something new in the state of denmark!')
+            old_d3ck_status = JSON.parse(JSON.stringify(d3ck_status))
+            status_or_die()
+        }
+        else {
+            // console.log('same ol, same ol')
+        }
+
     }).fail(ajaxError);
 
 }
@@ -1002,6 +1014,8 @@ local_socket = null
 
 function socket_looping() {
 
+    return
+
     console.log('trying to do a socket connect')
 
     var recInterval  = null;
@@ -1014,7 +1028,8 @@ function socket_looping() {
         'force new connection'      : true,
         'reconnection delay'        : 100,
         'reconnection limit'        : 100,
-        'max reconnection attempts' : Infinity
+        'max reconnection attempts' : Infinity,
+        'resource'                  : 'catz'
 //      'transports': [
 //                                  'websocket',
 //                                  'flashsocket',

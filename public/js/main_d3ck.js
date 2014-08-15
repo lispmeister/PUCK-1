@@ -24,9 +24,10 @@ var ovpn_slogs = 'openvpn_server_logs'
 var ovpn_clogs = 'openvpn_client_logs'
 
 // conf file fodder
-var D3CK_TIMEOUT         = 5000  // 5 seconds should be enough for anyone!
-var PREGNANT_PAUSE       = 5000
-var SOCK_CHECK           = 1000
+var D3CK_TIMEOUT    = 5000  // 5 seconds should be enough for anyone!
+var PREGNANT_PAUSE  = 5000
+var SOCK_CHECK      = 1000
+var STATUS_CHECK    = 3000
 
 var all_d3ck_ids = {}
 
@@ -325,7 +326,8 @@ $(document).ready(function () {
     socket_looping()
 
     // sow the seed o' doubt
-    get_status()
+    
+    setInterval(get_status,STATUS_CHECK)
 
     // setInterval(get_status,PREGNANT_PAUSE)
     setTimeout(get_status,PREGNANT_PAUSE)
