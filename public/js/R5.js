@@ -744,6 +744,7 @@ var io = ('undefined' === typeof module ? {} : module.exports);
    */
 
   io.connect = function (host, details) {
+
     var uri = io.util.parseUri(host)
       , uuri
       , socket;
@@ -762,6 +763,7 @@ var io = ('undefined' === typeof module ? {} : module.exports);
       , secure: 'https' == uri.protocol
       , port: uri.port || ('https' == uri.protocol ? 443 : 80)
       , query: uri.query || ''
+      , 'force new connection': true
     };
 
     io.util.merge(options, details);

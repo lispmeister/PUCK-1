@@ -3100,6 +3100,8 @@ function fire_up_local () {
 //
 // signaling
 //
+var io_sig = {}
+
 function fire_up_remote () {
 
     console.log('\n\nfiring up remote sockets......')
@@ -3109,7 +3111,10 @@ function fire_up_remote () {
 //  var _ss        = express()
 //  var sig_server = _ss.listen(d3ck_port_int);
     // var io_sig     = require('socket.io').listen(d3cky, { resource: 'sigsig' })
-    var io_sig     = require('socket.io').listen(d3cky)
+
+    io_sig     = require('socket.io').listen(d3cky)
+    io_disable.disable('browser client cache');
+
 
     //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
     // app.use(express.static(__dirname + '/public'));
