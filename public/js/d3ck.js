@@ -1029,7 +1029,8 @@ function socket_looping() {
         'reconnection delay'        : 100,
         'reconnection limit'        : 100,
         'max reconnection attempts' : Infinity,
-        'resource'                  : 'catz'
+        'resource'                  : 'catz',
+        'transports'                : ['xhr-polling']
 //      'transports': [
 //                                  'websocket',
 //                                  'flashsocket',

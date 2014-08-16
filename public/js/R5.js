@@ -4539,7 +4539,14 @@ var swfobject=function(){var D="undefined",r="object",S="Shockwave Flash",W="Sho
    * @api private
    */
 
-  io.transports.push('jsonp-polling');
+  // io.transports.push('jsonp-polling');
+  io.transports = [ 'xhr-polling' ]
+//                                  'websocket',
+//                                  'flashsocket',
+//                                  'htmlfile',
+//                                  'xhr-polling',
+//                                  'jsonp-polling'
+//                  ]
 
 })(
     'undefined' != typeof io ? io.Transport : module.exports
