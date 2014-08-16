@@ -3064,7 +3064,7 @@ function fire_up_local () {
 
     var sock_user   = ""
 
-    var web_io = require('socket.io').listen(d3cky, { resource: 'catz' });
+    var web_io = require('socket.io').listen(d3cky, { resource: '/catz' });
     
 
     //
@@ -3238,7 +3238,7 @@ function fire_up_remote () {
 
 }
 
-fire_up_local()
+// fire_up_local()
 fire_up_remote()
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array

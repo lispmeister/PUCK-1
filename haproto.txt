@@ -33,8 +33,11 @@ frontend wwws
     acl is_sig path_beg /socket.io
     use_backend sock_signalz if is_sig
 
+    acl is_websocket path_beg /catz
     acl is_websocket hdr(Upgrade) -i WebSocket
-    use_backend sock_signalz if is_websocket
+
+    use_backend websocket_backend if is_sig
+    use_backend websocket_backend if is_websocket
 
     # if all else fails... web
     default_backend www_backend
