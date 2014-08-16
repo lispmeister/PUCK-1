@@ -3113,8 +3113,8 @@ function fire_up_remote () {
     // var io_sig     = require('socket.io').listen(d3cky, { resource: 'sigsig' })
 
     io_sig     = require('socket.io').listen(d3cky)
-    io_disable.disable('browser client cache');
 
+    io_sig.disable('browser client cache');
 
     //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
     // app.use(express.static(__dirname + '/public'));
