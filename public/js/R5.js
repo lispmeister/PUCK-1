@@ -98,7 +98,7 @@ function SimpleWebRTC(opts) {
     var options = opts || {};
     var config = this.config = {
             url: SIGNALING_SERVER,
-            resource: 'sigsig',
+            // resource: 'sigsig',
             socketio: { 'force new connection': true },
             debug: false,
             localVideoEl: '',
@@ -2296,7 +2296,8 @@ var io = ('undefined' === typeof module ? {} : module.exports);
           'http' + (options.secure ? 's' : '') + ':/'
         , options.host + ':' + options.port
         //, options.resource
-        , 'sigsig'
+        // , 'sigsig'
+        , 'socket.io'
         , io.protocol
         , io.util.query(this.options.query, 't=' + +new Date)
       ].join('/');

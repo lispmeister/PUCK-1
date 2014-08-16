@@ -1306,10 +1306,13 @@ function detect_webRTC(element) {
 //
 function set_up_RTC(remote) {
 
+    console.log('setting up that ol rtc magic')
+
     var remote_d3ck = ""        // pid of other d3ck
-    var p33r_url    = "/p33rs"  // url of server currently connected to - local or remote?
 
     var ip          = window.location.hostname
+
+/*
 
     // someone connected to us
     if (d3ck_status.openvpn_server.vpn_status == "up") {
@@ -1329,7 +1332,6 @@ function set_up_RTC(remote) {
 //      SIGNALING_SERVER = 'wss://' + remote_ip + ':' + D3CK_SIG_PORT
 //      console.log('changing signaling server to: ' + SIGNALING_SERVER)
 //      p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
-
 //      ip = remote
 
     }
@@ -1339,6 +1341,8 @@ function set_up_RTC(remote) {
         alert('hmmm... are you connected...?')
         return
     }
+
+*/
 
     console.log('setting up RTC: ' + SIGNALING_SERVER)
 

@@ -3067,26 +3067,6 @@ function fire_up_local () {
     var web_io = require('socket.io').listen(d3cky, { resource: 'catz' });
     
 
-    function describeRoom(name) {
-        var clients = web_io.sockets.clients(name);
-        var result = {
-            clients: {}
-        };
-        clients.forEach(function (client) {
-            result.clients[client.id] = client.resources;
-        });
-        return result;
-    }
-
-    function safeCb(cb) {
-        if (typeof cb === 'function') {
-            return cb;
-        } else {
-            return function () {};
-        }
-    }
-
-
     //
     // cat fax & status
     //
@@ -3126,14 +3106,35 @@ function fire_up_remote () {
 
     console.log('\n\n... trying... to set up... on port ' + d3ck_port_forward + '\n\n')
 
-    var _ss        = express()
-    var sig_server = _ss.listen(d3ck_port_forward);
-    var io_sig     = require('socket.io').listen(sig_server, { resource: 'sigsig' })
+//  var _ss        = express()
+//  var sig_server = _ss.listen(d3ck_port_int);
+    // var io_sig     = require('socket.io').listen(d3cky, { resource: 'sigsig' })
+    var io_sig     = require('socket.io').listen(d3cky)
 
     //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
     // app.use(express.static(__dirname + '/public'));
 
-    _ss.use(express.static(__dirname))
+    // _ss.use(express.static(__dirname))
+
+    function describeRoom(name) {
+        var clients = io_sig.sockets.clients(name);
+        var result = {
+            clients: {}
+        };
+        clients.forEach(function (client) {
+            result.clients[client.id] = client.resources;
+        });
+        return result;
+    }
+
+    function safeCb(cb) {
+        if (typeof cb === 'function') {
+            return cb;
+        } else {
+            return function () {};
+        }
+    }
+
 
     io_sig.sockets.on('connection', function (ss_client) {
 

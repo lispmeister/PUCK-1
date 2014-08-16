@@ -67,6 +67,11 @@ $(document).ready(function () {
     $('#logout').click(function         (e) { window.location.href='/logout'; })
 
 
+    $('body').on('click', '#rtc_button', function() { 
+        console.log('rtc!!!'); 
+        set_up_RTC() 
+    })
+
     // log areas
     // $("#ovpn_client_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } })
     // $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } })
