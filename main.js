@@ -443,7 +443,7 @@ headers:
 
 */
 
-    if (typeof req.headers['x-forwarded-for'] != 'undefined') {
+    if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
 
         console.log('... ok... trying x-forw....')
 
