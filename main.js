@@ -429,12 +429,25 @@ function auth(req, res, next) {
         return next();
     }
 
-    if (req.body.ip_addr == client_ip) {
+
+headers: 
+   { accept: '*/*',
+     'user-agent': 'Restler for node.js',
+     host: '10.105.154.1:8080',
+     'accept-encoding': 'gzip, deflate',
+     'content-type': 'multipart/form-data; boundary=48940923NODERESLTER3890457293',
+     'content-length': '87119',
+     'x-forwarded-proto': 'https',
+     'x-forwarded-for': '10.105.154.6' },
+
+
+
+    if (req.headers['x-forwarded-for'] == client_vpn_ip) {
         console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
         return next();
     }
     else {
-        console.log('not client ip: ' + client_ip + ' != ' + req.body.ip_addr)
+        console.log('not client ip: ' + client_vpn_ip + ' != ' + req.headers['x-forwarded-for'])
     }
 
 
@@ -712,6 +725,7 @@ function watch_logs(logfile, log_type) {
             magic_server_down1  = "OpenVPN Server lost client",
             magic_server_down2  = "Client Disconnect",
             magic_server_remote = "Peer Connection Initiated",
+            magic_server_rvpn   = "Client Connect :",
 
             moment_in_time = moment().format('ddd  HH:mm:ss MM-DD-YY'),
             moment_in_secs =  (new Date).getTime(),
@@ -737,11 +751,21 @@ function watch_logs(logfile, log_type) {
 
             }
 
+            // the remote client's IP addr... looking for lines that look like:
+            //
+            //      Client Connect : 10.105.154.6
+            //
+            if (line.indexOf(magic_server_rvpn) > -1) {
+                client_vpn_ip = line.match(/((([0-9]+\.){3}([0-9]+){1}))/)[0]
+                console.log('\n------> ' + client_vpn_ip + '<--- openvpn client IP\n\n')
+            }
+
             // various states of up-id-ness and down-o-sity
             if (line.indexOf(magic_server_up) > -1) {
                 console.log('\n\n\n++++++++++++' + logfile + ' \n\n Openvpn server up:\n\n')
                 console.log(line)
                 console.log('\n\n')
+
 
                 server_magic = {
                     vpn_status : "up",
