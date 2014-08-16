@@ -429,9 +429,10 @@ function auth(req, res, next) {
         return next();
     }
 
+/*
 
 headers: 
-   { accept: '*/*',
+   { accept:
      'user-agent': 'Restler for node.js',
      host: '10.105.154.1:8080',
      'accept-encoding': 'gzip, deflate',
@@ -440,7 +441,7 @@ headers:
      'x-forwarded-proto': 'https',
      'x-forwarded-for': '10.105.154.6' },
 
-
+*/
 
     if (req.headers['x-forwarded-for'] == client_vpn_ip) {
         console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
