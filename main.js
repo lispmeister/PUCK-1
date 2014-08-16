@@ -443,12 +443,18 @@ headers:
 
 */
 
-    if (req.headers['x-forwarded-for'] == client_vpn_ip) {
-        console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
-        return next();
-    }
-    else {
-        console.log('not client ip: ' + client_vpn_ip + ' != ' + req.headers['x-forwarded-for'])
+    if (typeof req.headers['x-forwarded-for'] != 'undefined') {
+
+        console.log('... ok... trying x-forw....')
+
+        if (req.headers['x-forwarded-for'] == client_vpn_ip) {
+            console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
+            return next();
+        }
+        else {
+            console.log('not client ip: ' + client_vpn_ip + ' != ' + req.headers['x-forwarded-for'])
+        }
+
     }
 
 
