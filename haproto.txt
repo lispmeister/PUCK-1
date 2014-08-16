@@ -26,6 +26,8 @@ defaults
     option http-keep-alive
 
 frontend wwws
+    mode http
+
     bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
     timeout client 1h
 
@@ -35,12 +37,22 @@ frontend wwws
     # acl is_sox path_dir usermsg
 
     # signals for web RTC
-    acl is_sig path_dir sigsig
-    use_backend sock_signalz if is_sig
+
+#xxxx
+#   acl is_sig path_dir sigsig
+#   use_backend sock_signalz if is_sig
 
     # normal sox stuff
+#xxxx
+#   acl is_websocket hdr(Upgrade) -i WebSocket
+#   use_backend websocket_backend if is_websocket
+
+
     acl is_websocket hdr(Upgrade) -i WebSocket
-    use_backend websocket_backend if is_websocket
+    use_backend sock_signalz if is_websocket
+
+
+
 
 #   tcp-request inspect-delay 500ms
 #   tcp-request content accept if HTTP
