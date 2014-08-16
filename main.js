@@ -2767,6 +2767,8 @@ var server_options = {
 
 server = express()
 
+server.enable('trust proxy');
+
 // various helpers
 server.use(response());
 
