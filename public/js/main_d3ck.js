@@ -36,6 +36,14 @@ ring = new Audio("media/ringring.mp3") // load it up
 
 $(document).ready(function () {
 
+    // video funkytown
+    $('#video_effect').change(function() {
+        var opt = $('option:selected', this).attr('value')
+        console.log('ch-ch-ch-changing to ' + opt)
+        $('#localVideo').css('-webkit-filter', opt);
+    });
+
+
     var image     = ""
     // var d3ck_id   = ""
 

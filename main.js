@@ -481,7 +481,7 @@ headers:
 //      console.log(req.connection.getPeerCertificate())
 //  }
 
-    console.log('I pity da fool who tries to sneak by me!  ' + req.path)
+    console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
     res.redirect(302, '/login.html')
 
 }

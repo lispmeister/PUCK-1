@@ -311,7 +311,6 @@ function state_vpn(state, browser_ip) {
 
         set_up_RTC(remote_ip) // fly free, web RTC!
 
-
         if (! d3ck_current.busy) {
             console.log('\t[+] fire up the outbound signs')
 
@@ -421,10 +420,20 @@ function event_connect(direction, caller) {
 
 }
 
+// video toyz on/off
+function toggle_special_FX() {
+
+    // turn on/off special video FX
+    $('#video_effect_div').toggleClass('hidden')
+
+}
+
 //
 // hang up the phone, return to home
 //
 function event_hang_up() {
+
+    toggle_special_FX()
 
     // i has gone
     console.log('hanging up!')
@@ -942,7 +951,7 @@ function drag_and_d3ck(other_d3ck) {
         changeInput: '<div class="dragDropBox"><span class="message">CLICK -or- DROP files to upload <span style="font-size:200%"><br />' + other_d3ck + '</span></div>',
         appendTo   : '.dragDropBox',
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
-        maxSize    : 1024,
+        maxSize    : 1024 * 1024,
         uploadFile: {
             // url:         'https://10.217.62.1:8080/up',
             url:         '/up/' + other_d3ck,
@@ -1313,8 +1322,6 @@ function set_up_RTC(remote) {
 
     var ip          = window.location.hostname
 
-/*
-
     // someone connected to us
     if (d3ck_status.openvpn_server.vpn_status == "up") {
         console.log("PEEEEER js: server up")
@@ -1330,6 +1337,7 @@ function set_up_RTC(remote) {
         // need to reset after hangup...!
         // xxxxx!!!!
         //
+
 //      SIGNALING_SERVER = 'wss://' + remote_ip + ':' + D3CK_SIG_PORT
 //      console.log('changing signaling server to: ' + SIGNALING_SERVER)
 //      p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
@@ -1342,8 +1350,6 @@ function set_up_RTC(remote) {
         alert('hmmm... are you connected...?')
         return
     }
-
-*/
 
     console.log('setting up RTC: ' + SIGNALING_SERVER)
 
@@ -1359,123 +1365,7 @@ function set_up_RTC(remote) {
     });
 
 
-//  var peer = new Peer(my_d3ck.D3CK_ID, { 
-//      iceServers: [{}],
-//      secure: true,
-//      debug: 3, 
-//      url: SIGNALING_SERVER,
-//      host: ip
-//  })
-
-
-// until .... do:
-
-//  // can't do nothin' until get my p33rs
-//    var jqXHR_list = $.ajax({
-//        url: '/p33rs',          // ... must ask the right server...!
-//        async:false,
-//        dataType: 'json'
-//    })
-//
-//    jqXHR_list.done(function (data, textStatus, jqXHR) {
-//        console.log('\n\njxq p33r list wootz\n\n')
-//        console.log(data)
-//
-//        // should do some length checking as well
-//        for (var i = 0; i < data.length; i++) {
-//            var d = data[i]
-//            console.log('d3ck: ' + d)
-//            if (d != my_d3ck.D3CK_ID) {
-//                console.log('!!!!')
-//                console.log('someone new is here! ' + d)
-//                remote_d3ck = d
-//            }
-//        }
-//    })
-//
-//    console.log('actually trying to connect to ' + remote_d3ck)
-//
-//    // xxx - puckid, name, etc....
-//    var conn = peer.connect(remote_d3ck)
-//
-//    // Compatibility shim
-//    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-//    
-//    peer.on('open', function(){
-//        $('#my-id').text(peer.id);
-//    });
-//    
-//    // Receiving a call
-//    peer.on('call', function(call){
-//      // Answer the call automatically (instead of prompting user) for demo purposes
-//      call.answer(window.localStream);
-//      step3(call);
-//    });
-//    peer.on('error', function(err){
-//       console.log(err.message);
-//      // Return to step 2 if error occurs
-//      step2();
-//    });
-//    
-//    // Click handlers setup
-//    $(function(){
-//      $('#make-call').click(function(){
-//        // Initiate a call!
-//        var call = peer.call($('#callto-id').val(), window.localStream);
-//    
-//        step3(call);
-//      });
-//    
-//      $('#end-call').click(function(){
-//        window.existingCall.close();
-//        step2();
-//      });
-//    
-//      // Retry if getUserMedia fails
-//      $('#step1-retry').click(function(){
-//        $('#step1-error').hide();
-//        step1();
-//      });
-//    
-//      // Get things started
-//      step1();
-//    });
-//    
-//    function step1 () {
-//      // Get audio/video stream
-//      navigator.getUserMedia({audio: true, video: true}, function(stream){
-//        // Set your video displays
-//        $('#my-video').prop('src', URL.createObjectURL(stream));
-//    
-//        window.localStream = stream;
-//        step2();
-//      }, function(){ $('#step1-error').show(); });
-//    }
-//    
-//    function step2 () {
-//      $('#step1, #step3').hide();
-//      $('#step2').show();
-//    }
-//    
-//    function step3 (call) {
-//      // Hang up on an existing call if present
-//      if (window.existingCall) {
-//        window.existingCall.close();
-//      }
-//    
-//      // Wait for stream on the call, then set peer video display
-//      call.on('stream', function(stream){
-//        $('#their-video').prop('src', URL.createObjectURL(stream));
-//      });
-//    
-//      // UI stuff
-//      window.existingCall = call;
-//      $('#their-id').text(call.peer);
-//      call.on('close', step2);
-//      $('#step1, #step2').hide();
-//      $('#step3').show();
-//    }
-
+    toggle_special_FX()
 
 }
 
