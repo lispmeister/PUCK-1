@@ -8,7 +8,14 @@
 #
 # - zen
 #
-# Fri May  2 14:58:27 PDT 2014
+# 
+# Sun Aug 17 11:03:46 PDT 2014
+
+# latest node for arm/raspberry pi:
+#
+# http://nodejs.org/dist/v0.10.27/node-v0.10.27-linux-arm-pi.tar.gz
+#
+
 #
 
 # ... need a somewhat recent version of haproxy....

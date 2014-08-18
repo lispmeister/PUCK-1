@@ -426,6 +426,9 @@ function toggle_special_FX() {
     // turn on/off special video FX
     $('#video_effect_div').toggleClass('hidden')
 
+    $('#remoteVideos').html('')
+    $('#localVideo').html('')
+
 }
 
 //
