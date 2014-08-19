@@ -122,6 +122,8 @@ function populate_events(cat) {
 
     console.log('sucking in table data for ' + cat)
 
+    if (typeof cat == "undefined" || cat == "") return
+
     var url       = "/events/" + encodeURIComponent(cat)
 
     if      (cat == 'vpn_client_connected') _cat = 'Calls made'
@@ -426,8 +428,14 @@ function toggle_special_FX() {
     // turn on/off special video FX
     $('#video_effect_div').toggleClass('hidden')
 
-    $('#remoteVideos').html('')
-    $('#localVideo').html('')
+//  $('#remoteVideos').html('')
+//  $('#localVideo').html('')
+
+// <div class='title'>
+//     TitleText 1
+//     <a class='delete' href="#">delete...</a>
+// </div>
+
 
 }
 

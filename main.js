@@ -323,10 +323,32 @@ var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 //
 // but could be manual changes, etc.
 //
+
+
+//
+// xxx - for now, just doing a blanket set for all... will go into individuals later
+//
 function assign_capabilities(_d3ck, new_capabilities) {
 
-    console.log('assigning capabilities given from ' + security_level + ' to d3ck ' + _d3ck.PUCK_ID)
-    _d3ck.capabilities = new_capabilities
+    // console.log('assigning capabilities given from ' + security_level + ' to d3ck ' + _d3ck.D3CK_ID)
+    console.log('assigning capabilities to: ' + _d3ck.D3CK_ID)
+
+    if (typeof new_capabilities != "undefined") {
+        console.log('using user-given values...')
+        _d3ck["capabilities"] = new_capabilities
+    }
+    else {
+        var capz = {}
+
+        console.log('taking from base defaults...')
+        Object.keys(capabilities).forEach(function(k) {
+            console.log(k + '\t: ' + capabilities[k].trusting)
+            capz[k] = capabilities[k].trusting
+        })
+
+        _d3ck["capabilities"] = capz
+
+    }
 
     update_d3ck(_d3ck)
 
@@ -607,6 +629,7 @@ while (init) {
                 console.log('d3ckarrific!')
                 // console.log(body)
                 bwana_d3ck = JSON.parse(body)
+
                 createEvent('internal server', {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
                 init = true
             }
@@ -1205,18 +1228,17 @@ function update_d3ck(_d3ck) {
 
     console.log('updating data for ' + _d3ck.D3CK_ID)
 
-    rclient.set(_d3ck.key, _d3ck.value, function(err) {
-
+    rclient.set(_d3ck.D3CK_ID, JSON.stringify(_d3ck), function(err) {
         if (err) {
             console.log(err, 'update_d3ck failed ' + JSON.stringify(err));
             return(err);
         } else {
+            _d3ck_events = { updated_d3ck : '127.0.0.1' }
+            create_d3ck_key_store(_d3ck)
+            create_d3ck_image(_d3ck)
+            createEvent('127.0.0.1', {event_type: "create", d3ck_id: _d3ck.D3CK_ID})
             console.log('redis update success')
 
-            _d3ck_events = { updated_d3ck : client_ip }
-            create_d3ck_key_store(_d3ck.value)
-            create_d3ck_image(_d3ck.value)
-            createEvent(get_client_ip(req), {event_type: "create", d3ck_id: req.body.value.D3CK_ID})
         }
     })
 
@@ -1307,6 +1329,9 @@ function create_d3ck(req, res, next) {
 
         }
     })
+
+    // can they do this, that, or the other
+    assign_capabilities(d3ck)
 
     res.send(204);
 
@@ -2514,6 +2539,8 @@ function quikStart(req, res, next) {
         }
     })
 
+    assign_capabilities(bwana_d3ck)
+
     console.log("D3CK image... " + d3ck_image)
 
     secretz          = {}
@@ -2653,6 +2680,8 @@ function formCreate(req, res, next) {
                         var cmd  = d3ck_bin + '/create_d3ck.sh'
                         var argz = [r_data.D3CK_ID, r_data.image, r_data.ip_addr, "\"all_ips\": [\"" + r_data.all_ips + "\"]", r_data.owner.name, r_data.owner.email]
                         d3ck_spawn(cmd, argz)
+
+                        assign_capabilities(r_data)
 
                         // now write the image data for the d3ck in question
                         console.log('just about to keel over')
