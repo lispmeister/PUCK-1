@@ -477,8 +477,6 @@
 
                     <!-- vpn stuff -->
 
-                    <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
-
                     <span class='small' style="color:red">If connected to another D3CK and you don't see video... something is wrong!</span>
 
                     <div class="col-md-4">
@@ -533,15 +531,18 @@
 
                 <style>
                     #remoteVideos video { height: 360px; }
-                    #localVideo { height: 240px; }
+                    #localVideo   video { height: 240px; }
                 </style>
 
                 <div id="all_videos">
-                    <h4 id="h4_local">Local Video</h4>
-                    <video id="localVideo"></video>
 
+                    <div id="remoteVideos">
+                        <h4 id="h4_remote">Remote Video</h4>
+                    </div>
+
+                    <h4 id="h4_local">Local Video</h4>
                     <!-- little hack for fun -->
-                    <div id="video_effect_div" class="hidden">
+                    <span id="video_effect_div" class="hidden">
                         <span class="spacer10"></span>
                         <select id="video_effect"  class="textbox">
                             <option><b>Select an effect</b></option>
@@ -555,10 +556,9 @@
                             <option id="vid-opacity"    value="opacity(0.3)">      opacity</option>
                             <option id="vid-clear"      value="clear">             <span id="cleary">clear effects</span></option>
                         </select>
-                    </div>
-                    <div id="remoteVideos">
-                        <h4 id="h4_remote">Remote Video</h4>
-                    </div>
+                    </span>
+
+                    <video id="localVideo"></video>
 
                 </div>
 

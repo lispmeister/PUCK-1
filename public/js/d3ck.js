@@ -1499,7 +1499,7 @@ function createCORSRequest(method, url){
 //
 function cat_chat() {
     
-    console.log('catting as : ' + my_d3ck.name)
+    console.log('catting as : ' + my_d3ck.D3CK_ID)
 
     // listener, whenever the server emits 'chat_receive', this updates the chat body
     kittens_mittens.on('cat_chat', function (data) {
@@ -1509,22 +1509,30 @@ function cat_chat() {
         //console.log(username)
         console.log(data)
 
-        username = my_d3ck.name
+        // username = my_d3ck.name
 
-        console.log('got data! ' + data)
+        console.log('got data! ' + JSON.stringify(data))
 
         // $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
-        $('#cat_chat').prepend('<div><b>'+username + ':</b> ' + data + '<br></div>')
+        $('#cat_chat').prepend('<div><b>'+ data.user + ':</b> ' + data.data + '<br></div>')
 
     });
 
     // when the client clicks SEND
     $('#datasend').click( function() {
-        var message = $('#meow').val();
-        console.log('sending...' + message)
+        var message = {}
+
+        message.user = my_d3ck.owner.name
+        message.data = $('#meow').val();
+        // var message = $('#meow').val();
+
+        console.log('sending...' + JSON.stringify(message))
+
         $('#meow').val('');
+
         // pack it off to the server
         kittens_mittens.emit('cat_chat', message);
+
     });
 
     // when hit enter

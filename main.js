@@ -3153,6 +3153,8 @@ function fire_up_local () {
 //
 var io_sig = {}
 
+var cool_cats = {}
+
 function fire_up_remote () {
 
     console.log('\n\nfiring up remote sockets......')
@@ -3174,9 +3176,7 @@ function fire_up_remote () {
 
     function describeRoom(name) {
         var clients = io_sig.sockets.clients(name);
-        var result = {
-            clients: {}
-        };
+        var result = { clients: {} };
         clients.forEach(function (client) {
             result.clients[client.id] = client.resources;
         });
@@ -3191,6 +3191,8 @@ function fire_up_remote () {
         }
     }
 
+    io_sig.set('log level', 1);
+
 
     io_sig.sockets.on('connection', function (ss_client) {
 
@@ -3202,7 +3204,6 @@ function fire_up_remote () {
             audio: false
         };
 
-
         // pass a message to another id
         ss_client.on('message', function (details) {
             console.log('mess: ' + JSON.stringify(details))
@@ -3210,7 +3211,15 @@ function fire_up_remote () {
             if (!details) return;
 
             var otherClient = io_sig.sockets.sockets[details.to];
+
+            // console.log(io_sig.sockets.sockets)
+
             if (!otherClient) return;
+
+            // ... well...
+            cool_cats[otherClient] = otherClient
+
+            // console.log(otherClient)
 
             details.from = ss_client.id;
             otherClient.emit('message', details);
@@ -3222,19 +3231,23 @@ function fire_up_remote () {
 
             console.log('A kitten? For me? ' + JSON.stringify(kitten))
 
-            if (!kitten) return;
+            // if (!kitten) return;
+            // if (!otherClient) return;
 
-            var otherClient = io_sig.sockets.sockets[kitten.to];
-            if (!otherClient) return;
+            kitten.from = ss_client.id;
 
-            details.from = ss_client.id;
+            console.log('sending free kittens from... ' + ss_client.id)
 
-            console.log('sending free kittens to... ' + ss_client.id)
+            // console.log(ss_client)
 
-            otherClient.emit('cat_chat', kitten);
+            for (var cat_client in io_sig.sockets.sockets) {
+                console.log('sending to... ' + JSON.stringify(cat_client))
+                // console.log('sending to... ' )
+                // var c = io_sig.sockets.sockets[
+                io_sig.sockets.sockets[cat_client].emit('cat_chat', kitten);
+            }
 
         });
-
 
 
         ss_client.on('shareScreen', function () {
@@ -3263,8 +3276,11 @@ function fire_up_remote () {
         }
 
         function join(name, cb) {
+            console.log('joining... ' + name)
+
             // sanity check
             if (typeof name !== 'string') return;
+
             // leave any existing rooms
             removeFeed();
             safeCb(cb)(null, describeRoom(name));

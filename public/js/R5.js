@@ -150,9 +150,9 @@ function SimpleWebRTC(opts) {
     // our socket.io connection
     connection = this.connection = io.connect(this.config.url, this.config.socketio);
 
-kittens_mittens = connection
-console.log('.. and... socket.io: ' );
-console.log(kittens_mittens);
+    kittens_mittens = connection
+    console.log('.. and... socket.io: ' );
+    console.log(kittens_mittens);
 
 
     connection.on('connect', function () {
@@ -5414,7 +5414,7 @@ function Peer(options) {
     // handle screensharing/broadcast mode
     if (options.type === 'screen') {
         if (this.parent.localScreen && this.sharemyscreen) {
-            this.logger.log('adding local screen stream to peer connection');
+            console.log('adding local screen stream to peer connection');
             this.pc.addStream(this.parent.localScreen);
             this.broadcaster = options.broadcaster;
         }
@@ -5438,7 +5438,7 @@ util.inherits(Peer, WildEmitter);
 Peer.prototype.handleMessage = function (message) {
     var self = this;
 
-    this.logger.log('getting', message.type, message);
+    console.log('getting', message.type, message);
 
     if (message.prefix) this.browserPrefix = message.prefix;
 
@@ -5475,7 +5475,7 @@ Peer.prototype.send = function (messageType, payload) {
         payload: payload,
         prefix: webrtc.prefix
     };
-    this.logger.log('sending', messageType, message);
+    console.log('sending', messageType, message);
     this.parent.emit('message', message);
 };
 
@@ -5486,7 +5486,7 @@ Peer.prototype.sendDirectly = function (channel, messageType, payload) {
         type: messageType,
         payload: payload
     };
-    this.logger.log('sending via datachannel', channel, messageType, message);
+    console.log('sending via datachannel', channel, messageType, message);
     var dc = this.getDataChannel(channel);
     if (dc.readyState != 'open') return false;
     dc.send(JSON.stringify(message));
@@ -5521,7 +5521,7 @@ Peer.prototype.onIceCandidate = function (candidate) {
     if (candidate) {
         this.send('candidate', candidate);
     } else {
-        this.logger.log("End of candidates.");
+        console.log("End of candidates.");
     }
 };
 

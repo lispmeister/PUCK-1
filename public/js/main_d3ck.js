@@ -80,6 +80,30 @@ $(document).ready(function () {
     $('body').on('click', '#rtc_button', function() { 
         console.log('rtc!!!'); 
         set_up_RTC() 
+
+        console.log('... I want you to focus... on the spinning disk...')
+
+        var lastFocus = [];
+
+        $('#meow').find(':text,:radio,:checkbox,select,textarea').focus(function() {
+            lastFocus = $(this);
+        });
+
+        $('body').on('click', '#datasend', function(){ 
+            console.log('... focus, damnit!')
+            if (lastFocus.length == 1) lastFocus.focus();
+        });
+
+
+/// FOCUSS>>>>>>!!!!!
+/// FOCUSS>>>>>>!!!!!
+/// FOCUSS>>>>>>!!!!!
+/// FOCUSS>>>>>>!!!!!
+/// FOCUSS>>>>>>!!!!!
+/// FOCUSS>>>>>>!!!!!
+
+
+
     })
 
     // log areas

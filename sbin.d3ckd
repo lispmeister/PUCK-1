@@ -30,9 +30,9 @@ if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
 
     cd ..
 
-    mkdir $d3ck_keystore       2> /dev/null
-    mkdir $keystore/vpn_client 2> /dev/null
-    mkdir $D3CK_UPLOADS        2> /dev/null
+    mkdir $d3ck_keystore
+    mkdir $keystore/vpn_client
+    mkdir $D3CK_UPLOADS
 
     cp $hell/ca* $hell/d3ck* $d3ck_keystore
 
