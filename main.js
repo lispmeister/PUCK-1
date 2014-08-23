@@ -1176,50 +1176,6 @@ function format_d3ck(req, res, body) {
 }
 
 
-//
-// write the crypto key stuff to the FS
-//
-function create_d3ck_key_store(data) {
-
-    console.log('PUUUUUUCKKKKKK!')
-    // console.log(data)
-
-    if (typeof data != 'object') {
-        data = JSON.parse(data)
-    }
-
-    console.log(data.vpn)
-
-    // var ca   = data.vpn_client.ca.join('\n')
-    // var key  = data.vpn_client.key.join('\n')
-    // var cert = data.vpn_client.cert.join('\n')
-
-    var ca   = data.vpn.ca.join('\n')
-    var key  = data.vpn.key.join('\n')
-    var cert = data.vpn.cert.join('\n')
-    var tls  = data.vpn.tlsauth.join('\n')
-
-    var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
-
-    console.log('Californiastic: ' + d3ck_dir)
-    console.log(ca)
-
-    // has to exist before the below will work...
-    mkdirp.sync(d3ck_dir, function () {
-        if(err) {
-            // xxx - user error, bail
-            console.log(err);
-        }
-    })
-
-    // xxx - errs to user!
-    write_2_file(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
-    write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
-    write_2_file(d3ck_dir + '/d3ck.key',     key)
-    write_2_file(d3ck_dir + '/d3ck.crt',     cert)
-    write_2_file(d3ck_dir + '/ta.key',       tls)
-
-}
 
 //
 // take a d3ck, update it in the DB and the filesystem, do error checking, etc., etc.
@@ -1234,10 +1190,11 @@ function update_d3ck(_d3ck) {
             return(err);
         } else {
             _d3ck_events = { updated_d3ck : '127.0.0.1' }
+
             create_d3ck_key_store(_d3ck)
             create_d3ck_image(_d3ck)
             createEvent('127.0.0.1', {event_type: "create", d3ck_id: _d3ck.D3CK_ID})
-            console.log('redis update success')
+            console.log('redis update_d3ck success')
 
         }
     })
@@ -1267,31 +1224,29 @@ function create_d3ck(req, res, next) {
     // if the IP we get the add from isn't in the ips the other d3ck
     // says it has... add it in; they may be coming from a NAT or
     // something weird
-    console.log('looking to see if your current ip (' + client_ip  +' is in your pool')
-    var found = false
-    for (var i = 0; i < all_client_ips.length; i++) {
-        if (all_client_ips[i] == client_ip) {
-            console.log('found it!')
-            found = true
-            break
+    if (client_ip != '127.0.0.1') {
+        console.log('looking to see if your current ip (' + client_ip  +') is in your pool')
+        var found = false
+        for (var i = 0; i < all_client_ips.length; i++) {
+            if (all_client_ips[i] == client_ip) {
+                console.log('found it!')
+                found = true
+                break
+            }
+        }
+        if (! found) {
+            console.log("[create_d3ck] You're coming from an IP that isn't in your stated IPs... adding [" + client_ip + "] to your IP pool just in case")
+            req.body.value.all_ips[all_client_ips.length] = client_ip
         }
     }
-    if (! found) {
-        console.log("[create_d3ck] You're coming from an IP that isn't in your stated IPs... adding [" + client_ip + "] to your IP pool just in case")
-        req.body.value.all_ips[all_client_ips.length] = client_ip
-    }
-
 
     var d3ck = {
-        key: req.body.key || req.body.value.replace(/\W+/g, '_'),
-        value:  JSON.stringify(req.body.value)
+        key    : req.body.key || req.body.value.replace(/\W+/g, '_'),
+        value  : JSON.stringify(req.body.value)
     }
 
-
     // TODO: Check if d3ck exists using EXISTS and fail if it does
-
     // console.log("key: " + d3ck.key);
-
     // console.log("value: " + d3ck.value);
 
     rclient.set(d3ck.key, d3ck.value, function(err) {
@@ -1304,9 +1259,7 @@ function create_d3ck(req, res, next) {
             //
             // if it's from a remote system, wake up local UI and tell user
             //
-
-            // garrr... openvpn breaks this too...
-            console.log('adding from: ' + req.body.value.name)
+            console.log('radding from: ' + req.body.value.name)
 
             d3ck_events = { new_d3ck : client_ip, new_d3ck_name: req.body.value.name }
 
@@ -1314,24 +1267,13 @@ function create_d3ck(req, res, next) {
 
             create_d3ck_image(d3ck.value)
 
-
-            // if (typeof my_net[client_ip] == "undefined") {
-            //     console.log('create appears to be coming from remote: ' + client_ip)
-            //     d3ck_events = { new_d3ck : client_ip }
-            //     create_d3ck_key_store(d3ck.value)
-            // }
-            // else {
-            //     d3ck_events = { new_d3ck : "" }
-            //     console.log('create appears to be coming from local D3CK/host: ' + client_ip)
-            // }
+            // can they do this, that, or the other
+            assign_capabilities(d3ck.value)
 
             createEvent(get_client_ip(req), {event_type: "create", d3ck_id: req.body.value.D3CK_ID})
 
         }
     })
-
-    // can they do this, that, or the other
-    assign_capabilities(d3ck)
 
     res.send(204);
 
@@ -1384,6 +1326,52 @@ function create_d3ck_image(data) {
 
 }
 
+//
+// write the crypto key stuff to the FS
+//
+function create_d3ck_key_store(data) {
+
+    console.log('PUUUUUUCKKKKKK!')
+    console.log(data)
+
+    if (typeof data != 'object') {
+        data = JSON.parse(data)
+    }
+
+    console.log(data.vpn)
+
+    // var ca   = data.vpn_client.ca.join('\n')
+    // var key  = data.vpn_client.key.join('\n')
+    // var cert = data.vpn_client.cert.join('\n')
+
+    var ca   = data.vpn.ca.join('\n')
+    var key  = data.vpn.key.join('\n')
+    var cert = data.vpn.cert.join('\n')
+    var tls  = data.vpn.tlsauth.join('\n')
+
+    var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
+
+    console.log('Californiastic: ' + d3ck_dir)
+    console.log(ca)
+
+    // has to exist before the below will work...
+    mkdirp.sync(d3ck_dir, function () {
+        if(err) {
+            // xxx - user error, bail
+            console.log(err);
+        }
+    })
+
+    // xxx - errs to user!
+    write_2_file(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
+    write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
+    write_2_file(d3ck_dir + '/d3ck.key',     key)
+    write_2_file(d3ck_dir + '/d3ck.crt',     cert)
+    write_2_file(d3ck_dir + '/ta.key',       tls)
+
+}
+
+
 // a few snippets
 
 //
@@ -1401,7 +1389,7 @@ function write_O2_file(file, obj) {
 
     try {
         fs.writeFileSync(file, stringy)
-        console.log('...success...')
+        console.log('...o2-w-success...')
     }
     catch (e) {
         console.log('err writing to ' + file + '...' + stringy)
@@ -1416,7 +1404,7 @@ function write_2_file(file, stringy) {
 
     try {
         fs.writeFileSync(file, stringy)
-        console.log('...success...')
+        console.log('...w-success...')
     }
     catch (e) {
         console.log('err writing to ' + file + '...' + stringy)
@@ -2573,7 +2561,7 @@ function quikStart(req, res, next) {
 //
 function formCreate(req, res, next) {
 
-    console.log("creating d3ck...")
+    console.log("form creating d3ck...")
     console.log(req.body)
 
     var ip_addr = req.body.ip_addr
@@ -2658,7 +2646,7 @@ function formCreate(req, res, next) {
 
                         // self added
                         d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: r_data.name }
-                        console.log('adding from: ' + bwana_d3ck.name)
+                        console.log('adding from: ' + r_data.name)
 
                         create_d3ck_key_store(r_data)
 
@@ -2954,6 +2942,7 @@ server.get('/ping', echoReply)
 
 // get or list d3cks
 server.post('/d3ck', auth, create_d3ck)
+
 server.get('/d3ck', auth, list_d3cks)
 
 // Return a d3ck by key
