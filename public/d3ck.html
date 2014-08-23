@@ -303,85 +303,6 @@
             </div>  <!-- ewes -->
 
 
-
-
-
-            <!-- vpn stuff -->
-
-            <div class="tab-pane fade" id="d3ck_vpn">
-
-                <div class="row">
-
-                    <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
-
-                    <span>If connected to another D3CK and you don't see video... something is wrong!</span>
-                    <button id="orson_wells" class="local" class="setup">Broadcast!</button>
-
-                    <div class="col-md-2"></div>
-
-                    <div class="col-md-4">
-
-                        <div style="padding:10px">
-                            <b>Cat Chat!</b> <span class="muted small">instant messaging, D3CK style</span><br />
-                        </div>
-
-                        <div>
-                            <div style="width:300px">
-                                <div id="conversation"></div>
-                                <input class="meow" id="meow" style="width:200px;" />
-                                <input type="button" class="datasend" id="datasend" value="send" />
-                            </div>
-                            <div id="cat_chat" class="content"></div>
-                        </div>
-
-                    </div> <!-- col-md-4 -->
-
-                </div> <!-- row -->
-
-                <div class="row">
-
-                    <hr>
-
-                    <div class="row" style="clear:both">
-                        <div class="col-md-4">
-                            <div id="local_video"></div>
-                        </div>
-                    </div>
-
-
-                    <button id="setup-meeting">Setup Meeting</button>
-
-                    <div class="container-fluid">
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#client_collapse">show/hide client logs</button>
-                                <div id="client_collapse" class="collapse">
-                                    
-                                    <div id="ovpn_client_infinity" class="mCSB_container content">
-                                        VPN client logs <hr> <!-- content -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div> <!-- row -->
-
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">show/hide server logs</button>
-
-                                <div id="server_collapse" class="collapse">
-                                    <div id="ovpn_server_infinity" class="mCSB_container content">
-                                        VPN server logs <hr> <!-- content --> 
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>  <!-- row -->
-                    </div> <!-- container -->
-                </div>  <!-- row -->
-            </div> <!-- vpn stuff -->
-
             <!-- trust/love -->
 
             <div class="tab-pane fade" id="d3ck_trust_explore">
@@ -548,8 +469,67 @@
              </div>
 
 
+
+
+
+
              <div class="tab-pane fade" id="rtc_hack">
+
+                    <!-- vpn stuff -->
+
+                    <div class="muted"> <h3 style="clear:both">VPN-a-tude</h3> </div>
+
+                    <span class='small' style="color:red">If connected to another D3CK and you don't see video... something is wrong!</span>
+
+                    <div class="col-md-4">
+
+                        <div style="padding:10px">
+                            <b>Cat Chat!</b> <span class="muted small">instant messaging, D3CK style</span><br />
+                        </div>
+
+                        <div>
+                            <div style="width:300px">
+                                <div id="conversation"></div>
+                                <input class="meow" id="meow" style="width:200px;" />
+                                <input type="button" class="datasend" id="datasend" value="send" />
+                            </div>
+                            <div id="cat_chat" class="content"></div>
+                        </div>
+
+                    </div> <!-- col-md-4 -->
+
+                    <div class="container-fluid hidden">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#client_collapse">show/hide client logs</button>
+                                <div id="client_collapse" class="collapse">
+                                    
+                                    <div id="ovpn_client_infinity" class="mCSB_container content">
+                                        VPN client logs <hr> <!-- content -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- row -->
+
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default" data-toggle="collapse" data-target="#server_collapse">show/hide server logs</button>
+
+                                <div id="server_collapse" class="collapse">
+                                    <div id="ovpn_server_infinity" class="mCSB_container content">
+                                        VPN server logs <hr> <!-- content --> 
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>  <!-- row -->
+                    </div> <!-- container -->
+
                 <div id="event_messages"> 
+
+
 
                 <style>
                     #remoteVideos video { height: 360px; }
@@ -557,7 +537,7 @@
                 </style>
 
                 <div id="all_videos">
-                    <h4>Local Video</h4>
+                    <h4 id="h4_local">Local Video</h4>
                     <video id="localVideo"></video>
 
                     <!-- little hack for fun -->
@@ -577,7 +557,7 @@
                         </select>
                     </div>
                     <div id="remoteVideos">
-                        <h4>Remote Video</h4>
+                        <h4 id="h4_remote">Remote Video</h4>
                     </div>
 
                 </div>

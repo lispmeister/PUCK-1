@@ -3207,7 +3207,6 @@ function fire_up_remote () {
         ss_client.on('message', function (details) {
             console.log('mess: ' + JSON.stringify(details))
 
-
             if (!details) return;
 
             var otherClient = io_sig.sockets.sockets[details.to];
@@ -3216,6 +3215,27 @@ function fire_up_remote () {
             details.from = ss_client.id;
             otherClient.emit('message', details);
         });
+
+
+        // all import cat chat!
+        ss_client.on('cat_chat', function (kitten) {
+
+            console.log('A kitten? For me? ' + JSON.stringify(kitten))
+
+            if (!kitten) return;
+
+            var otherClient = io_sig.sockets.sockets[kitten.to];
+            if (!otherClient) return;
+
+            details.from = ss_client.id;
+
+            console.log('sending free kittens to... ' + ss_client.id)
+
+            otherClient.emit('cat_chat', kitten);
+
+        });
+
+
 
         ss_client.on('shareScreen', function () {
             ss_client.resources.screen = true;

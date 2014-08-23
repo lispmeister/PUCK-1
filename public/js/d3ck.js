@@ -16,7 +16,8 @@ var d3ck_current            = {}
     killed_call             = false;
 
 var d3ck_status     = {},
-    old_d3ck_status = {}
+    old_d3ck_status = {},
+    webrtc          = {}
 
 var incoming_ip = "?"
 
@@ -552,8 +553,6 @@ function d3ck_create(element, ip_addr) {
     console.log('touch the hand of ... ')
     console.log('ip addr: ' + ip_addr)
 
-    // if (ip_addr
-
     var post_data         = {}
     post_data.ip_addr     = ip_addr
     post_data.d3ck_action = "CREATE"
@@ -804,6 +803,9 @@ function status_or_die() {
 
     // if nothing up now, kill any signs of a call, just to be sure
     if (d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") {
+
+        kill_RTC()
+
         console.log("it's dead, jim")
         d3ck_current.incoming = false
         d3ck_current.outgoing = false
@@ -826,6 +828,32 @@ function status_or_die() {
 }
 
 //
+// ... nuke the vids and other evidence...
+//
+function kill_RTC() {
+
+    console.log('die, rtc, die!')
+
+    // kill rtc stuff
+    try {
+        webrtc.hangUp()
+        console.log('et tu, zen?')
+    }
+    catch (e) {
+        console.log('... either not up or failzor in the slaying of webRTC...')
+    }
+
+    // kill the HTML for remote & local vids
+    $('#localVideo').remove()
+    $('#h4_local').append('\n<video id="localVideo"></video>\n')
+    $('#remoteVideos video').remove()
+
+    // kill the silly thing
+    $('#video_effect_div').attr("class",'hidden')
+
+}
+
+//
 // when disconnected, kill all the UI signs we put up
 //
 function remove_signs_of_call() {
@@ -839,6 +867,9 @@ function remove_signs_of_call() {
         $('body').removeClass('avgrund-active')
         state_ring(false)
         // fire_d3ck_status(d3ck_status)
+
+        kill_RTC()
+
     }
 
 }
@@ -1343,17 +1374,6 @@ function set_up_RTC(remote) {
     else if (d3ck_status.openvpn_client.vpn_status == "up") {
         console.log("PEEEEER js: client up")
         remote_d3ck = d3ck_status.openvpn_client.server_pid
-
-        //
-        // need to reset after hangup...!
-        // xxxxx!!!!
-        //
-
-//      SIGNALING_SERVER = 'wss://' + remote_ip + ':' + D3CK_SIG_PORT
-//      console.log('changing signaling server to: ' + SIGNALING_SERVER)
-//      p33r_url = 'https://' + remote_ip + ':' + D3CK_PORT + p33r_url
-//      ip = remote
-
     }
 
     // ... wtf, as they say...?
@@ -1364,7 +1384,7 @@ function set_up_RTC(remote) {
 
     console.log('setting up RTC: ' + SIGNALING_SERVER)
 
-    var webrtc = new SimpleWebRTC({
+    webrtc = new SimpleWebRTC({
         localVideoEl: 'localVideo',
         remoteVideosEl: 'remoteVideos',
         autoRequestMedia: true
@@ -1381,15 +1401,9 @@ function set_up_RTC(remote) {
 }
 
 
-// to try and ensure browser trusts rtc port as well as web port
-
 //
-// so it seems as though browsers need to talk to a port before
-// they trust it, even if from the same server; to combat this
-// I'll try to see if I get anything from the server on that
-// port, and if not pop up a window on that port
-//
-//
+// pop up a little thing with a message to the users... used to be used for
+// something else... time has moved on....
 //
 
 function rtc_haxx0r_trick() {
