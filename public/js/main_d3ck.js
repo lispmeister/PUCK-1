@@ -371,8 +371,6 @@ $(document).ready(function () {
     // setInterval(get_status,PREGNANT_PAUSE)
     setTimeout(get_status,PREGNANT_PAUSE)
 
-    setInterval(check_sock,SOCK_CHECK)
-
     // http://stackoverflow.com/questions/16214326/bootstrap-dropdown-with-hover
     $(function(){               
         $('.dropdown').hover(function() {

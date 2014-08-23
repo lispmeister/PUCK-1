@@ -1018,47 +1018,6 @@ function drag_and_d3ck(other_d3ck) {
 
 
 //
-// try to get web sockets going
-//
-
-// according to socksjs - "Current state of the connection: 0-connecting, 1-open, 2-closing, 3-closed"
-function check_sock () {
-
-    // console.log("checking the ol' sock")
-
-    try {
-        var state = local_socket._transport.ws.readyState
-    }
-    catch (e) {
-        // console.log('not connected')
-        return
-    }
-
-    // kill them all and add any that apply
-    $('#socket_wrench').removeClass("amber").removeClass("red").removeClass("green")
-
-    if (state == 0) {
-        $('#socket_wrench').addClass("amber")
-        console.log('[>] sockjs connecting...')
-    }
-    else if (state == 1) {
-        $('#socket_wrench').addClass("green")
-        // console.log('[+] sockjs good...')
-    }
-    else if (state == 2) {
-        $('#socket_wrench').addClass("amber")
-        console.log('[<] sockjs closing...')
-    }
-    else if (state == 3) {
-        $('#socket_wrench').addClass("red")
-        console.log('[.] sockjs closed...')
-    }
-    else {
-        console.log('UNKNOWN SOCKJS status: ' + state)
-    }
-}
-
-//
 // enter the socket loop!
 //
 local_socket = null
