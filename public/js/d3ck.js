@@ -1343,6 +1343,9 @@ function set_up_RTC(remote) {
 
     console.log('setting up RTC: ' + SIGNALING_SERVER)
 
+    $('#remoteVideos video').remove()
+
+
     webrtc = new SimpleWebRTC({
         localVideoEl: 'localVideo',
         remoteVideosEl: 'remoteVideos',
@@ -1488,6 +1491,8 @@ function cat_chat() {
         console.log('sending...' + JSON.stringify(message))
 
         $('#meow').val('');
+
+        $('#meow').focus();
 
         // pack it off to the server
         kittens_mittens.emit('cat_chat', message);
