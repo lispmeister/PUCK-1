@@ -92,7 +92,6 @@ var attachMediaStream = require('attachmediastream');
 var mockconsole = require('mockconsole');
 var io = require('socket.io-client');
 
-
 function SimpleWebRTC(opts) {
     var self = this;
     var options = opts || {};
@@ -150,6 +149,11 @@ function SimpleWebRTC(opts) {
 
     // our socket.io connection
     connection = this.connection = io.connect(this.config.url, this.config.socketio);
+
+kittens_mittens = connection
+console.log('.. and... socket.io: ' );
+console.log(kittens_mittens);
+
 
     connection.on('connect', function () {
         self.emit('connectionReady', connection.socket.sessionid);
@@ -677,6 +681,7 @@ WildEmitter.prototype.getWildcardCallbacks = function (eventName) {
 /*! Socket.IO.js build:0.9.16, development. Copyright(c) 2011 LearnBoost <dev@learnboost.com> MIT Licensed */
 
 var io = ('undefined' === typeof module ? {} : module.exports);
+
 (function() {
 
 /**

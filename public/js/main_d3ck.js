@@ -20,6 +20,8 @@ var remote_sock = ""
 var socky_love  = false
 var my_d3ck     = {}
 
+loco_sock       = {}
+
 var ovpn_slogs = 'openvpn_server_logs'
 var ovpn_clogs = 'openvpn_client_logs'
 

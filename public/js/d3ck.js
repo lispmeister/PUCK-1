@@ -1395,8 +1395,9 @@ function set_up_RTC(remote) {
         webrtc.joinRoom('d3ck')
     });
 
-
     toggle_special_FX()
+
+    cat_chat()
 
 }
 
@@ -1470,8 +1471,6 @@ function rtc_haxx0r_trick() {
 
     })
 
-
-
 }
 
 // from http://jquery-howto.blogspot.com/2013/09/jquery-cross-domain-ajax-request.html
@@ -1492,5 +1491,49 @@ function createCORSRequest(method, url){
     }
     return xhr;
 
+}
+
+
+//
+// Cat chat (TM) - for moar cat fax.
+//
+function cat_chat() {
+    
+    console.log('catting as : ' + my_d3ck.name)
+
+    // listener, whenever the server emits 'chat_receive', this updates the chat body
+    kittens_mittens.on('cat_chat', function (data) {
+        // seem to get some odd things
+
+        //console.log(stamp)
+        //console.log(username)
+        console.log(data)
+
+        username = my_d3ck.name
+
+        console.log('got data! ' + data)
+
+        // $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
+        $('#cat_chat').prepend('<div><b>'+username + ':</b> ' + data + '<br></div>')
+
+    });
+
+    // when the client clicks SEND
+    $('#datasend').click( function() {
+        var message = $('#meow').val();
+        console.log('sending...' + message)
+        $('#meow').val('');
+        // pack it off to the server
+        kittens_mittens.emit('cat_chat', message);
+    });
+
+    // when hit enter
+    $('#meow').keypress(function(e) {
+        if(e.which == 13) {
+            $(this).blur();
+            console.log('enter...')
+            $('#datasend').focus().click();
+        }
+    })
 }
 
