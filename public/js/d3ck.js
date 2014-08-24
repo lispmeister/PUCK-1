@@ -675,7 +675,7 @@ function get_status() {
         // console.log('status wootz\n' + data)
         d3ck_status = JSON.parse(data)
         // console.log("got status?  " + JSON.stringify(d3ck_status))
-        console.log('got status?')
+        console.log('got status? ...' + JSON.stringify(d3ck_status.events) + '...')
         // status_or_die()
 
         // if something is new, do something!
@@ -748,7 +748,7 @@ function status_or_die() {
     // and hopefully won't fuck up anything you're doing
 
     if (d3ck_status.events.new_d3ck_ip.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
-        remote_ip       = d3ck_status.events.new_d3ck_ip
+        remote_ip   = d3ck_status.events.new_d3ck_ip
         remote_name = d3ck_status.events.new_d3ck_name
         console.log(remote_ip + ' added as friend')
 
