@@ -747,9 +747,9 @@ function status_or_die() {
     // if someone has added you, create a modest sized bit of text that tells you
     // and hopefully won't fuck up anything you're doing
 
-    if (typeof d3ck_status.events != "undefined" && d3ck_status.events.new_d3ck_ip.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
+    if (d3ck_status.events.new_d3ck_ip.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
         remote_ip       = d3ck_status.events.new_d3ck_ip
-        var remote_name = d3ck_status.events.new_d3ck_name
+        remote_name = d3ck_status.events.new_d3ck_name
         console.log(remote_ip + ' added as friend')
 
         // a bit down from the top, and stay until wiped away or refreshed
