@@ -1228,7 +1228,7 @@ function format_d3ck(req, res, body) {
 function update_d3ck(_d3ck) {
 
     console.log('updating data for ' + _d3ck.D3CK_ID)
-
+// 
     rclient.set(_d3ck.D3CK_ID, JSON.stringify(_d3ck), function(err) {
         if (err) {
             console.log(err, 'update_d3ck failed ' + JSON.stringify(err));
@@ -2007,9 +2007,12 @@ function uploadSchtuff(req, res, next) {
                 if (upload_target == "local") {
                     console.log('local')
                     browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+
                     d3ck_status.browser_events = browser_magic
+                    d3ck_status.file_events    = file_magic
 
                     createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
+
                     res.send(204, {"status" : target_file})
                 }
 
@@ -2032,7 +2035,9 @@ function uploadSchtuff(req, res, next) {
                         else {
                             console.log('upload to ' + upload_target + ' complete')
                             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
+
                             d3ck_status.browser_events = browser_magic
+                            d3ck_status.file_events    = file_magic
 
                             createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
                             console.log(data);
