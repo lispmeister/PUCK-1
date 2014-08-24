@@ -184,7 +184,7 @@ rclient.get(d3ck_id, function (err, reply) {
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_pid":"unknown"},
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
-    d3ck_events     = {"new_d3ck":""},
+    d3ck_events     = {"new_d3ck_ip":""},
     browser_magic   = {}
     old_d3ck_status = {},
     d3ck_status     = {};
@@ -2665,7 +2665,7 @@ function formCreate(req, res, next) {
                         console.log('vpn-ify...!')
 
                         // self added
-                        d3ck_events = { new_d3ck : '127.0.0.1', new_d3ck_name: r_data.name }
+                        d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
                         console.log('adding from: ' + r_data.name)
 
                         create_d3ck_key_store(r_data)
