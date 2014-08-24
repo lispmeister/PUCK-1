@@ -1110,34 +1110,37 @@ function pollStatus(file) {
 }
 
 //
-// hand out the latest news
+// hand out the latest news; client polls
 //
 function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    if (typeof io == "object") {
-        // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
-        var msg = {type: "status", status: d3ck_status}
-        cat_power(msg)
-    }
-    else { 
-        // console.log('kitties not ready')
-    }
-
+    // after sent, clear
     var tmp_status = d3ck_status
 
-    // after sent, clear
     file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
     d3ck_events                = {"new_d3ck":""}
     browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+
     d3ck_status.events         = d3ck_events
     d3ck_status.file_events    = file_magic
     d3ck_status.browser_events = browser_magic
 
-//
-// as marvin once said, what's going on?
-//
+
+    // used to use sockets... no more
+    // if (typeof io == "object") {
+    //     // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
+    //     var msg = {type: "status", status: tmp_status}
+    ////      cat_power(msg)
+    // }
+    // else { 
+    //     // console.log('kitties not ready')
+    // }
+
+    //
+    // as marvin once said, what's going on?
+    //
     res.send(200, JSON.stringify(tmp_status))
 
 }

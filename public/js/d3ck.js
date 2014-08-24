@@ -668,7 +668,6 @@ function get_status() {
     // console.log('get STATUS')
 
     var url = "/status"
-    var url = "/status.d3ck"
 
     var jqXHR_get_status = $.ajax({ url: url, })
 
