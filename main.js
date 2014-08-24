@@ -1384,7 +1384,7 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
     // and the entire json card
-    write_2_file(d3ck_dir + '/' + data.D3CK_ID, JSON.stringify(data))
+    write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))
 
 }
 

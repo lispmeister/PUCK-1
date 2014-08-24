@@ -683,13 +683,7 @@ function get_status() {
         if (! _.isEqual(old_d3ck_status, d3ck_status)) {
             console.log('something new in the state of denmark!')
             old_d3ck_status = JSON.parse(JSON.stringify(d3ck_status))
-            if (first_news) {
-                console.log('...first time, tho....')
-                first_news = false
-            }
-            else {
-                status_or_die()
-            }
+            status_or_die()
         }
         else {
             // console.log('same ol, same ol')
@@ -762,7 +756,14 @@ function status_or_die() {
         // a bit down from the top, and stay until wiped away or refreshed
 
         if (typeof remote_name == "undefined" || remote_name != "")
-            $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
+            // do not repeat file upload or adding friend news
+            if (first_news) {
+                console.log('...first time, tho....')
+                first_news = false
+            }
+            else {
+                $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
+            }
 
         d3ck_status.browser_events[browser_ip].notify_add = true
     }
@@ -771,22 +772,30 @@ function status_or_die() {
     // XXX - odd corner case... if both systems have the same IP ... say... testing behind a nat...
     // this probably won't work as expected.....
     else if (d3ck_status.file_events.file_name.length && ! d3ck_status.browser_events[browser_ip].notify_file) {
+
         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
 
-        // if we're connected, the file is being shipped to the other machine, not local
-        // show inbound note if you sent file, else say when it succeeds
-        if ((d3ck_status.file_events.file_from == browser_ip && d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") || d3ck_status.file_events.file_from != browser_ip) {
-            console.log('new local file(z)!')
-
-            // put in or lookup PiD, then owner/d3ck's name!
-            $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); from " + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
-
-            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-            // d3ck_status.browser_events[browser_ip].notify_file = true
-            }
+        // do not repeat file upload or adding friend news
+        if (first_news) {
+            console.log('...first time, tho....')
+            first_news = false
+        }
         else {
-            console.log('file(z) from remote')
-            $.bootstrapGrowl("File transferred: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes)", {offset: {from: 'top', amount: 70}, delay: -1})
+            // if we're connected, the file is being shipped to the other machine, not local
+            // show inbound note if you sent file, else say when it succeeds
+            if ((d3ck_status.file_events.file_from == browser_ip && d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") || d3ck_status.file_events.file_from != browser_ip) {
+                console.log('new local file(z)!')
+
+                // put in or lookup PiD, then owner/d3ck's name!
+                $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); from " + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+
+                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+                // d3ck_status.browser_events[browser_ip].notify_file = true
+                }
+            else {
+                console.log('file(z) from remote')
+                $.bootstrapGrowl("File transferred: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes)", {offset: {from: 'top', amount: 70}, delay: -1})
+            }
         }
     }
     // server... incoming ring
