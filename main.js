@@ -333,6 +333,8 @@ function assign_capabilities(_d3ck, new_capabilities) {
 
     // console.log('assigning capabilities given from ' + security_level + ' to d3ck ' + _d3ck.D3CK_ID)
     console.log('assigning capabilities to: ' + _d3ck.D3CK_ID)
+    console.log(typeof _d3ck)
+    console.log(_d3ck)
 
     if (typeof new_capabilities != "undefined") {
         console.log('using user-given values...')
@@ -664,9 +666,10 @@ function change_status() {
 
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
-    console.log("status: " + d3ck_status)
+    console.log("status: " + JSON.stringify(d3ck_status))
 
     var msg = {type: "status", status: d3ck_status}
+
     cat_power(msg)
 
     // xxx - errs to user!
@@ -1018,18 +1021,20 @@ function cat_power(msg) {
 
     console.log('kitty Powa!  => ' + JSON.stringify(msg))
 
-    if (msg.type != "openvpn_server") {
+// used to use sockets to communicate this...
 
-        try {
-            console.log('catpower writez:  catFax, ' + JSON.stringify(msg))
-            // cat_sock.write(JSON.stringify(msg))
-            cat_sock.emit('catFax', JSON.stringify(msg))
-        }
-        catch (e) {
-            // need a browser...
-            console.log('channel not up yet....? ' + e)
-        }
-    }
+//    if (msg.type != "openvpn_server") {
+//
+//        try {
+//            console.log('catpower writez:  catFax, ' + JSON.stringify(msg))
+//            // cat_sock.write(JSON.stringify(msg))
+//            cat_sock.emit('catFax', JSON.stringify(msg))
+//        }
+//        catch (e) {
+//            // need a browser...
+//            console.log('channel not up yet....? ' + e)
+//        }
+//    }
 
 }
 
@@ -1225,7 +1230,6 @@ function update_d3ck(_d3ck) {
 function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
-    console.log (req.params)
 
     var ip_addr = req.body.ip_addr
 
@@ -1271,12 +1275,12 @@ function create_d3ck(req, res, next) {
             console.log(err, 'put_d3ck: unable to store in Redis db');
             next(err);
         } else {
-            console.log({d3ck: req.body}, 'put_d3ck: done');
+            // console.log({d3ck: req.body}, 'put_d3ck: done');
 
             //
             // if it's from a remote system, wake up local UI and tell user
             //
-            console.log('radding from: ' + req.body.value.name)
+            console.log('redis saved data from: ' + req.body.value.name)
 
             d3ck_events = { new_d3ck : client_ip, new_d3ck_name: req.body.value.name }
 
@@ -1349,7 +1353,7 @@ function create_d3ck_image(data) {
 function create_d3ck_key_store(data) {
 
     console.log('PUUUUUUCKKKKKK!')
-    console.log(data)
+    // console.log(data)
 
     if (typeof data != 'object') {
         data = JSON.parse(data)
