@@ -1126,20 +1126,25 @@ function pollStatus(file) {
 //
 // hand out the latest news; client polls
 //
+tmp_status = {}
 function d3ckStatus(req, res, next) {
 
-    console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
+    // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    // after sent, clear
-    var tmp_status = d3ck_status
+    if (JSON.stringify(tmp_status) == JSON.stringify(d3ck_status)) {
+        console.log('no status change...')
+    }
+    else {
+        tmp_status                 = d3ck_status
 
-    file_magic                 = { "file_name"   : "", "file_size" : "", "file_from" : ""}
-    d3ck_events                = { "new_d3ck_ip" : ""}
-    browser_magic[client_ip]   = { "notify_add"  : false, "notify_ring":false, "notify_file":false}
-    d3ck_status.events         = d3ck_events
-    d3ck_status.file_events    = file_magic
-    d3ck_status.browser_events = browser_magic
+        file_magic                 = { "file_name"   : "", "file_size" : "", "file_from" : ""}
+        d3ck_events                = { "new_d3ck_ip" : ""}
+        browser_magic[client_ip]   = { "notify_add"  : false, "notify_ring":false, "notify_file":false}
 
+        d3ck_status.events         = d3ck_events
+        d3ck_status.file_events    = file_magic
+        d3ck_status.browser_events = browser_magic
+    }
 
     // used to use sockets... no more
     // if (typeof io == "object") {
