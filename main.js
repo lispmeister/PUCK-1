@@ -657,15 +657,6 @@ function change_status() {
 
     console.log('changing status...')
 
-    // in with the old, out with the new... er, reverse that
-    d3ck_status                = {}
-    d3ck_status.openvpn_server = server_magic
-    d3ck_status.openvpn_client = client_magic
-
-    d3ck_status.events         = d3ck_events
-    d3ck_status.file_events    = file_magic
-    d3ck_status.browser_events = browser_magic
-
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
     console.log("status: " + JSON.stringify(d3ck_status))
@@ -1144,6 +1135,7 @@ function d3ckStatus(req, res, next) {
     // else { 
     //     // console.log('kitties not ready')
     // }
+
 
     //
     // as marvin once said, what's going on?
