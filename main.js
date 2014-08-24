@@ -806,6 +806,8 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
+                d3ck_status.openvpn_server = server_magic
+
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
 
                 change_status() // make sure everyone hears the news
@@ -834,6 +836,8 @@ function watch_logs(logfile, log_type) {
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
                     }
+
+                d3ck_status.openvpn_server = server_magic
 
                 createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
                 change_status() // make sure everyone hears the news
@@ -876,6 +880,8 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
+                d3ck_status.openvpn_client = client_magic
+
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
                 change_status() // make sure everyone hears the news
 
@@ -901,6 +907,8 @@ function watch_logs(logfile, log_type) {
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
                     }
+
+                d3ck_status.openvpn_client = client_magic
 
                 createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
 
@@ -1114,14 +1122,15 @@ function d3ckStatus(req, res, next) {
 
     console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-//  // after sent, clear
-//  var tmp_status = d3ck_status
-//  file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-//  d3ck_events                = {"new_d3ck":""}
-//  browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-//  d3ck_status.events         = d3ck_events
-//  d3ck_status.file_events    = file_magic
-//  d3ck_status.browser_events = browser_magic
+    // after sent, clear
+    var tmp_status = d3ck_status
+
+    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+    d3ck_events                = {"new_d3ck":""}
+    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+    d3ck_status.events         = d3ck_events
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
 
 
     // used to use sockets... no more
@@ -1138,7 +1147,8 @@ function d3ckStatus(req, res, next) {
     //
     // as marvin once said, what's going on?
     //
-    res.send(200, JSON.stringify(d3ck_status))
+    res.send(200, JSON.stringify(tmp_status))
+
     // res.send(200, JSON.stringify(tmp_status))
 
 }
@@ -1975,6 +1985,8 @@ function uploadSchtuff(req, res, next) {
                 if (upload_target == "local") {
                     console.log('local')
                     browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                    d3ck_status.browser_events = browser_magic
+
                     createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
                     res.send(204, {"status" : target_file})
                 }
@@ -1998,6 +2010,8 @@ function uploadSchtuff(req, res, next) {
                         else {
                             console.log('upload to ' + upload_target + ' complete')
                             browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                            d3ck_status.browser_events = browser_magic
+
                             createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
                             console.log(data);
 
