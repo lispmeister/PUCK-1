@@ -332,9 +332,11 @@ var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 function assign_capabilities(_d3ck, new_capabilities) {
 
     // console.log('assigning capabilities given from ' + security_level + ' to d3ck ' + _d3ck.D3CK_ID)
+
+    if (typeof _d3ck == "string")
+        _d3ck = JSON.parse(_d3ck)
+
     console.log('assigning capabilities to: ' + _d3ck.D3CK_ID)
-    console.log(typeof _d3ck)
-    console.log(_d3ck)
 
     if (typeof new_capabilities != "undefined") {
         console.log('using user-given values...')
