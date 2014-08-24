@@ -1135,6 +1135,9 @@ function d3ckStatus(req, res, next) {
         console.log('no status change...')
     }
     else {
+        console.log('NEW STATUS!')
+        console.log(d3ck_status)
+
         tmp_status                 = d3ck_status
 
         file_magic                 = { "file_name"   : "", "file_size" : "", "file_from" : ""}
