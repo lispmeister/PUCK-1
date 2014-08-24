@@ -185,16 +185,22 @@ var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","durati
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_pid":"unknown"},
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
     d3ck_events     = {"new_d3ck_ip":""},
-    browser_magic   = {}
+    browser_magic   = {},
     old_d3ck_status = {},
-    d3ck_status     = {};
+    d3ck_status     = {},
+    blank_status    = {};   // for resetting
+
+    blank_status.events         = d3ck_events
+    blank_status.openvpn_server = server_magic
+    blank_status.openvpn_client = client_magic
+    blank_status.file_events    = file_magic
+    blank_status.browser_events = browser_magic
 
     d3ck_status.events         = d3ck_events
     d3ck_status.openvpn_server = server_magic
     d3ck_status.openvpn_client = client_magic
     d3ck_status.file_events    = file_magic
     d3ck_status.browser_events = browser_magic
-
 
 var server           = "",
     d3ck2ip          = {},      // d3ck ID to IP mapping
@@ -1134,19 +1140,18 @@ function d3ckStatus(req, res, next) {
     if (JSON.stringify(tmp_status) == JSON.stringify(d3ck_status)) {
         console.log('no status change...')
     }
+
     else {
         console.log('NEW STATUS!')
         console.log(d3ck_status)
 
-        tmp_status                 = d3ck_status
+        tmp_status                 = JSON.parse(JSON.stringify(d3ck_status))
 
-        file_magic                 = { "file_name"   : "", "file_size" : "", "file_from" : ""}
-        d3ck_events                = { "new_d3ck_ip" : ""}
-        browser_magic[client_ip]   = { "notify_add"  : false, "notify_ring":false, "notify_file":false}
-
-        d3ck_status.events         = d3ck_events
-        d3ck_status.file_events    = file_magic
+        // clear out the old
+        browser_magic[client_ip]   = { "notify_add": false, "notify_ring": false, "notify_file": false }
+        d3ck_status                = JSON.parse(JSON.stringify(blank_status))
         d3ck_status.browser_events = browser_magic
+
     }
 
     // used to use sockets... no more
