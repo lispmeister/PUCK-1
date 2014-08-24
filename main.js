@@ -464,26 +464,23 @@ function auth(req, res, next) {
         return next();
     }
 
-/*
+    console.log("\n\n")
+    console.log("Xfor?")
+    console.log(req.headers['x-forwarded-for'])
+    console.log("\n\n")
 
-headers: 
-   { accept:
-     'user-agent': 'Restler for node.js',
-     host: '10.105.154.1:8080',
-     'accept-encoding': 'gzip, deflate',
-     'content-type': 'multipart/form-data; boundary=48940923NODERESLTER3890457293',
-     'content-length': '87119',
-     'x-forwarded-proto': 'https',
-     'x-forwarded-for': '10.105.154.6' },
+    if (req.body.ip_addr == '') {
+        console.log('pass... localhost' + req.path)
+        return next();
+    }
 
-*/
 
     if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
 
         console.log('... ok... trying x-forw....')
 
         if (req.headers['x-forwarded-for'] == client_vpn_ip) {
-            console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
+            console.log('... if I let you (' + client_vpn_ip + ') vpn, I let you...' + req.path)
             return next();
         }
         else {
@@ -2032,6 +2029,10 @@ function uploadSchtuff(req, res, next) {
                 // post to a remote D3CK... first look up IP based on PID, then post to it
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
+
+                    // xxxx
+                    // get the remote key necessary for client-side auth
+                    // pfx = fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.all')
 
                     restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local', {
                         multipart: true,

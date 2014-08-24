@@ -15,7 +15,10 @@ sudo /etc/init.d/d3ck stop
 
 sudo rm -f /etc/d3ck/redis/dump.rdb 
 sudo rm -f /etc/d3ck/logs/redis-server.log
-sudo rm -rf /etc/d3ck/d3cks/*
+# sudo rm -rf /etc/d3ck/d3cks/*
+sudo rm -rf /etc/d3ck/d3cks
+mkdir       /etc/d3ck/d3cks
+
 sudo rm -rf /etc/d3ck/public/uploads/*
 sudo rm -rf /etc/d3ck/secretz.json
 

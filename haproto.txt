@@ -28,6 +28,17 @@ defaults
 frontend wwws
     mode http
 
+    # pass along cert info
+    http-request set-header X-SSL                       %[ssl_fc]
+    http-request set-header X-SSL-Client-Verify         %[ssl_c_verify]
+    http-request set-header X-SSL-Client-SHA1           %{+Q}[ssl_c_sha1]
+    http-request set-header X-SSL-Client-DN             %{+Q}[ssl_c_s_dn]
+    http-request set-header X-SSL-Client-CN             %{+Q}[ssl_c_s_dn(cn)]
+    http-request set-header X-SSL-Issuer                %{+Q}[ssl_c_i_dn]
+    http-request set-header X-SSL-Client-Not-Before     %{+Q}[ssl_c_notbefore]
+    http-request set-header X-SSL-Client-Not-After      %{+Q}[ssl_c_notafter]
+
+
     # 
     # bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all ciphers ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
 
