@@ -452,7 +452,7 @@ function auth(req, res, next) {
     // are you logged in as a user, say, via the web?
     //
     if (req.isAuthenticated()) {
-        console.log('already chex: ' + req.path)
+        // console.log('already chex: ' + req.path)
         return next();
     }
 
@@ -1138,9 +1138,8 @@ function d3ckStatus(req, res, next) {
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
     if (JSON.stringify(tmp_status) == JSON.stringify(d3ck_status)) {
-        console.log('no status change...')
+        // console.log('no status change...')
     }
-
     else {
         console.log('NEW STATUS!')
         console.log(d3ck_status)
