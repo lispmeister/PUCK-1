@@ -655,7 +655,7 @@ while (init) {
 //
 function change_status() {
 
-    console.log('changing status...')
+    console.log('changing/writing new status...')
 
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
@@ -1112,18 +1112,16 @@ function pollStatus(file) {
 //
 function d3ckStatus(req, res, next) {
 
-    // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
+    console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    // after sent, clear
-    var tmp_status = d3ck_status
-
-    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    d3ck_events                = {"new_d3ck":""}
-    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-
-    d3ck_status.events         = d3ck_events
-    d3ck_status.file_events    = file_magic
-    d3ck_status.browser_events = browser_magic
+//  // after sent, clear
+//  var tmp_status = d3ck_status
+//  file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+//  d3ck_events                = {"new_d3ck":""}
+//  browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+//  d3ck_status.events         = d3ck_events
+//  d3ck_status.file_events    = file_magic
+//  d3ck_status.browser_events = browser_magic
 
 
     // used to use sockets... no more
@@ -1140,7 +1138,8 @@ function d3ckStatus(req, res, next) {
     //
     // as marvin once said, what's going on?
     //
-    res.send(200, JSON.stringify(tmp_status))
+    res.send(200, JSON.stringify(d3ck_status))
+    // res.send(200, JSON.stringify(tmp_status))
 
 }
 
