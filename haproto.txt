@@ -27,7 +27,52 @@ defaults
 
 frontend wwws
     mode http
-    bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all
+
+    # 
+    # bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all ciphers ECDHE-RSA-AES128-SHA256:AES128-GCM-SHA256:RC4:HIGH:!MD5:!aNULL:!EDH
+
+    # bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all no-tls-tickets ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-RSA-RC4-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA
+
+    # bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all ciphers RC4:HIGH:!aNULL:!MD5
+
+    # stateful SSL session resumption:
+    #
+    #   no-tls-tickets
+    #
+
+    # no beast:
+    # http://blog.haproxy.com/2013/01/21/mitigating-the-ssl-beast-attack-using-the-aloha-load-balancer-haproxy/
+    #
+    #   ciphers RC4:HIGH:!aNULL:!MD5
+
+    #
+    # want this as well...?
+    #
+    # !eNULL
+    #
+    # yes, according to... https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html
+    #
+    # AES256+EECDH:AES256+EDH:!aNULL:!eNULL
+    #
+
+    #bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all ciphers AES256+EECDH:AES256+EDH:RC4:HIGH:!MD5:!aNULL:!eNULL:!EDH
+    # bind :443 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all ciphers AES256+EECDH:AES256+EDH:RC4:HIGH:!MD5:!aNULL:!eNULL:!EDH
+
+    # and... pfs, according to - 
+
+    # bind :443 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all no-tls-tickets ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-RSA-RC4-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES128-SHA:AES256-SHA256:AES256-SHA:RC4-SHA:HIGH:!MD5:!aNULL:!eNULL:!EDH
+
+    acl sslv3 req_ssl_ver 3:3.1
+
+    # mozilla recommendations: https://wiki.mozilla.org/Security/Server_Side_TLS
+
+    bind :8080 ssl crt /etc/d3ck/d3cks/D3CK/d3ck.all no-tls-tickets ciphers TLS_DHE_RSA_WITH_AES_128_CBC_SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK
+
+
+    rspadd Strict-Transport-Security:\ max-age=31536000
+
+    rsprep ^Set-Cookie:\ (.*) Set-Cookie:\ \1;\ Secure
+ 
     timeout client 1h
 
     acl is_sig path_beg /socket.io

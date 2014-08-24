@@ -200,7 +200,8 @@ var server           = "",
     d3ck2ip          = {},      // d3ck ID to IP mapping
     ip2d3ck          = {},      // IP mapping to d3ck ID
     bwana_d3ck       = {},
-    d3ck_status_file = d3ck_home   + '/status.d3ck',
+    // d3ck_status_file = d3ck_home   + '/status.d3ck',
+    d3ck_status_file = d3ck_public + '/status.d3ck',
     d3ck_remote_vpn  = d3ck_public + '/openvpn_server.ip';
 
 // proxy up?
@@ -674,12 +675,12 @@ function change_status() {
     console.log('end status')
 
     // reset/clear
-    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    d3ck_events                = {"new_d3ck":""}
-    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-    d3ck_status.events         = d3ck_events
-    d3ck_status.file_events    = file_magic
-    d3ck_status.browser_events = browser_magic
+//  file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+//  d3ck_events                = {"new_d3ck":""}
+//  browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+//  d3ck_status.events         = d3ck_events
+//  d3ck_status.file_events    = file_magic
+//  d3ck_status.browser_events = browser_magic
 
 }
 
@@ -1124,7 +1125,20 @@ function d3ckStatus(req, res, next) {
         // console.log('kitties not ready')
     }
 
-    res.send(200, JSON.stringify(d3ck_status))
+    var tmp_status = d3ck_status
+
+    // after sent, clear
+    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
+    d3ck_events                = {"new_d3ck":""}
+    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+    d3ck_status.events         = d3ck_events
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
+
+//
+// as marvin once said, what's going on?
+//
+    res.send(200, JSON.stringify(tmp_status))
 
 }
 
@@ -1369,6 +1383,9 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
+    // and the entire json card
+    write_2_file(d3ck_dir + '/' + data.D3CK_ID, JSON.stringify(data))
+
 }
 
 
@@ -1511,7 +1528,6 @@ function createEvent(client_ip, event_data) {
     console.log('in createEvent - ' + JSON.stringify(event_data))
 
     console.log(event_data)
-
 
     var e_type      = event_data.event_type
     event_data.from = client_ip
@@ -1956,14 +1972,15 @@ function uploadSchtuff(req, res, next) {
                 //
                 if (upload_target == "local") {
                     console.log('local')
-                    createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[client_ip]})
+                    browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                    createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
                     res.send(204, {"status" : target_file})
                 }
 
                 //
                 // REMOTE
                 //
-                // post to a remote D3CK, if connected... first look up IP based on PID, then post to it
+                // post to a remote D3CK... first look up IP based on PID, then post to it
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
 
@@ -1978,6 +1995,7 @@ function uploadSchtuff(req, res, next) {
                         }
                         else {
                             console.log('upload to ' + upload_target + ' complete')
+                            browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
                             createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
                             console.log(data);
 
@@ -2676,7 +2694,7 @@ function formCreate(req, res, next) {
                         console.log(d3ck_public)
                         console.log(r_data)
 
-                        write_2_file(d3ck_public + r_data.image         , b64_decode(r_data.image_b64))
+                        write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
 
                         // write_2_file(d3ck_public + r_data.image + ".b64", r_data.image_b64)
 
@@ -2690,6 +2708,7 @@ function formCreate(req, res, next) {
                             d3ck_spawn(cmd, argz)
                         }
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
+
                     })
                     req.on('error', function(e) {
                         console.log('create Error... no d3ck data back? ', e.message)

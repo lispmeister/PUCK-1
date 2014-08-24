@@ -51,7 +51,7 @@ $(document).ready(function () {
 
     var tt = ['d3ck_top_left', 'd3ck_top_cog', 'd3ck_top_home', 'd3ck_top_skull', 'd3ck_top_ewe', 
               'd3ck_top_love', 'd3ck_top_cloud', 'd3ck_top_messages', 'd3ck_help', 'd3ck_video', 
-              'socket_wrench', 'd3ck_git']
+              'd3ck_git']
 
     for (var i = 0 ; i < tt.length; i++) {
         $('#' + tt[i]).popover( {delay: { show: 1000, hide: 200 }, trigger: "hover", placement: "bottom"})
@@ -93,16 +93,6 @@ $(document).ready(function () {
             console.log('... focus, damnit!')
             if (lastFocus.length == 1) lastFocus.focus();
         });
-
-
-/// FOCUSS>>>>>>!!!!!
-/// FOCUSS>>>>>>!!!!!
-/// FOCUSS>>>>>>!!!!!
-/// FOCUSS>>>>>>!!!!!
-/// FOCUSS>>>>>>!!!!!
-/// FOCUSS>>>>>>!!!!!
-
-
 
     })
 
@@ -381,6 +371,25 @@ $(document).ready(function () {
     }); 
 
     detect_webRTC('d3ck_rtc_health_check')
+
+    //  timer circle
+//    $('#timer_countdown').TimeCircles({
+//        total_duration  : 30, 
+//        // total_duration  : 0, 
+//        direction: "Counter-clockwise",
+//        count_past_zero : false,
+//        time            : {
+//            Days            : { show: false },
+//            Hours           : { show: false },
+//            Minutes         : { show: false },
+//            Seconds         : { show: true, color: "#2b94ea"}
+//        }
+//    }).addListener(function(unit, value, total) {
+//        // if(total <= 0) {
+//        //     alert('wakka!')
+//        // }
+//    });
+    
 
 })
 

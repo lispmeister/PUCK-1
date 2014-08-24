@@ -662,11 +662,13 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
 //
 // ... snag /status
 //
+first_news = true
 function get_status() {
 
     // console.log('get STATUS')
 
     var url = "/status"
+    var url = "/status.d3ck"
 
     var jqXHR_get_status = $.ajax({ url: url, })
 
@@ -681,7 +683,13 @@ function get_status() {
         if (! _.isEqual(old_d3ck_status, d3ck_status)) {
             console.log('something new in the state of denmark!')
             old_d3ck_status = JSON.parse(JSON.stringify(d3ck_status))
-            status_or_die()
+            if (first_news) {
+                console.log('...first time, tho....')
+                first_news = false
+            }
+            else {
+                status_or_die()
+            }
         }
         else {
             // console.log('same ol, same ol')
@@ -754,20 +762,22 @@ function status_or_die() {
         // a bit down from the top, and stay until wiped away or refreshed
 
         if (typeof remote_name == "undefined" || remote_name != "")
-            $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
+            $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
 
         d3ck_status.browser_events[browser_ip].notify_add = true
     }
     // did santa come?
 
     // XXX - odd corner case... if both systems have the same IP ... say... testing behind a nat...
-    // this won't work as expected, but the file should transfer anyway....
+    // this probably won't work as expected.....
     else if (d3ck_status.file_events.file_name.length && ! d3ck_status.browser_events[browser_ip].notify_file) {
         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
+
         // if we're connected, the file is being shipped to the other machine, not local
         // show inbound note if you sent file, else say when it succeeds
         if ((d3ck_status.file_events.file_from == browser_ip && d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") || d3ck_status.file_events.file_from != browser_ip) {
             console.log('new local file(z)!')
+
             // put in or lookup PiD, then owner/d3ck's name!
             $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); from " + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
@@ -1344,7 +1354,6 @@ function set_up_RTC(remote) {
     console.log('setting up RTC: ' + SIGNALING_SERVER)
 
     $('#remoteVideos video').remove()
-
 
     webrtc = new SimpleWebRTC({
         localVideoEl: 'localVideo',
