@@ -36,6 +36,9 @@ var SHORT_WAIT = 1000  // 1 sec
 var D3CK_SOCK_RETRY   = 3000
 var LOCAL_VIDEO_WIDTH = 480
 
+var ONE_HOUR = 60*60    // seconds
+
+
 var sock = null
 
 // helper from http://stackoverflow.com/questions/377644/jquery-ajax-error-handling-show-custom-exception-messages
@@ -295,7 +298,6 @@ function state_vpn(state, browser_ip) {
             }
 
             // d3ck_status.browser_events[browser_ip].notify_file = true
-            drag_and_d3ck(d3ck_status.openvpn_server.client)
 
         }
         else {
@@ -329,8 +331,6 @@ function state_vpn(state, browser_ip) {
             })
 
             d3ck_current.outgoing = true
-
-            drag_and_d3ck(d3ck_status.openvpn_client.server)
 
             $('body').removeClass('avgrund-active');
             state_ring(false)
@@ -584,6 +584,9 @@ function d3ck_create(element, ip_addr) {
 //
 // farm out https requests to remote systems since js/jquery balk at that kinda shit
 //
+
+var draggers = {} // track drag-n-drop areas
+
 function d3ck_ping(all_ips, d3ckid, url) {
 
     // console.log('in d3ck_ping')
@@ -612,10 +615,34 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
         // make the button clickable and green
         if (data.status == "OK") {
-            // console.log('success with ' + ping_url)
+            console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
+
+            var safe_id = 'uppity_' + data.ip.replace(/\./g, '_')
+
+            var ele = $('#'+element_id).parent().closest('div').find('.remote_ip strong')
+
             // change IP address to the one who answered
-            $('#'+element_id).parent().closest('div').find('.remote_ip strong').html('<strong>' + data.ip + '</strong>')
+            // $('#'+element_id).parent().closest('div').find('.remote_ip strong').html('<strong>' + data.ip + '</strong>')
+            $(ele).html('<strong>' + data.ip + '</strong>')
+
+            var current_time_in_seconds = new Date().getTime() / 1000;
+
+            //
+            // haven't seen this before... potential problems with ips in the future... sigh
+            // 
+            // don't change it more than once per hour...?
+            //
+            if (typeof draggers[data.ip] == "undefined" || (current_time_in_seconds - draggers[data.ip]) > ONE_HOUR ) {
+                // make it actionable
+                console.log('drag -n- drop away!')
+                draggers[data.ip] = current_time_in_seconds
+                drag_and_d3ck(safe_id, d3ckid, data.ip)
+            }
+            else {
+                console.log('not your time yet, young jedi')
+            }
+
         }
         else {
             console.log('not ok...')
@@ -837,8 +864,6 @@ function status_or_die() {
             console.log('clearing all flags of any calls to false')
         }
 
-        drag_and_d3ck("local")
-
     }
 
     first_news = false
@@ -1002,20 +1027,31 @@ function fire_d3ck_status(jstatus) {
 
 // draws the drag-n-drop box... need to call it anytime
 // vpn state changes
-function drag_and_d3ck(other_d3ck) { 
-    console.log('draggin n d3ckin to ' + other_d3ck)
+function drag_and_d3ck(safe_id, d3ckid, ip) { 
+
+    if (safe_id == "local") return
+
+    console.log('draggin n d3ckin... to....', safe_id, d3ckid, ip)
 
     // out with the old, in with the new
-    $('.dragDropBox').remove()
+    // $('.dragDropBox').remove()           XXXX?
+    // $('#uppity').filer({
 
-    $('#uppity').filer({
-        changeInput: '<div class="dragDropBox"><span class="message">CLICK -or- DROP files to upload <span style="font-size:200%"><br />' + other_d3ck + '</span></div>',
+    var safe_ip = ip.replace(/\./g, '_')
+
+    // remove old, add new form
+    $('#' + safe_id).remove()
+
+    $('#vpn_form_' + d3ckid).append('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
+
+    $('#' + safe_id).filer({
+        changeInput: '<div class="dragDropBox" id="dragDropBox_' + safe_ip + '><span class="message">CLICK -or- DROP files to upload</span></div>',
         appendTo   : '.dragDropBox',
+        // appendTo   : '#dragDropBox_' + safe_id,
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
         maxSize    : 1024 * 1024,
         uploadFile: {
-            // url:         'https://10.217.62.1:8080/up',
-            url:         '/up/' + other_d3ck,
+            url:         '/up/' + ip,
             data:        {},
             beforeSend:  function(parent){parent.append('<div class="progress-bar" />');},
             success:     function(data, parent, progress){ },

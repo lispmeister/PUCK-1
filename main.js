@@ -494,25 +494,28 @@ headers:
     //
     // are you CERTIFICATE authenticated?
     //
-//  if(req.client.authorized){
-//
-//      console.log('my cert homie!')
-//
-//      console.log(req.connection.getPeerCertificate())
-//
-//      var subject = req.connection.getPeerCertificate().subject;
-//
-//      //          { subject:
-//      //              { C: 'AQ',
-//      // [...]
-//      //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
-//
-//      // organization: subject.O,
-//  }
-//  else {
-//      console.log("hmmm ... let's look at this a min...")
-//      console.log(req.connection.getPeerCertificate())
-//  }
+    if(req.client.authorized){
+  
+        console.log('my cert homie...?!!?!')
+  
+        console.log(req.connection.getPeerCertificate())
+  
+        var subject = req.connection.getPeerCertificate().subject;
+
+        console.log('Subj: ')
+        console.log(subject)
+  
+        //          { subject:
+        //              { C: 'AQ',
+        // [...]
+        //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
+  
+        // organization: subject.O,
+    }
+    else {
+        console.log("hmmm ... let's look at this a min...")
+        console.log(req.connection.getPeerCertificate())
+    }
 
     console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
     res.redirect(302, '/login.html')
@@ -2005,7 +2008,9 @@ function uploadSchtuff(req, res, next) {
                 // LOCAL - file still stashed here for now
                 //
                 if (upload_target == "local") {
-                    console.log('local')
+                    console.log('local... d3ckid?')
+                    console.log(bwana_d3ck.D3CK_ID)
+
                     browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
 
                     d3ck_status.browser_events = browser_magic
@@ -2406,6 +2411,9 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     ping_done = true
                     d3ck2ip[ping_d3ckid] = all_ips[i]
                     ip2d3ck[all_ips[i]] = ping_d3ckid
+
+                    console.log('d2i, ip2d, pid', all_ips[i], ip2d3ck[all_ips[i]], ping_d3ckid)
+
                     res.send(200, ping_data)
                 }
                 responses++

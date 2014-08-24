@@ -304,16 +304,15 @@ $(document).ready(function () {
                                     '</form>'                                                                          +
                                  '</div>'                                                                              +
                               '</div>'                                                                                 +
-                            '</div>'                                                                                   
+                            '</div>'
 
-                         //   '</div>'                                                                                 +
-                         //'</li>'
 
                          // let the 'stache go to town!
                          var d3ck_html = Mustache.to_html(template, d3ck);
 
                          // $('#d3ck_details').html(html);
                          $("#d3ck_friends").append(d3ck_html)
+
                          // console.log('\nMUSTACHE!!!:\n' + d3ck_html + '\n\n')
 
                          // add the real ID
