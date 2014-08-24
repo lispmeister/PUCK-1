@@ -1275,7 +1275,9 @@ function create_d3ck(req, res, next) {
             //
             console.log('redis saved data from: ' + req.body.value.name)
 
-            d3ck_events = { new_d3ck : client_ip, new_d3ck_name: req.body.value.name }
+            d3ck_events = { new_d3ck_ip : client_ip, new_d3ck_name: req.body.value.name }
+
+            d3ck_status.events = d3ck_events
 
             create_d3ck_key_store(d3ck.value)
 
