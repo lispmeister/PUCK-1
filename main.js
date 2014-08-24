@@ -1535,16 +1535,18 @@ function setTCPProxy(req, res, next) {
 //
 // Redis keys will all be lowercase, while D3CKs are all upper case+digits
 //
-function createEvent(client_ip, event_data) {
+function createEvent(ip, event_data) {
 
-    console.log('in createEvent - ' + JSON.stringify(event_data))
+    console.log('in createEvent - ' + ip + ', ' + JSON.stringify(event_data))
 
     console.log(event_data)
 
     var e_type      = event_data.event_type
-    event_data.from = client_ip
-    // event_data.time = Date.now()
-    event_data.time = Date()
+
+    event_data.from    = ip
+    event_data.d3ck_id = ip2d3ck[ip]
+    event_data.time    = Date()
+
     var key         = e_type + ":" + event_data.time
 
     rclient.set(key, JSON.stringify(event_data), function(err) {
@@ -1775,7 +1777,7 @@ function list_d3cks(req, res, next) {
  */
 function echoReply(req, res, next) {
 
-    var client_ip = get_client_ip(req)
+    client_ip = get_client_ip(req)
 
     // & what's our IP addr?
     // looks like host: '192.168.0.250:12034',
