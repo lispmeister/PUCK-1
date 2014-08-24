@@ -22,8 +22,11 @@ var Tail       = require('./tail').Tail,
     os         = require('os'),
     passport   = require('passport'),
     l_Strategy = require('passport-local').Strategy,
+    passportIO = require("passport.socketio"),
     path       = require('path'),
     tcpProxy   = require('tcp-proxy'),
+    redis      = require("redis"),
+    candyStore = require('connect-redis')(express),
     request    = require('request'),
     response   = require('response-time'),
     rest       = require('rest'),
@@ -124,8 +127,7 @@ var d3ck_owners = []
 public_routes = config.public_routes
 
 ///--- Redis
-var redis = require("redis"),
-rclient   = redis.createClient();
+rclient = redis.createClient();
 
 rclient.on("error", function (err) {
     console.log("Redis client error: " + err);
@@ -498,23 +500,26 @@ headers:
   
         console.log('my cert homie...?!!?!')
   
-        console.log(req.connection.getPeerCertificate())
+        try {
+            console.log(req.connection.getPeerCertificate())
+            var subject = req.connection.getPeerCertificate().subject;
+            console.log('Subj: ')
+            console.log(subject)
   
-        var subject = req.connection.getPeerCertificate().subject;
-
-        console.log('Subj: ')
-        console.log(subject)
+            //          { subject:
+            //              { C: 'AQ',
+            // [...]
+            //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
   
-        //          { subject:
-        //              { C: 'AQ',
-        // [...]
-        //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
-  
-        // organization: subject.O,
+            // organization: subject.O,
+        }
+        catch (e) {
+            console.log('errzor on getpeer... sock?  ' + JSON.stringify(e))
+        }
     }
     else {
-        console.log("hmmm ... let's look at this a min...")
-        console.log(req.connection.getPeerCertificate())
+        console.log('cert auth failed')
+        // console.log(req.connection.getPeerCertificate())
     }
 
     console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
@@ -1713,7 +1718,7 @@ function getEvent(req, res, next) {
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
                         }
                         else {
-                            // console.log("event data retrieved: " + data.toString());
+                            console.log("event data retrieved: " + data.toString());
                             jdata = data.toString()
                             // hack it into a json string
                             jdata = JSON.parse('[{' + jdata.substr(1,jdata.length-1) + ']')
@@ -2100,7 +2105,7 @@ function d3ck_spawn(command, argz) {
 //
 // execute a command SYNCHRONOUSLY (blocking!), log stuff
 //
-function d3ck_spawn_sync(command, argz) {
+function d2ck_spawn_sync(command, argz) {
 
     console.log('a sync spawn o d3ck emerges... ' + ' (' + command + ')\n\n\t')
 
@@ -2907,7 +2912,31 @@ server.use(cors());
 
 // passport/auth stuff
 server.use(express.cookieParser());
-server.use(express.session({ secret: 'kittykittykittycat' }));
+
+//
+// need 16 randomnish bytes... I can wait all night
+//
+console.log('generating bytes for the secret secret.')
+
+// when you get lemons... ah, you know the drill
+var lemons   = d3ck_bin + "/gen_randish.sh"
+var lemonade = sh.exec(lemons)
+
+console.log('squeezing the lemons, they reveal their secrets! ' + JSON.stringify(lemonade))
+
+//
+// not sure about the store stuff... does passport do the same below (/aaa)?
+// ... so much dox in so little time. Think this will work. Maybe.
+//
+server.use(express.session({ 
+    secret  : lemonade.stdout,
+    store   : new candyStore({
+                    client: rclient
+    }),
+    key     : '_doublestuff_cookie_'
+}));
+
+
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
@@ -2917,9 +2946,11 @@ server.use(server.router);
 server.use(auth)
 
 //
+//
 // actual routes n stuff
 //
-
+//
+//
 
 // have we seen them before this login session?  True/false
 cookie = ""
@@ -2928,23 +2959,25 @@ server.get('/aaa', function(req, res) {
 
     console.log('AAA? ')
 
-    rclient.get('session_cookie', function (err, scookie) {
+    rclient.get('_doublestuff_cookie_', function (err, scookie) {
         if (err) {
             console.log(err, 'no cookie, no fun');
+
             next(err);
-            // res.send(200, {session_cookie: req.client._httpMessage.req.sessionID})
+
             cookie = req.client._httpMessage.req.sessionID
-            res.send(200, {session_cookie: false })
+            res.send(200, {_doublestuff_cookie_: false })
+
         }
         else {
             if (cookie == scookie) {
                 console.log('seen this cookie before... stale!')
-                res.send(200, { session_cookie: true } )
+                res.send(200, { _doublestuff_cookie_: true } )
             }
             else {
                 cookie = scookie
                 console.log('fresh cookie, mon: ', cookie)
-                res.send(200, { session_cookie: false } )
+                res.send(200, { _doublestuff_cookie_: false } )
             }
         }
     });
@@ -3083,7 +3116,7 @@ server.post('/login',
         // set a cookie so wont show the same intro page always
         cookie = ""
 
-        rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
+        rclient.set('_doublestuff_cookie_', req.client._httpMessage.req.sessionID, function(err) {
             if (err) {
                 console.log(err, 'session cookie crumbled: ' + JSON.stringify(err));
                 return(err);
@@ -3187,7 +3220,6 @@ function fire_up_local () {
 
     var web_io = require('socket.io').listen(d3cky, { resource: '/catz' });
     
-
     //
     // cat fax & status
     //
@@ -3236,6 +3268,31 @@ function fire_up_remote () {
     // var io_sig     = require('socket.io').listen(d3cky, { resource: 'sigsig' })
 
     io_sig     = require('socket.io').listen(d3cky)
+
+
+    // try some auth stuff here
+    io_sig.set('authorization', passportIO.authorize({
+        cookieParser: express.cookieParser,
+        key         : '_doublestuff_cookie_',       // name of cookie => session_id
+        secret      : lemonade.stdout,
+        store       : candyStore,
+        success     : socket_onAuthorizeSuccess,    // *optional* callback on success
+        fail        : socket_onAuthorizeFail        // *optional* callback on success
+
+    }));
+
+    function socket_onAuthorizeSuccess(data, accept){
+        console.log('successful connex to socket.io!');
+        accept(null, true);
+    }
+
+    function socket_onAuthorizeFail(data, message, error, accept){
+        console.log('failed connection to socket.io, sigh... ', message);
+        // We use this callback to log all of our failed connections.
+        accept(null, false);
+    }
+
+
 
     io_sig.disable('browser client cache');
 
