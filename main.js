@@ -806,6 +806,8 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
+                browser_magic = { "notify_add":false, "notify_ring":true, "notify_file":true}
+                d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_server = server_magic
 
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
@@ -837,6 +839,8 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
+                browser_magic = { "notify_add":false, "notify_ring":true, "notify_file":true}
+                d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_server = server_magic
 
                 createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
@@ -880,6 +884,8 @@ function watch_logs(logfile, log_type) {
                     stop_s     : "n/a"
                     }
 
+                browser_magic = { "notify_add":true, "notify_ring":true, "notify_file":true}
+                d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_client = client_magic
 
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID})
@@ -908,6 +914,8 @@ function watch_logs(logfile, log_type) {
                     stop_s     : moment_in_time
                     }
 
+                browser_magic = { "notify_add":true, "notify_ring":true, "notify_file":true}
+                d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_client = client_magic
 
                 createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
@@ -2011,7 +2019,7 @@ function uploadSchtuff(req, res, next) {
                         }
                         else {
                             console.log('upload to ' + upload_target + ' complete')
-                            browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                            browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
                             d3ck_status.browser_events = browser_magic
 
                             createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
