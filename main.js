@@ -1125,9 +1125,9 @@ function d3ckStatus(req, res, next) {
     // after sent, clear
     var tmp_status = d3ck_status
 
-    file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-    d3ck_events                = {"new_d3ck":""}
-    browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
+    file_magic                 = { "file_name"   : "", "file_size" : "", "file_from" : ""}
+    d3ck_events                = { "new_d3ck_ip" : ""}
+    browser_magic[client_ip]   = { "notify_add"  : false, "notify_ring":false, "notify_file":false}
     d3ck_status.events         = d3ck_events
     d3ck_status.file_events    = file_magic
     d3ck_status.browser_events = browser_magic
