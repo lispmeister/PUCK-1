@@ -842,6 +842,7 @@ function status_or_die() {
 
     }
 
+    first_news = false
     // fire_d3ck_status(d3ck_status)
 
 }
