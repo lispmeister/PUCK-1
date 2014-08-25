@@ -427,6 +427,7 @@ function findByUsername(name, fn) {
 function auth(req, res, next) {
 
     console.log('authentication check for... ' + req.path)
+    console.log(req)
 
     var ip = get_client_ip(req)
 
