@@ -2024,8 +2024,11 @@ function uploadSchtuff(req, res, next) {
 
                     var options = {
                         method  : 'POST',
-                        url     : url,
-                        key     :  fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.key'),
+                        hostname: upload.target,
+                        port: d3ck_port_ext,
+                        path: '/up/local',
+                        // url     : url,
+                        key     : fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.key'),
                         cert    : fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.crt'),
                         headers : {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -2034,19 +2037,19 @@ function uploadSchtuff(req, res, next) {
 
                     };
                     // options.agent = new https.Agent(options);
-                    console.log("URL: " + url)
+                    console.log("options: " + options)
 
+                    var post_data = ""
                     var request = https.request(options, function(response) {
-                        var body = ""
                         //When we receive data, we want to store it in a string
                         response.on('data', function (chunk) {
-                            body += chunk;
+                            post_data += chunk;
                             console.log('chunking...')
                         });
                         //On end of the request, run what we need to
                         response.on('end',function() {
                             console.log('post end!')
-                            console.log(body);
+                            console.log(post_data);
                         });
                     });
 
