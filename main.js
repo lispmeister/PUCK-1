@@ -464,14 +464,14 @@ function auth(req, res, next) {
         return next();
     }
 
-    console.log("\n\n")
-    console.log("Xfor?")
-    console.log(req.headers['x-forwarded-for'])
-    console.log("\n\n")
+    console.log("\n\nXfor? " + req.headers['x-forwarded-for'] + "\n\n")
 
-    if (req.body.ip_addr == '') {
-        console.log('pass... localhost' + req.path)
+    if (req.body.ip_addr == remote_client) {
+        console.log('pass... ' + remote_client + ' ... ' + req.path)
         return next();
+    }
+    else {
+        console.log('bad ip... ' + remote_client)
     }
 
 
