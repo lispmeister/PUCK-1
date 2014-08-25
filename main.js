@@ -468,7 +468,7 @@ function auth(req, res, next) {
 
     // terrible idea... fix! xxxxx
     if (typeof ip2d3ck[req.body.ip_addr] != "undefined") {
-        console.log('pass... ' + req.body.ip_addr + ' -> ' ip2d3ck[req.body.ip_addr] + ' ... ' + req.path)
+        console.log('pass... ' + req.body.ip_addr + ' -> ' + ip2d3ck[req.body.ip_addr] + ' ... ' + req.path)
         return next();
     }
     else {
