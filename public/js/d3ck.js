@@ -64,10 +64,10 @@ function formatErrorMessage(jqXHR, exception) {
 // ping myself
 function who_am_i() {
     $.get('/ping', function(d3ck) {
-        console.log('my name/id/status are: ', d3ck.name, d3ck.pid, d3ck.status)
-        d3ck_status = 'Name: ' + d3ck.name + '<br />Status: ' + d3ck.status + '<br />ID: ' + d3ck.pid
+        console.log('my name/id/status are: ', d3ck.name, d3ck.did, d3ck.status)
+        d3ck_status = 'Name: ' + d3ck.name + '<br />Status: ' + d3ck.status + '<br />ID: ' + d3ck.did
         // get my own data
-        $.getJSON('/d3ck/' + d3ck.pid, function(d3ckinfo) {
+        $.getJSON('/d3ck/' + d3ck.did, function(d3ckinfo) {
             console.log('my D3CK:')
             my_d3ck = d3ckinfo
             console.log(my_d3ck)
@@ -286,7 +286,7 @@ function state_vpn(state, browser_ip) {
             // ensure video button is enabled if a call is in progress
             $('#d3ck_video').addClass('green').addClass('pulse')
             $('button:contains("connecting")').text('connected from')
-            $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_pid).text('connected').removeClass('btn-primary').addClass('btn-success')
+            $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('connected').removeClass('btn-primary').addClass('btn-success')
 
             console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
             incoming_ip = d3ck_status.openvpn_server.client
@@ -1374,20 +1374,20 @@ function set_up_RTC(remote) {
 
     console.log('setting up that ol rtc magic')
 
-    var remote_d3ck = ""        // pid of other d3ck
+    var remote_d3ck = ""        // did of other d3ck
 
     var ip          = window.location.hostname
 
     // someone connected to us
     if (d3ck_status.openvpn_server.vpn_status == "up") {
         console.log("PEEEEER js: server up")
-        remote_d3ck = d3ck_status.openvpn_server.client_pid
+        remote_d3ck = d3ck_status.openvpn_server.client_did
     }
 
     // we're connected to them
     else if (d3ck_status.openvpn_client.vpn_status == "up") {
         console.log("PEEEEER js: client up")
-        remote_d3ck = d3ck_status.openvpn_client.server_pid
+        remote_d3ck = d3ck_status.openvpn_client.server_did
     }
 
     // ... wtf, as they say...?

@@ -172,9 +172,9 @@ $(document).ready(function () {
     $.get('/ping', function(d3ck) {
         my_d3ck = d3ck
 
-        console.log('my name/id/status are: ', my_d3ck.name, my_d3ck.pid, my_d3ck.status)
+        console.log('my name/id/status are: ', my_d3ck.name, my_d3ck.did, my_d3ck.status)
 
-        my_d3ck_status = 'Name: ' + my_d3ck.name + '<br />Status: ' + my_d3ck.status + '<br />ID: ' + my_d3ck.pid
+        my_d3ck_status = 'Name: ' + my_d3ck.name + '<br />Status: ' + my_d3ck.status + '<br />ID: ' + my_d3ck.did
 
         if (my_d3ck.status == "OK") {
             // $('#d3ck_status').addClass('btn-success').removeClass('disabled')
@@ -187,9 +187,9 @@ $(document).ready(function () {
 
         $('#d3ck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "D3CK Status").attr("data-content", my_d3ck_status).popover({delay: { hide: 200 }, trigger: "hover"})
 
-        console.log('my name/id/status are: ', my_d3ck.name, my_d3ck.pid, my_d3ck.status)
+        console.log('my name/id/status are: ', my_d3ck.name, my_d3ck.did, my_d3ck.status)
 
-        my_d3ck_status = 'Name: ' + my_d3ck.name + '<br />Status: ' + my_d3ck.status + '<br />ID: ' + my_d3ck.pid
+        my_d3ck_status = 'Name: ' + my_d3ck.name + '<br />Status: ' + my_d3ck.status + '<br />ID: ' + my_d3ck.did
 
         if (my_d3ck.status == "OK")
             // $('#d3ck_status').addClass('btn-success').removeClass('disabled')
@@ -221,7 +221,7 @@ $(document).ready(function () {
                     // bit of a race condition... figure out how to get the d3ckID of
                     // this D3CK (see above) prior to these so I can not put it up
                     // on the screen... lots of ways to do this....
-                    if (my_d3ck.pid != val) {
+                    if (my_d3ck.did != val) {
 
                         var name        = truncate(d3ckinfo.name)
                         var owner       = truncate(d3ckinfo.owner.name)
@@ -324,7 +324,7 @@ $(document).ready(function () {
 
                          // pingy - check if system is up... do it once, then at regular intervals
                          d3ck_ping(all_ips, d3ckid, d3ck_url)
-                         // args are function, timeout, function (ips, pid, and url)
+                         // args are function, timeout, function (ips, did, and url)
                          setInterval(d3ck_ping, ping_poll, all_ips, d3ckid, d3ck_url)
 
                          // start images in gray, color (if avail) on mouseover

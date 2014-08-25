@@ -91,7 +91,7 @@ var secretz = {}
 var d3ck_server_ip    = ""
 
 //
-// stupid hax from stupid certs - https://github.com/mikeal/request/issues/418
+// studid hax from studid certs - https://github.com/mikeal/request/issues/418
 //
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
@@ -102,7 +102,7 @@ var MAX_IMAGE_SIZE   = config.limits.max_image_size
 var MAX_UPLOAD_SIZE  = config.limits.max_upload_size
 
 // this many milliseconds to look to see if new data has arrived....
-var PID_POLLING_TIME = config.misc.pid_polling_time
+var PID_POLLING_TIME = config.misc.did_polling_time
 
 // users must run quickstart if they haven't already
 var redirect_to_quickstart = true
@@ -142,7 +142,7 @@ var decoder       = new StringDecoder('utf8');
 
 // global D3CK ID for this server's D3CK
 try {
-    d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.pid')
+    d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.did')
     d3ck_id = decoder.write(d3ck_id);
     d3ck_id = d3ck_id.replace(/\n/, '');
 }
@@ -183,8 +183,8 @@ rclient.get(d3ck_id, function (err, reply) {
 // yes, yes, lazy too
 
 // status and other bits
-var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},
-    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_pid":"unknown"},
+var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"},
+    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"},
     file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
     d3ck_events     = {"new_d3ck_ip":""},
     browser_magic   = {},
@@ -812,7 +812,7 @@ function watch_logs(logfile, log_type) {
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
                     client     : client_remote_ip,
-                    client_pid : ip2d3ck[client_remote_ip],
+                    client_did : ip2d3ck[client_remote_ip],
                     server_ip  : cat_fact_server,
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
@@ -845,7 +845,7 @@ function watch_logs(logfile, log_type) {
                     start      : "n/a",
                     start_s    : "n/a",
                     client     : "",
-                    client_pid : "",
+                    client_did : "",
                     server_ip  : "",
                     duration   : v_duration,
                     stop       : moment_in_time,
@@ -891,7 +891,7 @@ function watch_logs(logfile, log_type) {
                     start      : moment_in_time,
                     start_s    : moment_in_secs,
                     server     : server_remote_ip,
-                    server_pid : ip2d3ck[server_remote_ip],
+                    server_did : ip2d3ck[server_remote_ip],
                     duration   : "n/a",             // this should only hit once per connection
                     stop       : "n/a",
                     stop_s     : "n/a"
@@ -921,7 +921,7 @@ function watch_logs(logfile, log_type) {
                     start      : "n/a",
                     start_s    : "n/a",
                     server     : "",
-                    server_pid : "",
+                    server_did : "",
                     duration   : v_duration,
                     stop       : moment_in_time,
                     stop_s     : moment_in_time
@@ -1416,7 +1416,7 @@ function create_d3ck_key_store(data) {
     })
 
     // xxx - errs to user!
-    write_2_file(d3ck_dir + '/d3ck.pid',     data.D3CK_ID)
+    write_2_file(d3ck_dir + '/d3ck.did',     data.D3CK_ID)
     write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
     write_2_file(d3ck_dir + '/d3ck.key',     key)
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
@@ -1818,7 +1818,7 @@ function echoReply(req, res, next) {
     }
     else {
         // console.log('echo, echo, echo....')
-        var response = {status: "OK", "name": bwana_d3ck.name, "pid": d3ck_id}
+        var response = {status: "OK", "name": bwana_d3ck.name, "did": d3ck_id}
     }
 
     // res.send(200, response)
@@ -2408,9 +2408,9 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
                 ping_data.ip = ip
 
-                if (ping_data.pid != ping_d3ckid) {
+                if (ping_data.did != ping_d3ckid) {
                     console.log("ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave")
-                    console.log(ping_data.pid + ' != ' + ping_d3ckid)
+                    console.log(ping_data.did + ' != ' + ping_d3ckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     // res.send(420, response) // enhance your calm!
                 }
@@ -2420,7 +2420,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     d3ck2ip[ping_d3ckid] = all_ips[i]
                     ip2d3ck[all_ips[i]] = ping_d3ckid
 
-                    console.log('d2i, ip2d, pid', all_ips[i], ip2d3ck[all_ips[i]], ping_d3ckid)
+                    console.log('d2i, ip2d, did', all_ips[i], ip2d3ck[all_ips[i]], ping_d3ckid)
 
                     res.send(200, ping_data)
                 }
@@ -2671,7 +2671,7 @@ function formCreate(req, res, next) {
                 data = JSON.parse(data)
 
                 // make the d3ck's dir... should not exist!
-                var d3ck_dir = config.D3CK.keystore + '/' + data.pid
+                var d3ck_dir = config.D3CK.keystore + '/' + data.did
 
                 mkdirp.sync(d3ck_dir, function () {
                     if(err) {
@@ -2681,7 +2681,7 @@ function formCreate(req, res, next) {
                 })
 
                 // now get remote information
-                url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/d3ck/' + data.pid
+                url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/d3ck/' + data.did
 
                 // if ping is successful, rustle up and write appropriate data
                 var req = https.get(url, function(response) {
