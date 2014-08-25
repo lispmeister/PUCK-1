@@ -2018,33 +2018,58 @@ function uploadSchtuff(req, res, next) {
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
 
-                    var stream = fs.createReadStream('./file');
+                    var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+                    // one at a time for now ;(
+                    var stream = fs.createReadStream(target_path);
 
                     var options = {
-                        url: 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
-                        method: 'POST',
-                        // data: { "uppity[]": fs.file(target_path, null, target_size, null, "image/jpg") }
-                        key:  fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.key'),
-                        cert: fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.crt'),
-                        headers: {
+                        method  : 'POST',
+                        url     : url,
+                        key     :  fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.key'),
+                        cert    : fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.crt'),
+                        headers : {
                             'Content-Type': 'application/x-www-form-urlencoded',
-                            'Content-Length': post_data.length
+                            'Content-Length': target_size
                         }
 
                     };
-                    options.agent = new https.Agent(options);
+                    // options.agent = new https.Agent(options);
+                    console.log("URL: " + url)
 
-                    var req = https.request(options)
+                    var request = https.request(options, function(response) {
+                        var body = ""
+                        //When we receive data, we want to store it in a string
+                        response.on('data', function (chunk) {
+                            body += chunk;
+                            console.log('chunking...')
+                        });
+                        //On end of the request, run what we need to
+                        response.on('end',function() {
+                            console.log('post end!')
+                            console.log(body);
+                        });
+                    });
+
+                    //Now we need to set up the request itself. 
+                    //This is a simple sample error function
+                    request.on('error', function(e) {
+                        console.log('error on request: ' + e.message);
+                        res.send(200, {"error" : e.message})
+                    });
+
+                    //Write our post data to the request
+                    //request.write(postdata);
+                    //End the request.
+                    //request.end();
 
                     stream.on('data', function(data) {
                         console.log('writing...z!')
-                        req.write(data);
+                        request.write(data);
                     });
 
                     stream.on('end', function() {
-                        console.log('the end is night, motherfucker')
-                        postReq.end();
-
+                        console.log('the end is nigh, motherfucker')
+                        request.end();
                         done_posting()
 
                     });
@@ -2059,11 +2084,6 @@ function uploadSchtuff(req, res, next) {
 
                         console.log('done...?')
 
-                        if (data instanceof Error) {
-                            console.log('Error:', data.message);
-                            res.send(200, {"error" : data.message})
-                        }
-                        else {
                             console.log('upload to ' + upload_target + ' complete')
                             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
 
@@ -2071,7 +2091,6 @@ function uploadSchtuff(req, res, next) {
                             d3ck_status.file_events    = file_magic
 
                             createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
-                            console.log(data);
 
                             // get rid of evidence
                             fs.unlink(target_path, function (err) {
@@ -2081,7 +2100,6 @@ function uploadSchtuff(req, res, next) {
 
 
                             res.send(204, {"status" : target_file})
-                        }
                     }
                 }
             }
