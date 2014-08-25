@@ -466,13 +466,15 @@ function auth(req, res, next) {
 
     console.log("\n\nXfor? " + req.headers['x-forwarded-for'] + "\n\n")
 
+    var cip = req.headers['x-forwarded-for']
+
     // terrible idea... fix! xxxxx
-    if (typeof ip2d3ck[req.body.ip_addr] != "undefined") {
-        console.log('pass... ' + req.body.ip_addr + ' -> ' + ip2d3ck[req.body.ip_addr] + ' ... ' + req.path)
+    if (typeof ip2d3ck[cip] != "undefined") {
+        console.log('pass... ' + cip + ' -> ' + ip2d3ck[cip] + ' ... ' + req.path)
         return next();
     }
     else {
-        console.log('bad ip... ' + req.body.ip_addr)
+        console.log('bad ip... ' + cip)
     }
 
 
