@@ -428,7 +428,7 @@ function auth(req, res, next) {
 
     console.log('authentication check for... ' + req.path)
 
-    var ip = get_client_ip()
+    var ip = get_client_ip(req)
 
     var url_bits = req.path.split('/')
 
