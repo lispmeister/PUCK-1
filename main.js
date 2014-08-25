@@ -466,7 +466,8 @@ function auth(req, res, next) {
 
     console.log("\n\nXfor? " + req.headers['x-forwarded-for'] + "\n\n")
 
-    if (req.body.ip_addr == remote_client) {
+    // terrible idea... fix! xxxxx
+    if (typeof ip2d3ck[req.body.ip_addr] != "undefined") {
         console.log('pass... ' + remote_client + ' ... ' + req.path)
         return next();
     }
