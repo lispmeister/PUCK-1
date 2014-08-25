@@ -13,6 +13,8 @@ sleep 2
 
 sudo /etc/init.d/d3ck stop
 
+sudo /etc/init.d/nginx stop
+
 sudo rm -f /etc/d3ck/redis/dump.rdb 
 sudo rm -f /etc/d3ck/logs/redis-server.log
 # sudo rm -rf /etc/d3ck/d3cks/*
