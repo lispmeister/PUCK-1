@@ -468,11 +468,11 @@ function auth(req, res, next) {
 
     // terrible idea... fix! xxxxx
     if (typeof ip2d3ck[req.body.ip_addr] != "undefined") {
-        console.log('pass... ' + remote_client + ' ... ' + req.path)
+        console.log('pass... ' + req.body.ip_addr + ' -> ' ip2d3ck[req.body.ip_addr] + ' ... ' + req.path)
         return next();
     }
     else {
-        console.log('bad ip... ' + remote_client)
+        console.log('bad ip... ' + req.body.ip_addr)
     }
 
 
