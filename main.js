@@ -2934,25 +2934,34 @@ server.use(cors());
 // passport/auth stuff
 server.use(express.cookieParser());
 
-//
-// need 16 randomnish bytes... I can wait all night
-//
-console.log('generating bytes for the secret secret.')
 
-// when you get lemons... ah, you know the drill
-var lemons   = d3ck_bin + "/gen_randish.sh"
-var lemonade = sh.exec(lemons)
+//
+// need n randomnish bytes... I can wait all night... defaults to 16 hex pairs
+//
+function gen_somewhat_random(n) {
 
-console.log('squeezing the lemons, they reveal their secrets! ' + JSON.stringify(lemonade))
+    if (typeof n == "undefined") n = 16
+
+    console.log('generating ' + n + ' bytes for the secret secret.')
+
+    // when you get lemons... ah, you know the drill
+    var lemons   = d3ck_bin + "/gen_randish.sh " + n
+    var lemonade = sh.exec(lemons)
+
+    console.log('squeezing the lemons, they reveal their secrets! ' + JSON.stringify(lemonade))
+
+    return(lemonade.stdout)
+
+}
 
 //
 // not sure about the store stuff... does passport do the same below (/aaa)?
 // ... so much dox in so little time. Think this will work. Maybe.
 //
 server.use(express.session({ 
-    secret: lemonade.stdout,
-    store: new candyStore({
-        client: rclient
+    secret: gen_somewhat_random()
+//  store: new candyStore({
+//      client: rclient
     })
 }));
 
@@ -2979,19 +2988,22 @@ server.get('/aaa', function(req, res) {
 
     console.log('AAA? ')
 
+    cookie = req.client._httpMessage.req.sessionID
+
     rclient.get('session_cookie', function (err, scookie) {
+        // failzor getting cookie
         if (err) {
             console.log(err, 'no cookie, no fun');
             next(err);
             // res.send(200, {session_cookie: req.client._httpMessage.req.sessionID})
-            cookie = req.client._httpMessage.req.sessionID
             res.send(200, {session_cookie: false })
         }
         else {
             if (cookie == scookie) {
-                console.log('seen this cookie before... stale!')
+                console.log('seen this cookie before... stale... old... used up... but still good...')
                 res.send(200, { session_cookie: true } )
             }
+            // no dice
             else {
                 cookie = scookie
                 console.log('fresh cookie, mon: ', cookie)
@@ -3007,6 +3019,7 @@ server.get('/aaa', function(req, res) {
 server.post('/quik', quikStart)
 
 server.get('/logout', function(req, res) {
+    rclient.del('session_cookie')
     req.logout();
     res.redirect('/');
 });
@@ -3131,10 +3144,12 @@ server.all('/url', auth, webProxy)
 server.post('/login',
     passport.authenticate('local', { failureRedirect: '/loginFailure', failureFlash: true }),
     function(req, res) {
-        // set a cookie so wont show the same intro page always
+
         cookie = ""
 
-        rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
+        // cookie baking
+        // rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
+        rclient.set('session_cookie', gen_somewhat_random(), function(err) {
             if (err) {
                 console.log(err, 'session cookie crumbled: ' + JSON.stringify(err));
                 return(err);
@@ -3148,7 +3163,6 @@ server.post('/login',
         res.redirect('/');
     }
 )
-
 
 // get peerjs peers
 server.get('/p33rs', auth, function(req, res, next) {
