@@ -1,4 +1,10 @@
 
+user zen;
+
+pid /etc/d3ck/logs/nginx.pid;
+
+worker_processes 1;
+
 working_directory /etc/d3ck;
 
 events { worker_connections  1024; }
@@ -53,7 +59,7 @@ http {
         #
         location /socket.io {   
 
-            proxy_pass          http://10.111.132.1:5555;
+            proxy_pass          http://10.151.241.1:5555;
             proxy_http_version  1.1;
 
             proxy_set_header    X-SSL-Client-Verify $ssl_client_verify;

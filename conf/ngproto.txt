@@ -1,4 +1,10 @@
 
+user zen;
+
+pid /etc/d3ck/logs/nginx.pid;
+
+worker_processes 1;
+
 working_directory /etc/d3ck;
 
 events { worker_connections  1024; }

@@ -2024,8 +2024,8 @@ function uploadSchtuff(req, res, next) {
                         url: 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
                         method: 'POST',
                         // data: { "uppity[]": fs.file(target_path, null, target_size, null, "image/jpg") }
-                        key:  fs.readFileSync('/etc/d3ck/d3cks/40040301E381C5917FA4CE4633209A33124E6F8A/d3ck.key'),
-                        cert: fs.readFileSync('/etc/d3ck/d3cks/40040301E381C5917FA4CE4633209A33124E6F8A/d3ck.crt'),
+                        key:  fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + /d3ck.key'),
+                        cert: fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + /d3ck.crt'),
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                             'Content-Length': post_data.length
