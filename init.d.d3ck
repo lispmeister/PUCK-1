@@ -78,6 +78,8 @@ case $1 in
                     kill $PID
                 done
 
+                service nginx stop
+
                 log_end_msg $?
                   ;;
 
