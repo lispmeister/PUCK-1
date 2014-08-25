@@ -428,6 +428,8 @@ function auth(req, res, next) {
 
     console.log('authentication check for... ' + req.path)
 
+    var ip = get_client_ip()
+
     var url_bits = req.path.split('/')
 
     if (__.contains(public_routes, url_bits[1])) {
@@ -462,13 +464,14 @@ function auth(req, res, next) {
     //
     // are you logged in as a user, say, via the web?
     //
+
     if (req.isAuthenticated()) {
         // console.log('already chex: ' + req.path)
         return next();
     }
 
     // for now... let in localhost... may rethink
-    if (req.body.ip_addr == '127.0.0.1') {
+    if (ip == '127.0.0.1') {
         console.log('pass... localhost' + req.path)
         return next();
     }
@@ -477,19 +480,18 @@ function auth(req, res, next) {
 
         console.log('... ok... trying x-forw....')
 
-        if (req.headers['x-forwarded-for'] == client_vpn_ip) {
+        if (ip == client_vpn_ip) {
             console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
             return next();
         }
         else {
-            console.log('not client ip: ' + client_vpn_ip + ' != ' + req.headers['x-forwarded-for'])
+            console.log('not client ip: ' + client_vpn_ip + ' != ' + ip)
         }
-
     }
 
     // console.log(req.headers)
 
-    console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
+    console.log('I pity da fool who tries to sneak by me!  ' + req.path, ip)
     res.redirect(302, '/login.html')
 
 }
@@ -973,16 +975,12 @@ function NotImplementedError() {
     this.name = 'NotImplementedError';
 }
 
-// the browser's IP
+// who is talking to us?
 function get_client_ip(req) {
 
-    // client_ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
-    // client_ip = req.ip
+    client_ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
 
-    // with HAProxy, it's req.headers['x-forwarded-for']
-    client_ip = req.headers['x-forwarded-for']
-
-    // console.log("C-ip: " + client_ip)
+    console.log("C-ip: " + client_ip)
 
     if (typeof client_ip == "undefined") {
         console.log('no IP here...')
