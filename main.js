@@ -55,8 +55,8 @@ var Tail       = require('./tail').Tail,
 
 // simple conf file...
 var config = JSON.parse(fs.readFileSync('/etc/d3ck/D3CK.json').toString())
+console.log('d3ck conf:')
 console.log(config);
-
 console.log(config.D3CK)
 
 // shortcuts
@@ -240,7 +240,6 @@ function get_d3ck_vital_bits () {
         console.log('\nSECRETZ!!!!  Found secret file... does it check out?')
         secretz = JSON.parse(fs.readFileSync(d3ck_secretz).toString())
         console.log(JSON.stringify(secretz))
-        console.log('\n')
 
         // should be a single user, but keep this code in case we support more in future
         secretz.id = 0
@@ -540,6 +539,7 @@ passport.use(new l_Strategy(
                 if (!user) { console.log("unknown user: " + name); return done(null, false, { message: 'Unknown user ' + name }); }
 
                 // if (_hash == d3ck_owners[0].hash) {
+                console.log('tick....')
                 console.log(d3ck_owners[0].hash)
 
                 if (bcrypt.compareSync(password, d3ck_owners[0].hash)) {
@@ -1075,6 +1075,7 @@ function pollStatus(file) {
             console.log('file errz - ' + err)
         }
         else {
+            console.log('... reading...')
             console.log(data.toString())
             d3ck_status = JSON.parse(data.toString())
         }
@@ -1373,8 +1374,8 @@ function create_d3ck_key_store(data) {
 
     var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
 
-    console.log('Californiastic: ' + d3ck_dir)
-    console.log(ca)
+//  console.log('Californiastic: ' + d3ck_dir)
+//  console.log(ca)
 
     // has to exist before the below will work...
     mkdirp.sync(d3ck_dir, function () {
