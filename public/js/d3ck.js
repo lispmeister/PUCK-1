@@ -590,7 +590,7 @@ var draggers = {} // track drag-n-drop areas
 
 function d3ck_ping(all_ips, d3ckid, url) {
 
-    // console.log('in d3ck_ping')
+    console.log('in d3ck_ping')
     // console.log(d3ckid, url)
     // console.log(all_ips)
 
@@ -612,14 +612,14 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
     jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
         var ret = data
-        // console.log("pingzor " + JSON.stringify(data))
+        console.log("pingzor " + JSON.stringify(data))
+
+        var safe_id = 'uppity_' + data.ip.replace(/\./g, '_')
 
         // make the button clickable and green
         if (data.status == "OK") {
             console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
-
-            var safe_id = 'uppity_' + data.ip.replace(/\./g, '_')
 
             var ele = $('#'+element_id).parent().closest('div').find('.remote_ip strong')
 
@@ -636,6 +636,8 @@ function d3ck_ping(all_ips, d3ckid, url) {
             //
             if (typeof draggers[data.ip] == "undefined" || (current_time_in_seconds - draggers[data.ip]) > ONE_HOUR ) {
                 // make it actionable
+                // remove old, add new form
+                $('#' + safe_id).remove()
                 console.log('drag -n- drop away!')
                 draggers[data.ip] = current_time_in_seconds
                 drag_and_d3ck(safe_id, d3ckid, data.ip)
@@ -646,6 +648,7 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
         }
         else {
+            $('#' + safe_id).remove() // remove old, add new form
             console.log('not ok...')
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
         }
@@ -653,10 +656,12 @@ function d3ck_ping(all_ips, d3ckid, url) {
             // console.log( "ping fail for " + ping_url)
             // console.log(err)
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
+            $('#'+element_id).closest('form').find('div').remove()
     }).error(function(err) {
             // console.log( "ping error for " + ping_url)
             // console.log(err)
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
+            $('#'+element_id).closest('form').find('div').remove()
     })
 
 // console.log('post-pingy ' + d3ckid + '... putting into ' + element_id)
@@ -1031,6 +1036,13 @@ function fire_d3ck_status(jstatus) {
 function drag_and_d3ck(safe_id, d3ckid, ip) { 
 
     if (safe_id == "local") return
+    if (safe_id == "local") return
+    if (safe_id == "local") return
+    if (safe_id == "local") return
+    if (safe_id == "local") return
+    if (safe_id == "local") return
+    if (safe_id == "local") return
+    if (safe_id == "local") return
 
     console.log('draggin n d3ckin... to....', safe_id, d3ckid, ip)
 
@@ -1040,10 +1052,8 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
 
     var safe_ip = ip.replace(/\./g, '_')
 
-    // remove old, add new form
-    $('#' + safe_id).remove()
-
-    $('#vpn_form_' + d3ckid).append('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
+    // $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
+    $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
 
     $('#' + safe_id).filer({
         changeInput: '<div class="dragDropBox" id="dragDropBox_' + safe_ip + '><span class="message">CLICK -or- DROP files to upload</span></div>',

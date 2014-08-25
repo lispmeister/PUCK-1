@@ -467,7 +467,7 @@ function auth(req, res, next) {
     //
     // are you CERTIFICATE authenticated?
     //
-    if(req.client.authorized){
+    if (req.client.authorized) {
   
         console.log('my cert homie...?!!?!')
   
@@ -3305,7 +3305,13 @@ function fire_up_remote () {
     }
 
     function socket_onAuthorizeFail(data, message, error, accept){
-        console.log('failed connection to socket.io, sigh... ', message);
+
+        if (error) {
+            throw new Error(message)
+        }
+        else {
+            console.log('failed connection to socket.io, sigh... ', message);
+        }
         // We use this callback to log all of our failed connections.
         accept(null, false);
     }
