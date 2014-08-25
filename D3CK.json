@@ -44,7 +44,7 @@
     },
 
     "misc": {
-        "pid_polling_time" : "3000"
+        "did_polling_time" : "3000"
     },
 
     "public_routes": [

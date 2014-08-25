@@ -13,7 +13,7 @@ echo starting D3CK server...
 cd $D3CK_HOME
 
 # nuke any past status
-echo '{"events":{"new_d3ck":""},"openvpn_server":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_pid":"unknown"},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, "browser_events":{"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}}, "file_events": { "file_name" : "", "file_size" : "", "file_from" : ""}}' > $D3CK_HOME/status.d3ck
+echo '{"events":{"new_d3ck":""},"openvpn_server":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, "browser_events":{"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}}, "file_events": { "file_name" : "", "file_size" : "", "file_from" : ""}}' > $D3CK_HOME/status.d3ck
 
 # clear server and client logs
 echo > $D3CK_LOGS/client_vpn.log
@@ -44,21 +44,21 @@ if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
     cp $hell/vpn* $keystore/vpn_client
 
     # print SHA1 fingerprint
-    openssl x509 -noout -fingerprint -in $d3ck_keystore/d3ck.crt | awk -F= '{print $2}' | sed 's/://g' | tee -a $d3ck_keystore/d3ck.pid
+    openssl x509 -noout -fingerprint -in $d3ck_keystore/d3ck.crt | awk -F= '{print $2}' | sed 's/://g' | tee -a $d3ck_keystore/d3ck.did
 
-    pid=`cat $d3ck_keystore/d3ck.pid`
-    cp $d3ck_keystore/d3ck.pid $D3CK_HOME/public/d3ck.pid
+    did=`cat $d3ck_keystore/d3ck.did`
+    cp $d3ck_keystore/d3ck.did $D3CK_HOME/public/d3ck.did
 
     # DHM key
-    ./create_tlsauth.sh $pid
+    ./create_tlsauth.sh $did
 
     # xxx - give all clients the same TA key?  No!
 
     ./create_dhm.sh
 
-    mv $d3ck_keystore/* $keystore/$pid
+    mv $d3ck_keystore/* $keystore/$did
     rmdir $d3ck_keystore
-    ln -s $keystore/$pid $d3ck_keystore
+    ln -s $keystore/$did $d3ck_keystore
 
     # print out some summary data about the keys
     for cert in $d3ck_keystore/{d3ck,ca}.crt $keystore/vpn_client/vpn_client.crt ; do
@@ -71,7 +71,7 @@ if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
 
     # need to start this before we try a REST call to it....
 
-    ./exe/init_d3ck.sh $pid img $ip "$($D3CK_HOME/exe/get_net.sh)" Ms_D3CK d3ck@example.com
+    ./exe/init_d3ck.sh $did img $ip "$($D3CK_HOME/exe/get_net.sh)" Ms_D3CK d3ck@example.com
 
     NODE_PATH="$D3CK_HOME/" node main.js &
 
@@ -81,9 +81,9 @@ if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
     while test 2 = 1 ; do
         echo sleeping for 2 seconds
         sleep 2
-        echo ./exe/create_d3ck.sh $pid img/d3ck.png $ip "$($D3CK_HOME/exe/get_net.sh)" Ms_D3CK d3ck@example.com
+        echo ./exe/create_d3ck.sh $did img/d3ck.png $ip "$($D3CK_HOME/exe/get_net.sh)" Ms_D3CK d3ck@example.com
 
-        # ./exe/create_d3ck.sh $pid img/d3ck.png $ip "$($D3CK_HOME/exe/get_net.sh)" Ms.D3CK d3ck@example.com
+        # ./exe/create_d3ck.sh $did img/d3ck.png $ip "$($D3CK_HOME/exe/get_net.sh)" Ms.D3CK d3ck@example.com
 
         if [ $? == 0 ] ; then
             break
@@ -91,7 +91,7 @@ if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
     done
 
 else
-    cp $d3ck_keystore/d3ck.pid $D3CK_HOME/public/d3ck.pid
+    cp $d3ck_keystore/d3ck.did $D3CK_HOME/public/d3ck.did
 
     # if not started above, do so now
     NODE_PATH="$D3CK_HOME/" node main.js &
