@@ -433,7 +433,7 @@ function auth(req, res, next) {
 
     var url_bits = req.path.split('/')
 
-    console.log('contains...')
+    // console.log('contains...')
     if (__.contains(public_routes, url_bits[1])) {
         if (redirect_to_quickstart && url_bits[1] == "login.html") {
             console.log('almost let you go to login.html, but nothing to login to')
@@ -443,7 +443,7 @@ function auth(req, res, next) {
         }
     }
 
-    console.log('qs...')
+    // console.log('qs...')
     // I don't care if you are auth'd or not, you don't get much but quickstart until
     // you've set up your d3ck....
     if (redirect_to_quickstart) {
@@ -458,7 +458,7 @@ function auth(req, res, next) {
     //
     // hmm... is this safe?
     //
-    console.log('cert...?')
+    // console.log('cert...?')
     if (typeof req.headers['x-ssl-client-verify'] != "undefined" && req.headers['x-ssl-client-verify'] == "SUCCESS"){
         console.log('my cert homie...?!!?!')
         return next();
@@ -471,18 +471,18 @@ function auth(req, res, next) {
 
     console.log('auth...?')
     if (req.isAuthenticated()) {
-        // console.log('already chex: ' + req.path)
+        console.log('already chex: ' + req.path)
         return next();
     }
 
     // for now... let in localhost... may rethink
-    console.log('localhost')
+    // console.log('localhost')
     if (ip == '127.0.0.1') {
         console.log('pass... localhost' + req.path)
         return next();
     }
 
-    console.log('x-forw')
+    // console.log('x-forw')
     if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
 
         console.log('... ok... trying x-forw....')
