@@ -978,16 +978,26 @@ function NotImplementedError() {
 // who is talking to us?
 function get_client_ip(req) {
 
-    client_ip = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.ip || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress
-
-    console.log("C-ip: " + client_ip)
-
-    if (typeof client_ip == "undefined") {
+    if (typeof req.headers['x-real-ip'] != "undefined") 
+        client_ip = req.headers['x-real-ip']
+    else if (typeof req.headers['x-forwarded-for'] != "undefined")
+        client_ip = req.headers['x-forwarded-for']
+    else if (typeof req.ip != "undefined")
+        client_ip = req.ip
+    else if (typeof req.connection.remoteAddress != "undefined")
+        client_ip = req.connection.remoteAddress
+    else if (typeof req.socket.remoteAddress != "undefined")
+        client_ip = req.socket.remoteAddress
+    else if (typeof req.connection.socket.remoteAddress != "undefined")
+        client_ip = req.connection.socket.remoteAddress
+    else {
         console.log('no IP here...')
         return("")
     }
-    else
-        return client_ip
+
+    console.log("C-ip: " + client_ip)
+
+    return client_ip
 
 }
 
