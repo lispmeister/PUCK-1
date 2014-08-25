@@ -464,34 +464,6 @@ function auth(req, res, next) {
         return next();
     }
 
-    console.log("\n\nXfor? " + req.headers['x-forwarded-for'] + "\n\n")
-    console.log("\n\nrip? " + req.ip + "\n\n")
-
-    // terrible idea... fix! xxxxx
-    if (typeof ip2d3ck[req.ip] != "undefined") {
-        console.log('pass... ' + req.ip + ' -> ' + ip2d3ck[req.ip] + ' ... ' + req.path)
-        return next();
-    }
-    else {
-        console.log('bad ip... ' + req.ip)
-    }
-
-
-    if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
-
-        console.log('... ok... trying x-forw....')
-
-        if (req.headers['x-forwarded-for'] == client_vpn_ip) {
-            console.log('... if I let you (' + client_vpn_ip + ') vpn, I let you...' + req.path)
-            return next();
-        }
-        else {
-            console.log('not client ip: ' + client_vpn_ip + ' != ' + req.headers['x-forwarded-for'])
-        }
-
-    }
-
-
     //
     // are you CERTIFICATE authenticated?
     //
@@ -520,6 +492,40 @@ function auth(req, res, next) {
         console.log('cert auth failed')
         // console.log(req.connection.getPeerCertificate())
     }
+
+    console.log("\n\nXfor? " + req.headers['x-forwarded-for'] + "\n\n")
+    console.log("rip? " + req.ip + "\n\n")
+
+    //
+    // monumentally bad idea... fix! xxxxx
+    //
+    // should be using client side certs, sigh
+    //
+    // also not checking path for ..'s or whatever... how many things wrong here?
+    //
+    if (typeof ip2d3ck[req.ip] != "undefined" && req.path.substr(3) == '/up') {
+        console.log('pass... ' + req.ip + ' -> ' + ip2d3ck[req.ip] + ' ... ' + req.path)
+        return next();
+    }
+    else {
+        console.log('bad ip... ' + req.ip)
+    }
+
+
+    if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
+
+        console.log('... ok... trying x-forw....')
+
+        if (req.headers['x-forwarded-for'] == client_vpn_ip) {
+            console.log('... if I let you (' + client_vpn_ip + ') vpn, I let you...' + req.path)
+            return next();
+        }
+        else {
+            console.log('not client ip: ' + client_vpn_ip + ' != ' + req.headers['x-forwarded-for'])
+        }
+
+    }
+
 
     console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
     res.redirect(302, '/login.html')
@@ -1422,7 +1428,16 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
-    // and the entire json card
+    // client stuff now
+    var client_ca   = data.vpn_client.ca.join('\n')
+    var client_key  = data.vpn_client.key.join('\n')
+    var client_cert = data.vpn_client.cert.join('\n')
+
+    write_2_file(d3ck_dir + '/client_ca.crt', ca)
+    write_2_file(d3ck_dir + '/client.key',    key)
+    write_2_file(d3ck_dir + '/client.crt',    cert)
+
+    // finally the entire json card
     write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))
 
 }

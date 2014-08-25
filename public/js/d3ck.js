@@ -126,7 +126,8 @@ function populate_events(cat) {
 
     console.log('sucking in table data for ' + cat)
 
-    if (typeof cat == "undefined" || cat == "") return
+    // added sess should have a better way... xxx
+    if (typeof cat == "undefined" || cat == "" || cat == "sess") return
 
     var url       = "/events/" + encodeURIComponent(cat)
 
@@ -809,7 +810,7 @@ function status_or_die() {
         else {
             // if we're connected, the file is being shipped to the other machine, not local
             // show inbound note if you sent file, else say when it succeeds
-            if ((d3ck_status.file_events.file_from == browser_ip && d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") || d3ck_status.file_events.file_from != browser_ip) {
+            if (d3ck_status.file_events.file_from != browser_ip) {
                 console.log('new local file(z)!')
 
                 // put in or lookup PiD, then owner/d3ck's name!
@@ -1078,139 +1079,8 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
 local_socket = null
 
 function socket_looping() {
-
-    return
-
-    console.log('trying to do a socket connect')
-
-    var recInterval  = null;
-    var socket       = null;
-
-
-    // Initialize the socket & handlers
-    // local_socket = io.connect('https://' + window.location.hostname + ':5555', {
-    local_socket = io.connect('https://' + window.location.hostname + ':8080', {
-        'force new connection'      : true,
-        'reconnection delay'        : 100,
-        'reconnection limit'        : 100,
-        'max reconnection attempts' : Infinity,
-        'resource'                  : 'catz',
-        'transports'                : ['xhr-polling']
-//      'transports': [
-//                                  'websocket',
-//                                  'flashsocket',
-//                                  'htmlfile',
-//                                  'xhr-polling',
-//                                  'jsonp-polling'
-//                  ]
-    })
-
-    local_socket.on('pong', function(data){
-        console.log('[o] pong... ping...')
-        local_socket.emit('message', '123450');
-    })
-
-    local_socket.on('error', function(e){
-        console.log('[!!..!!] erroneous rex... ')
-        console.log(e)
-    })
-
-    local_socket.on('connect', function(){
-        console.log('[>] hackasaurus rex... ')
-        local_socket.emit('message', '123456');
-    })
-
-
-    local_socket.on('reconnection', function() {
-        console.log('[x] sockio ... Ive missed you so!')
-    })
-
-
-    local_socket.on('open', function() {
-        console.log('[*] sockio open... sez a me... clearing the retry d3cks')
-    })
-     
-    // socket.on('event', function(data){});
-
-    // hoop, skip, jump
-    local_socket.on('disconnect', function() {
-        console.log('[-] sockio disconnect')
-    })
-     
-    local_socket.on('close', function() {
-        console.log('[-] sockio closed')
-    })
-     
-    local_socket.on('message', function(d3ck_message) {
-        console.log('[mmm....] message... ')
-        console.log(JSON.stringify(d3ck_message))
-    })
-
-    local_socket.on('catFax', function(d3ck_message){
-        console.log('[^..^] cat FAX!!!!')
-        console.log(d3ck_message)
-       
-    // local_socket.on('message', function(d3ck_message) {
-        console.log('[^..^] messages or cat facts!')
-
-        d3ck_message = JSON.parse(d3ck_message)
-
-        if (d3ck_message.type == "status") {
-            // console.log('processing status message')
-
-            d3ck_status = d3ck_message.status
-
-            // if something is new, do something!
-            if (! _.isEqual(old_d3ck_status, d3ck_status)) {
-                console.log('something new in the state of denmark!')
-                old_d3ck_status = d3ck_status
-                status_or_die()
-            }
-            else {
-                // console.log('same ol, same ol')
-            }
-        }
-        // OVPN logs for client/server
-        else if (d3ck_message.type == "openvpn_server") {
-            console.log('ovpn server logz')
-            // console.log('server: ' + data.line)
-            // $("#ovpn_server_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-            // $("#ovpn_server_infinity").mCustomScrollbar("update")
-            // $("#ovpn_server_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        }
-        else if (d3ck_message.type == "openvpn_client") {
-            console.log('ovpn client logz')
-            // $("#ovpn_client_infinity .mCSB_container").append('<div class="log_line">' + d3ck_message.line + "</div>")
-            // $("#ovpn_client_infinity").mCustomScrollbar("update")
-            // $("#ovpn_client_infinity").mCustomScrollbar("scrollTo",".log_line:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
-        }
-        else if (d3ck_message.type == "cat_fact") {
-            console.log('incoming cat fact!')
-            console.log(d3ck_message.fact)
-             $('#d3ck_footy').append('<br />' + d3ck_message.fact)
-        }
-
-
-        //
-        // RTC Stuff
-        //
-        else {
-           console.log('??? message type... perhaps RTC-land will deal with it?')
-           console.log(JSON.stringify(d3ck_message))
-        }
-
-    })
-
+    // deprecated
 }
-
-//
-// magic time, courtesy of rtc.. many of the RTC functions below
-// taken from the marvelous https://github.com/muaz-khan demos;
-//
-
-rtc_peer       = {}
-local_connect  = false
-remote_connect = false
 
 //
 // print out an indented list from an object
@@ -1334,6 +1204,7 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
 
 }
 
+//
 // mostly from https://www.webrtc-experiment.com/DetectRTC/
 //
 // can you walk and talk the ... walking talk
@@ -1364,7 +1235,7 @@ function detect_webRTC(element) {
 
 
 //
-// function almost all from http://peerjs.com/, plus some errors introduced by me
+// much adapted from http://SimpleWebRTC.com/, plus errors introduced by me
 //
 
 //
@@ -1446,13 +1317,6 @@ function rtc_haxx0r_trick() {
 
             console.log("it's a messi biz, but someone has to do it")
 
-            // might want to use the signaling server location for now, 'cuz
-            // it might point to new server... may have to fuxx0r with that
-            // as well... testing, testin....
-            // SIGNALING_SERVER = 'wss://' + window.location.hostname + ':8081/rtc/websocket';
-            // SIGNALING_SERVER.substring(3)  -> rips off wss
-
-            // var messi_url          = 'https://' + window.location.hostname + ':5555/popup.html'
             var messi_url          = 'https://' + window.location.hostname + ':' + D3CK_SIG_PORT + '/popup.html'
             var messi_url_fallback = '/popup_fallback.html'  // no cors detected
 
