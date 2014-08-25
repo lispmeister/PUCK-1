@@ -2931,6 +2931,9 @@ server.use(cors());
 // passport/auth stuff
 server.use(express.cookieParser());
 
+var cookieParser = express.cookieParser();
+
+
 //
 // need 16 randomnish bytes... I can wait all night
 //
@@ -2950,8 +2953,7 @@ server.use(express.session({
     secret  : lemonade.stdout,
     store   : new candyStore({
                     client: rclient
-    }),
-    key     : '_doublestuff_cookie_'
+    })
 }));
 
 
@@ -3012,7 +3014,7 @@ server.get('/logout', function(req, res) {
 });
 
 server.get('/loginFailure', function(req, res, next) {
-  res.send('Failed authentication, try again...?');
+    res.send('Failed authentication, try again...?');
 });
 
 // before this really don't answer to much other than the user startup
@@ -3035,12 +3037,9 @@ async.whilst(
             // before this really don't answer to much other than the user startup
             // console.log('adding routes')
             // fire_up_server_routes()
-
             return false
         }
-
         return true
-
     },
 
     function (callback) {
@@ -3290,8 +3289,8 @@ function fire_up_remote () {
 
     // try some auth stuff here
     io_sig.set('authorization', passportIO.authorize({
-        cookieParser: express.cookieParser,
-        key         : '_doublestuff_cookie_',       // name of cookie => session_id
+        cookieParser: cookieParser,
+        key         : 'connect.sid',       // name of cookie => session_id
         secret      : lemonade.stdout,
         store       : candyStore,
         success     : socket_onAuthorizeSuccess,    // *optional* callback on success
