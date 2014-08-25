@@ -218,8 +218,8 @@ div.growlUI h1, div.growlUI h2 {
 .dragDropBox{
     position:relative;
     display:block;
-    min-height: 200px;
-    width:500px;
+    min-height: 100px;
+    width:220;
     background-color:#f3f3f3;
     border:2px dashed #aaa;
     text-align: center;
