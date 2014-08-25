@@ -978,9 +978,9 @@ function NotImplementedError() {
 // who is talking to us?
 function get_client_ip(req) {
 
-    if (typeof req.headers['x-real-ip'] != "undefined") 
+    if (typeof req.headers != "undefined" && typeof req.headers['x-real-ip'] != "undefined")
         client_ip = req.headers['x-real-ip']
-    else if (typeof req.headers['x-forwarded-for'] != "undefined")
+    else if (typeof req.headers != "undefined" && typeof req.headers['x-forwarded-for'] != "undefined")
         client_ip = req.headers['x-forwarded-for']
     else if (typeof req.ip != "undefined")
         client_ip = req.ip
