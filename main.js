@@ -426,7 +426,7 @@ function findByUsername(name, fn) {
 
 function auth(req, res, next) {
 
-//  console.log('authentication check for... ' + req.path)
+    console.log('authentication check for... ' + req.path)
 
     var url_bits = req.path.split('/')
 

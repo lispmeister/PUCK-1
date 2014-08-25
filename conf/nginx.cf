@@ -53,7 +53,7 @@ http {
         #
         location /socket.io {   
 
-            proxy_pass          http://10.164.137.1:5555;
+            proxy_pass          http://10.44.198.1:5555;
             proxy_http_version  1.1;
 
             proxy_set_header    X-SSL-Client-Verify $ssl_client_verify;
