@@ -54,7 +54,7 @@ unlock_d3ckdate() {
 
 all_da_ps() {
         # only works on D3CK... will kill others if not careful...!   ;)
-        echo $(ps axuww|egrep 'haproxy -f|openv|yate|node main.js'|grep -v grep | awk '{print $2}')
+        echo $(ps axuww|egrep 'nginx|openv|yate|node main.js'|grep -v grep | awk '{print $2}')
 }
 
 case $1 in
