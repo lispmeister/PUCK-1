@@ -39,7 +39,7 @@ sed -e 's/D3CK_SIG/'"$sig"'/' -e 's/D3CK_WEB/'"$web"'/' $proto > $conf
 
 echo restarting nginx
 
-sudo killall $binary
+killall $binary
 
-sudo $binary -c $conf
+$binary -c $conf
 
