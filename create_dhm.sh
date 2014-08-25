@@ -20,8 +20,6 @@ fi
 echo creating DH parameters... 
 echo "... unfasten your seatbelt and take a walk, maybe a vacation, this'll take awhile...."
 
-mkdir /etc/d3ck/D3CK 2> /dev/null
-
 # start crankin' on DH...
 time openssl dhparam -out $keyfile $KEY_SIZE
 

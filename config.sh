@@ -62,12 +62,12 @@ export KEY_ORG="D3ckasaurusRex"     # organization
 export KEY_OU="SillyLittleArms"     # org unit
 export KEY_EMAIL="d3ck@example.com" # org unit
 # COMMON_NAME="$bits_o_128.example.com"      # hmm....
+export KEY_CN='*'                   # will be overwriting
 export COMMON_NAME='*'
 export KEY_NAME="D3CK"              # X509 Subject Field
-export KEY_CN='*'
 
 export days="-days $KEY_LIFE"       # 999 days from now
 
 # putting it all together
-export magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
+# export magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 

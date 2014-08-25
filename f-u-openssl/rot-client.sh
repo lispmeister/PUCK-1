@@ -39,6 +39,9 @@ mkdir "$d3ck_home" 2> /dev/null
 
 echo Client key size will be $KEY_SIZE bits
 
+KEY_CN=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
+magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
+
 # client
 openssl req $magic -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $d3ck.key -out $d3ck.csr -config stupid.conf
 

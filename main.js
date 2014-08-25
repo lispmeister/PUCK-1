@@ -427,6 +427,8 @@ function findByUsername(name, fn) {
 
 function auth(req, res, next) {
 
+//  console.log('authentication check for... ' + req.path)
+
     var url_bits = req.path.split('/')
 
     if (__.contains(public_routes, url_bits[1])) {
@@ -447,7 +449,16 @@ function auth(req, res, next) {
         // return next({ redirecting: 'quikstart.html'});
     }
 
-//  console.log('authentication check for... ' + req.path)
+    //
+    // are you certifiable?
+    //
+    // hmm... is this safe?
+    //
+    if (typeof req.headers['x-ssl-client-verify'] != "undefined" && req.headers['x-ssl-client-verify'] == "SUCCESS"){
+        console.log('my cert homie...?!!?!')
+        return next();
+    }
+
 
     //
     // are you logged in as a user, say, via the web?
@@ -463,20 +474,6 @@ function auth(req, res, next) {
         return next();
     }
 
-/*
-
-headers: 
-   { accept:
-     'user-agent': 'Restler for node.js',
-     host: '10.105.154.1:8080',
-     'accept-encoding': 'gzip, deflate',
-     'content-type': 'multipart/form-data; boundary=48940923NODERESLTER3890457293',
-     'content-length': '87119',
-     'x-forwarded-proto': 'https',
-     'x-forwarded-for': '10.105.154.6' },
-
-*/
-
     if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
 
         console.log('... ok... trying x-forw....')
@@ -491,32 +488,7 @@ headers:
 
     }
 
-
-    //
-    // are you CERTIFICATE authenticated?
-    //
-    if(req.client.authorized){
-  
-        console.log('my cert homie...?!!?!')
-  
-        console.log(req.connection.getPeerCertificate())
-  
-        var subject = req.connection.getPeerCertificate().subject;
-
-        console.log('Subj: ')
-        console.log(subject)
-  
-        //          { subject:
-        //              { C: 'AQ',
-        // [...]
-        //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
-  
-        // organization: subject.O,
-    }
-    else {
-        console.log("hmmm ... let's look at this a min...")
-        console.log(req.connection.getPeerCertificate())
-    }
+    // console.log(req.headers)
 
     console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
     res.redirect(302, '/login.html')

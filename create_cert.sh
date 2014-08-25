@@ -31,7 +31,7 @@ mode="$2"
 
 # key files
 key="$keystore/$org/d3ck.key"    # private key
-pid="$keystore/$org/d3ck.pid"    # D3CK id
+did="$keystore/$org/d3ck.did"    # D3CK id
 crt="$keystore/$org/d3ck.crt"    # certificate
 csr="$keystore/$org/d3ck.csr"    # signing request
 
@@ -45,8 +45,8 @@ else
     # CAcrt="$keystore/D3CK/d3ck.crt"
 fi
 
-if [ -f $key -o -f $pid -o -f $crt -o -f $csr ]; then
-    echo "Not going to overwrite existing cert with same name ($key or $pid or $crt or $csr)"
+if [ -f $key -o -f $did -o -f $crt -o -f $csr ]; then
+    echo "Not going to overwrite existing cert with same name ($key or $did or $crt or $csr)"
     exit 2
 fi
 
@@ -68,5 +68,5 @@ fi
 chmod -R 755 $keystore/$org
 
 # print SHA1 fingerprint
-openssl x509 -noout -fingerprint -in $crt | awk -F= '{print $2}' | sed 's/://g' | tee -a $pid
+openssl x509 -noout -fingerprint -in $crt | awk -F= '{print $2}' | sed 's/://g' | tee -a $did
 
