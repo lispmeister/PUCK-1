@@ -610,6 +610,13 @@ function d3ck_ping(all_ips, d3ckid, url) {
         cache: false
     })
 
+
+    //
+    // XXX -
+    //
+    // this won't bring back up the drag-n-drop if the connection is up,
+    // then goes down, then comes back up... have to reload browser
+    //
     jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
         var ret = data
         console.log("pingzor " + JSON.stringify(data))

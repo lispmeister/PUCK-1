@@ -22,11 +22,10 @@ var Tail       = require('./tail').Tail,
     os         = require('os'),
     passport   = require('passport'),
     l_Strategy = require('passport-local').Strategy,
-    passportIO = require("passport.socketio"),
     path       = require('path'),
     tcpProxy   = require('tcp-proxy'),
     redis      = require("redis"),
-    candyStore = require('connect-redis')(express),
+    candyStore = require('connect-redis')(express);
     request    = require('request'),
     response   = require('response-time'),
     rest       = require('rest'),
@@ -464,60 +463,26 @@ function auth(req, res, next) {
         return next();
     }
 
-    //
-    // are you CERTIFICATE authenticated?
-    //
-    if (req.client.authorized) {
-  
-        console.log('my cert homie...?!!?!')
-  
-        try {
-            console.log(req.connection.getPeerCertificate())
-            var subject = req.connection.getPeerCertificate().subject;
-            console.log('Subj: ')
-            console.log(subject)
-  
-            //          { subject:
-            //              { C: 'AQ',
-            // [...]
-            //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
-  
-            // organization: subject.O,
-        }
-        catch (e) {
-            console.log('errzor on getpeer... sock?  ' + JSON.stringify(e))
-        }
-    }
-    else {
-        console.log('cert auth failed')
-        // console.log(req.connection.getPeerCertificate())
-    }
+/*
 
-    console.log("\n\nXfor? " + req.headers['x-forwarded-for'] + "\n\n")
-    console.log("rip? " + req.ip + "\n\n")
+headers: 
+   { accept:
+     'user-agent': 'Restler for node.js',
+     host: '10.105.154.1:8080',
+     'accept-encoding': 'gzip, deflate',
+     'content-type': 'multipart/form-data; boundary=48940923NODERESLTER3890457293',
+     'content-length': '87119',
+     'x-forwarded-proto': 'https',
+     'x-forwarded-for': '10.105.154.6' },
 
-    //
-    // monumentally bad idea... fix! xxxxx
-    //
-    // should be using client side certs, sigh
-    //
-    // also not checking path for ..'s or whatever... how many things wrong here?
-    //
-    if (typeof ip2d3ck[req.ip] != "undefined" && req.path.substr(3) == '/up') {
-        console.log('pass... ' + req.ip + ' -> ' + ip2d3ck[req.ip] + ' ... ' + req.path)
-        return next();
-    }
-    else {
-        console.log('bad ip... ' + req.ip)
-    }
-
+*/
 
     if (typeof req.headers['x-forwarded-for'] != 'undefined' && typeof client_vpn_ip != 'undefined') {
 
         console.log('... ok... trying x-forw....')
 
         if (req.headers['x-forwarded-for'] == client_vpn_ip) {
-            console.log('... if I let you (' + client_vpn_ip + ') vpn, I let you...' + req.path)
+            console.log('... if I let you (' + client_ip + ') vpn, I let you...' + req.path)
             return next();
         }
         else {
@@ -526,6 +491,32 @@ function auth(req, res, next) {
 
     }
 
+
+    //
+    // are you CERTIFICATE authenticated?
+    //
+    if(req.client.authorized){
+  
+        console.log('my cert homie...?!!?!')
+  
+        console.log(req.connection.getPeerCertificate())
+  
+        var subject = req.connection.getPeerCertificate().subject;
+
+        console.log('Subj: ')
+        console.log(subject)
+  
+        //          { subject:
+        //              { C: 'AQ',
+        // [...]
+        //          fingerprint: '27:AF:A6:54:5C:D8:A7:A5:1C:AE:81:4F:CF:3A:9A:B7:AB:8D:8E:65' }
+  
+        // organization: subject.O,
+    }
+    else {
+        console.log("hmmm ... let's look at this a min...")
+        console.log(req.connection.getPeerCertificate())
+    }
 
     console.log('I pity da fool who tries to sneak by me!  ' + req.path, req.ip)
     res.redirect(302, '/login.html')
@@ -1428,16 +1419,7 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
-    // client stuff now
-    var client_ca   = data.vpn_client.ca.join('\n')
-    var client_key  = data.vpn_client.key.join('\n')
-    var client_cert = data.vpn_client.cert.join('\n')
-
-    write_2_file(d3ck_dir + '/client_ca.crt', ca)
-    write_2_file(d3ck_dir + '/client.key',    key)
-    write_2_file(d3ck_dir + '/client.crt',    cert)
-
-    // finally the entire json card
+    // and the entire json card
     write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))
 
 }
@@ -1732,7 +1714,7 @@ function getEvent(req, res, next) {
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
                         }
                         else {
-                            console.log("event data retrieved: " + data.toString());
+                            // console.log("event data retrieved: " + data.toString());
                             jdata = data.toString()
                             // hack it into a json string
                             jdata = JSON.parse('[{' + jdata.substr(1,jdata.length-1) + ']')
@@ -2047,14 +2029,46 @@ function uploadSchtuff(req, res, next) {
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
 
-                    // xxxx
-                    // get the remote key necessary for client-side auth
-                    // pfx = fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.all')
+                    var stream = fs.createReadStream('./file');
 
-                    restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local', {
-                        multipart: true,
-                        data: { "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg") }
-                    }).on("complete", function(data) {
+                    var options = {
+                        url: 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
+                        method: 'POST',
+                        // data: { "uppity[]": fs.file(target_path, null, target_size, null, "image/jpg") }
+                        key:  fs.readFileSync('/etc/d3ck/d3cks/40040301E381C5917FA4CE4633209A33124E6F8A/d3ck.key'),
+                        cert: fs.readFileSync('/etc/d3ck/d3cks/40040301E381C5917FA4CE4633209A33124E6F8A/d3ck.crt'),
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Content-Length': post_data.length
+                        }
+
+                    };
+                    options.agent = new https.Agent(options);
+
+                    var req = https.request(options)
+
+                    stream.on('data', function(data) {
+                        console.log('writing...z!')
+                        req.write(data);
+                    });
+
+                    stream.on('end', function() {
+                        console.log('the end is night, motherfucker')
+                        postReq.end();
+
+                        done_posting()
+
+                    });
+
+//                  restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
+//                      multipart: true,
+//                      data: "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg")
+//                  .on("complete", function(data)
+//                  .on("complete", function(data)
+
+                    function done_posting() {
+
+                        console.log('done...?')
 
                         if (data instanceof Error) {
                             console.log('Error:', data.message);
@@ -2079,7 +2093,7 @@ function uploadSchtuff(req, res, next) {
 
                             res.send(204, {"status" : target_file})
                         }
-                    })
+                    }
                 }
             }
         })
@@ -2931,9 +2945,6 @@ server.use(cors());
 // passport/auth stuff
 server.use(express.cookieParser());
 
-var cookieParser = express.cookieParser();
-
-
 //
 // need 16 randomnish bytes... I can wait all night
 //
@@ -2950,9 +2961,9 @@ console.log('squeezing the lemons, they reveal their secrets! ' + JSON.stringify
 // ... so much dox in so little time. Think this will work. Maybe.
 //
 server.use(express.session({ 
-    secret  : lemonade.stdout,
-    store   : new candyStore({
-                    client: rclient
+    secret: lemonade.stdout,
+    store: new candyStore({
+        client: rclient
     })
 }));
 
@@ -2979,25 +2990,23 @@ server.get('/aaa', function(req, res) {
 
     console.log('AAA? ')
 
-    rclient.get('_doublestuff_cookie_', function (err, scookie) {
+    rclient.get('session_cookie', function (err, scookie) {
         if (err) {
             console.log(err, 'no cookie, no fun');
-
             next(err);
-
+            // res.send(200, {session_cookie: req.client._httpMessage.req.sessionID})
             cookie = req.client._httpMessage.req.sessionID
-            res.send(200, {_doublestuff_cookie_: false })
-
+            res.send(200, {session_cookie: false })
         }
         else {
             if (cookie == scookie) {
                 console.log('seen this cookie before... stale!')
-                res.send(200, { _doublestuff_cookie_: true } )
+                res.send(200, { session_cookie: true } )
             }
             else {
                 cookie = scookie
                 console.log('fresh cookie, mon: ', cookie)
-                res.send(200, { _doublestuff_cookie_: false } )
+                res.send(200, { session_cookie: false } )
             }
         }
     });
@@ -3014,7 +3023,7 @@ server.get('/logout', function(req, res) {
 });
 
 server.get('/loginFailure', function(req, res, next) {
-    res.send('Failed authentication, try again...?');
+  res.send('Failed authentication, try again...?');
 });
 
 // before this really don't answer to much other than the user startup
@@ -3037,9 +3046,12 @@ async.whilst(
             // before this really don't answer to much other than the user startup
             // console.log('adding routes')
             // fire_up_server_routes()
+
             return false
         }
+
         return true
+
     },
 
     function (callback) {
@@ -3133,7 +3145,7 @@ server.post('/login',
         // set a cookie so wont show the same intro page always
         cookie = ""
 
-        rclient.set('_doublestuff_cookie_', req.client._httpMessage.req.sessionID, function(err) {
+        rclient.set('session_cookie', req.client._httpMessage.req.sessionID, function(err) {
             if (err) {
                 console.log(err, 'session cookie crumbled: ' + JSON.stringify(err));
                 return(err);
@@ -3237,6 +3249,7 @@ function fire_up_local () {
 
     var web_io = require('socket.io').listen(d3cky, { resource: '/catz' });
     
+
     //
     // cat fax & status
     //
@@ -3285,37 +3298,6 @@ function fire_up_remote () {
     // var io_sig     = require('socket.io').listen(d3cky, { resource: 'sigsig' })
 
     io_sig     = require('socket.io').listen(d3cky)
-
-
-    // try some auth stuff here
-    io_sig.set('authorization', passportIO.authorize({
-        cookieParser: cookieParser,
-        key         : 'connect.sid',       // name of cookie => session_id
-        secret      : lemonade.stdout,
-        store       : candyStore,
-        success     : socket_onAuthorizeSuccess,    // *optional* callback on success
-        fail        : socket_onAuthorizeFail        // *optional* callback on success
-
-    }));
-
-    function socket_onAuthorizeSuccess(data, accept){
-        console.log('successful connex to socket.io!');
-        accept(null, true);
-    }
-
-    function socket_onAuthorizeFail(data, message, error, accept){
-
-        if (error) {
-            throw new Error(message)
-        }
-        else {
-            console.log('failed connection to socket.io, sigh... ', message);
-        }
-        // We use this callback to log all of our failed connections.
-        accept(null, false);
-    }
-
-
 
     io_sig.disable('browser client cache');
 
