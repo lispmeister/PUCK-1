@@ -1373,6 +1373,14 @@ function create_d3ck_key_store(data) {
 
     console.log(data.vpn_client)
 
+    var client_key  = data.vpn_client.key.join('\n')
+
+    if (client_key == "") {
+        console.log('no key data... bailin on add...')
+        alert('no key data... bailin on add...')
+    }
+
+
     // client stuff
     var client_key  = data.vpn_client.key.join('\n')
     var client_cert = data.vpn_client.cert.join('\n')
