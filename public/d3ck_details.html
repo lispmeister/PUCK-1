@@ -50,27 +50,10 @@
 
             <ul class="nav nav-tabs navbar-nav navbar-left">
 
-                <li class="active"><a href="#home" data-toggle="tab"><span id="d3ck_top_home" title="home" data-content="Click your heels three times..." class="glyphicon glyphicon-home"></span></a></li>
-
-                <li> <a href="#d3ck_vpn" data-toggle="tab"><span id="d3ck_video" title="VPN" data-content="All the cool stuff - calls, chat, etc" class="glyphicon glyphicon-facetime-video"></span></a></li>
-
-                </ul>
-
-            <ul class="nav nav-tabs navbar-nav navbar-right">
-
-                <li> <a href="#"><span class="green glyphicon icon-lightbulb-idea" id="d3ck_status"></span></a></li>
-
-                <li> <a href="#"><span data-content="help, videos, etc. here..." class="glyphicon icon-question-sign" id="d3ck_help"></span></a></li>
-
-                <li> <a href="#skull" data-toggle="tab"><span id="d3ck_top_skull" title="PANIC!" data-content="Aieee!  Ack!  No!  PANIC TIME!!!!!" class="glyphicon icon-skull"></span></a></li>
-
-
-                <li> <a target="_blank" href="https://github.com/zenfish/D3CK"><span id="d3ck_git" title="github sources" data-content="Github, sources 'n' secretz here" class="glyphicon icon-github"></span></a></li>
-
+                <li class="active"><a href="/" data-toggle="tab"><span id="d3ck_top_home" title="home" data-content="Click your heels three times..." class="glyphicon glyphicon-home"></span></a></li>
             </ul>
 
         </nav>
-
 
         <div class="container-fluid">
 
@@ -85,38 +68,6 @@
         <div class="container-fluid tab-content">
 
         <!-- d3cks -->
-
-            <div class="tab-pane fade in active" id="home"> </div>
-    
-            <!-- profile -->
-            <div class="tab-pane fade" id="skull">
-                <div class="row-fluid marketing" id="d3ck_panic_area">
-
-                    <div class="muted">
-                        <h3 style="clear:both">&iexcl;PANIC!</h3>
-                    </div>
-
-                    <div>
-                        <p> Pushing these buttons is not for the faint of heart.
-                        <ul>
-                            <p> <li><strong>PANIC</strong> will crush your D3CK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.</li>
-                            <p> <li><strong>Stop server</strong> stops the D3CK server dead.  UI will no longer work until restarted!</li>
-                            <p> <li><strong>Restart server</strong> does just that - the D3CK server restarts.  UI will no longer work until it finishes restarting.</li>
-                            <p> <li><strong>Stop VPN client</strong> kills any VPN clients
-
-                        </ul>
-                    </div>
-
-                    <p>
-                    <div>
-                        <button id="d3ck_panic" type="button" class="btn btn-danger">PANIC</button>
-                        <button id="stop_server" type="button" class="btn">Stop Server</button>
-                        <button id="restart_server" type="button" class="btn btn-warning">Restart Server</button>
-                        <button id="halt_vpn_client" type="button" class="btn btn-primary">Die VPN, Die!</button>
-                    </div>
-                </div>
-            </div>
-
 
         <div class="container">
 
@@ -277,6 +228,12 @@
             print_d3ck(d3ckid, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
 
          })
+
+
+        $('body').on('click', '#d3ck_top_home', function(event) { 
+            console.log('clickin my heelz as fast as I can')
+            window.location.href = "/"
+        })
 
      })
 
