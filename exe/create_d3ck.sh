@@ -69,15 +69,14 @@ $D3CK_HOME/create_tlsauth.sh $d3ck_id
 # clumsy way to get the content into json form
 # v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.crt)
 v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/ta.key)
+v_ca=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}'  $keystore/D3CK/d3ckroot.crt)
 
-v_ca=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}'  $keystore/$d3ck_id/d3ckroot.crt)
+v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.crt)
 
 # dont give our secret sauce to remotes!
 v_key=""
-
 if [ "$d3ck_ip" = "@" ] ; then
     v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.key)
-    v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.crt)
 
 else
     echo generating new keys
@@ -85,8 +84,8 @@ else
     $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
     # v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.key)
     # v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.crt)
-    v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $D3CK_HOME/f-u-openssl/clients/$r_d3ck_id.key)
-    v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $D3CK_HOME/f-u-ope
+    client_v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $D3CK_HOME/f-u-openssl/clients/$r_d3ck_id.key)
+    client_v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $D3CK_HOME/f-u-ope
 nssl/clients/$r_d3ck_id.crt)
 fi
 
@@ -108,7 +107,7 @@ vpn='"vpn" : {
 
 ip_addr_vpn=`echo $ip_addr | sed 's/:.*$//'`
 
-remote_vpn=$(./setup_vpnclient.sh)
+# remote_vpn=$(./setup_vpnclient.sh)
 
 image_b64=$(base64 < $D3CK_HOME/public/$image)
 
@@ -132,7 +131,10 @@ cat <<E_O_C
                 "email"   : "$email"
             },
             $vpn,
-            $remote_vpn
+            "vpn_client" : {
+                "key"      : ['"$client_v_key"'],
+                "cert"     : ['"$client_v_cert"'],
+                }
     }
 }
 E_O_C

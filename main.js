@@ -1368,15 +1368,15 @@ function create_d3ck_key_store(data) {
     // console.log(data)
 
     if (typeof data != 'object') {
-        data = JSON.parse(data)
+         data = JSON.parse(data)
     }
 
-    console.log(data.vpn)
+    console.log(data.vpn_client)
 
     // client stuff
-    var ca   = data.vpn_client.ca.join('\n')
-    var key  = data.vpn_client.key.join('\n')
-    var cert = data.vpn_client.cert.join('\n')
+    var client_ca   = data.vpn_client.ca.join('\n')
+    var client_key  = data.vpn_client.key.join('\n')
+    var client_cert = data.vpn_client.cert.join('\n')
 
     var ca   = data.vpn.ca.join('\n')
     var key  = data.vpn.key.join('\n')
@@ -1385,7 +1385,8 @@ function create_d3ck_key_store(data) {
 
     var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
 
-//  console.log('Californiastic: ' + d3ck_dir)
+    console.log('... news certs are going to live in: ' + d3ck_dir)
+
 //  console.log(ca)
 
     // has to exist before the below will work...
@@ -1403,8 +1404,9 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
-    write_2_file(d3ck_dir + '/cli3nt.key',   key)
-    write_2_file(d3ck_dir + '/cli3nt.crt',   cert)
+    write_2_file(d3ck_dir + '/cli3nt.ca',   client_ca)
+    write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
+    write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
 
     // and the entire json card
     write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))
