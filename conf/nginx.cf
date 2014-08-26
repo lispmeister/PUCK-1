@@ -1,6 +1,7 @@
 
 user zen;
 
+
 # misc jinxy stuff
 
 pid                     /etc/d3ck/logs/nginx.pid;
@@ -78,7 +79,7 @@ http {
         location /socket.io {   
 
             # sockety stuff
-            proxy_pass              http://10.177.219.1:5555;
+            proxy_pass              http://10.9.253.1:5555;
             proxy_http_version      1.1;
             proxy_redirect          off;
 
