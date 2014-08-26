@@ -23,6 +23,9 @@ http {
         ssl                         on;
         server_name                 d3ck;
 
+        # xxx - todo - drag this in from other confs
+        client_max_body_size 1024M;
+
         #
         # logs
         #
