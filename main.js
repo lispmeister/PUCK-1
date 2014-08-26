@@ -2033,8 +2033,8 @@ function uploadSchtuff(req, res, next) {
                         host    : upload_target,
                         port    : d3ck_port_ext,
                         path    : '/up/local',
-                        key     : fs.readFileSync("userA.key"),
-                        cert    : fs.readFileSync("userA.crt"),
+                        key     : fs.readFileSync(d3ck_keystore + ip2d3ck[upload_target] + "cli3nt.key"),
+                        cert    : fs.readFileSync(d3ck_keystore + ip2d3ck[upload_target] + "cli3nt.crt"),
                     };
 
 
@@ -2778,9 +2778,8 @@ function formCreate(req, res, next) {
                         write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
 
                         // write_2_file(d3ck_public + r_data.image + ".b64", r_data.image_b64)
-
-                        console.log(bwana_d3ck)
-                        console.log(typeof bwana_d3ck)
+                        // console.log(bwana_d3ck)
+                        // console.log(typeof bwana_d3ck)
 
                         if (d3ck_id != r_data.D3CK_ID) {
                             console.log("posting our d3ck data to the d3ck we just added....")
