@@ -27,8 +27,8 @@ pid="$1"
 ip=$2
 
 ca="       --ca  $keystore/$pid/d3ckroot.crt"
-key="     --key  $keystore/$pid/d3ck.key"
-cert="   --cert  $keystore/$pid/d3ck.crt"
+key="     --key  $keystore/$pid/cli3nt.key"
+cert="   --cert  $keystore/$pid/cli3nt.crt"
 tls="--tls-auth  $keystore/$pid/ta.key"
 # dh="       --dh  $d3ck_home/d3cks/$pid/dh_param"
 
