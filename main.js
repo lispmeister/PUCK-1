@@ -1908,19 +1908,6 @@ function downloadStuff (req, res, next) {
 
 }
 
-// helper
-function createMultipartBuffer(boundary, size) {
-      var head =
-            '--'+boundary+'\r\n'
-          + 'content-disposition: form-data; name="field1"\r\n'
-          + '\r\n'
-        , tail = '\r\n--'+boundary+'--\r\n'
-        , buffer = new Buffer(size);
-
-      buffer.write(head, 'ascii', 0);
-      buffer.write(tail, 'ascii', buffer.length - tail.length);
-      return buffer;
-}
 
 // req.files contains all the goods, including:
 //
@@ -2032,13 +2019,13 @@ function uploadSchtuff(req, res, next) {
                         host    : upload_target,
                         port    : d3ck_port_ext,
                         path    : '/up/local',
-                        key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key"),
-                        cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt"),
+                        key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                        cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
                         headers : req.files.uppity[i-1].headers
                     };
 
-                    console.log('opts')
-                    console.log(options)
+                    console.log('opts: ' +  ip2d3ck[upload_target])
+                    console.log(JSON.stringify(options))
 
                     var request = https.request(options, function(response) {
                         form.append('fieldName', 'uppity[]'),

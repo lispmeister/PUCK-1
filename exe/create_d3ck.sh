@@ -1,4 +1,4 @@
-#!/bin/bash -x 
+#!/bin/bash
 #
 # create a new d3ck via curl
 #
@@ -73,15 +73,15 @@ v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json,
 v_ca=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}'  $keystore/$d3ck_id/d3ckroot.crt)
 
 # dont give our secret sauce to remotes!
-v_key="{}"
+v_key=""
 
 if [ "$d3ck_ip" = "@" ] ; then
     v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.key)
-    v_key="{}"
     v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.crt)
 
 else
     echo generating new keys
+    echo $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
     $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
     v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.key)
     v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.crt)
@@ -143,7 +143,7 @@ echo $new_d3ck
 echo "using curl to create D3CK..."
 
 echo curl -k -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_d3ck" $d3ck_url
-     curl -k -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_d3ck" $d3ck_url &> $results
+#    curl -k -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_d3ck" $d3ck_url &> $results
 
 if [ $? != 0 ] ; then
    echo "curl REST to D3CK server failed to create D3CK"
