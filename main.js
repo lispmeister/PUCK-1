@@ -2732,8 +2732,6 @@ function formCreate(req, res, next) {
                         console.log('vpn-ify...!')
                         console.log(JSON.stringify(r_data.vpn));
 
-                        // self added
-                        d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
                         console.log('adding from: ' + r_data.name)
 
                         create_d3ck_key_store(r_data)
@@ -2750,11 +2748,18 @@ function formCreate(req, res, next) {
                         //
                         // ... back to the program, dog!
                         //
-                        console.log("executing create_d3ck.sh")
+                        console.log("executing create_d3ck.sh to add locally")
 
                         // this simply takes the pwd and finds the exe area...
                         var cmd  = d3ck_bin + '/create_d3ck.sh'
-                        var argz = [r_data.D3CK_ID, r_data.image, r_data.ip_addr, "\"all_ips\": [\"" + r_data.all_ips + "\"]", r_data.owner.name, r_data.owner.email]
+
+                        var argz = [r_data.D3CK_ID, 
+                                    r_data.image, 
+                                    r_data.ip_addr, 
+                                    "\"all_ips\": [\"" + r_data.all_ips + "\"]", 
+                                    r_data.owner.name, 
+                                    r_data.owner.email]
+
                         d3ck_spawn(cmd, argz)
 
                         assign_capabilities(r_data)
@@ -2766,12 +2771,25 @@ function formCreate(req, res, next) {
                         // write image
                         write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
 
-                        if (d3ck_id != r_data.D3CK_ID) {
-                            console.log("posting our d3ck data to the d3ck we just added....")
-                            argz = [d3ck_id, bwana_d3ck.image, bwana_d3ck.ip_addr, "\"all_ips\": [" + my_ips + "]", bwana_d3ck.owner.name, bwana_d3ck.owner.email, ip_addr, r_data.D3CK_ID]
+                        // self added
+                        d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
 
-                            d3ck_spawn(cmd, argz)
-                        }
+                        //
+                        // return the favor
+                        //
+                        console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
+
+                        argz = [bwana_d3ck.D3CK_ID, 
+                                bwana_d3ck.image, 
+                                bwana_d3ck.ip_addr, 
+                                "\"all_ips\": [" + my_ips + "]", 
+                                bwana_d3ck.owner.name, 
+                                bwana_d3ck.owner.email, 
+                                ip_addr, 
+                                r_data.D3CK_ID]
+
+                        d3ck_spawn(cmd, argz)
+
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
 
                     })
