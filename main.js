@@ -2019,8 +2019,6 @@ function uploadSchtuff(req, res, next) {
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
                     
-                    console.log(req.files.uppity)
-                    console.log(i-1)
                     console.log(req.files.uppity[i-1])
 
                     var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
@@ -2035,8 +2033,11 @@ function uploadSchtuff(req, res, next) {
                         path    : '/up/local',
                         key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key"),
                         cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt"),
+                        headers : req.files.uppity[i-1].headers
                     };
 
+                    console.log('opts')
+                    console.log(options)
 
                     var request = https.request(options, function(response) {
                         form.append('fieldName', 'uppity[]'),
@@ -2070,22 +2071,22 @@ function uploadSchtuff(req, res, next) {
 
                         console.log('done...?')
 
-                            console.log('upload to ' + upload_target + ' complete')
-                            browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
+                        console.log('upload to ' + upload_target + ' complete')
+                        browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
 
-                            d3ck_status.browser_events = browser_magic
-                            d3ck_status.file_events    = file_magic
+                        d3ck_status.browser_events = browser_magic
+                        d3ck_status.file_events    = file_magic
 
-                            createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
+                        createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
 
-                            // get rid of evidence
-                            fs.unlink(target_path, function (err) {
-                                if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
-                                console.log('successfully deleted ' + target_path)
-                            });
+                        // get rid of evidence
+                        fs.unlink(target_path, function (err) {
+                            if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
+                            console.log('successfully deleted ' + target_path)
+                        });
 
 
-                            res.send(204, {"status" : target_file})
+                        res.send(204, {"status" : target_file})
                     }
                 }
             }
