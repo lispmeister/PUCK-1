@@ -1223,9 +1223,10 @@ function update_d3ck(_d3ck) {
         } else {
             _d3ck_events = { updated_d3ck : '127.0.0.1' }
 
-            create_d3ck_key_store(_d3ck)
-            create_d3ck_image(_d3ck)
-            createEvent('127.0.0.1', {event_type: "create", d3ck_id: _d3ck.D3CK_ID})
+            // create_d3ck_key_store(_d3ck)
+            // create_d3ck_image(_d3ck)
+
+            createEvent('127.0.0.1', {event_type: "update", d3ck_id: _d3ck.D3CK_ID})
             console.log('redis update_d3ck success')
 
         }
