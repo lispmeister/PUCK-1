@@ -1134,9 +1134,9 @@ function d3ckStatus(req, res, next) {
         tmp_status                 = JSON.parse(JSON.stringify(d3ck_status))
 
         // clear out the old
-        browser_magic[client_ip]   = { "notify_add": false, "notify_ring": false, "notify_file": false }
-        d3ck_status                = JSON.parse(JSON.stringify(blank_status))
-        d3ck_status.browser_events = browser_magic
+        // browser_magic[client_ip]   = { "notify_add": false, "notify_ring": false, "notify_file": false }
+        // d3ck_status                = JSON.parse(JSON.stringify(blank_status))
+        // d3ck_status.browser_events = browser_magic
 
     }
 

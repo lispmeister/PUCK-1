@@ -1017,7 +1017,7 @@ function stop_server() {
 //
 function fire_d3ck_status(jstatus) {
 
-    // console.log('firing status off')
+    console.log('firing status off')
     jstatus = JSON.stringify(jstatus)
 
     var status_xhr = $.ajax({
