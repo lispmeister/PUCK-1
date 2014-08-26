@@ -426,7 +426,7 @@ function findByUsername(name, fn) {
 
 function auth(req, res, next) {
 
-    console.log('authentication check for... ' + req.path)
+    // console.log('authentication check for... ' + req.path)
     // console.log(req)
 
     var ip = get_client_ip(req)
@@ -469,7 +469,8 @@ function auth(req, res, next) {
     // are you logged in as a user, say, via the web?
     //
 
-    console.log('auth...?')
+    // console.log('auth...?')
+
     if (req.isAuthenticated()) {
         console.log('already chex: ' + req.path)
         return next();
@@ -1003,7 +1004,7 @@ function get_client_ip(req) {
         return("")
     }
 
-    console.log("C-ip: " + client_ip)
+    // console.log("C-ip: " + client_ip)
 
     return client_ip
 
@@ -2017,65 +2018,47 @@ function uploadSchtuff(req, res, next) {
                 // post to a remote D3CK... first look up IP based on PID, then post to it
                 else {
                     console.log("going to push it to the next in line: " + upload_target)
+                    
+                    console.log(req.files.uppity)
+                    console.log(i-1)
+                    console.log(req.files.uppity[i-1])
 
                     var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
-                    // one at a time for now ;(
-                    var stream = fs.createReadStream(target_path);
+
+                    var FormData = require('form-data');
+                    var form = new FormData();
 
                     var options = {
                         method  : 'POST',
-                        hostname: upload.target,
-                        port: d3ck_port_ext,
-                        path: '/up/local',
-                        // url     : url,
-                        key     : fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.key'),
-                        cert    : fs.readFileSync('/etc/d3ck/d3cks/' + ip2d3ck[upload_target] + '/d3ck.crt'),
-                        headers : {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Content-Length': target_size
-                        }
-
+                        host    : upload_target,
+                        port    : d3ck_port_ext,
+                        path    : '/up/local',
+                        key     : fs.readFileSync("userA.key"),
+                        cert    : fs.readFileSync("userA.crt"),
                     };
-                    // options.agent = new https.Agent(options);
-                    console.log("options: " + options)
 
-                    var post_data = ""
+
                     var request = https.request(options, function(response) {
-                        //When we receive data, we want to store it in a string
-                        response.on('data', function (chunk) {
-                            post_data += chunk;
-                            console.log('chunking...')
-                        });
-                        //On end of the request, run what we need to
-                        response.on('end',function() {
-                            console.log('post end!')
-                            console.log(post_data);
-                        });
+                        form.append('fieldName', 'uppity[]'),
+                        form.append('originalFilename', req.files.uppity[i-1].originalFilename),
+                        form.append('path', target_file),
+                        form.append('size', req.files.uppity[i-1].size),
+                        form.append('name', req.files.uppity[i-1].name),
+                        form.append('type', req.files.uppity[i-1].type)
                     });
 
-                    //Now we need to set up the request itself. 
-                    //This is a simple sample error function
+                    form.pipe(request);
+
+                    request.on('response', function(res) {
+                        console.log("Resp: " + res.statusCode);
+                        done_posting()
+                    });
+
                     request.on('error', function(e) {
                         console.log('error on request: ' + e.message);
                         res.send(200, {"error" : e.message})
                     });
 
-                    //Write our post data to the request
-                    //request.write(postdata);
-                    //End the request.
-                    //request.end();
-
-                    stream.on('data', function(data) {
-                        console.log('writing...z!')
-                        request.write(data);
-                    });
-
-                    stream.on('end', function() {
-                        console.log('the end is nigh, motherfucker')
-                        request.end();
-                        done_posting()
-
-                    });
 
 //                  restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
 //                      multipart: true,
@@ -2459,7 +2442,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     d3ck2ip[ping_d3ckid] = all_ips[i]
                     ip2d3ck[all_ips[i]] = ping_d3ckid
 
-                    console.log('d2i, ip2d, did', all_ips[i], ip2d3ck[all_ips[i]], ping_d3ckid)
+                    // console.log('d2i, ip2d, did', all_ips[i], ip2d3ck[all_ips[i]], ping_d3ckid)
 
                     res.send(200, ping_data)
                 }

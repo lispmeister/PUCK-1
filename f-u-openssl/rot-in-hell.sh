@@ -51,5 +51,5 @@ magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 openssl req $magic -new -newkey rsa:$KEY_SIZE -config stupid.conf -keyout vpn_client.key -out vpn_client.req -batch -nodes
 openssl ca $magic -batch -in vpn_client.req -out vpn_client.crt -config stupid.conf -days $KEY_LIFE -batch
 
-chmod -R 755 /etc/d3ck/f-u-openssl/keys
+chmod -R 755 /etc/d3ck/f-u-openssl
 

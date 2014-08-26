@@ -45,6 +45,7 @@ magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 # client
 openssl req $magic -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $d3ck.key -out $d3ck.csr -config stupid.conf
 
-openssl ca $magic -cert ca.crt -batch -keyfile ca.key -days $KEY_LIFE -out $d3ck.crt -in $d3ck.csr -config stupid.conf
+openssl ca $magic -cert $keystore/D3CK/ca.crt -batch -keyfile $keystore/D3CK/ca.key -days $KEY_LIFE -out $d3ck.crt -in $d3ck.csr -config stupid.conf
 
-chmod -R 755 /etc/d3ck/f-u-openssl/keys
+chmod -R 755 /etc/d3ck/f-u-openssl
+
