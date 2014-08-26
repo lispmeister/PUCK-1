@@ -1948,6 +1948,7 @@ function uploadSchtuff(req, res, next) {
         var target_file = req.files.uppity[i].name
         var target_path = d3ck_public + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
+        var file_type   = req.files.uppity[i].type
 
         // skip if too big
         if (target_size > MAX_UPLOAD_SIZE) {
@@ -1959,101 +1960,108 @@ function uploadSchtuff(req, res, next) {
 
         console.log('trying ' + tmpfile + ' -> ' + target_path)
 
+        file_magic = {
+            file_name : target_file,
+            file_size : target_size,
+            file_from : client_ip
+        }
+
         //
-        // NOTE - target & orig file MUST be in same file system
+        // LOCAL or remote?
         //
-        // also... slight race condition.  Life goes on.
+        console.log('moment of truth.. local or no?  => ' + upload_target)
 
-        console.log('trying to rename....')
+        //
+        // LOCAL - file still stashed here for now
+        //
+        if (upload_target == "local") {
+            console.log('local...')
 
-        // XXX if on different FS, have to copy
-        // also check to see if exists!
-        fs.rename(tmpfile, target_path, function (err) {
-            if (err)  {
-                console.log('errz - ')
-                console.log(err)
-            }
-            else {
-                console.log('rename complete');
-                console.log('woohoo')
+            //
+            // NOTE - target & orig file MUST be in same file system
+            //
+            // also... slight race condition.  Life goes on.
 
-                file_magic = {
-                    file_name : target_file,
-                    file_size : target_size,
-                    file_from : client_ip
+            console.log('trying to rename....')
+
+            // XXX if on different FS, have to copy
+            // also check to see if exists!
+            fs.rename(tmpfile, target_path, function (err) {
+                if (err)  {
+                    console.log('errz - ')
+                    console.log(err)
                 }
-
-                //
-                // LOCAL or remote?
-                //
-                console.log('moment of truth.. local or no?  => ' + upload_target)
-
-                //
-                // LOCAL - file still stashed here for now
-                //
-                if (upload_target == "local") {
-                    console.log('local... d3ckid?')
-                    console.log(bwana_d3ck.D3CK_ID)
-
-                    browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
-
-                    d3ck_status.browser_events = browser_magic
-                    d3ck_status.file_events    = file_magic
-
-                    createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
-
-                    res.send(204, {"status" : target_file})
-                }
-
-                //
-                // REMOTE
-                //
-                // post to a remote D3CK... first look up IP based on PID, then post to it
                 else {
-                    console.log("going to push it to the next in line: " + upload_target)
-                    
-                    console.log(req.files.uppity[i-1])
+                    console.log('rename complete');
+                    console.log('woohoo')
+                }
+            })
 
-                    var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+            browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
 
-                    var FormData = require('form-data');
-                    var form = new FormData();
+            d3ck_status.browser_events = browser_magic
+            d3ck_status.file_events    = file_magic
 
-                    var options = {
-                        method  : 'POST',
-                        host    : upload_target,
-                        port    : d3ck_port_ext,
-                        path    : '/up/local',
-                        key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                        cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                        headers : req.files.uppity[i-1].headers
-                    };
+            createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
 
-                    console.log('opts: ' +  ip2d3ck[upload_target])
-                    console.log(JSON.stringify(options))
-
-                    var request = https.request(options, function(response) {
-                        form.append('fieldName', 'uppity[]'),
-                        form.append('originalFilename', req.files.uppity[i-1].originalFilename),
-                        form.append('path', target_file),
-                        form.append('size', req.files.uppity[i-1].size),
-                        form.append('name', req.files.uppity[i-1].name),
-                        form.append('type', req.files.uppity[i-1].type)
-                    });
-
-                    form.pipe(request);
-
-                    request.on('response', function(res) {
-                        console.log("Resp: " + res.statusCode);
-                        done_posting()
-                    });
-
-                    request.on('error', function(e) {
-                        console.log('error on request: ' + e.message);
-                        res.send(200, {"error" : e.message})
-                    });
+            res.send(204, {"status" : target_file})
 
 
+
+        }
+
+        //
+        // REMOTE
+        //
+        // post to a remote D3CK... first look up IP based on PID, then post to it
+        else {
+            console.log("going to push it to the next in line: " + upload_target)
+            
+            console.log(req.files.uppity[i-1])
+
+            var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+
+            var options = {
+                method  : 'POST',
+                host    : upload_target,
+                port    : d3ck_port_ext,
+                path    : '/up/local',
+                multipart: true,
+                key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString()
+                // headers : req.files.uppity[i-1].headers
+            };
+
+            console.log('opts: ' +  ip2d3ck[upload_target])
+            console.log(JSON.stringify(options))
+
+            var needle = require('needle');
+
+            // var target_size = req.files.uppity[i].size
+            // var target_file = req.files.uppity[i].name
+            // var target_path = d3ck_public + "/uploads/" + target_file
+            // var tmpfile     = req.files.uppity[i].path
+
+            var data = { image: { file: tmpfile, content_type: file_type } }
+
+            needle.post('http://my.other.app.com', data, options, function(err, resp, body) {
+                if (err) {
+                    console.log('I blew it, sammy, try again?  ' + JSON.stringify(err))
+                    res.send(200, {"error" : err.message})
+                }
+                else {
+                    console.log('could it... should it... would it... woo?')
+                    console.log(resp)
+                    done_posting()
+                }
+            });
+
+//                      ('fieldName', 'uppity[]'),
+//                      ('originalFilename', req.files.uppity[i-1].originalFilename),
+//                      ('path', target_file),
+//                      ('size', req.files.uppity[i-1].size),
+//                      ('name', req.files.uppity[i-1].name),
+//                      ('type', req.files.uppity[i-1].type)
 //                  restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
 //                      multipart: true,
 //                      data: "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg")
@@ -2082,8 +2090,8 @@ function uploadSchtuff(req, res, next) {
                         res.send(204, {"status" : target_file})
                     }
                 }
-            }
-        })
+
+
     }
 
 }
