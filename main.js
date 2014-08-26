@@ -2687,10 +2687,10 @@ function formCreate(req, res, next) {
                 // make the d3ck's dir... should not exist!
                 var d3ck_dir = config.D3CK.keystore + '/' + data.did
 
-                mkdirp.sync(d3ck_dir, function () {
+                mkdirp.sync(d3ck_dir, function (err) {
                     if(err) {
                         // xxx - user error, bail
-                        console.log(err);
+                        console.log('e: ' + err);
                     }
                 })
 
