@@ -2033,8 +2033,8 @@ function uploadSchtuff(req, res, next) {
                         host    : upload_target,
                         port    : d3ck_port_ext,
                         path    : '/up/local',
-                        key     : fs.readFileSync(d3ck_keystore + ip2d3ck[upload_target] + "cli3nt.key"),
-                        cert    : fs.readFileSync(d3ck_keystore + ip2d3ck[upload_target] + "cli3nt.crt"),
+                        key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key"),
+                        cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt"),
                     };
 
 
