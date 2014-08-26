@@ -109,6 +109,15 @@ ip_addr_vpn=`echo $ip_addr | sed 's/:.*$//'`
 # remote_vpn=$(./setup_vpnclient.sh)
 
 image_b64=$(base64 < $D3CK_HOME/public/$image)
+# xxxxxxxxx
+# xxxxxxxxx
+# xxxxxxxxx
+# xxxxxxxxx
+# xxxxxxxxx
+# xxxxxxxxx
+# xxxxxxxxx
+# xxxxxxxxx
+image_b64=""
 
 # echo $image_base64
 
@@ -131,9 +140,9 @@ cat <<E_O_C
             },
             $vpn,
             "vpn_client" : {
-                "key"      : ['"$client_v_key"'],
-                "cert"     : ['"$client_v_cert"'],
-                }
+                "key"      : [$client_v_key],
+                "cert"     : [$client_v_cert]
+            }
     }
 }
 E_O_C
