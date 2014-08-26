@@ -5475,7 +5475,7 @@ Peer.prototype.send = function (messageType, payload) {
         payload: payload,
         prefix: webrtc.prefix
     };
-    console.log('sending', messageType, message);
+    // console.log('sending', messageType, message);
     this.parent.emit('message', message);
 };
 

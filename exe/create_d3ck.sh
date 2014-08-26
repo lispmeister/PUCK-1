@@ -143,7 +143,7 @@ echo $new_d3ck
 echo "using curl to create D3CK..."
 
 echo curl -k -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_d3ck" $d3ck_url
-#    curl -k -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_d3ck" $d3ck_url &> $results
+     curl -k    -H "Accept: application/json" -H "Content-type: application/json" -X POST -d "@$new_d3ck" $d3ck_url &> $results
 
 if [ $? != 0 ] ; then
    echo "curl REST to D3CK server failed to create D3CK"

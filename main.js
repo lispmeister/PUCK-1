@@ -3324,7 +3324,7 @@ function fire_up_remote () {
 
         // pass a message to another id
         ss_client.on('message', function (details) {
-            console.log('mess: ' + JSON.stringify(details))
+            // console.log('mess: ' + JSON.stringify(details))
 
             if (!details) return;
 
