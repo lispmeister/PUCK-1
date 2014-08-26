@@ -1,7 +1,6 @@
 
 user zen;
 
-
 # misc jinxy stuff
 
 pid                     /etc/d3ck/logs/nginx.pid;
