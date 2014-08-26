@@ -834,6 +834,8 @@ function status_or_die() {
             else {
                 console.log('file(z) from remote')
                 $.bootstrapGrowl("File transferred: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes)", {offset: {from: 'top', amount: 70}, delay: -1})
+                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+
             }
         }
     }
@@ -1042,29 +1044,30 @@ function fire_d3ck_status(jstatus) {
 // vpn state changes
 function drag_and_d3ck(safe_id, d3ckid, ip) { 
 
-    if (safe_id == "local") return
-    if (safe_id == "local") return
-    if (safe_id == "local") return
-    if (safe_id == "local") return
-    if (safe_id == "local") return
-    if (safe_id == "local") return
-    if (safe_id == "local") return
-    if (safe_id == "local") return
+    if (safe_id != "local") {
 
-    console.log('draggin n d3ckin... to....', safe_id, d3ckid, ip)
+        console.log('draggin n d3ckin... to....', safe_id, d3ckid, ip)
 
-    // out with the old, in with the new
-    // $('.dragDropBox').remove()           XXXX?
-    // $('#uppity').filer({
+        // out with the old, in with the new
+        // $('.dragDropBox').remove()           XXXX?
+        // $('#uppity').filer({
 
-    var safe_ip = ip.replace(/\./g, '_')
+        var safe_ip = ip.replace(/\./g, '_')
 
-    // $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
-    $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
+        // $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
+        $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
+    }
+    else {
+        safe_id = "uppity"
+        ip      = "local"
+        safe_ip = "local"
+    }
+
+    var ele = '#dragDropBox_' + safe_ip
 
     $('#' + safe_id).filer({
-        changeInput: '<div class="dragDropBox" id="dragDropBox_' + safe_ip + '><span class="message">CLICK -or- DROP files to upload</span></div>',
-        appendTo   : '.dragDropBox',
+        changeInput: '<div class="dragDropBox" id="dragDropBox_' + safe_ip + '"><span class="message">CLICK -or- DROP files to upload</span></div>',
+        appendTo   : ele,
         // appendTo   : '#dragDropBox_' + safe_id,
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
         maxSize    : 1024 * 1024,
@@ -1078,10 +1081,10 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
             onUploaded:  function(parent){ }
         },
         dragDrop: {
-            dropBox:  '.dragDropBox',
-            dragOver: function(e, parent){ $('.dragDropBox').addClass('hover'); },
-            dragOut:  function(e, parent){ $('.dragDropBox').removeClass('hover'); },
-            drop:     function(e, formData, parent){ $('.dragDropBox').removeClass('hover'); },
+            dropBox:  ele,
+            dragOver: function(e, parent){ $(ele).addClass('hover'); },
+            dragOut:  function(e, parent){ $(ele).removeClass('hover'); },
+            drop:     function(e, formData, parent){ $(ele).removeClass('hover'); },
         },
         onEmpty    : function(parent, appendBox){ $(appendBox).removeClass('done'); },
         onSelect   : function(e,parent,appendBox){ $(appendBox).addClass('done'); }

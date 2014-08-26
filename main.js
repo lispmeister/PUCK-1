@@ -473,7 +473,7 @@ function auth(req, res, next) {
     // console.log('auth...?')
 
     if (req.isAuthenticated()) {
-        console.log('already chex: ' + req.path)
+        // console.log('already chex: ' + req.path)
         return next();
     }
 
@@ -663,14 +663,6 @@ function change_status() {
     write_O2_file(d3ck_status_file, d3ck_status)
 
     console.log('end status')
-
-    // reset/clear
-//  file_magic                 = { "file_name" : "", "file_size" : "", "file_from" : ""}
-//  d3ck_events                = {"new_d3ck":""}
-//  browser_magic[client_ip]   = { "notify_add":false, "notify_ring":false, "notify_file":false}
-//  d3ck_status.events         = d3ck_events
-//  d3ck_status.file_events    = file_magic
-//  d3ck_status.browser_events = browser_magic
 
 }
 
@@ -1559,7 +1551,6 @@ function createEvent(ip, event_data) {
     var e_type      = event_data.event_type
 
     event_data.from    = ip
-    event_data.d3ck_id = ip2d3ck[ip]
     event_data.time    = Date()
 
     var key         = e_type + ":" + event_data.time
