@@ -1378,7 +1378,8 @@ function create_d3ck_key_store(data) {
 
     if (client_key == "") {
         console.log('no key data... bailin on add...')
-        alert('no key data... bailin on add...')
+        // alert('no key data... bailin on add...')
+        return
     }
 
 
