@@ -1373,9 +1373,10 @@ function create_d3ck_key_store(data) {
 
     console.log(data.vpn)
 
-    // var ca   = data.vpn_client.ca.join('\n')
-    // var key  = data.vpn_client.key.join('\n')
-    // var cert = data.vpn_client.cert.join('\n')
+    // client stuff
+    var ca   = data.vpn_client.ca.join('\n')
+    var key  = data.vpn_client.key.join('\n')
+    var cert = data.vpn_client.cert.join('\n')
 
     var ca   = data.vpn.ca.join('\n')
     var key  = data.vpn.key.join('\n')
@@ -1401,6 +1402,9 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.key',     key)
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
+
+    write_2_file(d3ck_dir + '/cli3nt.key',   key)
+    write_2_file(d3ck_dir + '/cli3nt.crt',   cert)
 
     // and the entire json card
     write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))

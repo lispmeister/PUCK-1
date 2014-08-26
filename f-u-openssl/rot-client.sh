@@ -33,7 +33,7 @@ cd /etc/d3ck/f-u-openssl
 . d3ck-vars
 
 d3ck_home="$keystore/$1"
-d3ck="$d3ck_home/cli3nt"
+storage="$hell/clients"
 
 mkdir "$d3ck_home" 2> /dev/null
 
@@ -43,9 +43,9 @@ KEY_CN=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; pri
 magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 
 # client
-openssl req $magic -extensions client -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $d3ck.key -out $d3ck.csr -config stupid.conf
+openssl req $magic -extensions client -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $storage/$1.key -out $storage/$.csr -config stupid.conf
 
-openssl ca $magic -extensions client -cert $keystore/D3CK/ca.crt -batch -keyfile $keystore/D3CK/ca.key -days $KEY_LIFE -out $d3ck.crt -in $d3ck.csr -config stupid.conf
+openssl ca $magic -extensions client -cert $keystore/D3CK/ca.crt -batch -keyfile $keystore/D3CK/ca.key -days $KEY_LIFE -out $storage/$1.crt -in $storage/$1.csr -config stupid.conf
 
-chmod -R 755 /etc/d3ck/f-u-openssl
+chmod -R 755 $hell $d3ck_home
 
