@@ -2091,6 +2091,8 @@ function uploadSchtuff(req, res, next) {
 //
 function d3ck_spawn(command, argz) {
 
+// xxx - add time/date
+
     cmd = command.split('/')[command.split('/').length -1]
 
     console.log('a spawn o d3ck emerges... ' + ' (' + cmd + ')\n\n\t' + command + ' ' + argz.join(' ') + '\n')
@@ -2728,12 +2730,7 @@ function formCreate(req, res, next) {
                         }
 
                         console.log('vpn-ify...!')
-                        console.log('vpn-ify...!')
-                        console.log('vpn-ify...!')
                         console.log(JSON.stringify(r_data.vpn));
-                        console.log('vpn-ify...!')
-                        console.log('vpn-ify...!')
-                        console.log('vpn-ify...!')
 
                         // self added
                         d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
@@ -2764,14 +2761,10 @@ function formCreate(req, res, next) {
 
                         // now write the image data for the d3ck in question
                         console.log('just about to keel over')
-                        console.log(d3ck_public)
-                        console.log(r_data)
+                        // console.log(r_data)
 
+                        // write image
                         write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
-
-                        // write_2_file(d3ck_public + r_data.image + ".b64", r_data.image_b64)
-                        // console.log(bwana_d3ck)
-                        // console.log(typeof bwana_d3ck)
 
                         if (d3ck_id != r_data.D3CK_ID) {
                             console.log("posting our d3ck data to the d3ck we just added....")
@@ -2799,6 +2792,7 @@ function formCreate(req, res, next) {
         return(e)
     })
 
+    console.log('end-o-create...')
 
 }
 
