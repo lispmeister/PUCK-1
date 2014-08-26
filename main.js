@@ -1403,7 +1403,6 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
-    write_2_file(d3ck_dir + '/cli3nt.ca',   client_ca)
     write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
     write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
 

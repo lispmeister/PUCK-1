@@ -1171,9 +1171,6 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
     }
 
     var vpn_client = {
-        port       : d3ckinfo.vpn_client.port,
-        protocol   : d3ckinfo.vpn_client.protocol,
-        ca         : d3ckinfo.vpn_client.ca.join('\n'),
         key        : d3ckinfo.vpn_client.key.join('\n'),
         cert       : d3ckinfo.vpn_client.cert.join('\n')
     }
