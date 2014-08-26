@@ -460,6 +460,7 @@ function auth(req, res, next) {
     //
     // console.log('cert...?')
     if (typeof req.headers['x-ssl-client-verify'] != "undefined" && req.headers['x-ssl-client-verify'] == "SUCCESS"){
+        console.log(req.headers)
         console.log('my cert homie...?!!?!')
         return next();
     }
