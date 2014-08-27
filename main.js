@@ -185,7 +185,7 @@ rclient.get(d3ck_id, function (err, reply) {
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"},
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"},
     file_magic      = { file_name: "", file_size: "", file_from: "", direction: ""},
-                
+
     d3ck_events     = {"new_d3ck_ip":""},
     browser_magic   = {},
     old_d3ck_status = {},
@@ -1068,25 +1068,31 @@ function cat_stamp() {
 // hand out the latest news; client polls
 //
 tmp_status = {}
+
 function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    if (JSON.stringify(tmp_status) == JSON.stringify(d3ck_status)) {
-        // console.log('no status change...')
-    }
-    else {
-        console.log('NEW STATUS!')
-        console.log(d3ck_status)
-        tmp_status = JSON.parse(JSON.stringify(d3ck_status))
-    }
+    tmp_status  = JSON.parse(JSON.stringify(d3ck_status))
+    d3ck_status = blank_status
 
     //
     // as marvin once said, what's going on?
     //
     res.send(200, JSON.stringify(d3ck_status))
 
+
     // used to use sockets... no more
+
+//  if (JSON.stringify(tmp_status) == JSON.stringify(d3ck_status)) {
+        // console.log('no status change...')
+//  }
+//  else {
+//      console.log('NEW STATUS!')
+//      console.log(d3ck_status)
+//      tmp_status = JSON.parse(JSON.stringify(d3ck_status))
+//  }
+
 
 }
 
