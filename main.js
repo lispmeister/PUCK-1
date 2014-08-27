@@ -2173,9 +2173,7 @@ function uploadSchtuff(req, res, next) {
                 ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
                 key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                 cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                headers : { 'x-filename' : target_file        }
-                headers : { 'x-filesize' : target_size        }
-                headers : { 'x-d3ckID'   : bwana_d3ck.D3CK_ID }
+                headers : { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
                 //strictSSL : true
             };
 
