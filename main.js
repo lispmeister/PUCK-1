@@ -2156,7 +2156,18 @@ function uploadSchtuff(req, res, next) {
 
             var request = require('request');
 
-            var r = request.post(url, function optionalCallback (err, httpResponse, body) {
+            var options = {
+                //method  : 'POST',
+                //host    : upload_target,
+                //port    : d3ck_port_ext,
+                //path    : '/up/local',
+                key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString()
+                //headers : headers
+            };
+
+
+            var r = request.post(url, options, function optionalCallback (err, httpResponse, body) {
                 if (err) {
                     console.error('upload failed:', err);
                     }
@@ -2169,19 +2180,10 @@ function uploadSchtuff(req, res, next) {
 
             form.append(target_file, tmpfile)
 
-            form.append('key',  fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString())
-            form.append('cert', fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString())
-            form.append('ca',   fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString())
+            //form.append('key',  fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString())
+            //form.append('cert', fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString())
+            //form.append('ca',   fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString())
 
-            var options = {
-                method  : 'POST',
-                host    : upload_target,
-                port    : d3ck_port_ext,
-                path    : '/up/local',
-                key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                headers : headers
-            };
 
             // var request = https.request(options)
 
