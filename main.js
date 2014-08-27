@@ -1914,6 +1914,48 @@ function downloadStuff (req, res, next) {
 }
 
 
+//
+// a hack until .... until godot shows up
+//
+// tear up some data, save it to the brig
+//
+function bodice_ripper(bodice) {
+
+    console.log('ripping away')
+
+    var data = ""
+
+    // ----------------------------320756311425686976538052
+    // Content-Disposition: form-data; name="scrabble.jpg"; filename="31115-t9y74u.jpg"
+    // Content-Type: image/jpeg
+    // [... data ...]
+    //
+    lines = bodice.split("\n");
+
+    for(i = 0; i < lines.length - 1; i++) {
+
+        if (line.indexOf("-----") == 0) {
+            console.log('found separator')
+            console.log(line)
+        }
+        else if (line.indexOf("Content-Disposition") == 0) {
+            console.log('good disposition, good girl!')
+            console.log(line)
+        }
+        else if (line.indexOf("Content-type") == 0) {
+            console.log('whats your type?')
+            console.log(line)
+        }
+        else {
+            console.log('misc trash')
+            data .= line
+        }
+    }
+
+    console.log('bodice ripped, ' + data.length() + ' bytes ready to save')
+
+}
+
 // req.files contains all the goods, including:
 //
 //  size
@@ -1945,15 +1987,22 @@ function uploadSchtuff(req, res, next) {
     console.log('from : ' + client_ip)
 
 
+
+    //
+    // yet another hack in a long line of hacks...
+    // this time, multipart forms... let's just try to see
+    // if I can figure this out; this is only d3ck-2-d3ck
+    // 
     var body = ""
     // go with the flow, or stream, or w/e....
     req.on('data', function (chunk) {
         console.log('one chunk at a time...')
-        console.log(chunk)
+        // console.log(chunk)
         body += chunk;
     });
     req.on('end', function () {
         console.log('end-o-stream: ' + body);
+        bodice_ripper(body)
     });
 
 
