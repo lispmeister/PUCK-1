@@ -464,6 +464,9 @@ function auth(req, res, next) {
         console.log('my cert homie...?!!?!')
         return next();
     }
+    else {
+        console.log(req.headers)
+    }
 
 
     //
