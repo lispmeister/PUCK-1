@@ -78,7 +78,6 @@ var d3ck_proto_signal = config.D3CK.d3ck_proto_signal
 // start with a clean slate
 d3ck_status = {}
 clear_status()
-change_status()
 
 // capabilities...
 var capabilities      = config.capabilities
@@ -601,7 +600,7 @@ var sleepy_time = 5
 var init = false
 
 // xxx null for now
-while (init) {
+// while (init) {
 
     console.log('suckit, d3ck!')
 
@@ -633,9 +632,11 @@ while (init) {
         }
     })
 
-    sleep.sleep(sleepy_time)
+//  sleep.sleep(sleepy_time)
 
-}
+// }
+
+change_status()
 
 
 //
