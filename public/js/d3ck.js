@@ -832,8 +832,12 @@ function status_or_die() {
 
             var friend = all_d3ck_ids[d3ck_status.file_events.did].owner.name
 
+            var dir    = ""
+
+            if (d3ck_status.file_events.direction != "local") dir = ' to ' + friend + "/" + d3ck_status.file_events.direction
+
             // put in or lookup PiD, then owner/d3ck's name!
-            $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+            $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
 
             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
             // d3ck_status.browser_events[browser_ip].notify_file = true
