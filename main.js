@@ -1924,6 +1924,7 @@ function bodice_ripper(bodice) {
     console.log('ripping away')
 
     var data = ""
+    var name = ""
 
     // ----------------------------320756311425686976538052
     // Content-Disposition: form-data; name="scrabble.jpg"; filename="31115-t9y74u.jpg"
@@ -1941,20 +1942,42 @@ function bodice_ripper(bodice) {
             console.log(line)
         }
         else if (line.indexOf("Content-Disposition") == 0) {
+        // Content-Disposition: form-data; name="dona-scrabble.jpg"; filename="32024-m3ps38.jpg"
+
             console.log('good disposition, good girl!')
             console.log(line)
+
+            var semis = line.split('; ')
+            console.log(semis[2])
+
+            name = line.replace(new RegExp('^.*=name"'),'')
+            name = name.replace(new RegExp('".*$'),'')
+
+            console.log(semis[2])
+            console.log(name)
+
         }
         else if (line.indexOf("Content-type") == 0) {
             console.log('whats your type?')
             console.log(line)
         }
         else {
-            console.log('misc trash')
+            // console.log('misc trash')
             data += line
         }
     }
 
-    console.log('bodice ripped, ' + data.length() + ' bytes ready to save')
+    if (name == "") name = "anon"
+
+    console.log('bodice ripped, ready to save to ' + name)
+
+    fs.writeFile(d3ck_public + "/uploads/" + name, data, function(err) {
+        if(err) {
+            console.log(err);
+        } else {
+            console.log("jesus saves files and souls!')
+        }
+    }); 
 
 }
 
@@ -2110,6 +2133,8 @@ function uploadSchtuff(req, res, next) {
             //
             console.log('addding... ' + tmpfile, target_file)
             form.append(target_file, fs.createReadStream(tmpfile))
+
+
 
             // ask nicely
             form.pipe(request)
