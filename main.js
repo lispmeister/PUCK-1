@@ -184,7 +184,8 @@ rclient.get(d3ck_id, function (err, reply) {
 // status and other bits
 var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"},
     client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"},
-    file_magic      = { "file_name" : "", "file_size" : "", "file_from" : ""},
+    file_magic      = { file_name: "", file_size: "", file_from: "", direction: ""},
+                
     d3ck_events     = {"new_d3ck_ip":""},
     browser_magic   = {},
     old_d3ck_status = {},
@@ -2009,6 +2010,7 @@ function uploadSchtuff(req, res, next) {
                 file_name : file_name,
                 file_size : file_size,
                 file_from : client_ip
+                direction : "local"
             }
 
             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
@@ -2050,7 +2052,8 @@ function uploadSchtuff(req, res, next) {
             file_magic = {
                 file_name : target_file,
                 file_size : target_size,
-                file_from : client_ip
+                file_from : client_ip,
+                direction : "local"
             }
 
             //
@@ -2127,6 +2130,7 @@ function uploadSchtuff(req, res, next) {
 
                         browser_magic              = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic
+                        file_magic.direction       = upload_target
                         d3ck_status.file_events    = file_magic
 
                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target })

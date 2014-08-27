@@ -825,15 +825,19 @@ function status_or_die() {
             if (d3ck_status.file_events.file_from != browser_ip) {
                 console.log('new local file(z)!')
 
+                // var direction = "?"
+                // if      (d3ck_status.file_events.direction == "send")    direction = "sent to "
+                // else if (d3ck_status.file_events.direction == "receive") direction = "from "
+
                 // put in or lookup PiD, then owner/d3ck's name!
-                $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); from " + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+                $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); " + direction + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
                 $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
                 // d3ck_status.browser_events[browser_ip].notify_file = true
                 }
             else {
                 console.log('file(z) from remote')
-                $.bootstrapGrowl("File transferred: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes)", {offset: {from: 'top', amount: 70}, delay: -1})
+                $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) sent to " + d3ck_status.file_events.direction, {offset: {from: 'top', amount: 70}, delay: -1})
                 $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
 
             }
