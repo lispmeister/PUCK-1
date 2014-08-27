@@ -2060,7 +2060,7 @@ function uploadSchtuff(req, res, next) {
         req.body.data.on('data', function(chunk) {
             fileg_data += chunk
         })
-        req.body.data.on('end', function() {
+        req.on('end', function() {
 
             console.log('someday has come for upload....?')
 
