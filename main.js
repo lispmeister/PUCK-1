@@ -2171,7 +2171,8 @@ function uploadSchtuff(req, res, next) {
             form.append(target_file, file_data)
 
             // ask nicely
-            form.submit(request, function(err, data) {
+            url = 'https://' + upload_target + ':' + d3ck_port_ext
+            form.submit(url, request, function(err, data) {
 
             // request.on('response', function (res)
                 if (err) {
