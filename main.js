@@ -2165,7 +2165,7 @@ function uploadSchtuff(req, res, next) {
                     console.log('Upload successful!  Server responded with:', httpResponse);
                     // done_posting()
                 }
-            }).form({target_file, fs.readFileSync(tmpfile) })
+            }).form({target_file: fs.readFileSync(tmpfile) })
 
         }
 
