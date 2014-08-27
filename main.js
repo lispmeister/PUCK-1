@@ -2181,7 +2181,7 @@ function uploadSchtuff(req, res, next) {
                     console.error('upload failed:', err);
                     }
                 else {
-                    console.log('Upload successful!  Server responded with:', resp);
+                    console.log('Upload successful...!')
                     // done_posting()
                 }
             }))
