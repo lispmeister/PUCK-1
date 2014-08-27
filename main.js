@@ -176,24 +176,10 @@ rclient.get(d3ck_id, function (err, reply) {
 })
 
 
-d3ck_status     = {}
-
-// need to reset status from time to time
-function clear_status () {
-
-    server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"}
-    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"}
-    file_magic      = { file_name: "", file_size: "", file_from: "", direction: ""}
-    d3ck_events     = {"new_d3ck_ip":""}
-    browser_magic   = {}
-
-    d3ck_status.events         = d3ck_events
-    d3ck_status.openvpn_server = server_magic
-    d3ck_status.openvpn_client = client_magic
-    d3ck_status.file_events    = file_magic
-    d3ck_status.browser_events = browser_magic
-
-}
+// start with a clean slate
+d3ck_status = {}
+clear_status()
+change_status()
 
 //
 // get the latest status... create the file if it doesn't exist...
@@ -217,9 +203,23 @@ var d3ck_proxy_up  = false,
 var all_client_ips = [],
     client_ip      = "";
 
-// start with a clean slate
-change_status()
 
+// need to reset status from time to time
+function clear_status () {
+
+    server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"}
+    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"}
+    file_magic      = { file_name: "", file_size: "", file_from: "", direction: ""}
+    d3ck_events     = {"new_d3ck_ip":""}
+    browser_magic   = {}
+
+    d3ck_status.events         = d3ck_events
+    d3ck_status.openvpn_server = server_magic
+    d3ck_status.openvpn_client = client_magic
+    d3ck_status.file_events    = file_magic
+    d3ck_status.browser_events = browser_magic
+
+}
 
 //
 // only exist after user has run startup
