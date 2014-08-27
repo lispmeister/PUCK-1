@@ -2056,9 +2056,10 @@ function uploadSchtuff(req, res, next) {
 
         // req.setBodyEncoding("binary");
 
-        var file_data = ""
+        var file_name = req.headers['x-filename']
 
-        var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
+        // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
+        var ws = fs.createWriteStream(d3ck_public + file_name)
         // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
 
         req.pipe(ws)
@@ -2073,13 +2074,7 @@ function uploadSchtuff(req, res, next) {
             d3ck_status.file_events    = file_magic
 
             // createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
-            createEvent(client_ip, {event_type: "remote_upload", "file_name": 'lucky', "file_size": 9001, "d3ck_id": ip2d3ck[client_ip]})
-
-            // get rid of evidence
-            fs.unlink(target_path, function (err) {
-                if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
-                console.log('successfully deleted ' + target_path)
-            });
+            createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": 9001, "d3ck_id": ip2d3ck[client_ip]})
 
             res.send(204, {"status" : target_file})
         })
@@ -2173,6 +2168,7 @@ function uploadSchtuff(req, res, next) {
                 ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
                 key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                 cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                headers : { "x-filename": target_file }
                 //strictSSL : true
             };
 
