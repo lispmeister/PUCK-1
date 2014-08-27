@@ -2051,22 +2051,32 @@ function uploadSchtuff(req, res, next) {
     // this time, multipart forms... let's just try to see
     // if I can figure this out; this is only d3ck-2-d3ck
     // 
-//  var buff = ""
-//  // go with the flow, or stream, or w/e....
-//  req.on('data', function (chunk) {
-//      console.log('one chunk at a time...')
-//      // console.log(chunk)
-//      buff += chunk;
-//  });
-//  req.on('end', function () {
-//      // console.log('end-o-stream: ' + buff);
-//      console.log('end-o-stream')
-//      bodice_ripper(buff)
-//  });
+    if (typeof req.body.data != 'undefined') {
+        console.log('another d3ck sending something...?  ' + req.body.filename)
+        write_2_file(d3ck_public + "/uploads/" + req.body.filename, req.body.data)
 
+        console.log('done...?')
 
-//  if (typeof req.files.uppity != "undefined") {
-//      console.log('normal stuff')
+        console.log('upload to ' + upload_target + ' complete')
+        browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
+
+        d3ck_status.browser_events = browser_magic
+        d3ck_status.file_events    = file_magic
+
+        createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
+
+        // get rid of evidence
+        fs.unlink(target_path, function (err) {
+            if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
+            console.log('successfully deleted ' + target_path)
+        });
+
+        res.send(204, {"status" : target_file})
+    }
+
+    else {
+
+        console.log('normal stuff')
 
 
     for (var i=0; i<req.files.uppity.length; i++) {
@@ -2154,7 +2164,7 @@ function uploadSchtuff(req, res, next) {
                 //strictSSL : true
             };
 
-            var file = fs.readFileSync(tmpfile) 
+            var file_data = fs.readFileSync(tmpfile) 
 
             var postit = request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
@@ -2164,35 +2174,14 @@ function uploadSchtuff(req, res, next) {
                     console.log('Upload successful!  Server responded with:', resp);
                     // done_posting()
                 }
-            }).form({ target_file: 'hello world' })
+            }).form({ data: file_data, filename: target_file })
 
             // postit.form({ target_file: file })
 
         }
 
-        function done_posting() {
-
-                        console.log('done...?')
-
-                        console.log('upload to ' + upload_target + ' complete')
-                        browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
-
-                        d3ck_status.browser_events = browser_magic
-                        d3ck_status.file_events    = file_magic
-
-                        createEvent(client_ip, {event_type: "remote_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target]})
-
-                        // get rid of evidence
-                        fs.unlink(target_path, function (err) {
-                            if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
-                            console.log('successfully deleted ' + target_path)
-                        });
-
-
-                        res.send(204, {"status" : target_file})
-        }
     }
-    //}
+    }
 
 }
 
