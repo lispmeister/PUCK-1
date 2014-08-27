@@ -2208,7 +2208,7 @@ function uploadSchtuff(req, res, next) {
                         res.send(204, {"status" : target_file})
         }
     }
-    }
+    //}
 
 }
 
