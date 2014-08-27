@@ -2052,7 +2052,7 @@ function uploadSchtuff(req, res, next) {
     // 
     if (typeof req.files.uppity == 'undefined') {
 
-        console.log('another d3ck sending something...?)
+        console.log('another d3ck sending something...?')
 
         // req.setBodyEncoding("binary");
 
