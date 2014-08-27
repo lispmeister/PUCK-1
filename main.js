@@ -2052,23 +2052,22 @@ function uploadSchtuff(req, res, next) {
     // 
     if (typeof req.files.uppity == 'undefined') {
 
-        console.log('another d3ck sending something...?  ' + req.body.filename)
+        console.log('another d3ck sending something...?)
 
         // req.setBodyEncoding("binary");
 
         var file_data = ""
 
         req.on('data', function(chunk) {
-            fileg_data += chunk
+            file_data += chunk
         })
         req.on('end', function() {
 
             console.log('someday has come for upload....?')
 
             // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
-            fs.createWriteStream(d3ck_public + '/uploads/lucky.png').pipe(req);
-
-            console.log('done...?')
+            // fs.createWriteStream(d3ck_public + '/uploads/lucky.png').pipe(req);
+            write_O2_file(d3ck_public + '/uploads/lucky.png', file_data)
 
             console.log('upload to ' + upload_target + ' complete')
             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
