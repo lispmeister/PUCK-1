@@ -1951,13 +1951,13 @@ function bodice_ripper(bodice) {
             console.log(semis[2])
 
             name = line.replace(new RegExp('^.*=name"'),'')
-            name = name.replace(new RegExp('".*$'),'')
+            name = name.match(/"([^"]+)"/)[1];
 
             console.log(semis[2])
             console.log(name)
 
         }
-        else if (line.indexOf("Content-type") == 0) {
+        else if (line.indexOf("Content-Type") == 0) {
             console.log('whats your type?')
             console.log(line)
         }
