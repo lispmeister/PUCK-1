@@ -1923,6 +1923,16 @@ function bodice_ripper(bodice) {
 
     console.log('ripping away')
 
+    fs.writeFile(d3ck_public + "/uploads/" + name, bodice, function(err) {
+        if(err) {
+            console.log(err);
+        } else {
+            console.log('jesus saves files and souls!')
+        }
+    }); 
+
+    return
+
     var data  = ""
     var name  = ""
     var bytes = 0
@@ -1936,6 +1946,8 @@ function bodice_ripper(bodice) {
     var line   = ""
 
     for (; offset < bodice.length; offset++) {
+        console.log('trying to run through bodice....')
+
         if (bodice[offset] === 0x0a) {      // newline
 
             line = bodice.slice(0, offset).toString()
