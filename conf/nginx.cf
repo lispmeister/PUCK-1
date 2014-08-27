@@ -78,7 +78,7 @@ http {
         location /socket.io {   
 
             # sockety stuff
-            proxy_pass              http://10.162.249.1:5555;
+            proxy_pass              http://10.98.131.1:5555;
             proxy_http_version      1.1;
             proxy_redirect          off;
 

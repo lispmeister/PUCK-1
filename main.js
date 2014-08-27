@@ -1948,7 +1948,7 @@ function bodice_ripper(bodice) {
         }
         else {
             console.log('misc trash')
-            data .= line
+            data += line
         }
     }
 
