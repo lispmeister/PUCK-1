@@ -2056,7 +2056,12 @@ function uploadSchtuff(req, res, next) {
 
         // req.setBodyEncoding("binary");
 
-        var file_name = req.headers['x-filename']
+        var file_name   = req.headers['x-filename']
+        var file_size   = req.headers['x-filesize']
+        // xxx
+        // when self-testing through a NAT... ips started getting weird... really
+        // should figure out from cert matching
+        var file_d3ckID = req.headers['x-d3ckID']
 
         // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
         var ws = fs.createWriteStream(d3ck_public + '/uploads/' + file_name)
@@ -2074,7 +2079,7 @@ function uploadSchtuff(req, res, next) {
             d3ck_status.file_events    = file_magic
 
             // createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
-            createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": 9001, "d3ck_id": ip2d3ck[client_ip]})
+            createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckID})
 
             res.send(204, {"status" : target_file})
         })
@@ -2168,7 +2173,9 @@ function uploadSchtuff(req, res, next) {
                 ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
                 key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                 cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                headers : { "x-filename": target_file }
+                headers : { 'x-filename' : target_file        }
+                headers : { 'x-filesize' : target_size        }
+                headers : { 'x-d3ckID'   : bwana_d3ck.D3CK_ID }
                 //strictSSL : true
             };
 
