@@ -2052,6 +2052,9 @@ function uploadSchtuff(req, res, next) {
     // 
     if (typeof req.body.filename != 'undefined') {
         console.log('another d3ck sending something...?  ' + req.body.filename)
+
+        // req.setBodyEncoding("binary");
+
         write_O2_file(d3ck_public + "/uploads/" + req.body.filename, req.body.data)
 
         console.log('done...?')
@@ -2163,7 +2166,7 @@ function uploadSchtuff(req, res, next) {
                 //strictSSL : true
             };
 
-            var file_data = fs.readFileSync(tmpfile) 
+            // var file_data = fs.readFileSync(tmpfile) 
 
             console.log('FN: ' + target_file)
 
@@ -2175,7 +2178,7 @@ function uploadSchtuff(req, res, next) {
                     console.log('Upload successful!  Server responded with:', resp);
                     // done_posting()
                 }
-            }).form({ data: file_data, filename: target_file })
+            }).form({ data: fs.createReadStream(tmpfile), filename: target_file })
 
             // postit.form({ target_file: file })
 
