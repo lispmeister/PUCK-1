@@ -2166,6 +2166,7 @@ function uploadSchtuff(req, res, next) {
 
             form.append('key',  fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString())
             form.append('cert', fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString())
+            form.append('ca',   fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString())
 
             var options = {
                 method  : 'POST',
