@@ -2162,7 +2162,8 @@ function uploadSchtuff(req, res, next) {
                 //port    : d3ck_port_ext,
                 //path    : '/up/local',
                 key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString()
+                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                strictSSL : true
                 //headers : headers
             };
 
