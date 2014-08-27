@@ -1980,7 +1980,7 @@ function bodice_ripper(bodice) {
 
     if (name == "") name = "anon"
 
-    console.log('bodice ripped, ready to save ' + data.length + ' bytes to ' + name)
+    console.log('bodice ripped, ready to save to ' + name)
 
     fs.writeFile(d3ck_public + "/uploads/" + name, data, function(err) {
         if(err) {
