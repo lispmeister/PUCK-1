@@ -843,7 +843,7 @@ function status_or_die() {
 
             var friend = all_d3ck_ids[d3ck_status.file_events.did].owner.name
 
-            $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) sent to " + friend + '/' + d3ck_status.file_events.direction, {offset: {from: 'top', amount: 70}, delay: -1})
+            $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
 
         }
