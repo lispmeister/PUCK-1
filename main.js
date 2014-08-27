@@ -1068,14 +1068,14 @@ function d3ckStatus(req, res, next) {
         console.log('clearing out the queue (' + status_queue.length + ')....')
     }
     else {
-        console.log('empty queue...')
+        //console.log('empty queue...')
         res.send(200, [])
     }
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
     //tmp_status = JSON.parse(JSON.stringify(status_queue))
 
-    console.log(status_queue)
+    //console.log(status_queue)
 
     var quo = []
     for (var i = 0; i < status_queue.length; i++) {
