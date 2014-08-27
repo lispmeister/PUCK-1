@@ -465,11 +465,7 @@ function auth(req, res, next) {
         return next();
     }
     else {
-        //console.log(req.headers)
-    }
-    if (__.contains(['up'], url_bits[1])) {
-        console.log('my upload homie...?!!?!')
-        return next();
+        console.log(req.headers)
     }
 
 
