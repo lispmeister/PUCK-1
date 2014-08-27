@@ -1130,33 +1130,15 @@ function d3ckStatus(req, res, next) {
     else {
         console.log('NEW STATUS!')
         console.log(d3ck_status)
-
-        tmp_status                 = JSON.parse(JSON.stringify(d3ck_status))
-
-        // clear out the old
-        // browser_magic[client_ip]   = { "notify_add": false, "notify_ring": false, "notify_file": false }
-        // d3ck_status                = JSON.parse(JSON.stringify(blank_status))
-        // d3ck_status.browser_events = browser_magic
-
+        tmp_status = JSON.parse(JSON.stringify(d3ck_status))
     }
-
-    // used to use sockets... no more
-    // if (typeof io == "object") {
-    //     // console.log('boosting status on iOS ' + JSON.stringify(d3ck_status))
-    //     var msg = {type: "status", status: tmp_status}
-    ////      cat_power(msg)
-    // }
-    // else { 
-    //     // console.log('kitties not ready')
-    // }
-
 
     //
     // as marvin once said, what's going on?
     //
-    res.send(200, JSON.stringify(tmp_status))
+    res.send(200, JSON.stringify(d3ck_status))
 
-    // res.send(200, JSON.stringify(tmp_status))
+    // used to use sockets... no more
 
 }
 
