@@ -2061,9 +2061,10 @@ function uploadSchtuff(req, res, next) {
             fileg_data += chunk
         })
         req.body.data.on('end', function() {
-            console.log('someday has come for upload....')
 
-            write_O2_file(d3ck_public + "/uploads/" + req.body.filename, file_data)
+            console.log('someday has come for upload....?')
+
+            fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
 
             console.log('done...?')
 
