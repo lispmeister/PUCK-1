@@ -1936,13 +1936,30 @@ function uploadSchtuff(req, res, next) {
 
     console.log('striving to upload....' + upload_target)
 
-    console.log(req)
+    // console.log(req)
 
     // console.log(req.files)
 
     client_ip = get_client_ip(req)
 
     console.log('from : ' + client_ip)
+
+
+    var body = ""
+    // go with the flow, or stream, or w/e....
+    req.on('data', function (chunk) {
+        console.log('one chunk at a time...')
+        console.log(chunk)
+        body += chunk;
+    });
+    req.on('end', function () {
+        console.log('end-o-stream: ' + body);
+    });
+
+
+    if (typeof req.files.uppity != "undefined") {
+        console.log('normal stuff')
+
 
     for (var i=0; i<req.files.uppity.length; i++) {
 
@@ -2075,6 +2092,7 @@ function uploadSchtuff(req, res, next) {
 
                         res.send(204, {"status" : target_file})
         }
+    }
     }
 
 }
