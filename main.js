@@ -2042,7 +2042,7 @@ function uploadSchtuff(req, res, next) {
 
     console.log('from : ' + client_ip)
 
-    console.log(req)
+    // console.log(req)
 
 
     //
