@@ -219,9 +219,6 @@ var d3ck_proxy_up  = false,
 var all_client_ips = [],
     client_ip      = "";
 
-// keep an eye on the above
-pollStatus(d3ck_status_file)
-
 // start with a clean slate
 change_status()
 
@@ -1067,56 +1064,6 @@ function cat_stamp() {
 
 
 //
-// watch the status file for changes
-//
-function pollStatus(file) {
-
-    console.log('here to statusfy you...')
-
-    // read or create it initially
-    if (d3ck_status == {}) {
-        if (!fs.existsSync(d3ck_status_file)) {
-            console.log('creating ' + d3ck_status_file)
-            write_O2_file(d3ck_status_file, d3ck_status)
-        }
-    }
-    fs.readFile(d3ck_status_file, function (err, data) {
-        if (err) {
-            console.log('file errz - ' + err)
-        }
-        else {
-            console.log('... reading...')
-            console.log(data.toString())
-            d3ck_status = JSON.parse(data.toString())
-        }
-    })
-
-    //
-    // now keep an eye on the above...if it changes, change
-    // the status with the new contents
-    //
-
-    console.log("I'm watching you, punk " + d3ck_status_file)
-
-//  fs.watchFile(d3ck_status_file, function (curr, prev) {
-//      console.log('changezor')
-        // simple conf file...
-//      fs.readFile(d3ck_status_file, function (err, data) {
-//          if (err) {
-//              console.log('errz - ' + err)
-//          }
-//          else {
-//              console.log(data.toString())
-//              d3ck_status = JSON.parse(data.toString())
-//          }
-//       })
-//  })
-
-    console.log('trigger set')
-
-}
-
-//
 // hand out the latest news; client polls
 //
 tmp_status = {}
@@ -1147,26 +1094,29 @@ function d3ckStatus(req, res, next) {
 //
 function postStatus (req, res, next) {
 
-    console.log ("got browser's status posted")
+    // deprecated
+    return
 
-    console.log (req.body)
-
-    client_ip = get_client_ip(req)
-
-    console.log('posting from : ' + client_ip)
-
-    d3ck_events   = req.body.events
-    file_magic    = req.body.file_events
-    browser_magic = req.body.browser_events
-    server_magic  = req.body.openvpn_server
-    client_magic  = req.body.openvpn_client
-
-    if (! __.isEqual(old_d3ck_status, d3ck_status)) {
-        change_status()
-        old_d3ck_status = d3ck_status
-    }
-
-    res.send(200, {"status" : "OK"})
+//    console.log ("got browser's status posted")
+//
+//    console.log (req.body)
+//
+//    client_ip = get_client_ip(req)
+//
+//    console.log('posting from : ' + client_ip)
+//
+//    d3ck_events   = req.body.events
+//    file_magic    = req.body.file_events
+//    browser_magic = req.body.browser_events
+//    server_magic  = req.body.openvpn_server
+//    client_magic  = req.body.openvpn_client
+//
+//    if (! __.isEqual(old_d3ck_status, d3ck_status)) {
+//        change_status()
+//        old_d3ck_status = d3ck_status
+//    }
+//
+//    res.send(200, {"status" : "OK"})
 
 }
 
@@ -2055,8 +2005,16 @@ function uploadSchtuff(req, res, next) {
 
             console.log('someday has come for upload....?')
 
+            var file_magic = {
+                file_name : file_name,
+                file_size : file_size,
+                file_from : client_ip
+            }
+
             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
+
             d3ck_status.browser_events = browser_magic
+
             d3ck_status.file_events    = file_magic
 
             createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckID})
@@ -2126,8 +2084,7 @@ function uploadSchtuff(req, res, next) {
                     }
                 })
 
-                browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
-
+                browser_magic              = { "notify_add":false, "notify_ring":false, "notify_file":true}
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.file_events    = file_magic
 
@@ -2167,6 +2124,11 @@ function uploadSchtuff(req, res, next) {
                         }
                     else {
                         console.log('Upload successful...!')
+
+                        browser_magic              = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                        d3ck_status.browser_events = browser_magic
+                        d3ck_status.file_events    = file_magic
+
                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target })
                         res.send(204, {"status" : file_name})
                     }

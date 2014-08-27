@@ -1017,6 +1017,9 @@ function stop_server() {
 //
 function fire_d3ck_status(jstatus) {
 
+    // deprecated
+    return
+
     console.log('firing status off')
     jstatus = JSON.stringify(jstatus)
 
