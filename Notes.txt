@@ -1,4 +1,12 @@
 
+header
+
+****    authorizationError: 'Hostname/IP doesn\'t match certificate\'s altnames' },
+
+
+
+
+
 **** If ports aren't open... start thingee on 8081 won't come up!
 
 

@@ -2164,9 +2164,9 @@ function uploadSchtuff(req, res, next) {
                     console.log('Upload successful!  Server responded with:', resp);
                     // done_posting()
                 }
-            })
+            }).form({ target_file: 'hello world' })
 
-            postit.form({ target_file: file })
+            // postit.form({ target_file: file })
 
         }
 
