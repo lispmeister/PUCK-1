@@ -2002,7 +2002,7 @@ function uploadSchtuff(req, res, next) {
         // xxx
         // when self-testing through a NAT... ips started getting weird... really
         // should figure out from cert matching
-        var file_d3ckID = req.headers['x-d3ckID']
+        var file_d3ckid = req.headers['x-d3ckid']
 
         // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
         var ws = fs.createWriteStream(d3ck_public + '/uploads/' + file_name)
@@ -2018,7 +2018,7 @@ function uploadSchtuff(req, res, next) {
                 file_name : file_name,
                 file_size : file_size,
                 file_from : client_ip,
-                did       : file_d3ckID,
+                did       : file_d3ckid,
                 direction : "local"
             }
 
@@ -2028,7 +2028,7 @@ function uploadSchtuff(req, res, next) {
 
             d3ck_status.file_events    = file_magic
 
-            createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckID}, d3ck_status)
+            createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
 
             res.send(204, {"status" : file_name})
 
@@ -2122,7 +2122,6 @@ function uploadSchtuff(req, res, next) {
                     did        : bwana_d3ck.D3CK_ID,
                     direction  : upload_target
                 }
-
 
                 var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
 
