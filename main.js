@@ -443,11 +443,6 @@ function auth(req, res, next) {
         }
     }
 
-    if (__.contains(['up'], url_bits[1])) {
-            console.log('upload homie!')
-            return next();
-        }
-
     // console.log('qs...')
     // I don't care if you are auth'd or not, you don't get much but quickstart until
     // you've set up your d3ck....
@@ -469,10 +464,6 @@ function auth(req, res, next) {
         console.log('my cert homie...?!!?!')
         return next();
     }
-    else {
-        console.log(req.headers)
-    }
-
 
     //
     // are you logged in as a user, say, via the web?
