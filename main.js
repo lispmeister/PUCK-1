@@ -75,6 +75,11 @@ var d3ck_port_forward = config.D3CK.d3ck_port_forward
 var d3ck_port_signal  = config.D3CK.d3ck_port_signal
 var d3ck_proto_signal = config.D3CK.d3ck_proto_signal
 
+// start with a clean slate
+d3ck_status = {}
+clear_status()
+change_status()
+
 // capabilities...
 var capabilities      = config.capabilities
 
@@ -175,11 +180,6 @@ rclient.get(d3ck_id, function (err, reply) {
     }
 })
 
-
-// start with a clean slate
-d3ck_status = {}
-clear_status()
-change_status()
 
 //
 // get the latest status... create the file if it doesn't exist...
