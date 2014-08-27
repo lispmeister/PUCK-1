@@ -711,21 +711,31 @@ function get_status() {
 
     var jqXHR_get_status = $.ajax({ url: url })
 
-    jqXHR_get_status.done(function (data, textStatus, jqXHR) {
-        // console.log('status wootz\n' + data)
-        d3ck_status = JSON.parse(data)
+    jqXHR_get_status.done(function (queue, textStatus, jqXHR) {
+        // console.log('status wootz\n' + queue)
         // console.log("got status?  " + JSON.stringify(d3ck_status))
-        console.log('got status? ...' + JSON.stringify(d3ck_status.events) + '...')
-        // status_or_die()
 
-        // if something is new, do something!
-        if (! _.isEqual(old_d3ck_status, d3ck_status)) {
-            console.log('something new in the state of denmark!')
-            old_d3ck_status = JSON.parse(JSON.stringify(d3ck_status))
-            status_or_die()
+        var lenq = _.keys(queue).length
+
+        console.log('status wootz: ' + lenq)
+
+        if (lenq <= 0) {
+            console.log('null queue, bummer')
         }
         else {
-            // console.log('same ol, same ol')
+
+            for (var i=0; i < lenq; i++) {
+
+                d3ck_status = queue[i]
+                console.log('got status? ...' + JSON.stringify(d3ck_status.events) + '...')
+                status_or_die()
+
+                // if something is new, do something!
+                //if (! _.isEqual(old_d3ck_status, d3ck_status)) {
+                //    console.log('something new in the state of denmark!')
+                //    old_d3ck_status = JSON.parse(JSON.stringify(d3ck_status))
+                //}
+            }
         }
 
     }).fail(ajaxError);
@@ -795,14 +805,7 @@ function status_or_die() {
         // a bit down from the top, and stay until wiped away or refreshed
 
         if (typeof remote_name == "undefined" || remote_name != "")
-            // do not repeat file upload or adding friend news
-            if (first_news) {
-                console.log('...first time, tho....')
-                first_news = false
-            }
-            else {
-                $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
-            }
+            $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
 
         d3ck_status.browser_events[browser_ip].notify_add = true
     }
@@ -814,33 +817,31 @@ function status_or_die() {
 
         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
 
-        // do not repeat file upload or adding friend news
-        if (first_news) {
-            console.log('...first time, tho....')
-            first_news = false
-        }
-        else {
-            // if we're connected, the file is being shipped to the other machine, not local
-            // show inbound note if you sent file, else say when it succeeds
-            if (d3ck_status.file_events.file_from != browser_ip) {
-                console.log('new local file(z)!')
+        // if we're connected, the file is being shipped to the other machine, not local
+        // show inbound note if you sent file, else say when it succeeds
+        if (d3ck_status.file_events.file_from != browser_ip) {
+            console.log('new local file(z)!')
 
-                // var direction = "?"
-                // if      (d3ck_status.file_events.direction == "send")    direction = "sent to "
-                // else if (d3ck_status.file_events.direction == "receive") direction = "from "
+            // var direction = "?"
+            // if      (d3ck_status.file_events.direction == "send")    direction = "sent to "
+            // else if (d3ck_status.file_events.direction == "receive") direction = "from "
 
-                // put in or lookup PiD, then owner/d3ck's name!
-                $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); from " + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+            var friend = all_d3ck_ids[d3ck_status.file_events.did].owner.name
 
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-                // d3ck_status.browser_events[browser_ip].notify_file = true
-                }
-            else {
-                console.log('file(z) from remote')
-                $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) sent to " + d3ck_status.file_events.direction, {offset: {from: 'top', amount: 70}, delay: -1})
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+            // put in or lookup PiD, then owner/d3ck's name!
+            $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); from " + friend + "/" + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
 
+            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+            // d3ck_status.browser_events[browser_ip].notify_file = true
             }
+        else {
+            console.log('file(z) from remote')
+
+            var friend = all_d3ck_ids[d3ck_status.file_events.did].owner.name
+
+            $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) sent to " + friend + '/' + d3ck_status.file_events.direction, {offset: {from: 'top', amount: 70}, delay: -1})
+            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+
         }
     }
     // server... incoming ring
