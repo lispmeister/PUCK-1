@@ -2145,27 +2145,26 @@ function uploadSchtuff(req, res, next) {
 
             var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
 
+            console.log(url)
+
             var options = {
-                //method  : 'POST',
-                //host    : upload_target,
-                //port    : d3ck_port_ext,
-                //path    : '/up/local',
                 ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
                 key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                 cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
                 //strictSSL : true
-                //headers : headers
             };
 
-            var arrr = request.post(url, options, function optionalCallback (err, httpResponse, body) {
+            var file = fs.readFileSync(tmpfile) 
+
+            request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
                     console.error('upload failed:', err);
                     }
                 else {
-                    console.log('Upload successful!  Server responded with:', httpResponse);
+                    console.log('Upload successful!  Server responded with:', resp);
                     // done_posting()
                 }
-            }).form({target_file: fs.readFileSync(tmpfile) })
+            }).form({ target_file: file })
 
         }
 
