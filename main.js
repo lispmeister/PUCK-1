@@ -443,6 +443,11 @@ function auth(req, res, next) {
         }
     }
 
+    if (__.contains(['up'], url_bits[1])) {
+            console.log('upload homie!')
+            return next();
+        }
+
     // console.log('qs...')
     // I don't care if you are auth'd or not, you don't get much but quickstart until
     // you've set up your d3ck....
@@ -2042,12 +2047,12 @@ function uploadSchtuff(req, res, next) {
 
     // console.log(req)
 
-    // console.log(req.files)
-
     client_ip = get_client_ip(req)
 
     console.log('from : ' + client_ip)
 
+
+    console.log(req.files)
 
 
     //
