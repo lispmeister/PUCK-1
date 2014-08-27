@@ -2051,13 +2051,14 @@ function uploadSchtuff(req, res, next) {
     // if I can figure this out; this is only d3ck-2-d3ck
     // 
     if (typeof req.files.uppity == 'undefined') {
+
         console.log('another d3ck sending something...?  ' + req.body.filename)
 
         // req.setBodyEncoding("binary");
 
         var file_data = ""
 
-        req.body.data.on('data', function(chunk) {
+        req.on('data', function(chunk) {
             fileg_data += chunk
         })
         req.on('end', function() {
