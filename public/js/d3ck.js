@@ -820,9 +820,10 @@ function status_or_die() {
 
         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
 
-        // if we're connected, the file is being shipped to the other machine, not local
-        // show inbound note if you sent file, else say when it succeeds
-        if (d3ck_status.file_events.file_from != browser_ip) {
+        // try to figure out if we sent it or the remote did
+
+        // if (d3ck_status.file_events.file_from != browser_ip) {
+        if (d3ck_status.file_events.did == my_d3ck.D3CK_ID) {
             console.log('new local file(z)!')
 
             // var direction = "?"
