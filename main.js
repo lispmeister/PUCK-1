@@ -2050,9 +2050,9 @@ function uploadSchtuff(req, res, next) {
     // this time, multipart forms... let's just try to see
     // if I can figure this out; this is only d3ck-2-d3ck
     // 
-    if (typeof req.body.data != 'undefined') {
+    if (typeof req.body.filename != 'undefined') {
         console.log('another d3ck sending something...?  ' + req.body.filename)
-        write_2_file(d3ck_public + "/uploads/" + req.body.filename, req.body.data)
+        write_O2_file(d3ck_public + "/uploads/" + req.body.filename, req.body.data)
 
         console.log('done...?')
 
@@ -2166,7 +2166,6 @@ function uploadSchtuff(req, res, next) {
             var file_data = fs.readFileSync(tmpfile) 
 
             console.log('FN: ' + target_file)
-            console.log(file_data.substr(0,10))
 
             var postit = request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
