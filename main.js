@@ -2055,6 +2055,11 @@ function uploadSchtuff(req, res, next) {
             var FormData = require('form-data');
             var form     = new FormData();
 
+            //
+            console.log('addding... ' + tmpfile, target_file)
+            form.append(target_file, fs.createReadStream(tmpfile))
+
+            // ask nicely
             form.pipe(request)
 
             request.on('response', function (res) {
