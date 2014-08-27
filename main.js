@@ -1936,7 +1936,9 @@ function uploadSchtuff(req, res, next) {
 
     console.log('striving to upload....' + upload_target)
 
-    console.log(req.files)
+    console.log(req)
+
+    // console.log(req.files)
 
     client_ip = get_client_ip(req)
 
@@ -1948,7 +1950,7 @@ function uploadSchtuff(req, res, next) {
         var target_file = req.files.uppity[i].name
         var target_path = d3ck_public + "/uploads/" + target_file
         var tmpfile     = req.files.uppity[i].path
-        var file_type   = req.files.uppity[i].type
+        var headers     = req.files.uppity[i].headers
 
         // skip if too big
         if (target_size > MAX_UPLOAD_SIZE) {
@@ -2006,8 +2008,6 @@ function uploadSchtuff(req, res, next) {
 
             res.send(204, {"status" : target_file})
 
-
-
         }
 
         //
@@ -2017,8 +2017,6 @@ function uploadSchtuff(req, res, next) {
         else {
             console.log("going to push it to the next in line: " + upload_target)
             
-            console.log(req.files.uppity[i-1])
-
             var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
 
             var options = {
@@ -2026,49 +2024,37 @@ function uploadSchtuff(req, res, next) {
                 host    : upload_target,
                 port    : d3ck_port_ext,
                 path    : '/up/local',
-                multipart: true,
                 key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString()
-                // headers : req.files.uppity[i-1].headers
+                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                headers : headers
             };
+
+            var request = https.request(options)
+
 
             console.log('opts: ' +  ip2d3ck[upload_target])
             console.log(JSON.stringify(options))
 
-            var needle = require('needle');
+            var FormData = require('form-data');
+            var form     = new FormData();
 
-            // var target_size = req.files.uppity[i].size
-            // var target_file = req.files.uppity[i].name
-            // var target_path = d3ck_public + "/uploads/" + target_file
-            // var tmpfile     = req.files.uppity[i].path
+            form.pipe(request)
 
-            var data = { image: { file: tmpfile, content_type: file_type } }
+            request.on('response', function (res) {
+                // if (err) {
+                //     console.log('upload erz: ' + JSON.stringify(err))
+                // }
+                // else {
 
-            needle.post('http://my.other.app.com', data, options, function(err, resp, body) {
-                if (err) {
-                    console.log('I blew it, sammy, try again?  ' + JSON.stringify(err))
-                    res.send(200, {"error" : err.message})
-                }
-                else {
-                    console.log('could it... should it... would it... woo?')
-                    console.log(resp)
-                    done_posting()
-                }
-            });
+                    console.log('upload... well... ' + res.statusCode);
 
-//                      ('fieldName', 'uppity[]'),
-//                      ('originalFilename', req.files.uppity[i-1].originalFilename),
-//                      ('path', target_file),
-//                      ('size', req.files.uppity[i-1].size),
-//                      ('name', req.files.uppity[i-1].name),
-//                      ('type', req.files.uppity[i-1].type)
-//                  restler.post('https://' + upload_target + ':' + d3ck_port_ext + '/up/local',
-//                      multipart: true,
-//                      data: "uppity[]": restler.file(target_path, null, target_size, null, "image/jpg")
-//                  .on("complete", function(data)
-//                  .on("complete", function(data)
+                    // done_posting()
+                // }
+            })
 
-                    function done_posting() {
+        }
+
+        function done_posting() {
 
                         console.log('done...?')
 
@@ -2088,10 +2074,7 @@ function uploadSchtuff(req, res, next) {
 
 
                         res.send(204, {"status" : target_file})
-                    }
-                }
-
-
+        }
     }
 
 }
