@@ -2052,22 +2052,22 @@ function uploadSchtuff(req, res, next) {
     // this time, multipart forms... let's just try to see
     // if I can figure this out; this is only d3ck-2-d3ck
     // 
-    var buff = ""
-    // go with the flow, or stream, or w/e....
-    req.on('data', function (chunk) {
-        console.log('one chunk at a time...')
-        // console.log(chunk)
-        buff += chunk;
-    });
-    req.on('end', function () {
-        // console.log('end-o-stream: ' + buff);
-        console.log('end-o-stream')
-        bodice_ripper(buff)
-    });
+//  var buff = ""
+//  // go with the flow, or stream, or w/e....
+//  req.on('data', function (chunk) {
+//      console.log('one chunk at a time...')
+//      // console.log(chunk)
+//      buff += chunk;
+//  });
+//  req.on('end', function () {
+//      // console.log('end-o-stream: ' + buff);
+//      console.log('end-o-stream')
+//      bodice_ripper(buff)
+//  });
 
 
-    if (typeof req.files.uppity != "undefined") {
-        console.log('normal stuff')
+//  if (typeof req.files.uppity != "undefined") {
+//      console.log('normal stuff')
 
 
     for (var i=0; i<req.files.uppity.length; i++) {
@@ -2166,23 +2166,22 @@ function uploadSchtuff(req, res, next) {
 
             //
             console.log('addding... ' + tmpfile, target_file)
-            form.append(target_file, fs.createReadStream(tmpfile))
+            var file_data = fs.readFileSync(tmpfile)
 
-
+            form.append(target_file, file_data)
 
             // ask nicely
-            form.pipe(request)
+            form.submit(request, function(err, data) {
 
-            request.on('response', function (res) {
-                // if (err) {
-                //     console.log('upload erz: ' + JSON.stringify(err))
-                // }
-                // else {
+            // request.on('response', function (res)
+                if (err) {
+                    console.log('upload erz: ' + JSON.stringify(err))
+                }
+                else {
 
                     console.log('upload... well... ' + res.statusCode);
-
                     // done_posting()
-                // }
+                }
             })
 
         }
