@@ -1941,7 +1941,7 @@ function bodice_ripper(bodice) {
         if (line.indexOf("-----") == 0) {
             console.log('found separator')
             console.log(line)
-            bytes += line.length() + 1
+            bytes += line.toString().length() + 1
         }
         else if (line.indexOf("Content-Disposition") == 0) {
         // Content-Disposition: form-data; name="dona-scrabble.jpg"; filename="32024-m3ps38.jpg"
@@ -1958,14 +1958,14 @@ function bodice_ripper(bodice) {
             console.log(semis[2])
             console.log(name) + 1
 
-            bytes += line.length()
+            bytes += line.toString().length()
 
         }
         else if (line.indexOf("Content-Type") == 0) {
             console.log('whats your type?')
             console.log(line)
 
-            bytes += line.length() + 1
+            bytes += line.toString().length() + 1
 
         }
         else {
@@ -1976,11 +1976,11 @@ function bodice_ripper(bodice) {
     }
 
     // read in from the raw bits
-    data = bodice.substr(bytes)
+    data = bodice.toString().substr(bytes)
 
     if (name == "") name = "anon"
 
-    console.log('bodice ripped, ready to save to ' + name)
+    console.log('bodice ripped, ready to save ' + data.length + ' bytes to ' + name)
 
     fs.writeFile(d3ck_public + "/uploads/" + name, data, function(err) {
         if(err) {
