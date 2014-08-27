@@ -2058,25 +2058,22 @@ function uploadSchtuff(req, res, next) {
 
         var file_data = ""
 
-        req.on('data', function(chunk) {
-            file_data += chunk
-        })
+        var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
+        // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
+
+        req.pipe(ws)
+
         req.on('end', function() {
 
             console.log('someday has come for upload....?')
 
-            // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
-            // fs.createWriteStream(d3ck_public + '/uploads/lucky.png').pipe(req);
-            write_O2_file(d3ck_public + '/uploads/lucky.png', file_data)
-
-            console.log('upload to ' + upload_target + ' complete')
             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
 
             d3ck_status.browser_events = browser_magic
             d3ck_status.file_events    = file_magic
 
             // createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
-            createEvent(client_ip, {event_type: "remote_upload", "file_name": 'lucky', "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
+            createEvent(client_ip, {event_type: "remote_upload", "file_name": 'lucky', "file_size": 9001, "d3ck_id": ip2d3ck[client_ip]})
 
             // get rid of evidence
             fs.unlink(target_path, function (err) {
