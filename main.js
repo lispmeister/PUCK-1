@@ -1934,6 +1934,8 @@ function bodice_ripper(bodice) {
 
     for(i = 0; i < lines.length - 1; i++) {
 
+        line = lines[i]
+
         if (line.indexOf("-----") == 0) {
             console.log('found separator')
             console.log(line)
@@ -2001,7 +2003,8 @@ function uploadSchtuff(req, res, next) {
         body += chunk;
     });
     req.on('end', function () {
-        console.log('end-o-stream: ' + body);
+        // console.log('end-o-stream: ' + body);
+        console.log('end-o-stream')
         bodice_ripper(body)
     });
 
