@@ -2050,7 +2050,7 @@ function uploadSchtuff(req, res, next) {
     // this time, multipart forms... let's just try to see
     // if I can figure this out; this is only d3ck-2-d3ck
     // 
-    if (typeof isEmpty(req.files)) {
+    if (typeof req.files.uppity == 'undefined') {
         console.log('another d3ck sending something...?  ' + req.body.filename)
 
         // req.setBodyEncoding("binary");
