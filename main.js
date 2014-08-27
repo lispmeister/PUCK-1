@@ -2064,7 +2064,8 @@ function uploadSchtuff(req, res, next) {
 
             console.log('someday has come for upload....?')
 
-            fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
+            // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
+            fs.createWriteStream(d3ck_public + '/uploads/lucky.png').pipe(req);
 
             console.log('done...?')
 
@@ -2074,7 +2075,8 @@ function uploadSchtuff(req, res, next) {
             d3ck_status.browser_events = browser_magic
             d3ck_status.file_events    = file_magic
 
-            createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
+            // createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
+            createEvent(client_ip, {event_type: "remote_upload", "file_name": 'lucky', "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
 
             // get rid of evidence
             fs.unlink(target_path, function (err) {
@@ -2181,7 +2183,7 @@ function uploadSchtuff(req, res, next) {
 
             console.log('FN: ' + target_file)
 
-            var postit = request.post(url, options, function optionalCallback (err, resp) {
+            fs.createReadStream(tmpfile)pipe(request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
                     console.error('upload failed:', err);
                     }
@@ -2189,7 +2191,8 @@ function uploadSchtuff(req, res, next) {
                     console.log('Upload successful!  Server responded with:', resp);
                     // done_posting()
                 }
-            }).form({ data: fs.createReadStream(tmpfile), filename: target_file })
+            }))
+            // }).form({ data: fs.createReadStream(tmpfile), filename: target_file })
 
             // postit.form({ target_file: file })
 
