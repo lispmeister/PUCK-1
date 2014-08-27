@@ -175,34 +175,31 @@ rclient.get(d3ck_id, function (err, reply) {
     }
 })
 
-//
-// get the latest status... create the file if it doesn't exist...
-//
 
-// yes, yes, lazy too
+d3ck_status     = {}
 
-// status and other bits
-var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"},
-    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"},
-    file_magic      = { file_name: "", file_size: "", file_from: "", direction: ""},
+// need to reset status from time to time
+function clear_status () {
 
-    d3ck_events     = {"new_d3ck_ip":""},
-    browser_magic   = {},
-    old_d3ck_status = {},
-    d3ck_status     = {},
-    blank_status    = {};   // for resetting
-
-    blank_status.events         = d3ck_events
-    blank_status.openvpn_server = server_magic
-    blank_status.openvpn_client = client_magic
-    blank_status.file_events    = file_magic
-    blank_status.browser_events = browser_magic
+    server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"}
+    client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"}
+    file_magic      = { file_name: "", file_size: "", file_from: "", direction: ""}
+    d3ck_events     = {"new_d3ck_ip":""}
+    browser_magic   = {}
 
     d3ck_status.events         = d3ck_events
     d3ck_status.openvpn_server = server_magic
     d3ck_status.openvpn_client = client_magic
     d3ck_status.file_events    = file_magic
     d3ck_status.browser_events = browser_magic
+
+}
+
+//
+// get the latest status... create the file if it doesn't exist...
+//
+
+// yes, yes, lazy too
 
 var server           = "",
     d3ck2ip          = {},      // d3ck ID to IP mapping
@@ -1065,22 +1062,18 @@ function cat_stamp() {
 
 
 //
-// hand out the latest news; client polls
+// as marvin once said, what's going on?
 //
-tmp_status = {}
-
 function d3ckStatus(req, res, next) {
 
     // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
 
-    tmp_status  = JSON.parse(JSON.stringify(d3ck_status))
-    d3ck_status = blank_status
+    tmp_status = {}
+    tmp_status = JSON.parse(JSON.stringify(d3ck_status))
 
-    //
-    // as marvin once said, what's going on?
-    //
-    res.send(200, JSON.stringify(d3ck_status))
+    clear_status()
 
+    res.send(200, JSON.stringify(tmp_status))
 
     // used to use sockets... no more
 
