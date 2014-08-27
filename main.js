@@ -2055,25 +2055,35 @@ function uploadSchtuff(req, res, next) {
 
         // req.setBodyEncoding("binary");
 
-        write_O2_file(d3ck_public + "/uploads/" + req.body.filename, req.body.data)
+        var file_data = ""
 
-        console.log('done...?')
+        req.body.data.on('data', function(chunk) {
+            fileg_data += chunk
+        })
+        req.body.data.on('end', function() {
+            console.log('someday has come for upload....')
 
-        console.log('upload to ' + upload_target + ' complete')
-        browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
+            write_O2_file(d3ck_public + "/uploads/" + req.body.filename, file_data)
 
-        d3ck_status.browser_events = browser_magic
-        d3ck_status.file_events    = file_magic
+            console.log('done...?')
 
-        createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
+            console.log('upload to ' + upload_target + ' complete')
+            browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
 
-        // get rid of evidence
-        fs.unlink(target_path, function (err) {
-            if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
-            console.log('successfully deleted ' + target_path)
-        });
+            d3ck_status.browser_events = browser_magic
+            d3ck_status.file_events    = file_magic
 
-        res.send(204, {"status" : target_file})
+            createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
+
+            // get rid of evidence
+            fs.unlink(target_path, function (err) {
+                if (err) console.log("couldn't delete uploaded file? " + target_path + " ... " + JSON.stringify(err))
+                console.log('successfully deleted ' + target_path)
+            });
+
+            res.send(204, {"status" : target_file})
+        })
+
     }
 
     else {
