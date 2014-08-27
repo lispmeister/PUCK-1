@@ -2042,7 +2042,6 @@ function uploadSchtuff(req, res, next) {
 
     console.log('from : ' + client_ip)
 
-
     console.log(req)
 
 
@@ -2165,6 +2164,9 @@ function uploadSchtuff(req, res, next) {
             };
 
             var file_data = fs.readFileSync(tmpfile) 
+
+            console.log('FN: ' + target_file)
+            console.log(file_data.substr(0,10))
 
             var postit = request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
