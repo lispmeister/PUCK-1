@@ -2185,7 +2185,7 @@ function uploadSchtuff(req, res, next) {
                         }
                     else {
                         console.log('Upload successful...!')
-                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": file_name, "file_size": file_size, "d3ck_id": ip2d3ck[upload_target], "ip": upload_target })
+                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "ip": upload_target })
                         res.send(204, {"status" : file_name})
                     }
                 }))
