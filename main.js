@@ -652,6 +652,9 @@ function change_status() {
 
     //  "browser":{"xxx-ip-xxx": { "notify-ring":false, "notify-file":false}
 
+    if (typeof d3ck_status.d3ck_id == 'undefined')
+        d3ck_status.d3ck_id =  bwana_d3ck.D3CK_ID
+
     console.log("status: " + JSON.stringify(d3ck_status))
 
     var msg = {type: "status", status: d3ck_status}
