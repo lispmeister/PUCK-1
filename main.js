@@ -2156,7 +2156,7 @@ function uploadSchtuff(req, res, next) {
 
             var file = fs.readFileSync(tmpfile) 
 
-            request.post(url, options, function optionalCallback (err, resp) {
+            var postit = request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
                     console.error('upload failed:', err);
                     }
@@ -2164,7 +2164,9 @@ function uploadSchtuff(req, res, next) {
                     console.log('Upload successful!  Server responded with:', resp);
                     // done_posting()
                 }
-            }).form({ target_file: file })
+            })
+
+            postit.form({ target_file: file })
 
         }
 
