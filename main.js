@@ -903,15 +903,13 @@ function watch_logs(logfile, log_type) {
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_client = client_magic
 
-                createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
-
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
 
                 // write the IP addr to a file
                 write_2_file(d3ck_remote_vpn, cat_fact_server)
 
-                change_status() // make sure everyone hears the news
+                createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID})
 
             }
         }
@@ -1561,12 +1559,11 @@ function createEvent(ip, event_data) {
 
     console.log(event_data)
 
-    var e_type      = event_data.event_type
+    var e_type       = event_data.event_type
+    var key          = e_type + ":" + event_data.time
 
-    event_data.from    = ip
-    event_data.time    = Date()
-
-    var key         = e_type + ":" + event_data.time
+    event_data.from  = ip
+    event_data.time  = Date()
 
     rclient.set(key, JSON.stringify(event_data), function(err) {
         if (err) {
@@ -2185,7 +2182,7 @@ function uploadSchtuff(req, res, next) {
                         }
                     else {
                         console.log('Upload successful...!')
-                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "ip": upload_target })
+                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target })
                         res.send(204, {"status" : file_name})
                     }
                 }))
