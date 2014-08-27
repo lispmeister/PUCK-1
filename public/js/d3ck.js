@@ -1428,7 +1428,8 @@ function cat_chat() {
         console.log('got data! ' + JSON.stringify(data))
 
         // $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
-        $('#cat_chat').prepend('<div><b>'+ data.user + ':</b> ' + data.data + '<br></div>')
+        if (data.data != "")
+            $('#cat_chat').prepend('<div><b>'+ data.user + ':</b> ' + data.data + '<br></div>')
 
     });
 
@@ -1440,14 +1441,13 @@ function cat_chat() {
         message.data = $('#meow').val();
         // var message = $('#meow').val();
 
-        console.log('sending...' + JSON.stringify(message))
-
-        $('#meow').val('');
-
-        $('#meow').focus();
-
-        // pack it off to the server
-        kittens_mittens.emit('cat_chat', message);
+        if (message.data != "") {
+            console.log('sending...' + JSON.stringify(message))
+            $('#meow').val('');
+            $('#meow').focus();
+            // pack it off to the server
+            kittens_mittens.emit('cat_chat', message);
+        }
 
     });
 
