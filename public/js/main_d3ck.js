@@ -36,6 +36,10 @@ var all_d3ck_ids = {}
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
 ring = new Audio("media/ringring.mp3") // load it up
 
+// exist function from http://stackoverflow.com/questions/31044/is-there-an-exists-function-for-jquery
+jQuery.fn.exists = function(){return this.length>0;}
+
+
 $(document).ready(function () {
 
     // video funkytown

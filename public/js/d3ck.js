@@ -7,6 +7,8 @@
 // track all d3ck IDs...
 all_d3ck_ids   = []
 
+all_pings = []
+
 // overall connection state
 var d3ck_current            = {}
     d3ck_current.incoming   = false,
@@ -610,6 +612,9 @@ function d3ck_ping(all_ips, d3ckid, url) {
         cache: false
     })
 
+    // if (typeof all_pings[ping_url] == "undefined") {
+    all_pings[ping_url] = false
+    // }
 
     //
     // XXX -
@@ -622,9 +627,13 @@ function d3ck_ping(all_ips, d3ckid, url) {
         console.log("pingzor " + JSON.stringify(data))
 
         var safe_id = 'uppity_' + data.ip.replace(/\./g, '_')
+        var safe_ip = data.ip.replace(/\./g, '_')
 
         // make the button clickable and green
         if (data.status == "OK") {
+
+            all_pings[ping_url] = true
+
             console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
 
@@ -639,24 +648,23 @@ function d3ck_ping(all_ips, d3ckid, url) {
             //
             // haven't seen this before... potential problems with ips in the future... sigh
             // 
-            // don't change it more than once per hour...?
-            //
-            if (typeof draggers[data.ip] == "undefined" || (current_time_in_seconds - draggers[data.ip]) > ONE_HOUR ) {
+            // if (typeof draggers[data.ip] == "undefined") {
                 // make it actionable
                 // remove old, add new form
-                $('#' + safe_id).remove()
-                console.log('drag -n- drop away!')
-                draggers[data.ip] = current_time_in_seconds
-                drag_and_d3ck(safe_id, d3ckid, data.ip)
-            }
-            else {
-                console.log('not your time yet, young jedi')
-            }
+                if (! $('#dragDropBox_' + safe_ip).exists()) {
+                    console.log('drag -n- drop away!')
+                    drag_and_d3ck(safe_id, d3ckid, data.ip)
+                }
+
+            // }
+            // else {
+            //     console.log('not your time yet, young jedi')
+            // }
 
         }
         else {
-            $('#' + safe_id).remove() // remove old, add new form
             console.log('not ok...')
+            $('#' + safe_id).remove() // remove old, add new form
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
         }
     }).fail(function(err) {
@@ -717,26 +725,21 @@ function get_status() {
 
         var lenq = _.keys(queue).length
 
-        console.log('status wootz: ' + lenq)
+        // console.log('status wootz: ' + lenq)
 
-        if (lenq <= 0) {
-            console.log('null queue, bummer')
+        // if (lenq <= 0) { console.log('null queue, bummer') }
+        for (var i=0; i < lenq; i++) {
+
+            d3ck_status = queue[i]
+            console.log('got status? ...' + JSON.stringify(d3ck_status.events) + '...')
+            status_or_die()
+
         }
-        else {
-
-            for (var i=0; i < lenq; i++) {
-
-                d3ck_status = queue[i]
-                console.log('got status? ...' + JSON.stringify(d3ck_status.events) + '...')
-                status_or_die()
-
                 // if something is new, do something!
                 //if (! _.isEqual(old_d3ck_status, d3ck_status)) {
                 //    console.log('something new in the state of denmark!')
                 //    old_d3ck_status = JSON.parse(JSON.stringify(d3ck_status))
                 //}
-            }
-        }
 
     }).fail(ajaxError);
 
@@ -1048,8 +1051,9 @@ function fire_d3ck_status(jstatus) {
 }
 
 
-// draws the drag-n-drop box... need to call it anytime
-// vpn state changes
+//
+// draws the drag-n-drop box...
+//
 function drag_and_d3ck(safe_id, d3ckid, ip) { 
 
     if (safe_id != "local") {
@@ -1057,12 +1061,8 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
         console.log('draggin n d3ckin... to....', safe_id, d3ckid, ip)
 
         // out with the old, in with the new
-        // $('.dragDropBox').remove()           XXXX?
-        // $('#uppity').filer({
-
         var safe_ip = ip.replace(/\./g, '_')
 
-        // $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
         $('#vpn_form_' + d3ckid).prepend('\n<div id="div_' + safe_id + '>uploadz...<form action="/up" method="post" enctype="multipart/form-data"><input class="uppity" id="' + safe_id + '" type="file" name="uppity" multiple="multiple" /></form></div>')
     }
     else {
