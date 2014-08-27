@@ -2009,7 +2009,7 @@ function uploadSchtuff(req, res, next) {
             var file_magic = {
                 file_name : file_name,
                 file_size : file_size,
-                file_from : client_ip
+                file_from : client_ip,
                 direction : "local"
             }
 
