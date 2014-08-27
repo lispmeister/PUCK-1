@@ -2059,7 +2059,7 @@ function uploadSchtuff(req, res, next) {
         var file_name = req.headers['x-filename']
 
         // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
-        var ws = fs.createWriteStream(d3ck_public + file_name)
+        var ws = fs.createWriteStream(d3ck_public + '/uploads/' + file_name)
         // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
 
         req.pipe(ws)
