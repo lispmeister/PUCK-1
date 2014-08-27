@@ -2074,14 +2074,13 @@ function uploadSchtuff(req, res, next) {
             console.log('someday has come for upload....?')
 
             browser_magic = { "notify_add":true, "notify_ring":false, "notify_file":true}
-
             d3ck_status.browser_events = browser_magic
             d3ck_status.file_events    = file_magic
 
-            // createEvent(client_ip, {event_type: "remote_upload", "file_name": req.body.filename, "file_size": req.body.data.length, "d3ck_id": ip2d3ck[client_ip]})
             createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckID})
 
-            res.send(204, {"status" : target_file})
+            res.send(204, {"status" : file_name})
+
         })
 
     }
@@ -2090,113 +2089,108 @@ function uploadSchtuff(req, res, next) {
 
         console.log('normal stuff')
 
+        for (var i=0; i<req.files.uppity.length; i++) {
 
-    for (var i=0; i<req.files.uppity.length; i++) {
+            var target_size = req.files.uppity[i].size
+            var target_file = req.files.uppity[i].name
+            var target_path = d3ck_public + "/uploads/" + target_file
+            var tmpfile     = req.files.uppity[i].path
+            var headers     = req.files.uppity[i].headers
 
-        var target_size = req.files.uppity[i].size
-        var target_file = req.files.uppity[i].name
-        var target_path = d3ck_public + "/uploads/" + target_file
-        var tmpfile     = req.files.uppity[i].path
-        var headers     = req.files.uppity[i].headers
-
-        // skip if too big
-        if (target_size > MAX_UPLOAD_SIZE) {
-            // XXX-errz to user
-            console.log('upload size (' + target_size + ') exceeds limit: ' + target_size)
-            continue
-        }
+            // skip if too big
+            if (target_size > MAX_UPLOAD_SIZE) {
+                // XXX-errz to user
+                console.log('upload size (' + target_size + ') exceeds limit: ' + target_size)
+                continue
+            }
 
 
-        console.log('trying ' + tmpfile + ' -> ' + target_path)
+            console.log('trying ' + tmpfile + ' -> ' + target_path)
 
-        file_magic = {
-            file_name : target_file,
-            file_size : target_size,
-            file_from : client_ip
-        }
-
-        //
-        // LOCAL or remote?
-        //
-        console.log('moment of truth.. local or no?  => ' + upload_target)
-
-        //
-        // LOCAL - file still stashed here for now
-        //
-        if (upload_target == "local") {
-            console.log('local...')
+            file_magic = {
+                file_name : target_file,
+                file_size : target_size,
+                file_from : client_ip
+            }
 
             //
-            // NOTE - target & orig file MUST be in same file system
+            // LOCAL or remote?
             //
-            // also... slight race condition.  Life goes on.
+            console.log('moment of truth.. local or no?  => ' + upload_target)
 
-            console.log('trying to rename....')
+            //
+            // LOCAL - file still stashed here for now
+            //
+            if (upload_target == "local") {
+                console.log('local...')
 
-            // XXX if on different FS, have to copy
-            // also check to see if exists!
-            fs.rename(tmpfile, target_path, function (err) {
-                if (err)  {
-                    console.log('errz - ')
-                    console.log(err)
-                }
-                else {
-                    console.log('rename complete');
-                    console.log('woohoo')
-                }
-            })
+                //
+                // NOTE - target & orig file MUST be in same file system
+                //
+                // also... slight race condition.  Life goes on.
 
-            browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                console.log('trying to rename....')
 
-            d3ck_status.browser_events = browser_magic
-            d3ck_status.file_events    = file_magic
-
-            createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
-
-            res.send(204, {"status" : target_file})
-
-        }
-
-        //
-        // REMOTE
-        //
-        // post to a remote D3CK... first look up IP based on PID, then post to it using
-        // client-side certs for auth
-        else {
-            console.log("going to push it to the next in line: " + upload_target)
-
-            var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
-
-            console.log(url)
-
-            var options = {
-                ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
-                key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                headers : { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
-                //strictSSL : true
-            };
-
-            // var file_data = fs.readFileSync(tmpfile) 
-
-            console.log('FN: ' + target_file)
-
-            fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
-                if (err) {
-                    console.error('upload failed:', err);
+                // XXX if on different FS, have to copy
+                // also check to see if exists!
+                fs.rename(tmpfile, target_path, function (err) {
+                    if (err)  {
+                        console.log('errz - ')
+                        console.log(err)
                     }
-                else {
-                    console.log('Upload successful...!')
-                    // done_posting()
-                }
-            }))
-            // }).form({ data: fs.createReadStream(tmpfile), filename: target_file })
+                    else {
+                        console.log('rename complete');
+                        console.log('woohoo')
+                    }
+                })
 
-            // postit.form({ target_file: file })
+                browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
 
+                d3ck_status.browser_events = browser_magic
+                d3ck_status.file_events    = file_magic
+
+                createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID})
+
+                res.send(204, {"status" : target_file})
+
+            }
+
+            //
+            // REMOTE
+            //
+            // post to a remote D3CK... first look up IP based on PID, then post to it using
+            // client-side certs for auth
+            else {
+                console.log("going to push it to the next in line: " + upload_target)
+
+                var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+
+                console.log(url)
+
+                var options = {
+                    ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
+                    key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                    cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                    headers : { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
+                    //strictSSL : true
+                };
+
+                // var file_data = fs.readFileSync(tmpfile) 
+
+                console.log('FN: ' + target_file)
+
+                fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                    if (err) {
+                        console.error('upload failed:', err);
+                        }
+                    else {
+                        console.log('Upload successful...!')
+                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": file_name, "file_size": file_size, "d3ck_id": ip2d3ck[upload_target], "ip": upload_target })
+                        res.send(204, {"status" : file_name})
+                    }
+                }))
+            }
         }
-
-    }
     }
 
 }
