@@ -2183,7 +2183,7 @@ function uploadSchtuff(req, res, next) {
 
             console.log('FN: ' + target_file)
 
-            fs.createReadStream(tmpfile)pipe(request.post(url, options, function optionalCallback (err, resp) {
+            fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
                 if (err) {
                     console.error('upload failed:', err);
                     }
