@@ -2142,8 +2142,27 @@ function uploadSchtuff(req, res, next) {
         // post to a remote D3CK... first look up IP based on PID, then post to it
         else {
             console.log("going to push it to the next in line: " + upload_target)
-            
+
             var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+
+
+            var request = require('request');
+
+            var r = request.post(url, function optionalCallback (err, httpResponse, body) {
+                if (err) {
+                    console.error('upload failed:', err);
+                    }
+                else {
+                    console.log('Upload successful!  Server responded with:', body);
+                }
+            })
+
+            var form = r.form()
+
+            form.append(target_file, tmpfile)
+
+            form.append('key',  fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString())
+            form.append('cert', fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString())
 
             var options = {
                 method  : 'POST',
@@ -2155,35 +2174,34 @@ function uploadSchtuff(req, res, next) {
                 headers : headers
             };
 
-            var request = https.request(options)
+            // var request = https.request(options)
 
+            // console.log('opts: ' +  ip2d3ck[upload_target])
+            // console.log(JSON.stringify(options))
 
-            console.log('opts: ' +  ip2d3ck[upload_target])
-            console.log(JSON.stringify(options))
-
-            var FormData = require('form-data');
-            var form     = new FormData();
+            // var FormData = require('form-data');
+            // var form     = new FormData();
 
             //
-            console.log('addding... ' + tmpfile, target_file)
-            var file_data = fs.readFileSync(tmpfile)
+            // console.log('addding... ' + tmpfile, target_file)
+            // var file_data = fs.readFileSync(tmpfile)
 
-            form.append(target_file, file_data)
+            // form.append(target_file, file_data)
 
             // ask nicely
-            url = 'https://' + upload_target + ':' + d3ck_port_ext
-            form.submit(url, request, function(err, data) {
+            // url = 'https://' + upload_target + ':' + d3ck_port_ext
+            // form.submit(url, request, function(err, data) {
 
             // request.on('response', function (res)
-                if (err) {
-                    console.log('upload erz: ' + JSON.stringify(err))
-                }
-                else {
+                // if (err) {
+                    // console.log('upload erz: ' + JSON.stringify(err))
+                // }
+                // else {
 
-                    console.log('upload... well... ' + res.statusCode);
+                    // console.log('upload... well... ' + res.statusCode);
                     // done_posting()
-                }
-            })
+                // }
+            // })
 
         }
 

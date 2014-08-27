@@ -1313,6 +1313,10 @@ function set_up_RTC(remote) {
 
 function rtc_haxx0r_trick() {
 
+    return
+
+
+
     console.log('trying to decide whether to pop up a window, rtc haxx0r style')
 
     var session_cookie = false
