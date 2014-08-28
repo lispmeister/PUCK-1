@@ -32,7 +32,7 @@
     },
     
     "crypto": {
-        "keysize"       : "2048",
+        "keysize"       : "1024",
         "life_d3ck"     : "365",
         "life_vpn"      : "30",
         "bcrypt_rounds" : "12"
