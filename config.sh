@@ -15,6 +15,7 @@ PATH=$PATH:/usr/local/bin:/usr/local/nodey/bin
 # crypto
 #
 export KEY_SIZE=1024
+export KEY_SIZE=2048
 export KEY_LIFE=365
 export CRL_LIFE=$KEY_LIFE
 

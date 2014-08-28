@@ -1461,3 +1461,51 @@ function cat_chat() {
     })
 }
 
+
+//
+// read in data about our certs
+//
+
+function crypto_411() {
+
+    var url = '/d3ck.crt.json'
+
+    var jqXHR_crypto = $.ajax({
+        url: url,
+        dataType: 'json'
+    })
+
+    jqXHR_crypto.done(function (data, textStatus, jqXHR) {
+        console.log('jxq crypto wootz')
+        console.log(data)
+
+        // something like.... 
+        //
+        //  {
+        //  "signature algorithm": "sha256WithRSAEncryption",
+        //  "issuer": " C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=be70d87d65f0cc5d2e6b458037eef436",
+        //  "invalid before": "Not Before: Aug 28 01:13:27 2014 GMT",
+        //  "invalid after": "Not After : Aug 28 01:13:27 2015 GMT",
+        //  "subject": "Subject: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=8205aa2b73ff95b4a5cb7bd70c1691c8",
+        //  "public key algorithm" : "Algorithm: rsaEncryption",
+        //  "key strength": "2048",
+        //  "certificate type": "SSL Server"
+        //  }
+
+        var len_cry = _.keys(data).length
+
+        for (var i = 0; i < len_cry; i++) {
+            var k = _.keys(data)[i]
+            var v = data[k]
+
+            console.log('k:v ', k, v)
+            $('#d3ck_crypto').append('<tr><td>' + k  + '</td><td>' + v  + '</td></tr>\n')
+
+        }
+
+    }).fail(function(err) {
+        console.log('errz on getting crypto stuff ' + JSON.stringify(err))
+    })
+
+}
+

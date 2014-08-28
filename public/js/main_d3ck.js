@@ -377,6 +377,9 @@ $(document).ready(function () {
 
     detect_webRTC('d3ck_rtc_health_check')
 
+    // paint in the data about our certs
+    crypto_411()
+
     //  timer circle
 //    $('#timer_countdown').TimeCircles({
 //        total_duration  : 30, 
