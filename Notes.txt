@@ -1,4 +1,13 @@
 
+ubuntu... make something in /etc/init.d runnable...
+
+    update-rc.d foo-filename defaults
+
+
+
+
+
+
 header
 
 ****    authorizationError: 'Hostname/IP doesn\'t match certificate\'s altnames' },
