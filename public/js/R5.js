@@ -264,13 +264,21 @@ function SimpleWebRTC(opts) {
     });
 
     this.webrtc.on('localScreen', function (stream) {
+
+        // zen - Sun Aug 31 14:46:17 PDT 2014
+        // kill the HTML for remote vids
+        $('#remoteVideos video').remove()
+        $('#video_effect_div').attr("class",'hidden')
+
         var item,
             el = document.createElement('video'),
             container = self.getRemoteVideoContainer();
 
         el.oncontextmenu = function () { return false; };
         el.id = 'localScreen';
+
         attachMediaStream(stream, el);
+
         if (container) {
             container.appendChild(el);
         }
@@ -343,7 +351,14 @@ SimpleWebRTC.prototype.disconnect = function () {
 
 SimpleWebRTC.prototype.handlePeerStreamAdded = function (peer) {
     var self = this;
+
+    // zen - Sun Aug 31 14:46:17 PDT 2014
+    // kill the HTML for remote & local vids
+    $('#remoteVideos video').remove()
+    $('#video_effect_div').attr("class",'hidden')
+
     var container = this.getRemoteVideoContainer();
+
     var video = attachMediaStream(peer.stream);
 
     // store video element as part of peer for easy removal
@@ -439,7 +454,14 @@ SimpleWebRTC.prototype.startLocalVideo = function () {
         if (err) {
             self.emit('localMediaError', err);
         } else {
+
+            // zen - Sun Aug 31 14:46:17 PDT 2014
+            // kill the HTML for local vids
+            //  $('#localVideo').remove()
+            //  $('#h4_local').append('\n<video id="localVideo"></video>\n')
+
             attachMediaStream(stream, self.getLocalVideoContainer(), self.config.localVideo);
+
         }
     });
 };

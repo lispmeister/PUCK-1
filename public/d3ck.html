@@ -124,11 +124,11 @@
 
                     <ul class="dropdown-menu" id="skull_menu">
                         
-                        <li style="width:100%"> <button id="logout"          style="width:125px; text-align:center;" type="button" class="btn btn-danger  btn-hover">Logout</button></a></li>
-                        <li style="width:100%"> <button id="stop_server"     style="width:125px; text-align:center;" type="button" class="btn btn-info    btn-hover">Stop Server</button></a></li>
-                        <li style="width:100%"> <button id="restart_server"  style="width:125px; text-align:center;" type="button" class="btn btn-warning btn-hover">Restart Server</button></a></li>
-                        <li style="width:100%"> <button id="halt_vpn_client" style="width:125px; text-align:center;" type="button" class="btn btn-primary btn-hover">Die VPN, Die!</button></a></li>
-                        <li style="width:100%"> <button id="d3ck_panic"      style="width:125px; text-align:center;" type="button" class="btn btn-danger  btn-hover">PANIC</button></a></li>
+                        <li style="width:100%"> <button id="logout"          style="width:125px; text-align:center;" type="button" class="btn btn-danger  btn-hover">Logout</button></li>
+                        <li style="width:100%"> <button id="stop_server"     style="width:125px; text-align:center;" type="button" class="btn btn-info    btn-hover">Stop Server</button></li>
+                        <li style="width:100%"> <button id="restart_server"  style="width:125px; text-align:center;" type="button" class="btn btn-warning btn-hover">Restart Server</button></li>
+                        <li style="width:100%"> <button id="halt_vpn_client" style="width:125px; text-align:center;" type="button" class="btn btn-primary btn-hover">Die VPN, Die!</button></li>
+                        <li style="width:100%"> <button id="d3ck_panic"      style="width:125px; text-align:center;" type="button" class="btn btn-danger  btn-hover">PANIC</button></li>
                         <li style="width:100%"> <a tabindex="-1" href="#skull" data-toggle="tab" style="width:125px; text-align:center;">Click2explain</a></li>
 
                     </ul>
@@ -151,7 +151,7 @@
             <a href="#" id="incoming" class="button left"></a>
             <a href="#" id="outgoing" class="button left"></a>
 
-            <form id="modalD3ck" class="modal fade form-horizontal" tabindex="-1" role="diaglog" aria-labelledby="modalD3ckLabel" aria-hidden="true" action='/form' method="POST">
+            <form id="modalD3ck" class="modal fade form-horizontal" tabindex="-1" role="dialog" aria-labelledby="modalD3ckLabel" aria-hidden="true" action='/form' method="POST">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -225,24 +225,24 @@
 
                     You just clicked....?
 
-                        <p> Pushing these buttons is not for the faint of heart.
+                        <p> Pushing these buttons is not for the faint of heart.</p>
                         <ul>
-                            <p> <li><strong>PANIC</strong> will crush your D3CK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.  Don't worry, it isn't implemented yet.</li>
-                            <p> <li><strong>Stop server</strong> stops the D3CK server dead.  UI will no longer work until restarted!</li>
-                            <p> <li><strong>Restart server</strong> does just that - the D3CK server restarts.  UI will no longer work until it finishes restarting.</li>
-                            <p> <li><strong>Stop VPN client</strong> kills any VPN clients
+                            <p> </p><li><strong>PANIC</strong> will crush your D3CK into uselessness.  Good if people are hammering at your door wanting its data or keys.  UI will no longer work.  Don't worry, it isn't implemented yet.</li>
+                            <p> </p><li><strong>Stop server</strong> stops the D3CK server dead.  UI will no longer work until restarted!</li>
+                            <p> </p><li><strong>Restart server</strong> does just that - the D3CK server restarts.  UI will no longer work until it finishes restarting.</li>
+                            <p> </p><li><strong>Stop VPN client</strong> kills any VPN clients
 
                         </ul>
                     </div>
 
-                    <p>
+                    <p></p>
 
                     <div>
-                        <button id="logout"          type="button" class="btn btn-danger">Logout</button>
-                        <button id="stop_server"     type="button" class="btn btn-info">Stop Server</button>
-                        <button id="restart_server"  type="button" class="btn btn-warning">Restart Server</button>
-                        <button id="halt_vpn_client" type="button" class="btn btn-primary">Die VPN, Die!</button>
-                        <button id="d3ck_panic"      type="button" class="btn btn-danger">PANIC</button>
+                        <button type="button" class="btn btn-danger">Logout</button>
+                        <button type="button" class="btn btn-info">Stop Server</button>
+                        <button type="button" class="btn btn-warning">Restart Server</button>
+                        <button type="button" class="btn btn-primary">Die VPN, Die!</button>
+                        <button type="button" class="btn btn-danger">PANIC</button>
                     </div>
                 </div>
             </div>
@@ -254,27 +254,43 @@
                     <h3 style="clear:both">profilasaurus</h3>
                     Enough about you, what about me?<p>
                     Details about your D3CK and possibly you, if you wish.<p>
-                    You'll be able to change your picture here, etc., etc.<p>
+                    Eventually you'll be able to edit your details; picture, name, etc., etc.<p>
                 </div>
 
-                <div class="container"> <div class="row">
-
-                    <div class="col-xs-6">
-                        <h3 style="clear:both">Cert Details</h3>
-                        <table id="d3ck_crypto" class="table table-condensed table-hover table-striped">
-                        <tr> <th> Aspect </th> <th> Information </th> </tr>
-                        </table>
-                    </div>
-
-                    <div class="col-xs-6">
-                        <h3>Browser WebRTC Health</h3>
-                        <table id="d3ck_rtc_health_check" class="table table-condensed table-hover table-striped">
-                        <tr> <th> Feature </th> <th> Support? </th> <th> Feature </th> <th> Support? </th> </tr>
-                        </table>
-                    </div>
-                </div> 
+                <div class="row">
 
                 <div class="panel-group" id="d3ck_accordion">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#d3ck_accordion" href="#d3ck_cert_details">Cert Details</a>
+                            </h4>
+                        </div>
+
+                        <div id="d3ck_cert_details" class="panel-collapse collapse in">
+                            <div class="panel-body"> </div>
+                                <table id="d3ck_crypto" class="table table-condensed table-hover table-striped">
+                                <tr> <th> Aspect </th> <th> Information </th> </tr>
+                                </table>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#d3ck_accordion" href="#div_rtc_health">Browser WebRTC Health</a>
+                            </h4>
+                        </div>
+
+                        <div id="div_rtc_health" class="panel-collapse collapse">
+                            <div class="panel-body">WebRTC is web technology used for video and audio when connected to another d3ck</div>
+                            <table id="d3ck_rtc_health_check" class="table table-condensed table-hover table-striped">
+                            <tr> <th> Feature </th> <th> Support? </th> <th> Feature </th> <th> Support? </th> </tr>
+                            </table>
+
+                        </div>
+                    </div>
 
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -282,7 +298,7 @@
                                 <a data-toggle="collapse" data-parent="#d3ck_accordion" href="#d3ck_base_details">D3CK details </a>
                             </h4>
                         </div>
-                        <div id="d3ck_base_details" class="panel-collapse collapse in">
+                        <div id="d3ck_base_details" class="panel-collapse collapse">
                             <div id="d3ck_basics" class="panel-body"> </div>
                         </div>
                     </div>
@@ -322,7 +338,7 @@
                         <h3 style="clear:both">Who do you trust?</h3>
                     </div>
                     <div>
-                        ...
+                        ...tbd...
                     </div>
                 </div>
             </div>
@@ -333,7 +349,7 @@
                         <h3 style="clear:both">Who trusts your D3CK?</h3>
                     </div>
                     <div>
-                        ...
+                        ...tbd...
                     </div>
                 </div>
 
@@ -535,10 +551,6 @@
                             </div>
                         </div>  <!-- row -->
                     </div> <!-- container -->
-
-                <div id="event_messages"> 
-
-
 
                 <style>
                     #remoteVideos video { height: 360px; }
