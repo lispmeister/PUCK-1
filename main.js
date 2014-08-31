@@ -359,8 +359,6 @@ var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 //
 function assign_capabilities(_d3ck, new_capabilities) {
 
-    // console.log('assigning capabilities given from ' + security_level + ' to d3ck ' + _d3ck.D3CK_ID)
-
     if (typeof _d3ck == "string")
         _d3ck = JSON.parse(_d3ck)
 
@@ -521,7 +519,6 @@ function auth(req, res, next) {
 
     // console.log(req.headers)
 
-    console.log('pity')
     console.log('I pity da fool who tries to sneak by me!  ' + req.path, ip)
     res.redirect(302, '/login.html')
 
@@ -1157,7 +1154,7 @@ function update_d3ck(_d3ck) {
             // create_d3ck_key_store(_d3ck)
             // create_d3ck_image(_d3ck)
 
-            createEvent('127.0.0.1', {event_type: "update", d3ck_id: _d3ck.D3CK_ID})
+            createEvent('127.0.0.1', {event_type: "update", "d3ck_id": _d3ck.D3CK_ID})
             console.log('redis update_d3ck success')
 
         }
@@ -1496,11 +1493,11 @@ function createEvent(ip, event_data, ds) {
 
     console.log(event_data)
 
-    var e_type       = event_data.event_type
-    var key          = e_type + ":" + event_data.time
-
     event_data.from  = ip
     event_data.time  = Date()
+
+    var e_type       = event_data.event_type
+    var key          = e_type + ":" + event_data.time
 
     rclient.set(key, JSON.stringify(event_data), function(err) {
         if (err) {
@@ -2600,7 +2597,7 @@ function quikStart(req, res, next) {
     // console.log(name, email, d3ck, password, stance)
 
     bwana_d3ck.name        = d3ck
-    bwana_d3ck.owner.name  = name.replace(new RegExp("jpeg$"),'jpg')
+    bwana_d3ck.owner.name  = name
     bwana_d3ck.owner.email = email
     bwana_d3ck.stance      = stance
 
@@ -2610,6 +2607,7 @@ function quikStart(req, res, next) {
     if (req.files.d3ck_image.path != "" && typeof req.files.d3ck_image.type != "undefined") {
 
         msg = ""
+
         if (req.files.d3ck_image.type != 'image/png' && req.files.d3ck_image.type != 'image/jpeg' && req.files.d3ck_image.type != 'image/gif') {
             msg = 'Invalid image format (' + req.files.d3ck_image.type + '), only accept: GIF, JPG, and PNG'
 
@@ -2656,7 +2654,7 @@ function quikStart(req, res, next) {
             // weirdness... writefile returns nada
             try {
                 fs.writeFileSync(full_d3ck_image, data, 'utf8')
-                console.log('updating d3ck json')
+                console.log('updating d3ck image on disk')
 
                 bwana_d3ck.image     = d3ck_image
                 bwana_d3ck.image_b64 = image_b64
@@ -2687,18 +2685,11 @@ function quikStart(req, res, next) {
 
     }
 
-    rclient.set(d3ck_id, JSON.stringify(bwana_d3ck), function(err) {
-        if (err) {
-            console.log(err, 'd3ck: unable to update Redis db');
-            console.log(err)
-        } else {
-            console.log('d3ck updated')
-        }
-    })
 
-    assign_capabilities(bwana_d3ck)
+    // update
+    // update_d3ck(bwana_d3ck)
+    assign_capabilities(bwana_d3ck)     // does update
 
-    console.log("D3CK image... " + d3ck_image)
 
     secretz          = {}
     secretz.id       = 0
