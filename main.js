@@ -1071,10 +1071,12 @@ function d3ckStatus(req, res, next) {
     if (typeof req.query.first_blood != "undefined") {
         console.log('They drew first blood, not me....')
         var _status = empty_status()
-        _status.openvpn_server = vpn_client_status
+
+        _status.openvpn_server = vpn_server_status
         _status.openvpn_client = vpn_client_status
 
         res.send(200, [_status])
+
     }
     // the usual usualness
     else {
