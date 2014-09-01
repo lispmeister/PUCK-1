@@ -1069,6 +1069,7 @@ function d3ckStatus(req, res, next) {
 
     // if the magic flag... sent when client first connects
     if (typeof req.query.first_blood != "undefined") {
+        console.log('They drew first blood, not me....')
         var _status = empty_status()
         _status.openvpn_server = vpn_client_status
         _status.openvpn_client = vpn_client_status
