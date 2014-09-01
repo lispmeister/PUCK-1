@@ -717,7 +717,7 @@ function get_status() {
 
     var url = "/status"
 
-    if (!first_news) url = url + "?first_blood=stallone"
+    if (first_news) url = url + "?first_blood=stallone"
 
     var jqXHR_get_status = $.ajax({ url: url })
 
