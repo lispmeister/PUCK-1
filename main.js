@@ -202,6 +202,8 @@ var d3ck_proxy_up  = false,
 var all_client_ips = [],
     client_ip      = "";
 
+var vpn_server_status = {}
+var vpn_client_status = {}
 
 // need to reset status from time to time
 function empty_status () {
@@ -793,6 +795,7 @@ function watch_logs(logfile, log_type) {
                 var browser_magic = { "notify_add":false, "notify_ring":true, "notify_file":true}
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_server = server_magic
+                vpn_server_status          = server_magic
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
 
             }
@@ -824,6 +827,7 @@ function watch_logs(logfile, log_type) {
                 var browser_magic = { "notify_add":false, "notify_ring":true, "notify_file":true}
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_server = server_magic
+                vpn_server_status          = server_magic
                 createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
             }
         }
@@ -867,6 +871,7 @@ function watch_logs(logfile, log_type) {
                 var browser_magic = { "notify_add":true, "notify_ring":true, "notify_file":true}
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_client = client_magic
+                vpn_client_status          = client_magic
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
 
             }
@@ -895,6 +900,7 @@ function watch_logs(logfile, log_type) {
                 var browser_magic = { "notify_add":true, "notify_ring":true, "notify_file":true}
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_client = client_magic
+                vpn_client_status          = client_magic
 
                 // reset to local
                 cat_fact_server = my_devs["tun0"]
@@ -1061,27 +1067,40 @@ function cat_stamp() {
 //
 function d3ckStatus(req, res, next) {
 
-    if (status_queue.length > 0) {
-        console.log('clearing out the queue (' + status_queue.length + ')....')
+    // if the magic flag... sent when client first connects
+    if (typeof req.query.first_blood != "undefined") {
+        var _status = empty_status()
+        _status.openvpn_server = vpn_client_status
+        _status.openvpn_client = vpn_client_status
+
+        res.send(200, [_status])
     }
+    // the usual usualness
     else {
-        //console.log('empty queue...')
-        res.send(200, [])
+
+        if (status_queue.length > 0) {
+            console.log('clearing out the queue (' + status_queue.length + ')....')
+        }
+        else {
+            //console.log('empty queue...')
+            res.send(200, [])
+        }
+
+        // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
+        //tmp_status = JSON.parse(JSON.stringify(status_queue))
+
+        //console.log(status_queue)
+
+        var quo = []
+        for (var i = 0; i < status_queue.length; i++) {
+            quo[i] = status_queue[i]
+        }
+
+        status_queue = [] // not to be confused with quo
+
+        res.send(200, quo)
+
     }
-
-    // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
-    //tmp_status = JSON.parse(JSON.stringify(status_queue))
-
-    //console.log(status_queue)
-
-    var quo = []
-    for (var i = 0; i < status_queue.length; i++) {
-        quo[i] = status_queue[i]
-    }
-
-    status_queue = [] // not to be confused with quo
-
-    res.send(200, quo)
 
 }
 
@@ -2836,6 +2855,8 @@ function formCreate(req, res, next) {
                         // console.log(r_data)
 
                         // write image
+                        console.log('image...')
+                        console.log(r_data.image_b64)
                         write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
 
                         // self added

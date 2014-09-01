@@ -717,11 +717,15 @@ function get_status() {
 
     var url = "/status"
 
+    if (!first_news) url = url + "?first_blood=stallone"
+
     var jqXHR_get_status = $.ajax({ url: url })
 
     jqXHR_get_status.done(function (queue, textStatus, jqXHR) {
         // console.log('status wootz\n' + queue)
         // console.log("got status?  " + JSON.stringify(d3ck_status))
+
+        first_news = false
 
         var lenq = _.keys(queue).length
 
@@ -895,7 +899,6 @@ function status_or_die() {
 
     }
 
-    first_news = false
     // fire_d3ck_status(d3ck_status)
 
 }

@@ -267,8 +267,8 @@ function SimpleWebRTC(opts) {
 
         // zen - Sun Aug 31 14:46:17 PDT 2014
         // kill the HTML for remote vids
+        console.log('nuking-n-adding remote')
         $('#remoteVideos video').remove()
-        $('#video_effect_div').attr("class",'hidden')
 
         var item,
             el = document.createElement('video'),
@@ -354,8 +354,8 @@ SimpleWebRTC.prototype.handlePeerStreamAdded = function (peer) {
 
     // zen - Sun Aug 31 14:46:17 PDT 2014
     // kill the HTML for remote & local vids
+    console.log('nuking-n-adding remote')
     $('#remoteVideos video').remove()
-    $('#video_effect_div').attr("class",'hidden')
 
     var container = this.getRemoteVideoContainer();
 
@@ -457,8 +457,9 @@ SimpleWebRTC.prototype.startLocalVideo = function () {
 
             // zen - Sun Aug 31 14:46:17 PDT 2014
             // kill the HTML for local vids
-            //  $('#localVideo').remove()
-            //  $('#h4_local').append('\n<video id="localVideo"></video>\n')
+            console.log('nuking-n-adding local')
+            $('#localVideo').remove()
+            $('#h4_local').append('\n<video id="localVideo"></video>\n')
 
             attachMediaStream(stream, self.getLocalVideoContainer(), self.config.localVideo);
 
