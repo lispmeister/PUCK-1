@@ -1,5 +1,6 @@
 
-user zen;
+# hack for my old box
+# user zen;
 
 # misc jinxy stuff
 
