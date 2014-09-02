@@ -64,6 +64,9 @@ case $1 in
 
         start)
 
+                # without this... we're hosed
+                service redis-server start
+
                 log_daemon_msg "Starting D3CK server" "d3ckd"
                 # lock_d3ckdate
                 start-stop-daemon --start --quiet --oknodo --pidfile $PIDFILE --startas $DAEMON -- -p $PIDFILE $D3CKD_OPTS
