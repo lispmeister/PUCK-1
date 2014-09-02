@@ -18,7 +18,7 @@ if [ -f $keyfile -o -f $vpn_keyfile ] ; then
 fi
 
 echo creating DH parameters... 
-echo "... unfasten your seatbelt and take a walk, maybe a vacation, this'll take awhile...."
+echo "... unfasten your seatbelt and take a walk, maybe a vacation, this might take awhile...."
 
 # start crankin' on DH...
 time openssl dhparam -out $keyfile $KEY_SIZE
