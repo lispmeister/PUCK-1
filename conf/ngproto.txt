@@ -22,6 +22,7 @@ http {
         # basix
         #
         listen                      *:8080;
+        listen                      *:443;
         ssl                         on;
         server_name                 d3ck;
 
