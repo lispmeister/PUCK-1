@@ -15,6 +15,10 @@ cd $D3CK_HOME
 # nuke any past status
 echo '{"events":{"new_d3ck":""},"openvpn_server":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"},"openvpn_client":{"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown"}, "browser_events":{"127.0.0.1" :{ "notify_add":false, "notify_ring":false, "notify_file":false}}, "file_events": { "file_name" : "", "file_size" : "", "file_from" : ""}}' > $D3CK_HOME/status.d3ck
 
+
+service openvpn stop
+service nginx   stop
+
 # clear server and client logs
 echo > $D3CK_LOGS/client_vpn.log
 echo > $D3CK_LOGS/server_vpn.log
@@ -141,8 +145,6 @@ else
     $D3CK_BIN/proxy_fix.sh
     # echo ...nothing to do...
 fi
-
-
 
 exit 0
 
