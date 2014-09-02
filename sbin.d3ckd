@@ -30,6 +30,8 @@ rm -f $D3CK_LOGS/*.out.log
 # if no dir or symlink
 if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
     cd $hell
+    mkdir clients
+
     ./rot-in-hell.sh
 
     cd ..

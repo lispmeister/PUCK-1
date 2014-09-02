@@ -2,108 +2,10 @@
 ubuntu... make something in /etc/init.d runnable...
 
     update-rc.d foo-filename defaults
-
-
-
-
-
-
-header
-
-****    authorizationError: 'Hostname/IP doesn\'t match certificate\'s altnames' },
-
-
-
-
-
-**** If ports aren't open... start thingee on 8081 won't come up!
-
-
-
-
-
-
-extended key usage cert
-
-
-Critical
-Signing
-Non-repudiation
-Key Encipherment
-If you are using extended key usage, check for
-
-Not Critical
-TLS Web Client Authentication
-E-mail protection
-
-
-
-
-ating DH parameters, 1024 bit long safe prime, generator 2
-This is going to take a long time
-.............................................+....................................................................................................+..........+..+............................................................+.....................................+......................................................................................................+...................................................................................+...............+...........................+......+...................+.....................+................+............+......................................................................................................................................+...........................................................................+......+...........................+........................+......................................................+.....+................................................................+.............................................................+.................................+..............+.......+.............................+.............................................................................................+......................................+.............................................+......................+.............................................................................................................................+.............................+...............................................................................................................................+......................+.....+.................................................................................................+................................+.+.......................................................................+......+......................+..........++*++*++*
-unable to write 'random state'
-
-
-
-
-BAD FILE NAME BELOW:
-
-
-You're coming from an IP that isn't in your stated IPs... adding it to your IP pool just in case
-key: EA7EEE204CB192297F490709B0C583D1DFFC9131
-value: {"name":"suzi","D3CK_ID":"EA7EEE204CB192297F490709B0C583D1DFFC9131","image":"/img/EA7EEE204CB192297F490709B0C583D1DFFC9131jpeg","image_b64":"iVBORw0KGgoAAAANSUhEUgAAAZAAAAEsCAYAAADtt+XCAAAACXBIWXMAAAsTAAALEwEAmpwYAABAAElEQVR4AezdW7OlR3kn+L137TpKKpXEQYCwkDDGiAA7xoZuN7gx2A5jZro7Juzoq4kJz0
-
-
+    update-rc.d foo-filename enable
 
 
 
 poker cards 3.5 x 2.5
 
 
-
-So currently ran this on llew's system
-
-    ./fw.sh up 10.0.0.71  5555 192.168.0.250 12034 tcp
-
-#####?    ip route add 192.168.0.250 dev tun1... no need if use 10.xx..xxxxx?
-
-
-Also - meld in signal server
-
-
-
-
-CURRENT ASSUMPTION: if D3CK-1 can ip-connect to D3CK-2, user-1 can ip-connect to D3CK-2 as well
-
-# Installed node from:
-# 
-#    http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
-#
-
-cd /tmp
-wget http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
-
-mkdir /usr/local/d3ck_stuff
-cd /usr/local/d3ck_stuff
-
-tar xvf /tmp/node-v0.10.24-linux-arm-pi.tar.gz
-rm /tmp/node-v0.10.24-linux-arm-pi.tar.gz
-
-# add line to .bash_profile
-
-echo export PATH=$PATH:/usr/local/d3ck_stuff/node-v0.10.24-linux-arm-pi/bin >> ~/.bash_profile
-
-
-# used this branch of node-http-proxy
-
-https://github.com/nodejitsu/node-http-proxy/tree/caronte
-
-# someone said:
-#
-# npm -g install /path/to/node-http-proxy-caronte
-
-# In my case, the install linkage was broken, so I had to run sudo npm link http-proxy
-
-
-+ websocket npm

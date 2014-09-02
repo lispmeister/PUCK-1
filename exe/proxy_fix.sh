@@ -16,7 +16,7 @@
 # if neither, do nothing
 #
 home="/etc/d3ck"
-# binary="$home/bin/nginx32"    # for my ancient ubuntu....
+binary="$home/bin/nginx32"    # for my ancient ubuntu....
 binary="nginx"
 proto="$home/conf/ngproto.txt"
 conf="$home/conf/nginx.cf"
