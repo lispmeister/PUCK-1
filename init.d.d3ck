@@ -82,6 +82,8 @@ case $1 in
                 done
 
                 service nginx stop
+                service redis-server stop
+                service openvpn stop
 
                 log_end_msg $?
                   ;;
