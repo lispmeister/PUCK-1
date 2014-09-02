@@ -36,7 +36,7 @@ if [ ! -d $d3ck_keystore -o ! -h $d3ck_keystore ] ; then
 
     cp $hell/ca* $hell/d3ck* $d3ck_keystore
 
-    # haproxy apparently wants it all in one file
+    # all in one file
     cat $hell/d3ck*{key,crt} $hell/ca* > $d3ck_keystore/d3ck.all
 
     ln -s $d3ck_keystore/ca.crt $d3ck_keystore/d3ckroot.crt

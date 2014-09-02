@@ -33,7 +33,7 @@ else
     exit 1
 fi
 
-echo creating new haproxy conf with $web and $sig
+echo creating new nginx conf with $web and $sig
 
 sed -e 's/D3CK_SIG/'"$sig"'/' -e 's/D3CK_WEB/'"$web"'/' $proto > $conf
 
