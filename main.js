@@ -175,7 +175,7 @@ rclient.get(d3ck_id, function (err, reply) {
         }
     }
     else {
-        console.log(err, 'get_d3ck: unable to retrieve %s', req.d3ck);
+        console.log(err, 'get_d3ck: unable to retrieve d3ck: ' + d3ck_id)
         sys.exit({ "no": "d3ck"})
     }
 })
