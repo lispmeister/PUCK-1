@@ -1871,107 +1871,6 @@ function downloadStuff (req, res, next) {
 }
 
 
-//
-// a hack until .... until godot shows up
-//
-// tear up some data, save it to the brig
-//
-function bodice_ripper(bodice) {
-
-    console.log('ripping away')
-
-    fs.writeFile(d3ck_public + "/uploads/" + name, bodice, function(err) {
-        if(err) {
-            console.log(err);
-        } else {
-            console.log('jesus saves files and souls!')
-        }
-    }); 
-
-    return
-
-    var data  = ""
-    var name  = ""
-    var bytes = 0
-
-    // ----------------------------320756311425686976538052
-    // Content-Disposition: form-data; name="scrabble.jpg"; filename="31115-t9y74u.jpg"
-    // Content-Type: image/jpeg
-    // [... data ...]
-    //
-    var offset = 0;
-    var line   = ""
-
-    for (; offset < bodice.length; offset++) {
-        console.log('trying to run through bodice....')
-
-        if (bodice[offset] === 0x0a) {      // newline
-
-            line = bodice.slice(0, offset).toString()
-
-            bodice = bodice.slice(offset + 1);
-
-            offset = 0;
-
-            if (line.indexOf("-----") == 0) {
-                console.log('found separator')
-                console.log(line)
-                bytes += line.length() + 1
-            }
-
-            else if (line.indexOf("Content-Disposition") == 0) {
-            // Content-Disposition: form-data; name="dona-scrabble.jpg"; filename="32024-m3ps38.jpg"
-
-                console.log('good disposition, good girl!')
-                console.log(line)
-
-                var semis = line.split('; ')
-                console.log(semis[2])
-
-                name = line.replace(new RegExp('^.*=name"'),'')
-                name = name.match(/"([^"]+)"/)[1];
-
-                console.log(semis[2])
-                console.log(name) + 1
-
-                bytes += line.length() + 1
-
-            }
-            else if (line.indexOf("Content-Type") == 0) {
-                console.log('whats your type?')
-                console.log(line)
-
-                bytes += line.length() + 1
-            }
-            else {
-                console.log('found data ' + bytes + ' bytes in')
-
-                data = bodice.slice(0, offset).toString()
-
-                break
-                // data += line
-            }
-        }
-    }
-
-
-    // read in from the raw bits
-    // data = bodice.toString().substr(bytes)
-
-    if (name == "") name = "anon"
-
-    console.log('bodice ripped, ready to save ' + data.length + ' bytes to ' + name)
-
-    fs.writeFile(d3ck_public + "/uploads/" + name, data, function(err) {
-        if(err) {
-            console.log(err);
-        } else {
-            console.log('jesus saves files and souls!')
-        }
-    }); 
-
-}
-
 // req.files contains all the goods, including:
 //
 //  size
@@ -3313,7 +3212,7 @@ server.get('/rest', function root(req, res, next) {
         'GET     /sping/:key',
         'GET     /status',
         'POST    /status',
-        'GET     /up/:key',
+        'POST    /up/:key',
         'GET     /url',
         'POST    /vpn/start',
         'GET     /vpn/stop'

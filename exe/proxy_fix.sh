@@ -16,8 +16,26 @@
 # if neither, do nothing
 #
 home="/etc/d3ck"
+binary32="$home/bin/nginx32"    # for my ancient ubuntu....
 binary="nginx"
-binary="$home/bin/nginx32"    # for my ancient ubuntu....
+
+if [ -x $binary32 ] ; then
+    echo using old binary...
+    binary=$binary32
+fi
+
+egrep -q '^zen:' /etc/passwd
+
+if [ $? -eq 0 ] ; then
+    echo running as zen
+
+
+xxxxx edit in place....
+
+
+fi
+
+
 proto="$home/conf/ngproto.txt"
 conf="$home/conf/nginx.cf"
 

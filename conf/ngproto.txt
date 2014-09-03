@@ -103,15 +103,6 @@ http {
 
         }
 
-        # instant messaging
-        location /http-bind {
-            proxy_pass              http://D3CK_SIG:5280/http-bind;
-            proxy_set_header        Host $host;
-            proxy_buffering         off;
-            tcp_nodelay             on;
-        }
-
-
         #
         # normal web stuff
         #
