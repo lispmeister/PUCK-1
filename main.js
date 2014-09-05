@@ -2,6 +2,7 @@
 // d3ck server
 //
 
+var Readable   = require('stream').Readable;
 // var Tail       = require('tail').Tail,
 var Tail       = require('./tail').Tail,
     async      = require('async'),
@@ -1868,15 +1869,14 @@ function knockKnock(req, res, next) {
 
     options.url  = url
     // options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+    // console.log(options)
 
     var data        = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
-    var post_stream = require('stream').Readable;
 
-    console.log(options)
+    var post_stream = new Readable;
 
-    var post_stream = require('stream').Readable;
-
-    post_stream.push(data)
+    post_stream.push(JSON.stringify(data))
+    post_stream.push(null)
 
     post_stream.pipe(request.post(options, function optionalCallback (err, resp) {
         if (err) {
