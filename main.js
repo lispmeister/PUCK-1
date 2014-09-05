@@ -1872,11 +1872,11 @@ function knockKnock(req, res, next) {
     var data        = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
     var post_stream = require('stream').Readable;
 
-    post_stream.push(data)
-
     console.log(options)
 
-    var Readable = require('stream').Readable;
+    var post_stream = require('stream').Readable;
+
+    post_stream.push(data)
 
     post_stream.pipe(request.post(options, function optionalCallback (err, resp) {
         if (err) {
