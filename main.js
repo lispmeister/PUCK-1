@@ -1839,6 +1839,7 @@ function knockKnock(req, res, next) {
 
     console.log('knock knock')
     //console.log(req.params)
+    console.log(req)
 
     // bail if we don't get ID
     var ip_addr = req.body.ip_addr
@@ -1865,8 +1866,10 @@ function knockKnock(req, res, next) {
 
     var options = load_up_cert_by_did(d3ckid)
 
-    options.body = req.body
     options.url  = url
+    options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+
+    console.log(options)
 
     request.post(options, function optionalCallback (err, resp) {
         if (err) {
@@ -1876,7 +1879,7 @@ function knockKnock(req, res, next) {
         else {
             console.log('knock success...!')
             console.log(resp)
-            res.send(200, resp)
+            res.send(200, resp.body)
         }
     })
 
