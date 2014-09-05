@@ -484,6 +484,10 @@ function auth(req, res, next) {
     if (typeof req.headers['x-ssl-client-verify'] != "undefined" && req.headers['x-ssl-client-verify'] == "SUCCESS"){
         console.log(req.headers)
         console.log('my cert homie...?!!?!')
+        //
+        // xxx - need to check not only if valid, but start tracking to see if they
+        // don't try to change their d3ck ID or something
+        //
         return next();
     }
 
@@ -1799,6 +1803,21 @@ function stopVPN(req, res, next) {
 
 }
 
+
+function load_up_cert(d3ck) {
+
+    console.log('loading up client cert for ' + d3ck)
+
+    var certz = {
+        ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/d3ckroot.crt").toString(),
+        key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/cli3nt.key").toString(),
+        cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/cli3nt.crt").toString(),
+    };
+
+    return(certz)
+
+}
+
 /*
  *
  * knock on the door... anyone home?
@@ -1812,45 +1831,46 @@ function knockKnock(req, res, next) {
     //console.log(req.params)
 
     // bail if we don't get ID
-    console.log(typeof req.params.d3ckid)
-    if (typeof req.params.d3ckid == "undefined") {
+    var ip_addr = req.body.ip_addr
+    var d3ckid  = req.body.d3ckid
+
+    console.log(ip_addr, d3ckid)
+
+    if (typeof d3ckid == "undefined") {
       var bad_dog = "No ID, no love";
       console.log(bad_dog)
       res.send(403, { "bad": "dog"});
       return
     }
     else {
-        console.log("you've passed the first test...", req.params.d3ckid)
+        console.log("you've passed the first test...", d3ckid)
     }
 
     console.log('moving on...')
 
-    client_ip = get_client_ip(req)
 
-    console.log("x-for  : " + req.headers['x-forwarded-for'])
-    console.log("conn-RA: " + req.connection.remoteAddress)
-    console.log("sock-RA: " + req.socket.remoteAddress)
-    console.log("conn-sock-RA: " + req.connection.socket.remoteAddress)
+    var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
 
-    // You're not from around here, are ya, boy?
-    if (typeof my_net[client_ip] == "undefined") {
-       // console.log(req)
-        console.log('appears to be coming from remote: ' + client_ip)
-        d3ck_events = { ring_ring : client_ip }
-    }
-    // Local
-    else {
-      console.log('local yokel')
-    }
+    console.log(url)
 
-//    var invisible_girl = "I can't see you, no IP...?";
-//    console.log(invisible_girl)
-//    res.send(403, invisible_girl);
-//    return next(false);
+    var options = load_up_cert(d3ck_id)
 
-    console.log(req.url, req.params.d3ckid)
+    options.body = req.body
 
-    res.send(200, {"hey" : client_ip});
+    request.post(url, options, function optionalCallback (err, resp) {
+        if (err) {
+            console.error('post to remote failed:', JSON.stringify(err))
+            res.send(200, {"err" : err});
+            }
+        else {
+            console.log('knock success...!')
+            console.log(resp)
+            res.send(200, resp)
+        }
+    })
+
+    // console.log("x-for  : " + req.headers['x-forwarded-for'])
+
 
 }
 
@@ -2030,6 +2050,7 @@ function uploadSchtuff(req, res, next) {
             //
             // post to a remote D3CK... first look up IP based on PID, then post to it using
             // client-side certs for auth
+            //
             else {
                 console.log("going to push it to the next in line: " + upload_target)
 
@@ -2045,14 +2066,9 @@ function uploadSchtuff(req, res, next) {
 
                 console.log(url)
 
-                var options = {
-                    ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ckroot.crt").toString(),
-                    key     : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                    cert    : fs.readFileSync(d3ck_keystore + '/' + ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                    headers : { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
-                    //strictSSL : true
-                };
+                var options = load_up_cert(upload_target)
 
+                options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
                 // var file_data = fs.readFileSync(tmpfile) 
 
                 console.log('FN: ' + target_file)
@@ -2065,12 +2081,9 @@ function uploadSchtuff(req, res, next) {
                         console.log('Upload successful...!')
 
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
-
                         d3ck_status.browser_events = browser_magic
                         d3ck_status.file_events    = file_magic
-
                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
-
                         res.send(204, {"status" : file_name})
                     }
                 }))

@@ -19,6 +19,9 @@ home="/etc/d3ck"
 binary32="$home/bin/nginx32"    # for my ancient ubuntu....
 binary="nginx"
 
+proto="$home/conf/ngproto.txt"
+conf="$home/conf/nginx.cf"
+
 if [ -x $binary32 ] ; then
     echo using old binary...
     binary=$binary32
@@ -26,18 +29,11 @@ fi
 
 egrep -q '^zen:' /etc/passwd
 
-if [ $? -eq 0 ] ; then
-    echo running as zen
-
-
-xxxxx edit in place....
-
-
+if [ $? -ne 0 ] ; then
+    echo not running as zen
+    perl -pi.bak -e 's/^user zen;/# user zen/' $proto
 fi
 
-
-proto="$home/conf/ngproto.txt"
-conf="$home/conf/nginx.cf"
 
 if `ifconfig|egrep -q '^tun1'` ; then
     echo tun1 exists... assuming we\'re a client

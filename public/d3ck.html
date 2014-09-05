@@ -594,7 +594,38 @@
             <div class="btn-toolbar"> <span></span></div>
         </div>
 
+        <button id="knock_knock" type="button" class="btn btn-primary">Knock</button>
+
+        <script>
+        $(document).ready(function () {
+
+            $('#knock_knock').click(function (e) { 
+                console.log('nock')
+                console.log(my_d3ck.D3CK_ID, my_d3ck.ip_addr)
+
+                var knock_knock = $.ajax({
+                    type: "POST",
+                    url: "/knock",
+                    // data: {d3ckid: my_d3ck.D3CK_ID, ipaddr: my_d3ck.ip_addr}
+                    data: {d3ckid: EDCD441063302FB92B7E7A342FB7B5B8BAFEED60, ipaddr: '54.203.255.17' }
+                })
+
+                knock_knock.done(function(msg) {
+                    console.log("posto facto")
+                    console.log(msg)
+                })
+
+                knock_knock.fail(function(xhr, textStatus, errorThrown) {
+                    console.log('failzor -> ' + JSON.stringify(xhr))
+                })
+
+            })
+        })
+        </script>
+
+
         <div class="btn-toolbar"> <span class="spacer100"></span></div>
+
 
         <div class="row">
             <div class="col-md-4 column footer">
