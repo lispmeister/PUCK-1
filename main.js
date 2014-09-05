@@ -1819,11 +1819,10 @@ function load_up_cert_by_ip(ip) {
 function load_up_cert_by_did(d3ck) {
 
     console.log('loading up client cert for ' + d3ck)
-    console.log(d3ck2ip)
     var certz = {
-        ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/d3ckroot.crt").toString(),
-        key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/cli3nt.key").toString(),
-        cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/cli3nt.crt").toString(),
+        ca      : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/d3ckroot.crt").toString(),
+        key     : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/cli3nt.key").toString(),
+        cert    : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/cli3nt.crt").toString(),
     };
     return(certz)
 
