@@ -1849,7 +1849,7 @@ function knockKnock(req, res, next) {
     console.log('moving on...')
 
 
-    var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+    var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/knock'
 
     console.log(url)
 
