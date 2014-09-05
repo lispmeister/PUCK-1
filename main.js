@@ -1866,8 +1866,9 @@ function knockKnock(req, res, next) {
     var options = load_up_cert_by_did(d3ckid)
 
     options.body = req.body
+    options.url  = url
 
-    request.post(url, options, function optionalCallback (err, resp) {
+    request.post(options, function optionalCallback (err, resp) {
         if (err) {
             console.error('post to remote failed:', JSON.stringify(err))
             res.send(200, {"err" : err});
