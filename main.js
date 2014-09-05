@@ -1867,11 +1867,18 @@ function knockKnock(req, res, next) {
     var options = load_up_cert_by_did(d3ckid)
 
     options.url  = url
-    options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+    // options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+
+    var data        = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+    var post_stream = require('stream').Readable;
+
+    post_stream.push(data)
 
     console.log(options)
 
-    request.post(options, function optionalCallback (err, resp) {
+    var Readable = require('stream').Readable;
+
+    post_stream.pipe(request.post(options, function optionalCallback (err, resp) {
         if (err) {
             console.error('post to remote failed:', JSON.stringify(err))
             res.send(200, {"err" : err});
@@ -1881,7 +1888,7 @@ function knockKnock(req, res, next) {
             console.log(resp)
             res.send(200, resp.body)
         }
-    })
+    }))
 
     // console.log("x-for  : " + req.headers['x-forwarded-for'])
 
