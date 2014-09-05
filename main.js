@@ -1863,7 +1863,7 @@ function knockKnock(req, res, next) {
 
     console.log(url)
 
-    var options = load_up_cert_by_did(d3ck_id)
+    var options = load_up_cert_by_did(d3ckid)
 
     options.body = req.body
 
