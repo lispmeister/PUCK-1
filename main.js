@@ -1804,16 +1804,27 @@ function stopVPN(req, res, next) {
 }
 
 
-function load_up_cert(d3ck) {
+function load_up_cert_by_ip(ip) {
+
+    console.log('loading up client cert for ' + ip)
+    console.log(ip)
+    var certz = {
+        ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ckroot.crt").toString(),
+        key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/cli3nt.key").toString(),
+        cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/cli3nt.crt").toString(),
+    };
+    return(certz)
+
+}
+function load_up_cert_by_did(d3ck) {
 
     console.log('loading up client cert for ' + d3ck)
-
+    console.log(d3ck2ip)
     var certz = {
         ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/d3ckroot.crt").toString(),
         key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/cli3nt.key").toString(),
         cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[d3ck] + "/cli3nt.crt").toString(),
     };
-
     return(certz)
 
 }
@@ -1853,7 +1864,7 @@ function knockKnock(req, res, next) {
 
     console.log(url)
 
-    var options = load_up_cert(d3ck_id)
+    var options = load_up_cert_by_did(d3ck_id)
 
     options.body = req.body
 
@@ -2066,7 +2077,7 @@ function uploadSchtuff(req, res, next) {
 
                 console.log(url)
 
-                var options = load_up_cert(upload_target)
+                var options = load_up_cert_by_ip(upload_target)
 
                 options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
                 // var file_data = fs.readFileSync(tmpfile) 
