@@ -1860,6 +1860,56 @@ function knockKnock(req, res, next) {
     console.log('moving on...')
 
 
+    // is it for us, or are we passing it on?
+    if (d3ckid == bwana_d3ck.D3CK_ID) {
+        console.log("for me? You shouldn't have!")
+        res.send(200, resp.body)
+    }
+    else {
+        console.log('... you want the next door down....')
+
+        var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/knock'
+
+        console.log(url)
+
+        var options = load_up_cert_by_did(d3ckid)
+
+        options.url  = url
+        options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+
+        console.log(options)
+
+        request.post(options, function optionalCallback (err, resp) {
+            if (err) {
+                console.error('post to remote failed:', JSON.stringify(err))
+                res.send(200, {"err" : err});
+                }
+            else {
+                console.log('knock success...!')
+                console.log(resp)
+                res.send(200, resp.body)
+            }
+        })
+
+
+
+    }
+
+}
+
+// upload and download some content from the vaults
+
+function downloadStuff (req, res, next) {
+
+    console.log('in DL stuff')
+
+    var uploadz = d3ck_public + "/uploads"
+
+    var files = fs.readdirSync(uploadz)
+
+    console.log(files)
+
+
     var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/knock'
 
     console.log(url)
