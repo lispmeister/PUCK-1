@@ -1839,7 +1839,7 @@ function knockKnock(req, res, next) {
 
     console.log('knock knock')
     //console.log(req.params)
-    console.log(req)
+    // console.log(req)
 
     // bail if we don't get ID
     var ip_addr = req.body.ip_addr
