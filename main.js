@@ -1863,7 +1863,7 @@ function knockKnock(req, res, next) {
     // is it for us, or are we passing it on?
     if (d3ckid == bwana_d3ck.D3CK_ID) {
         console.log("for me? You shouldn't have!")
-        res.send(200, resp.body)
+        res.send(200, { emotion: "<3" })
     }
     else {
         console.log('... you want the next door down....')
