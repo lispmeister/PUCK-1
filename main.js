@@ -1867,7 +1867,7 @@ function knockKnock(req, res, next) {
     var options = load_up_cert_by_did(d3ckid)
 
     options.url  = url
-    options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+    options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
 
     console.log(options)
 
