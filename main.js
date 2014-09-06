@@ -2,7 +2,6 @@
 // d3ck server
 //
 
-var Readable   = require('stream').Readable;
 // var Tail       = require('tail').Tail,
 var Tail       = require('./tail').Tail,
     async      = require('async'),
@@ -1868,17 +1867,11 @@ function knockKnock(req, res, next) {
     var options = load_up_cert_by_did(d3ckid)
 
     options.url  = url
-    // options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
-    // console.log(options)
+    options.data = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
 
-    var data        = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+    console.log(options)
 
-    var post_stream = new Readable;
-
-    post_stream.push(JSON.stringify(data))
-    post_stream.push(null)
-
-    post_stream.pipe(request.post(options, function optionalCallback (err, resp) {
+    request.post(options, function optionalCallback (err, resp) {
         if (err) {
             console.error('post to remote failed:', JSON.stringify(err))
             res.send(200, {"err" : err});
@@ -1888,7 +1881,7 @@ function knockKnock(req, res, next) {
             console.log(resp)
             res.send(200, resp.body)
         }
-    }))
+    })
 
     // console.log("x-for  : " + req.headers['x-forwarded-for'])
 
@@ -1965,6 +1958,7 @@ function uploadSchtuff(req, res, next) {
 
         // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
         var ws = fs.createWriteStream(d3ck_public + '/uploads/' + file_name)
+        // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
 
         req.pipe(ws)
 
