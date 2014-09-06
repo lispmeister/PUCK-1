@@ -1886,12 +1886,10 @@ function knockKnock(req, res, next) {
                 }
             else {
                 console.log('knock success...!')
-                console.log(resp)
+                console.log(resp.body)
                 res.send(200, resp.body)
             }
         })
-
-
 
     }
 
