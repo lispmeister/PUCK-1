@@ -95,7 +95,8 @@ vpn='"vpn" : {
 
 ip_addr_vpn=`echo $ip_addr | sed 's/:.*$//'`
 
-remote_vpn=$($D3CK_BIN/setup_vpnclient.sh)
+# remote_vpn=$($D3CK_BIN/setup_vpnclient.sh)
+remote_vpn="{}"
 
 # XXX - silly format that should be changed... leftover from... oh, bah, who cares, just fix it
 value='{ 
