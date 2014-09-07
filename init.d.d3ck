@@ -65,7 +65,8 @@ case $1 in
         start)
 
                 # without this... we're hosed
-                service redis-server start
+                # service redis-server start
+                /etc/init.d/redis* start
 
                 log_daemon_msg "Starting D3CK server" "d3ckd"
                 # lock_d3ckdate
@@ -86,7 +87,7 @@ case $1 in
                 done
 
                 service nginx stop
-                service redis-server stop
+                /etc/init.d/redis* stop
                 service openvpn stop
 
                 log_end_msg $?

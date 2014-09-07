@@ -72,7 +72,7 @@ v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json,
 v_ta=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/ta.key)
 
 # dont give our secret key to remotes ;)
-v_key="vpn_client : {}"
+v_key="{}"
 if [ "$d3ck_ip" = "@" ] ; then
     v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/d3ck.key)
 fi
@@ -96,7 +96,7 @@ vpn='"vpn" : {
 ip_addr_vpn=`echo $ip_addr | sed 's/:.*$//'`
 
 # remote_vpn=$($D3CK_BIN/setup_vpnclient.sh)
-remote_vpn="{}"
+remote_vpn="vpn_client : {}"
 
 # XXX - silly format that should be changed... leftover from... oh, bah, who cares, just fix it
 value='{ 
