@@ -1183,10 +1183,12 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
         dh         : d3ckinfo.vpn.dh.join('\n')
     }
 
-    var vpn_client = {
-        key        : d3ckinfo.vpn_client.key.join('\n'),
-        cert       : d3ckinfo.vpn_client.cert.join('\n')
-    }
+    var vpn_client = { }
+
+//  var vpn_client = {
+//      key        : d3ckinfo.vpn_client.key.join('\n'),
+//      cert       : d3ckinfo.vpn_client.cert.join('\n')
+//  }
 
     var d3ck = {
         d3ckid     : id3ck,

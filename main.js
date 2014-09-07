@@ -1375,15 +1375,12 @@ function create_d3ck_key_store(data) {
         return
     }
 
-
-    // client stuff
-    var client_key  = data.vpn_client.key.join('\n')
     var client_cert = data.vpn_client.cert.join('\n')
 
-    var ca   = data.vpn.ca.join('\n')
-    var key  = data.vpn.key.join('\n')
-    var cert = data.vpn.cert.join('\n')
-    var tls  = data.vpn.tlsauth.join('\n')
+    var ca          = data.vpn.ca.join('\n')
+    var key         = data.vpn.key.join('\n')
+    var cert        = data.vpn.cert.join('\n')
+    var tls         = data.vpn.tlsauth.join('\n')
 
     var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
 
@@ -2850,18 +2847,20 @@ function formCreate(req, res, next) {
                         // something weird
                         console.log('looking 2 see if your current ip is in your pool')
 
-                        // if you're coming from a NAT or someplace weird...
-                        var found = false
-                        for (var i = 0; i < r_data.all_ips.length; i++) {
-                            if (r_data.all_ips[i] == ip_addr) {
-                                console.log('remote ip found in d3ck data')
-                                found = true
-                                break
+                        if (ip_addr != d3ck_server_ip) {
+                            // if you're coming from a NAT or someplace weird...
+                            var found = false
+                            for (var i = 0; i < r_data.all_ips.length; i++) {
+                                if (r_data.all_ips[i] == ip_addr) {
+                                    console.log('remote ip found in d3ck data')
+                                    found = true
+                                    break
+                                }
                             }
-                        }
-                        if (! found) {
-                            console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
-                            r_data.all_ips[all_client_ips.length] = ip_addr
+                            if (! found) {
+                                console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
+                                r_data.all_ips[all_client_ips.length] = ip_addr
+                            }
                         }
 
                         console.log('vpn-ify...!')
