@@ -1257,8 +1257,10 @@ function create_cli3nt (req, res, next) {
         console.log("error!\n\n\n")
         return('')
     }
-
-    return(keyout.stdout)
+    else {
+        console.log('looks good...')
+        return(keyout.code)
+    }
 
 }
 
@@ -2968,7 +2970,7 @@ function formCreate(req, res, next) {
 
                         d3ck_spawn(cmd, argz)
 
-xxxxx
+                        create_cli3nt()
 
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
 
