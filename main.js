@@ -1227,6 +1227,42 @@ function update_d3ck(_d3ck) {
 }
 
 //
+// may be called either internally or via REST
+//
+function create_cli3nt (req, res, next) {
+
+    console.log ('creating client keys')
+
+    var target  = ''
+    var command = d3ck_home + '/f-u-openssl/rot-client.sh'
+    var argz    = []
+
+    //
+    // server internal
+    //
+    // xxx - not sure if this is a good idea, lol
+    //
+    if (typeof res == "undefined") {
+        argz   = [req]
+    }
+    else {
+        console.log('... not implemented yet... \n\n\n\n')
+    }
+
+    var keyout = d3ck_spawn_sync(command, argz)
+
+    console.log ('keyZ...' + JSON.stringify(keyz))
+
+    if (keyout.code) {
+        console.log("error!\n\n\n")
+        return('')
+    }
+
+    return(keyout.stdout)
+
+}
+
+//
 // Redis D3CKs key are all upper case+digits
 //
 function create_d3ck(req, res, next) {
@@ -1367,15 +1403,19 @@ function create_d3ck_key_store(data) {
 
     console.log(data.vpn_client)
 
-    var client_key  = data.vpn_client.key.join('\n')
+    var client_key  = ""
+    var client_cert = ""
 
-    if (client_key == "") {
-        console.log('no key data... bailin on add...')
-        // alert('no key data... bailin on add...')
-        return
+    try {
+        client_key  = data.vpn_client.key.join('\n')
+        client_cert = data.vpn_client.cert.join('\n')
     }
+    catch (e) {
+        console.log('no client keys in data...')
+        client_key  = ""
+        client_cert = ""
 
-    var client_cert = data.vpn_client.cert.join('\n')
+    }
 
     var ca          = data.vpn.ca.join('\n')
     var key         = data.vpn.key.join('\n')
@@ -2254,11 +2294,11 @@ function d3ck_spawn(command, argz) {
 }
 
 //
-// execute a command SYNCHRONOUSLY (blocking!), log stuff
+// execute a command synchronously(!) and return output
 //
-function d2ck_spawn_sync(command, argz) {
+function d3ck_spawn_sync(command, argz) {
 
-    console.log('a sync spawn o d3ck emerges... ' + ' (' + command + ')\n\n\t')
+    console.log('a sync emerges... ' + ' (' + command + ')\n\n\t')
 
     var cmd_string = command + ' ' + argz.join(' ')
 
@@ -2276,6 +2316,8 @@ function d2ck_spawn_sync(command, argz) {
     catch (e) {
         console.log("error writing log file with " + command + ' => ' + e.message)
     }
+
+    return(result)
 
 }
 
@@ -2926,6 +2968,8 @@ function formCreate(req, res, next) {
 
                         d3ck_spawn(cmd, argz)
 
+xxxxx
+
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
 
                     })
@@ -3217,6 +3261,9 @@ async.whilst(
 // Ping action - no auth
 server.get('/ping', echoReply)
 
+// get a new client key pair
+server.post('/cli3nt', auth, create_cli3nt)
+
 // get or list d3cks
 server.post('/d3ck', auth, create_d3ck)
 
@@ -3336,6 +3383,7 @@ server.post("/status", auth, postStatus)
 server.get('/rest', function root(req, res, next) {
     var routes = [
         'Routes with * are unauthenticated',
+        'GET     /cli3nt',
         'GET     /down',
         'GET     /events',
         'GET     /events/:key',
