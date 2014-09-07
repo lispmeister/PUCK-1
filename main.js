@@ -169,6 +169,7 @@ rclient.get(d3ck_id, function (err, reply) {
             sys.exit({'error': 'no D3CK Found'})
         }
         else {
+            console.log(reply)
             bwana_d3ck = JSON.parse(reply)
             console.log('d3ckaroo')
             // console.log(bwana_d3ck)
