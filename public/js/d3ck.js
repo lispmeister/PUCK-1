@@ -484,10 +484,6 @@ function event_hang_up() {
 //
 // get the current user's IP addr, put it where the element is
 //
-
-//
-// this broke when OpenVPN started forwarding along the https traffic ;(
-//
 function get_ip(element) {
 
     var url = "/getip"
@@ -524,7 +520,7 @@ function d3ck_vpn(element, d3ckid, ipaddr) {
     var pvpn = $.ajax({
         type: "POST",
         url: "/vpn/start",
-        data: {"d3ckid": d3ckid, "ipaddr": ipaddr}
+        data: {"d3ckid": d3ckid, "ip_addr": ipaddr}
     })
 
     pvpn.done(function(msg) {

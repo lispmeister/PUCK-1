@@ -210,11 +210,46 @@ function empty_status () {
 
     var d3ck_status     = {}
 
-    var server_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "client": "unknown", "client_did":"unknown"}
-    var client_magic    = {"vpn_status":"down","start":"n/a","start_s":"n/a","duration":"unknown","stop":"unknown","stop_s":"unknown", "server": "unknown", "server_did":"unknown"}
-    var file_magic      = { file_name: "", file_size: "", file_from: "", direction: "", did: ""}
-    var d3ck_events     = {"new_d3ck_ip":""}
+    var server_magic    = { 
+                            vpn_status  : "down",
+                            start       : "n/a",
+                            start_s     : "n/a",
+                            duration    : "unknown",
+                            stop        : "unknown",
+                            stop_s      : "unknown",
+                            client      : "unknown",
+                            client_did  : "unknown"
+                          }
+
+    var client_magic    = { 
+                            vpn_status  : "down",
+                            start       : "n/a",
+                            start_s     : "n/a",
+                            duration    : "unknown",
+                            stop        : "unknown",
+                            stop_s      : "unknown",
+                            server      : "unknown",
+                            server_did  : "unknown"
+                          }
+
+    var file_magic      = { 
+                            file_name   : "",
+                            file_size   : "",
+                            file_from   : "",
+                            direction   : "",
+                            did         : ""
+                          }
+
+    var d3ck_events     = { new_d3ck_ip  : "" }
+
     var browser_magic   = {}
+
+    // till figure out something better... xxx
+    var d3ck_request    = { 
+                            incoming_call : false,
+                            reply         : false,
+                            answer        : ""
+                          }
 
     if (typeof bwana_d3ck.D3CK_ID != "undefined") {
         d3ck_status.d3ck_id = bwana_d3ck.D3CK_ID
@@ -225,6 +260,7 @@ function empty_status () {
     d3ck_status.openvpn_client = client_magic
     d3ck_status.file_events    = file_magic
     d3ck_status.browser_events = browser_magic
+    d3ck_status.d3ck_requests  = d3ck_request
 
     return(d3ck_status)
 
@@ -1461,12 +1497,23 @@ function deleteAll(req, res, next) {
 }
 
 
+//
+// sends a URL request at the url encoded site; for http://cnn.com you'd send:
+//
+//      /url?http%3A%2F%2Fcnn.com
+//
 function webProxy(req, res, next) {
 
     console.log('proxie!' + '\n' + JSON.stringify(req.headers, true, 2))
 
-    res.send(request(req.url).pipe(res))
-
+    if (typeof req.query.url == "undefined") {
+        console.log('bad dog, no URL')
+        res.send(400, { error: 'bad dog, no URL, no biscuit!' })
+    }
+    else {
+        console.log('... trying... ' + req.query.url)
+        req.pipe(request(req.query.url)).pipe(res)
+    }
 }
 
 //
@@ -1863,7 +1910,25 @@ function knockKnock(req, res, next) {
     // is it for us, or are we passing it on?
     if (d3ckid == bwana_d3ck.D3CK_ID) {
         console.log("for me? You shouldn't have!")
-        res.send(200, { emotion: "<3" })
+
+        // mark it as an event, which will be picked up by the client, and then answered yes or no
+
+//      var d3ck_request    = { 
+//          incoming_call : false,
+//          reply         : false,
+//          answer        : ""
+//      }
+//
+//
+//      var d3ck_request    = { "incoming_call": false}
+//      d3ck_status.d3ck_requests  = d3ck_request
+//      createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
+
+/////   res.send(200, { emotion: "<3" })
+/////   res.send(200, { emotion: "<3" })
+/////   res.send(200, { emotion: "<3" })
+
+
     }
     else {
         console.log('... you want the next door down....')
@@ -2237,7 +2302,7 @@ function startVPN(req, res, next) {
     console.log('onto the execution...')
 
     var d3ckid = req.body.d3ckid
-    var ipaddr = req.body.ipaddr
+    var ipaddr = req.body.ip_addr
 
     console.log(d3ckid, ipaddr)
 
@@ -2365,7 +2430,8 @@ function put_d3ck(req, res, next) {
 function back_to_home (res) {
     console.log('on my way home')
     var home = "/"
-    res.redirect(302, home)
+    // res.redirect(302, home)
+    res.redirect(303, home)
 }
 
 //
@@ -2384,23 +2450,22 @@ function handleForm(req, res, next) {
         back_to_home(res)
     }
 
-    else if (req.body.d3ck_action == 'CREATE') {
+    var action = req.body.d3ck_action
+
+    if (action == 'CREATE') {
         formCreate(req, res, next)
         console.log('... suck... sess...?')
-
         back_to_home(res)
-        // res.statusCode = 201;
-        // res.end()
     }
 
-    else if (req.body.d3ck_action == 'DELETE') {
+    else if (action == 'DELETE') {
         formDelete(req, res, next)
         back_to_home(res)
     }
 
     // errror
     else {
-        console.log("error... unrecognized action: " + req.body.action);
+        console.log("error... unrecognized action: " + action);
         back_to_home(res)
     }
 
@@ -2435,6 +2500,11 @@ function formDelete(req, res, next) {
 // https ping a remote d3ck... it can have multiple
 // IP addrs, so ping them all at once and take the
 // first answer that matches their IP/PID
+//
+
+// URL looks something like...
+//
+//      /sping/686C2025589E6AEF898E3A9E96B5A723429872AB/192.168.0.250?_=1410057086534533
 //
 
 var ping_done = false
@@ -2498,6 +2568,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     console.log(ping_data.did + ' != ' + ping_d3ckid)
                     response = {status: "mismatch", "name": 'mismatched PID'}
                     // res.send(420, response) // enhance your calm!
+                    res.send(420, { error: "ID mismatch - the ping you d3cked doesn't match the d3ck-id you gave" })
                 }
 
                 else if (typeof ping_data != "undefined" && ping_data.status == "OK" && !ping_done) {
@@ -3264,10 +3335,12 @@ server.post("/status", auth, postStatus)
 // XXX - update!
 server.get('/rest', function root(req, res, next) {
     var routes = [
+        'Routes with * are unauthenticated',
         'GET     /down',
         'GET     /events',
         'GET     /events/:key',
         'GET     /forward',
+        '* POST  /login',
         'GET     /logout',
         'GET     /rest',
         'GET     /getip',
@@ -3284,7 +3357,7 @@ server.get('/rest', function root(req, res, next) {
         'GET     /server/stop',
         'GET     /server/restart',
         'GET     /setproxy',
-        'GET     /sping/:key',
+        'GET     /sping/:key1/:key2',
         'GET     /status',
         'POST    /status',
         'POST    /up/:key',

@@ -82,10 +82,10 @@ else
     echo generating new keys
     echo $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
     $D3CK_HOME/f-u-openssl/rot-client.sh $r_d3ck_id
-    # v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.key)
-    # v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$r_d3ck_id/cli3nt.crt)
     client_v_key=$(awk  '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $D3CK_HOME/f-u-openssl/clients/$r_d3ck_id.key)
     client_v_cert=$(awk '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $D3CK_HOME/f-u-openssl/clients/$r_d3ck_id.crt)
+    cp $D3CK_HOME/f-u-openssl/clients/$r_d3ck_id.key $keystore/$r_d3ck_id/_sent_client.key
+    cp $D3CK_HOME/f-u-openssl/clients/$r_d3ck_id.crt $keystore/$r_d3ck_id/_sent_client.crt
 fi
 
 v_dh="{}"
@@ -105,8 +105,6 @@ vpn='"vpn" : {
           }'
 
 ip_addr_vpn=`echo $ip_addr | sed 's/:.*$//'`
-
-# remote_vpn=$(./setup_vpnclient.sh)
 
 image_b64=$(base64 < $D3CK_HOME/public/$image)
 

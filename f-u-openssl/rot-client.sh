@@ -26,9 +26,9 @@ echo "  a black crane over the lake"
 echo "  may you rot in hell"
 echo
 
-cd /etc/d3ck/f-u-openssl
-
 . /etc/d3ck/config.sh
+
+cd $hell
 
 . d3ck-vars
 
@@ -46,6 +46,8 @@ magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 openssl req $magic -extensions client -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout $storage/$1.key -out $storage/$1.csr -config stupid.conf
 
 openssl ca $magic -extensions client -cert $keystore/D3CK/ca.crt -batch -keyfile $keystore/D3CK/ca.key -days $KEY_LIFE -out $storage/$1.crt -in $storage/$1.csr -config stupid.conf
+
+rm $hell/*.pem
 
 chmod -R 755 $hell $d3ck_home
 

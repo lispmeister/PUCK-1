@@ -116,7 +116,7 @@
                 <span> <input style="display:none" id="d3ckid_form" name="d3ckid" value="" /> </span>
                 <div class="controls">
                 <!-- this does some javascript fu below to post the data and redirect back to this page -->
-                <button id="d3ck_button_delete" class="btn btn-large btn-danger" onclick="d3ck_delete()">DELETE w NO CONFIRM </button>
+                <button id="d3ck_button_delete" class="btn btn-large btn-danger">DELETE w NO CONFIRM </button>
                 </div>
             </div>
         </fieldset>
@@ -171,14 +171,15 @@
 
           console.log('deleting ' + d3ckid)
 
-          var    dead_d3ck    = {}
-          dead_d3ck['d3ckid'] = d3ckid
-          dead_d3ck['action'] = 'DELETE'
+          var    dead_d3ck         = {}
+          dead_d3ck['d3ckid']      = d3ckid
+          dead_d3ck['d3ck_action'] = 'DELETE'
 
           var postify = $.ajax({
                type: "POST",
                // XXXX
-               url: "https://localhost:8080/d3ck",
+               // url: "/d3ck",
+               url: "/form",
                dataType: "json",
                data: dead_d3ck
           })
@@ -194,50 +195,57 @@
 //
 // when ready...
 //
-       $(document).ready(function () {
+$(document).ready(function () {
 
-         $('#d3ck_accordion').collapse({
-            toggle: false
-         })
-
-         // perhaps look for a better way :)
-         var query = location.search.substr(1);
-         var data = query.split("&");
-
-         for(var i=0; i<data.length; i++) {
-            var item = data[i].split("=");
-            if (item[0] = "d3ckid") {
-               $('#d3ck_vpn').append(item[1])
-               // global
-               d3ckid = item[1]
-               console.log("d3ckid: " + item[1])
-            }
-            else {
-               error = 1
-               $('#d3ck_id').append("Error - this page must be called with a d3ckid=valid-id")
-               console.log('Error - this page must be called with a valid-id, like https://localhost/d3ck_details.html?d3ck=markus007')
-            }
-         }
-         $('input[id=d3ckid_form]').val(d3ckid)
-
-         // get more detailed data...
-         $.getJSON('/d3ck/' + d3ckid, function(d3ckinfo) {
-
-            console.log(d3ckinfo)
-
-            print_d3ck(d3ckid, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
-
-         })
+    $("#d3ck_button_delete").on('click', function(e) { 
+        e.preventDefault();
+        d3ck_delete()
+    })
 
 
-        $('body').on('click', '#d3ck_top_home', function(event) { 
-            console.log('clickin my heelz as fast as I can')
-            window.location.href = "/"
-        })
+
+     $('#d3ck_accordion').collapse({
+        toggle: false
+     })
+
+     // perhaps look for a better way :)
+     var query = location.search.substr(1);
+     var data = query.split("&");
+
+     for(var i=0; i<data.length; i++) {
+        var item = data[i].split("=");
+        if (item[0] = "d3ckid") {
+           $('#d3ck_vpn').append(item[1])
+           // global
+           d3ckid = item[1]
+           console.log("d3ckid: " + item[1])
+        }
+        else {
+           error = 1
+           $('#d3ck_id').append("Error - this page must be called with a d3ckid=valid-id")
+           console.log('Error - this page must be called with a valid-id, like https://localhost/d3ck_details.html?d3ck=markus007')
+        }
+     }
+     $('input[id=d3ckid_form]').val(d3ckid)
+
+     // get more detailed data...
+     $.getJSON('/d3ck/' + d3ckid, function(d3ckinfo) {
+
+        console.log(d3ckinfo)
+
+        print_d3ck(d3ckid, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
 
      })
 
-    </script>
 
-  </body>
+    $('body').on('click', '#d3ck_top_home', function(event) { 
+        console.log('clickin my heelz as fast as I can')
+        window.location.href = "/"
+    })
+
+})
+
+</script>
+
+</body>
 </html>
