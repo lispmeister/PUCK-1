@@ -2925,7 +2925,7 @@ function formCreate(req, res, next) {
                         console.log("executing create_d3ck.sh to add locally")
 
                         // this simply takes the pwd and finds the exe area...
-                        var cmd  = d3ck_bin + '/create_d3ck.sh'
+                        var cmd  = d3ck_bin + '/create_server_d3ck.sh'
 
                         var argz = [r_data.D3CK_ID, 
                                     r_data.image, 
@@ -2954,6 +2954,8 @@ function formCreate(req, res, next) {
                         // return the favor
                         //
                         console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
+
+                        var cmd  = d3ck_bin + '/create_client_d3ck.sh'
 
                         argz = [bwana_d3ck.D3CK_ID, 
                                 bwana_d3ck.image, 
