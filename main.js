@@ -1272,6 +1272,8 @@ function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
 
+    console.log(req)
+
     var d3ck_status = empty_status()
 
     var ip_addr = req.body.ip_addr
@@ -2968,7 +2970,7 @@ function formCreate(req, res, next) {
 
                         d3ck_spawn(cmd, argz)
 
-                        create_cli3nt(r_data.D3CK_ID)
+                        // create_cli3nt(r_data.D3CK_ID)
 
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
 
@@ -3156,6 +3158,7 @@ server.use(express.session({
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
+server.use(express.bodyParser());
 server.use(server.router);
 
 // passport auth

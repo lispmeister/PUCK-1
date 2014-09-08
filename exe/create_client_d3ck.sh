@@ -88,8 +88,10 @@ if [ -f $keystore/$d3ck_id/dh.params ] ; then
     v_dh=$(awk   '{json = json " \"" $0 "\",\n"}END{print substr(json,1, match(json, ",[^,]*$") -1)}' $keystore/$d3ck_id/dh.params)
 fi
 
+
 # create the bundle to send
-bundle=$(cat $keystore/$r_d3ck_id/$r_d3ck_id)
+$D3CK_BIN/bundle_certs.js $r_d3ck_id
+bundle=$(cat $keystore/$r_d3ck_id/cli3nt.json)
 
 # echo $image_base64
 
@@ -98,10 +100,12 @@ bundle=$(cat $keystore/$r_d3ck_id/$r_d3ck_id)
 cat <<E_O_C
 {
     "key"  : "$d3ck_id",
-    "value": "$bundle"
+    "value": $bundle
 }
 E_O_C
 ) > $new_d3ck
+
+echo "NEW D3CK!"
 
 echo $new_d3ck
 

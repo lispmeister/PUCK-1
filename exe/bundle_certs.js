@@ -123,6 +123,8 @@ function rip_d3ck (d3ck, remote_did) {
 
     console.log('censoring ' + did)
 
+    console.log(d3ck)
+
 // openvpn --ca /etc/d3ck/d3cks/AC6C4FCA9ECAE6E88BA9D41BA0AA956942EDA9C4/d3ckroot.crt 
 //         --tls-auth /etc/d3ck/d3cks/AC6C4FCA9ECAE6E88BA9D41BA0AA956942EDA9C4/ta.key 
 //         --key /etc/d3ck/d3cks/AC6C4FCA9ECAE6E88BA9D41BA0AA956942EDA9C4/cli3nt.key 
@@ -140,16 +142,12 @@ function rip_d3ck (d3ck, remote_did) {
     censored.vpn.port         = d3ck.vpn.port
     censored.vpn.protocol     = d3ck.vpn.protocol
     censored.vpn.ca           = d3ck.vpn.ca
-    censored.vpn.key          = []
-
-    var certz = {
-        ca      : fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/d3ckroot.crt").toString(),
-        key     : fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString(),
-        cert    : fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString(),
-        all     : fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.all").toString()
-    };
-
-    censored.vpn.cert         = certz
+    censored.vpn.key          = [ 
+        ca   = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/d3ckroot.crt").toString(),
+        key  = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString(),
+        cert = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString(),
+        all  = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.all").toString()
+    ]
 
     censored.vpn.tlsauth      = d3ck.vpn.tlsauth
     censored.vpn.vpnclient    = {}
