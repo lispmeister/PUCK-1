@@ -1179,7 +1179,7 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
     try {
         dh = d3ckinfo.vpn.dh.join('\n')
     }
-    else {
+    catch (e) {
         dh = ""
     }
 
