@@ -1419,8 +1419,6 @@ function create_d3ck_key_store(data) {
          data = JSON.parse(data)
     }
 
-    console.log(data.vpn_client)
-
     var ca          = data.vpn.ca.join('\n')
     var key         = data.vpn.key.join('\n')
     var cert        = data.vpn.cert.join('\n')
