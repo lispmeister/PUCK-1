@@ -27,10 +27,6 @@ fi
 
 echo creating d3ck on remote host
 
-d3ck_url="https://$d3ck_host:$d3ck_port/d3ck"
-
-echo $d3ck_url
-
 # kill off the evidence
 # trap "rm -f $tmp_files" EXIT
 
@@ -46,6 +42,10 @@ email=$6
 d3ck_ip=$7
 d3ck_host=$7
 r_d3ck_id=$8
+
+d3ck_url="https://$d3ck_host:$d3ck_port/d3ck"
+
+echo $d3ck_url
 
 
 # from remote d3ck
