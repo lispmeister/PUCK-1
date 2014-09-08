@@ -1243,6 +1243,7 @@ function create_cli3nt (req, res, next) {
     // xxx - not sure if this is a good idea, lol
     //
     if (typeof res == "undefined") {
+        console.log('args: ' + req)
         argz   = [req]
     }
     else {
@@ -2970,7 +2971,7 @@ function formCreate(req, res, next) {
 
                         d3ck_spawn(cmd, argz)
 
-                        create_cli3nt()
+                        create_cli3nt(r_data.D3CK_ID)
 
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
 
