@@ -123,8 +123,6 @@ function rip_d3ck (d3ck, remote_did) {
 
     console.log('censoring ' + did)
 
-    console.log(d3ck)
-
 // openvpn --ca /etc/d3ck/d3cks/AC6C4FCA9ECAE6E88BA9D41BA0AA956942EDA9C4/d3ckroot.crt 
 //         --tls-auth /etc/d3ck/d3cks/AC6C4FCA9ECAE6E88BA9D41BA0AA956942EDA9C4/ta.key 
 //         --key /etc/d3ck/d3cks/AC6C4FCA9ECAE6E88BA9D41BA0AA956942EDA9C4/cli3nt.key 

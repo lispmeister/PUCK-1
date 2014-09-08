@@ -1271,18 +1271,22 @@ function create_cli3nt (req, res, next) {
 function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
-
-    console.log(req)
-
-    var d3ck_status = empty_status()
-
-    var ip_addr = req.body.ip_addr
+    // console.log(req.body)
+    console.log(req.body.value)
 
     if (!req.body.value) {
         console.log('create_d3ck: missing value');
         next(new MissingValueError());
         return;
     }
+
+    // if (typeof data != 'object') {
+    //     data = JSON.parse(data)
+    // }
+
+    var d3ck_status = empty_status()
+
+    var ip_addr = req.body.value.ip_addr
 
     client_ip  = get_client_ip(req)
     all_client_ips = req.body.value.all_ips
@@ -3158,7 +3162,7 @@ server.use(express.session({
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
-server.use(express.bodyParser());
+// server.use(express.bodyParser());
 server.use(server.router);
 
 // passport auth
