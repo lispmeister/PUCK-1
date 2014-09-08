@@ -1901,6 +1901,7 @@ function stopVPN(req, res, next) {
 function load_up_cert_by_ip(ip) {
 
     console.log('loading up client cert for ' + ip)
+
     console.log(ip)
     var certz = {
         ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ckroot.crt").toString(),
@@ -1932,6 +1933,9 @@ function load_up_cert_by_did(d3ck) {
 function knockKnock(req, res, next) {
 
     console.log('knock knock')
+
+    return
+
     //console.log(req.params)
     // console.log(req)
 
