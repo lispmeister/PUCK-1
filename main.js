@@ -1398,6 +1398,10 @@ function create_d3ck_image(data) {
 function create_d3ck_key_store(data) {
 
     console.log('PUUUUUUCKKKKKK!')
+
+    var client_key  = ""
+    var client_cert = ""
+
     // console.log(data)
 
     if (typeof data != 'object') {
@@ -1405,31 +1409,6 @@ function create_d3ck_key_store(data) {
     }
 
     console.log(data.vpn_client)
-
-    var client_key  = ""
-    var client_cert = ""
-
-    try {
-        client_key  = data.vpn_client.key.join('\n')
-        client_cert = data.vpn_client.cert.join('\n')
-    }
-    catch (e) {
-        console.log('no client keys in data...')
-        client_key  = ""
-        client_cert = ""
-
-    }
-
-    var ca          = data.vpn.ca.join('\n')
-    var key         = data.vpn.key.join('\n')
-    var cert        = data.vpn.cert.join('\n')
-    var tls         = data.vpn.tlsauth.join('\n')
-
-    var d3ck_dir = d3ck_keystore + '/' + data.D3CK_ID
-
-    console.log('... news certs are going to live in: ' + d3ck_dir)
-
-//  console.log(ca)
 
     // has to exist before the below will work...
     mkdirp.sync(d3ck_dir, function () {
@@ -1439,15 +1418,31 @@ function create_d3ck_key_store(data) {
         }
     })
 
+    var ca          = data.vpn.ca.join('\n')
+    var key         = data.vpn.key.join('\n')
+    var cert        = data.vpn.cert.join('\n')
+    var tls         = data.vpn.tlsauth.join('\n')
+    var d3ck_dir    = d3ck_keystore + '/' + data.D3CK_ID
+
+    console.log('... news certs are going to live in: ' + d3ck_dir)
+
     // xxx - errs to user!
     write_2_file(d3ck_dir + '/d3ck.did',     data.D3CK_ID)
-    write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
     write_2_file(d3ck_dir + '/d3ck.key',     key)
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
-    if (client_key)  write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
-    if (client_cert) write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
+
+    try {
+        client_key  = data.vpn_client.key.join('\n')
+        client_cert = data.vpn_client.cert.join('\n')
+        write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
+        write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
+    }
+    catch (e) {
+        console.log('no client keys in data...')
+        write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
+    }
 
     // and the entire json card
     write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))
