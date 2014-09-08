@@ -1410,14 +1410,6 @@ function create_d3ck_key_store(data) {
 
     console.log(data.vpn_client)
 
-    // has to exist before the below will work...
-    mkdirp.sync(d3ck_dir, function () {
-        if(err) {
-            // xxx - user error, bail
-            console.log(err);
-        }
-    })
-
     var ca          = data.vpn.ca.join('\n')
     var key         = data.vpn.key.join('\n')
     var cert        = data.vpn.cert.join('\n')
@@ -1425,6 +1417,14 @@ function create_d3ck_key_store(data) {
     var d3ck_dir    = d3ck_keystore + '/' + data.D3CK_ID
 
     console.log('... news certs are going to live in: ' + d3ck_dir)
+
+    // has to exist before the below will work...
+    mkdirp.sync(d3ck_dir, function () {
+        if(err) {
+            // xxx - user error, bail
+            console.log(err);
+        }
+    })
 
     // xxx - errs to user!
     write_2_file(d3ck_dir + '/d3ck.did',     data.D3CK_ID)
