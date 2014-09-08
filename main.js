@@ -1252,7 +1252,7 @@ function create_cli3nt (req, res, next) {
 
     var keyout = d3ck_spawn_sync(command, argz)
 
-    console.log ('keyZ...' + JSON.stringify(keyz))
+    console.log ('keyZ...' + JSON.stringify(keyout))
 
     if (keyout.code) {
         console.log("error!\n\n\n")
@@ -2313,8 +2313,8 @@ function d3ck_spawn_sync(command, argz) {
     console.log('stdout + stderr ' + result.stdout);
 
     try {
-        out = fs.writeFileSync(d3ck_logs + '/' + command + '.out.log', 'a+')
-        err = fs.writeFileSync(d3ck_logs + '/' + command + '.err.log', 'a+')
+        out = fs.writeFileSync(d3ck_logs + '/' + command.replace(/\\/g,'/').replace( /.*\//, '' )  + '.out.log', 'a+')
+        err = fs.writeFileSync(d3ck_logs + '/' + command.replace(/\\/g,'/').replace( /.*\//, '' )  + '.err.log', 'a+')
     }
     catch (e) {
         console.log("error writing log file with " + command + ' => ' + e.message)
