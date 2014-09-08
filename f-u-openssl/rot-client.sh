@@ -47,6 +47,11 @@ openssl req $magic -extensions client -nodes -batch -new -newkey rsa:$KEY_SIZE -
 
 openssl ca $magic -extensions client -cert $keystore/D3CK/ca.crt -batch -keyfile $keystore/D3CK/ca.key -days $KEY_LIFE -out $storage/$1.crt -in $storage/$1.csr -config stupid.conf
 
+cp  $storage/$1.crt $keystore/$1/cli3nt.crt
+cp  $storage/$1.key $keystore/$1/cli3nt.key
+
+cat $storage/$1.{crt,key} > $keystore/$1/cli3nt.all
+
 rm $hell/*.pem
 
 chmod -R 755 $hell $d3ck_home
