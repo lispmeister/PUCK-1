@@ -146,8 +146,9 @@ function rip_d3ck (d3ck, remote_did) {
 
     censored.vpn.tlsauth      = d3ck.vpn.tlsauth
     censored.vpn.vpnclient    = {}
-    censored.vpn.image_b64    = d3ck.image_b64
-    censored.vpn.capabilities = d3ck.capabilities
+
+    censored.image_b64        = d3ck.image_b64
+    censored.capabilities     = d3ck.capabilities
 
     console.log('... final result:')
 

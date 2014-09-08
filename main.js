@@ -1357,6 +1357,11 @@ function create_d3ck_image(data) {
         data = JSON.parse(data)
     }
 
+    console.log('create d3ck img')
+    console.log(data)
+
+    console.log(typeof data.image_b64)
+
     var image = b64_decode(data.image_b64)
 
     console.log('trying to decode: ' + data.image)
