@@ -146,8 +146,7 @@ var decoder       = new StringDecoder('utf8');
 
 // global D3CK ID for this server's D3CK
 try {
-    d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.did')
-    d3ck_id = decoder.write(d3ck_id);
+    d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.did').toString()
     d3ck_id = d3ck_id.replace(/\n/, '');
 }
 catch (e) {
@@ -1234,7 +1233,8 @@ function create_cli3nt (req, res, next) {
     console.log ('creating client keys')
 
     var target  = ''
-    var command = d3ck_home + '/f-u-openssl/rot-client.sh'
+    // var command = d3ck_home + '/f-u-openssl/rot-client.sh'
+    var command = d3ck_bin + '/bundle_certs.js'
     var argz    = []
 
     //
@@ -3662,9 +3662,6 @@ Object.size = function(obj) {
     }
     return size;
 }
-
-
-
 
 
 //
