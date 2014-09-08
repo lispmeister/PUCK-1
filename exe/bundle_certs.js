@@ -140,8 +140,10 @@ function rip_d3ck (d3ck, remote_did) {
     censored.vpn.port         = d3ck.vpn.port
     censored.vpn.protocol     = d3ck.vpn.protocol
     censored.vpn.ca           = d3ck.vpn.ca
-    censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString()
-    censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString(),
+    // censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString()
+    censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key")
+    // censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString(),
+    censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt")
     censored.vpn.all          = censored.vpn.key + '\n\n' + censored.vpn.cert
 
     censored.vpn.tlsauth      = d3ck.vpn.tlsauth
