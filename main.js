@@ -1446,8 +1446,8 @@ function create_d3ck_key_store(data) {
     write_2_file(d3ck_dir + '/d3ck.crt',     cert)
     write_2_file(d3ck_dir + '/ta.key',       tls)
 
-    write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
-    write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
+    if (client_key)  write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
+    if (client_cert) write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
 
     // and the entire json card
     write_2_file(d3ck_dir + '/' + data.D3CK_ID + '.json', JSON.stringify(data))
