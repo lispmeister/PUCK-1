@@ -1173,6 +1173,16 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
     console.log(d3ckinfo)
     console.log(elements)
 
+    var dh = ""
+
+    // XXXXX 
+    try {
+        dh = d3ckinfo.vpn.dh.join('\n')
+    }
+    else {
+        dh = ""
+    }
+
     var vpn = {
         port       : d3ckinfo.vpn.port,
         protocol   : d3ckinfo.vpn.protocol,
@@ -1180,7 +1190,7 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
         key        : d3ckinfo.vpn.key.join('\n'),
         cert       : d3ckinfo.vpn.cert.join('\n'),
         tlsauth    : d3ckinfo.vpn.tlsauth.join('\n'),
-        dh         : d3ckinfo.vpn.dh.join('\n')
+        dh         : dh
     }
 
     var vpn_client = { }
