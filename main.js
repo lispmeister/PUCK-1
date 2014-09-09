@@ -1226,9 +1226,47 @@ function update_d3ck(_d3ck) {
 }
 
 //
-// may be called either internally or via REST
+// via REST... executes a program, creates client certs, stashes them
+// in the querying d3ck's dir, then returns the certs back
 //
-function create_cli3nt (req, res, next) {
+function create_cli3nt_rest (req, res, next) {
+
+    // XXXX - have to verify that they're requesting for themselves,
+    // not for others!
+
+    //
+    // url
+    //
+    console.log('doing it the hard way....')
+
+    if (typeof req.query.did == "undefined") {
+        console.log('bad dog, no DiD!')
+        res.send(400, { error: 'bad dog, no DiD, no tasty bites!' })
+    }
+
+    var did = req.query.did
+
+    console.log('DiD: ' + did)
+
+    var keyout = d3ck_spawn_sync(command, argz)
+
+    if (keyout.code) {
+        console.log("error!\n\n\n")
+        res.send(420, { error: "couldn't retreive client certificates" } )
+    }
+    else {
+        console.log('looks good...')
+        var certz = fs.readFile(d3ck_keystore +'/'+ did + "/cli3nt.all").toString()
+        res.send(200, { ccertz: certz } )
+    }
+
+}
+
+
+//
+// as above, internal to server
+//
+function create_cli3nt_int (argz) {
 
     console.log ('creating client keys')
 
@@ -1240,16 +1278,9 @@ function create_cli3nt (req, res, next) {
     //
     // server internal
     //
-    // xxx - not sure if this is a good idea, lol
-    //
-    if (typeof res == "undefined") {
-        console.log('args: ' + req)
-        argz   = [req]
-    }
-    else {
-        console.log('... not implemented yet... \n\n\n\n')
-    }
-
+    console.log('args: ' + req)
+    argz   = [args]
+ 
     var keyout = d3ck_spawn_sync(command, argz)
 
     console.log ('keyZ...' + JSON.stringify(keyout))
@@ -2895,6 +2926,26 @@ function formCreate(req, res, next) {
                         r_data = JSON.parse(r_data)
                         console.log('remote d3ck info in...!')
 
+                        //
+                        // now get client certs
+                        //
+                        c_url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
+                        var c_req = https.get(c_url, function(c_response) {
+                            var c_data = ''
+                            c_response.on('data', function(chunk) {
+                                c_data += chunk
+                            })
+                            c_response.on('end', function() {
+
+                                console.log("CDATA: " + c_data)
+
+                                c_data = JSON.parse(c_data)
+
+                //xxxx
+                //xxxx
+                //xxxx
+
+
                         // if the IP we get the add from isn't in the ips the other d3ck
                         // says it has... add it in; they may be coming from a NAT or
                         // something weird
@@ -2953,6 +3004,7 @@ function formCreate(req, res, next) {
 
                         // now write the image data for the d3ck in question
                         console.log('just about to keel over')
+
                         // console.log(r_data)
 
                         // write image
@@ -2981,9 +3033,17 @@ function formCreate(req, res, next) {
 
                         d3ck_spawn(cmd, argz)
 
-                        // create_cli3nt(r_data.D3CK_ID)
-
                         createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
+
+})
+})
+// xxx
+c_req.on('error', function(e) {
+    console.log("Got error: " + e.message)
+    console.log('errz snatchin ' + url + ' ... ' + e.message)
+    return(e)
+})
+
 
                     })
                     req.on('error', function(e) {
@@ -3276,7 +3336,7 @@ async.whilst(
 server.get('/ping', echoReply)
 
 // get a new client key pair
-server.post('/cli3nt', auth, create_cli3nt)
+server.post('/cli3nt', auth, create_cli3nt_rest)
 
 // get or list d3cks
 server.post('/d3ck', auth, create_d3ck)
