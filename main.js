@@ -2937,10 +2937,18 @@ function formCreate(req, res, next) {
                             })
                             c_response.on('end', function() {
 
+                                console.log("CDATA: " + c_url)
                                 console.log("CDATA: " + c_data)
 
                                 c_data = JSON.parse(c_data)
 
+                //xxxx
+                //xxxx
+                //xxxx
+                //xxxx
+                //xxxx
+                //xxxx
+                //xxxx
                 //xxxx
                 //xxxx
                 //xxxx
@@ -3336,7 +3344,7 @@ async.whilst(
 server.get('/ping', echoReply)
 
 // get a new client key pair
-server.post('/cli3nt', auth, create_cli3nt_rest)
+server.get('/cli3nt', auth, create_cli3nt_rest)
 
 // get or list d3cks
 server.post('/d3ck', auth, create_d3ck)
