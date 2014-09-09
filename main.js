@@ -1261,17 +1261,13 @@ function create_cli3nt_rest (req, res, next) {
     else {
         console.log('looks good...')
         console.log(d3ck_keystore +'/'+ did + "/cli3nt.all")
-        var certz = fs.readFileSync(d3ck_keystore +'/'+ did + "/cli3nt.all").toString()
-        var certz = JSON.parse(certz)
 
-        var cli3nt_bundle      = JSON.parse(JSON.stringify(bwana_d3ck))
+        var cli3nt_bundle = fs.readFileSync(d3ck_keystore +'/'+ did + "/cli3nt.json").toString()
 
-        cli3nt_bundle.key  = certz.key
-        cli3nt_bundle.cert = certz.cert
-        cli3nt_bundle.ca   = certz.ca
-        cli3nt_bundle.all  = certz.all
+        //console.log(certz)
 
         res.send(200, cli3nt_bundle)
+
     }
 
 }
