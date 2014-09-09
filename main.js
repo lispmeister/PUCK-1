@@ -1264,7 +1264,7 @@ function create_cli3nt_rest (req, res, next) {
         var certz = fs.readFileSync(d3ck_keystore +'/'+ did + "/cli3nt.all").toString()
         var certz = JSON.parse(certz)
 
-        var cli3nt_bundle      = bwana_d3ck 
+        var cli3nt_bundle      = JSON.parse(JSON.stringify(bwana_d3ck))
         var cli3nt_bundle.key  = certz.key
         var cli3nt_bundle.cert = certz.cert
         var cli3nt_bundle.ca   = certz.ca
