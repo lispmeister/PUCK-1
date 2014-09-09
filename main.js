@@ -1260,6 +1260,7 @@ function create_cli3nt_rest (req, res, next) {
     }
     else {
         console.log('looks good...')
+        console.log(d3ck_keystore +'/'+ did + "/cli3nt.all")
         var certz = fs.readFile(d3ck_keystore +'/'+ did + "/cli3nt.all").toString()
         res.send(200, { ccertz: certz } )
     }
