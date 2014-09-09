@@ -1265,10 +1265,11 @@ function create_cli3nt_rest (req, res, next) {
         var certz = JSON.parse(certz)
 
         var cli3nt_bundle      = JSON.parse(JSON.stringify(bwana_d3ck))
-        var cli3nt_bundle.key  = certz.key
-        var cli3nt_bundle.cert = certz.cert
-        var cli3nt_bundle.ca   = certz.ca
-        var cli3nt_bundle.all  = certz.all
+
+        cli3nt_bundle.key  = certz.key
+        cli3nt_bundle.cert = certz.cert
+        cli3nt_bundle.ca   = certz.ca
+        cli3nt_bundle.all  = certz.all
 
         res.send(200, cli3nt_bundle)
     }
