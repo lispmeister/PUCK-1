@@ -3036,9 +3036,6 @@ function formCreate(req, res, next) {
                         console.log('errz snatchin ' + url + ' ... ' + e.message)
                         return(e)
                     })
-
-
-                    })
                     req.on('error', function(e) {
                         console.log('create Error... no d3ck data back? ', e.message)
                     })
@@ -3050,6 +3047,7 @@ function formCreate(req, res, next) {
             console.log('errz snatchin ' + url + ' ... ' + e.message)
             return(e)
         })
+    })
 
     console.log('end-o-create...')
 
