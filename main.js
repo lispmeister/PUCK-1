@@ -1234,6 +1234,10 @@ function create_cli3nt_rest (req, res, next) {
     // XXXX - have to verify that they're requesting for themselves,
     // not for others!
 
+    var target  = ''
+    var command = d3ck_bin + '/bundle_certs.js'
+    var argz    = []
+
     //
     // url
     //
@@ -1248,7 +1252,7 @@ function create_cli3nt_rest (req, res, next) {
 
     console.log('DiD: ' + did)
 
-    var keyout = d3ck_spawn_sync(command, argz)
+    var keyout = d3ck_spawn_sync(command, [did])
 
     if (keyout.code) {
         console.log("error!\n\n\n")
