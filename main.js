@@ -2930,34 +2930,6 @@ function formCreate(req, res, next) {
                         r_data = JSON.parse(r_data)
                         console.log('remote d3ck info in...!')
 
-                        //
-                        // now get client certs
-                        //
-                        c_url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
-                        var c_req = https.get(c_url, function(c_response) {
-                            var c_data = ''
-                            c_response.on('data', function(chunk) {
-                                c_data += chunk
-                            })
-                            c_response.on('end', function() {
-
-                                console.log("CDATA: " + c_url)
-                                console.log("CDATA: " + c_data)
-
-                                c_data = JSON.parse(c_data)
-
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-                //xxxx
-
-
                         // if the IP we get the add from isn't in the ips the other d3ck
                         // says it has... add it in; they may be coming from a NAT or
                         // something weird
@@ -3013,6 +2985,24 @@ function formCreate(req, res, next) {
                         d3ck_spawn(cmd, argz)
 
                         assign_capabilities(r_data)
+
+                        //
+                        // now get client certs
+                        //
+                        c_url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
+                        var c_req = https.get(c_url, function(c_response) {
+                            var c_data = ''
+                            c_response.on('data', function(chunk) {
+                                c_data += chunk
+                            })
+                            c_response.on('end', function() {
+
+                                console.log("CDATA: " + c_url)
+                                console.log("CDATA: " + c_data)
+
+                                c_data = JSON.parse(c_data)
+
+
 
                         // now write the image data for the d3ck in question
                         console.log('just about to keel over')
