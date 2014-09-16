@@ -142,7 +142,7 @@ function rip_d3ck (d3ck, remote_did) {
 
     // give them our CA
     // censored.vpn.ca           = d3ck.vpn.ca
-    censored.vpn.ca           = fs.readFileSync(d3ck_keystore +'/D3CK/d3ckroot.ca').toString().split('\n')
+    censored.vpn.ca           = fs.readFileSync(d3ck_keystore +'/D3CK/d3ckroot.crt').toString().split('\n')
 
     censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString().split('\n')
     censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString().split('\n')
