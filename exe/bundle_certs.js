@@ -47,7 +47,6 @@ var d3ck_home      = config.D3CK.home
 var d3ck_keystore  = d3ck_home + config.D3CK.keystore
 var d3ck_bin       = d3ck_home + config.D3CK.bin
 
-
 try {
     d3ck_id = fs.readFileSync(d3ck_keystore + '/D3CK/d3ck.did').toString()
     d3ck_id = d3ck_id.replace(/\n/, '');
@@ -57,6 +56,7 @@ catch (e) {
     console.log(e)
     process.exit(2)
 }
+
 
 //
 // execute command to get client certs
@@ -96,7 +96,7 @@ function suck_d3ck (id, remote_did) {
             }
             else {
                 // console.log(reply)
-                var bwana_d3ck = JSON.parse(reply)
+                bwana_d3ck = JSON.parse(reply)
                 console.log('d3ckaroo')
 
                 rip_d3ck(bwana_d3ck, remote_did)
@@ -139,7 +139,11 @@ function rip_d3ck (d3ck, remote_did) {
     censored.vpn              = {}
     censored.vpn.port         = d3ck.vpn.port
     censored.vpn.protocol     = d3ck.vpn.protocol
-    censored.vpn.ca           = d3ck.vpn.ca
+
+    // give them our CA
+    // censored.vpn.ca           = d3ck.vpn.ca
+    censored.vpn.ca           = fs.readFileSync(d3ck_keystore +'/D3CK/d3ckroot.ca').toString().split('\n')
+
     censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString().split('\n')
     censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString().split('\n')
     censored.vpn.all          = censored.vpn.key.join('\n') + '\n\n' + censored.vpn.cert.join('\n')
