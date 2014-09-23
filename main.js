@@ -1292,13 +1292,11 @@ function create_cli3nt_int (argz) {
     var target  = ''
     // var command = d3ck_home + '/f-u-openssl/rot-client.sh'
     var command = d3ck_bin + '/bundle_certs.js'
-    var argz    = []
 
     //
     // server internal
     //
     console.log('args: ' + req)
-    argz   = [args]
  
     var keyout = d3ck_spawn_sync(command, argz)
 
