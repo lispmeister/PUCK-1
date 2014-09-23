@@ -1,0 +1,126 @@
+-----BEGIN PRIVATE KEY-----
+MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKpa/TahiwWEQpox
+7yI5DvczuOlXVhWCNArH4haj1NYgDxVu+m7wBh4cVojD+00UdOs6e/Vw63VV2wNn
+Qo7sQinnu+5Q7752kn/aTE+c0aLthuC8yn3mPrN1mp49esytCyYy+xdDPhclK02/
+YdS2RvFyPjxwsz4vg1CAbqpCYGkNAgMBAAECgYAlCofIWzPJTUrWEEl43YM9iQeJ
+5S2Ym6kJNxEX7yOWM35UIL9fY91QqsS+FC8OQYZyp1LQuW7ZIoPup4M3ZHO2Ie2u
+kFtWhr1J8T+FZ5PK22sDVaVvyWTbqZgwvf/Qge8opmA8asMjohr18P6aGh/GqwuH
+FuyiANniZrLcLMBxgQJBAN2II2pzlUuVlwgDXSEBeou6m4c2eFbQF2l6RSdzfvBn
+ZkZ4Ay9Qkx2bUlg6ROuqIUX4hLQx3sTwwKX0OxkJQb0CQQDE3HA2d3Ap8wQ56ow+
+WgM+qTB3R65X+xOBgwFXjfWkNp7OEES1eewhvp482vm8R1uaEgMlGiEx8vmez+VF
+ETGRAkAlGSpNJmQHD1sGhYGwCE5cXfizsQSADUMOb+Jq0+WbHsW64VgvMUAhwiQN
+EF0AVjJSRGb8wik7M9IfOII5FBrFAkEAmAOdBwId89a7ibmLiE5buRRO35zTjQ7N
+ljHCZIiziZW/9WFsnTJD3B7k9Bsnw3La0lNcaFcQEREOHstswHOxcQJBANDCWcMX
+7JTWl6EdHehWLIavgQ3T6F21zsj61XQflOh20Q4c0dIeSOdG3MLUQ8gTt4MvybEw
+fjdzEMxppVsWn4E=
+-----END PRIVATE KEY-----
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            2c:d0:5a:07:eb:e0:84:d3:20:a9:40:fc:e9:88:2a:47
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=54998394f20a396c2e4764ffca6fd772
+        Validity
+            Not Before: Sep 23 15:16:56 2014 GMT
+            Not After : Sep 23 15:16:56 2015 GMT
+        Subject: C=AQ, ST=White, L=D3cktown, O=D3ckasaurusRex, CN=e69bf5d85330c326da8941491b465609
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (1024 bit)
+                Modulus:
+                    00:aa:5a:fd:36:a1:8b:05:84:42:9a:31:ef:22:39:
+                    0e:f7:33:b8:e9:57:56:15:82:34:0a:c7:e2:16:a3:
+                    d4:d6:20:0f:15:6e:fa:6e:f0:06:1e:1c:56:88:c3:
+                    fb:4d:14:74:eb:3a:7b:f5:70:eb:75:55:db:03:67:
+                    42:8e:ec:42:29:e7:bb:ee:50:ef:be:76:92:7f:da:
+                    4c:4f:9c:d1:a2:ed:86:e0:bc:ca:7d:e6:3e:b3:75:
+                    9a:9e:3d:7a:cc:ad:0b:26:32:fb:17:43:3e:17:25:
+                    2b:4d:bf:61:d4:b6:46:f1:72:3e:3c:70:b3:3e:2f:
+                    83:50:80:6e:aa:42:60:69:0d
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            Netscape Comment: 
+                d3ck Server Certificate
+            X509v3 Subject Key Identifier: 
+                41:BB:4F:15:8E:7E:67:A7:A1:6D:DB:A8:C7:B2:20:16:FA:24:36:3F
+            X509v3 Authority Key Identifier: 
+                keyid:9D:38:60:89:5F:B8:A1:B8:27:DC:28:C3:1F:84:29:70:0D:E6:9C:0F
+                DirName:/C=AQ/ST=White/L=D3cktown/O=D3ckasaurusRex/CN=54998394f20a396c2e4764ffca6fd772
+                serial:DF:93:4B:C3:42:F6:90:65
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha256WithRSAEncryption
+         5b:09:96:64:4e:49:f2:0c:7c:54:3b:e4:fa:69:48:be:ca:ed:
+         19:b4:16:e4:77:c1:00:be:33:6c:99:e4:6f:11:5e:c4:6e:ba:
+         d9:a4:68:85:ae:01:9a:8d:0d:dd:90:1f:7f:c4:32:c1:76:b6:
+         cd:49:5f:ef:24:82:06:41:0c:00:4d:d8:4d:90:a0:ed:2d:7c:
+         31:da:50:93:e3:23:c4:27:b2:55:15:59:83:d8:84:f1:c4:53:
+         67:cc:4c:b2:5e:fe:65:e2:7a:71:45:ca:ba:c6:91:04:23:ff:
+         dd:e9:fa:ca:8c:60:5a:cd:4f:02:6c:61:45:7a:82:9a:ad:64:
+         10:8c
+-----BEGIN CERTIFICATE-----
+MIIDozCCAwygAwIBAgIQLNBaB+vghNMgqUD86YgqRzANBgkqhkiG9w0BAQsFADB0
+MQswCQYDVQQGEwJBUTEOMAwGA1UECAwFV2hpdGUxETAPBgNVBAcMCEQzY2t0b3du
+MRcwFQYDVQQKDA5EM2NrYXNhdXJ1c1JleDEpMCcGA1UEAwwgNTQ5OTgzOTRmMjBh
+Mzk2YzJlNDc2NGZmY2E2ZmQ3NzIwHhcNMTQwOTIzMTUxNjU2WhcNMTUwOTIzMTUx
+NjU2WjB0MQswCQYDVQQGEwJBUTEOMAwGA1UECAwFV2hpdGUxETAPBgNVBAcMCEQz
+Y2t0b3duMRcwFQYDVQQKDA5EM2NrYXNhdXJ1c1JleDEpMCcGA1UEAwwgZTY5YmY1
+ZDg1MzMwYzMyNmRhODk0MTQ5MWI0NjU2MDkwgZ8wDQYJKoZIhvcNAQEBBQADgY0A
+MIGJAoGBAKpa/TahiwWEQpox7yI5DvczuOlXVhWCNArH4haj1NYgDxVu+m7wBh4c
+VojD+00UdOs6e/Vw63VV2wNnQo7sQinnu+5Q7752kn/aTE+c0aLthuC8yn3mPrN1
+mp49esytCyYy+xdDPhclK02/YdS2RvFyPjxwsz4vg1CAbqpCYGkNAgMBAAGjggE0
+MIIBMDAJBgNVHRMEAjAAMBEGCWCGSAGG+EIBAQQEAwIGQDAmBglghkgBhvhCAQ0E
+GRYXZDNjayBTZXJ2ZXIgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFEG7TxWOfmenoW3b
+qMeyIBb6JDY/MIGmBgNVHSMEgZ4wgZuAFJ04YIlfuKG4J9wowx+EKXAN5pwPoXik
+djB0MQswCQYDVQQGEwJBUTEOMAwGA1UECAwFV2hpdGUxETAPBgNVBAcMCEQzY2t0
+b3duMRcwFQYDVQQKDA5EM2NrYXNhdXJ1c1JleDEpMCcGA1UEAwwgNTQ5OTgzOTRm
+MjBhMzk2YzJlNDc2NGZmY2E2ZmQ3NzKCCQDfk0vDQvaQZTATBgNVHSUEDDAKBggr
+BgEFBQcDATALBgNVHQ8EBAMCBaAwDQYJKoZIhvcNAQELBQADgYEAWwmWZE5J8gx8
+VDvk+mlIvsrtGbQW5HfBAL4zbJnkbxFexG662aRoha4Bmo0N3ZAff8QywXa2zUlf
+7ySCBkEMAE3YTZCg7S18MdpQk+MjxCeyVRVZg9iE8cRTZ8xMsl7+ZeJ6cUXKusaR
+BCP/3en6yoxgWs1PAmxhRXqCmq1kEIw=
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+MIIDQDCCAqmgAwIBAgIJAN+TS8NC9pBlMA0GCSqGSIb3DQEBCwUAMHQxCzAJBgNV
+BAYTAkFRMQ4wDAYDVQQIDAVXaGl0ZTERMA8GA1UEBwwIRDNja3Rvd24xFzAVBgNV
+BAoMDkQzY2thc2F1cnVzUmV4MSkwJwYDVQQDDCA1NDk5ODM5NGYyMGEzOTZjMmU0
+NzY0ZmZjYTZmZDc3MjAeFw0xNDA5MjMxNTE2NTVaFw0xNTA5MjMxNTE2NTVaMHQx
+CzAJBgNVBAYTAkFRMQ4wDAYDVQQIDAVXaGl0ZTERMA8GA1UEBwwIRDNja3Rvd24x
+FzAVBgNVBAoMDkQzY2thc2F1cnVzUmV4MSkwJwYDVQQDDCA1NDk5ODM5NGYyMGEz
+OTZjMmU0NzY0ZmZjYTZmZDc3MjCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA
+oywj3BDO/5wPyaxBpys/fumEITLoNgQH/fwJWzxuQCga4R2CR+4BMDmgvoNw7ieG
+ebVGu2RG/TjerB91qoTvDpzFxeEBaW5QlZVVqwHF1z+RJcEzvwPeaRPZUTKc/ynE
+edr+JHKIHxTjf6UFBKmjMw9B/JdrwAeK3Nh8YErQerUCAwEAAaOB2TCB1jAdBgNV
+HQ4EFgQUnThgiV+4obgn3CjDH4QpcA3mnA8wgaYGA1UdIwSBnjCBm4AUnThgiV+4
+obgn3CjDH4QpcA3mnA+heKR2MHQxCzAJBgNVBAYTAkFRMQ4wDAYDVQQIDAVXaGl0
+ZTERMA8GA1UEBwwIRDNja3Rvd24xFzAVBgNVBAoMDkQzY2thc2F1cnVzUmV4MSkw
+JwYDVQQDDCA1NDk5ODM5NGYyMGEzOTZjMmU0NzY0ZmZjYTZmZDc3MoIJAN+TS8NC
+9pBlMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADgYEADUVGLFqgRM1El+PV
+E460IpAPyLOJVYjJ+tlkBdeLN+HpDPaXv2py5FDA52plfYxMd/l8TiaViyTFinWi
+UqK5ui11feqCpcI1E6zIsSyhBb/IdYBSRhZMfIJPy1Tyd0wZNp8oPhrPq3u+eWyI
+9c1ED8nmcOAUm+J65LBAKV+WIkk=
+-----END CERTIFICATE-----
+-----BEGIN PRIVATE KEY-----
+MIICdQIBADANBgkqhkiG9w0BAQEFAASCAl8wggJbAgEAAoGBAKMsI9wQzv+cD8ms
+QacrP37phCEy6DYEB/38CVs8bkAoGuEdgkfuATA5oL6DcO4nhnm1RrtkRv043qwf
+daqE7w6cxcXhAWluUJWVVasBxdc/kSXBM78D3mkT2VEynP8pxHna/iRyiB8U43+l
+BQSpozMPQfyXa8AHitzYfGBK0Hq1AgMBAAECgYAgCJBZqasZn0eyLfENon3qqmlY
+IyhXQl9XS12C3dA/JCByxVpISL9O+mFGRYOsHXJW/nGOZFdTaxC79ckh2ssbYO6P
+7MyUtjH0t1z4Grt0h6JhmouEXpkT39GFhnL4ZEN+XxORxDo1fDcRX30LXEpviR9B
+/WyJ39QrWVMq2SEmWQJBANbR0qnQbuG1d9Nmc6hez2hPCKnI8cmi6gxBMIdomUd6
+zYbk9LAuXWPcww3PptLzfxqv0+RRAplA/0tDV8lhbw8CQQDCc8EB2zDajPiQHhrm
+4buSg7Xsxk/AjQbAfjHH92plX8lT3F0CikWutQvPoRL/cLYSwmhv9cjYOLDAtP2Y
+jfn7AkB4Pavn50YZSmTOzFrSlHcNkKdtuY806N6Oi3KpaG/bZa5i4gbgEqOtgOUg
+9ukOzMKJYn99HacRtyLusrwReVsbAkARFBGTlCjKSS9bmQlL1e+fgqnrzc8bXkeF
+iI/evEA//xWzo9sXagWMvqH27nK4tLGJHEIH81Jciz4a7sqHJ5EZAkBK58FLSTZQ
+br5yNrbnkD/HD0uFTVUnricf3EcP9Gz20l07gS2/XNTeyb27DBGLD0GY8g592fQ9
+bdIohdmvvTrq
+-----END PRIVATE KEY-----

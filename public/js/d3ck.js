@@ -1440,20 +1440,22 @@ function cat_chat() {
         console.log('got data! ' + JSON.stringify(data))
 
         // $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
-        if (data.data != "")
+        if (data.data != "" && data.did != my_d3ck.D3CK_ID)
             $('#cat_chat').prepend('<div><b>'+ data.user + ':</b> ' + data.data + '<br></div>')
-
     });
 
     // when the client clicks SEND
     $('#datasend').click( function() {
         var message = {}
 
+        message.did  = my_d3ck.D3CK_ID
         message.user = my_d3ck.owner.name
         message.data = $('#meow').val();
         // var message = $('#meow').val();
 
         if (message.data != "") {
+            $('#cat_chat').prepend('<div><b>'+ my_d3ck.owner.name + ':</b> ' + message.data + '<br></div>')
+
             console.log('sending...' + JSON.stringify(message))
             $('#meow').val('');
             $('#meow').focus();
