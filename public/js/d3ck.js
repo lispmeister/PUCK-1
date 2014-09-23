@@ -479,6 +479,8 @@ function event_hang_up() {
 
     $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnected!</h1></span>")
 
+    go_d3ck_or_go_home()
+
 }
 
 //
