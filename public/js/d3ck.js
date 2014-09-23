@@ -590,7 +590,7 @@ var draggers = {} // track drag-n-drop areas
 
 function d3ck_ping(all_ips, d3ckid, url) {
 
-    console.log('in d3ck_ping')
+    // console.log('in d3ck_ping')
     // console.log(d3ckid, url)
     // console.log(all_ips)
 
