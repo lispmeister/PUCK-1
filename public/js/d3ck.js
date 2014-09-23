@@ -916,10 +916,14 @@ function kill_RTC() {
         console.log('leaving...')
         webrtc.leaveRoom()
 
+        console.log('disconnect?')
+        webrtc.connection.disconnect();
+
         console.log('really leaving..?')
         webrtc.hangUp()      // die, die, die, really
 
         console.log('et tu, zen?')
+
     }
     catch (e) {
         console.log('... either not up or failzor in the slaying of webRTC...')
