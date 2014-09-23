@@ -267,7 +267,7 @@ function SimpleWebRTC(opts) {
 
         // zen - Sun Aug 31 14:46:17 PDT 2014
         // kill the HTML for remote vids
-        console.log('nuking-n-adding remote')
+        console.log('nuking-n-adding localScreen')
         $('#remoteVideos video').remove()
 
         var item,
@@ -462,7 +462,7 @@ SimpleWebRTC.prototype.startLocalVideo = function () {
 
             // zen - Sun Aug 31 14:46:17 PDT 2014
             // kill the HTML for local vids
-            console.log('nuking-n-adding local')
+            console.log('nuking-n-adding startLocalVideo')
             $('#localVideo').remove()
             $('#h4_local').append('\n<video id="localVideo"></video>\n')
 
