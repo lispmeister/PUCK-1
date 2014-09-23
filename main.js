@@ -3504,51 +3504,6 @@ var d3cky = http.createServer(server)
 
 var cat_sock = {}
 
-function fire_up_local () {
-
-    console.log('\n\nfiring up local sockets......')
-
-    //
-    // fire up web sockets
-    //
-    var d3ck_users  = {},
-        all_cats    = []
-
-    var sock_user   = ""
-
-    var web_io = require('socket.io').listen(d3cky, { resource: '/catz' });
-    
-
-    //
-    // cat fax & status
-    //
-
-    web_io.sockets.on('connection', function (client) {
-
-        var address = client.handshake.address.address
-        // var address = client.request.connection.remoteAddress
-
-        console.log('a user (from ' + address + ') connected... well, a browser, actually')
-
-        if (isEmpty(cat_sock)) {
-            console.log('^..^')
-            console.log('... resetting cat sock to point to ' + address)
-            console.log('^..^')
-            cat_sock = client
-        }
-
-        d3ck_users[address] = address
-        console.log('[+] NEW connext from ' + address)
-
-        // a friendly cat fact
-        var cool_cat_fact = random_cat_fact(cat_facts)
-        var msg = {type: "cat_fact", fact: cool_cat_fact}
-        cat_power(msg)
-    })
-
-}
-
-
 //
 // signaling
 //
@@ -3556,178 +3511,163 @@ var io_sig = {}
 
 var cool_cats = {}
 
-function fire_up_remote () {
+console.log('\n\nfiring up sockets... trying... to set up... on port ' + d3ck_port_forward + '\n\n')
 
-    console.log('\n\nfiring up remote sockets......')
+io_sig = require('socket.io').listen(d3cky)
 
-    console.log('\n\n... trying... to set up... on port ' + d3ck_port_forward + '\n\n')
+// io_sig.disable('browser client cache');
 
-//  var _ss        = express()
-//  var sig_server = _ss.listen(d3ck_port_int);
-    // var io_sig     = require('socket.io').listen(d3cky, { resource: 'sigsig' })
 
-    io_sig     = require('socket.io').listen(d3cky)
+function describeRoom(name) {
+    var clients = io_sig.sockets.clients(name);
+    var result = { clients: {} };
+    clients.forEach(function (client) {
+        result.clients[client.id] = client.resources;
+    });
+    return result;
+}
 
-    io_sig.disable('browser client cache');
-
-    //     console.log('\n\n\nold sock listening on port ' + d3ck_port_forward + '\n\n\n')
-    // app.use(express.static(__dirname + '/public'));
-
-    // _ss.use(express.static(__dirname))
-
-    function describeRoom(name) {
-        var clients = io_sig.sockets.clients(name);
-        var result = { clients: {} };
-        clients.forEach(function (client) {
-            result.clients[client.id] = client.resources;
-        });
-        return result;
+function safeCb(cb) {
+    if (typeof cb === 'function') {
+        return cb;
+    } else {
+        return function () {};
     }
+}
 
-    function safeCb(cb) {
-        if (typeof cb === 'function') {
-            return cb;
-        } else {
-            return function () {};
+io_sig.set('log level', 1);
+
+
+io_sig.sockets.on('connection', function (ss_client) {
+
+    console.log("CONNEEEEECTION.....!")
+    console.log(ss_client)
+
+    ss_client.resources = {
+        screen: false,
+        video: true,
+        audio: false
+    };
+
+    // pass a message to another id
+    ss_client.on('message', function (details) {
+        // console.log('mess: ' + JSON.stringify(details))
+
+        if (!details) return;
+
+        var otherClient = io_sig.sockets.sockets[details.to];
+
+        // console.log(io_sig.sockets.sockets)
+
+        if (!otherClient) return;
+
+        // ... well...
+        cool_cats[otherClient] = otherClient
+
+        // console.log(otherClient)
+
+        details.from = ss_client.id;
+        otherClient.emit('message', details);
+    });
+
+
+    // all import cat chat!
+    ss_client.on('cat_chat', function (kitten) {
+
+        console.log('A kitten? For me? ' + JSON.stringify(kitten))
+
+        // if (!kitten) return;
+        // if (!otherClient) return;
+
+        kitten.from = ss_client.id;
+
+        console.log('sending free kittens from... ' + ss_client.id)
+
+        // console.log(ss_client)
+
+        for (var cat_client in io_sig.sockets.sockets) {
+            console.log('sending to... ' + JSON.stringify(cat_client))
+            // console.log('sending to... ' )
+            // var c = io_sig.sockets.sockets[
+            io_sig.sockets.sockets[cat_client].emit('cat_chat', kitten);
         }
-    }
-
-    io_sig.set('log level', 1);
-
-
-    io_sig.sockets.on('connection', function (ss_client) {
-
-        console.log("CONNEEEEECTION.....!")
-
-        ss_client.resources = {
-            screen: false,
-            video: true,
-            audio: false
-        };
-
-        // pass a message to another id
-        ss_client.on('message', function (details) {
-            // console.log('mess: ' + JSON.stringify(details))
-
-            if (!details) return;
-
-            var otherClient = io_sig.sockets.sockets[details.to];
-
-            // console.log(io_sig.sockets.sockets)
-
-            if (!otherClient) return;
-
-            // ... well...
-            cool_cats[otherClient] = otherClient
-
-            // console.log(otherClient)
-
-            details.from = ss_client.id;
-            otherClient.emit('message', details);
-        });
-
-
-        // all import cat chat!
-        ss_client.on('cat_chat', function (kitten) {
-
-            console.log('A kitten? For me? ' + JSON.stringify(kitten))
-
-            // if (!kitten) return;
-            // if (!otherClient) return;
-
-            kitten.from = ss_client.id;
-
-            console.log('sending free kittens from... ' + ss_client.id)
-
-            // console.log(ss_client)
-
-            for (var cat_client in io_sig.sockets.sockets) {
-                console.log('sending to... ' + JSON.stringify(cat_client))
-                // console.log('sending to... ' )
-                // var c = io_sig.sockets.sockets[
-                io_sig.sockets.sockets[cat_client].emit('cat_chat', kitten);
-            }
-
-        });
-
-
-        ss_client.on('shareScreen', function () {
-            ss_client.resources.screen = true;
-        });
-
-        ss_client.on('unshareScreen', function (type) {
-            ss_client.resources.screen = false;
-            removeFeed('screen');
-        });
-
-        ss_client.on('join', join);
-
-        function removeFeed(type) {
-            console.log('ss-remove-feed')
-            if (ss_client.room) {
-                io_sig.sockets.in(ss_client.room).emit('remove', {
-                    id: ss_client.id,
-                    type: type
-                });
-                if (!type) {
-                    ss_client.leave(ss_client.room);
-                    ss_client.room = undefined;
-                }
-            }
-        }
-
-        function join(name, cb) {
-            console.log('joining... ' + name)
-
-            // sanity check
-            if (typeof name !== 'string') return;
-
-            // leave any existing rooms
-            removeFeed();
-            safeCb(cb)(null, describeRoom(name));
-            ss_client.join(name);
-            ss_client.room = name;
-        }
-
-        // we don't want to pass "leave" directly because the
-        // event type string of "socket end" gets passed too.
-        ss_client.on('disconnect', function () {
-            console.log('ss-D/C')
-            removeFeed();
-        });
-        ss_client.on('leave', function () {
-            console.log('ss-leave')
-            removeFeed();
-        });
-
-        ss_client.on('create', function (name, cb) {
-            console.log('ss-create')
-            if (arguments.length == 2) {
-                cb = (typeof cb == 'function') ? cb : function () {};
-                name = name || uuid();
-            } else {
-                cb = name;
-                name = uuid();
-            }
-            // check if exists
-            if (io_sig.sockets.ss_clients(name).length) {
-                safeCb(cb)('taken');
-            } else {
-                join(name);
-                safeCb(cb)(null, name);
-            }
-        });
-
-        // ss_client.emit('stunservers', [])
-        // var credentials = [];
-        // ss_client.emit('turnservers', credentials);
 
     });
 
-}
 
-// fire_up_local()
-fire_up_remote()
+    ss_client.on('shareScreen', function () {
+        ss_client.resources.screen = true;
+    });
+
+    ss_client.on('unshareScreen', function (type) {
+        ss_client.resources.screen = false;
+        removeFeed('screen');
+    });
+
+    ss_client.on('join', join);
+
+    function removeFeed(type) {
+        console.log('ss-remove-feed')
+        if (ss_client.room) {
+            io_sig.sockets.in(ss_client.room).emit('remove', {
+                id: ss_client.id,
+                type: type
+            });
+            if (!type) {
+                ss_client.leave(ss_client.room);
+                ss_client.room = undefined;
+            }
+        }
+    }
+
+    function join(name, cb) {
+        console.log('joining... ' + name)
+
+        // sanity check
+        if (typeof name !== 'string') return;
+
+        // leave any existing rooms
+        removeFeed();
+        safeCb(cb)(null, describeRoom(name));
+        ss_client.join(name);
+        ss_client.room = name;
+    }
+
+    // we don't want to pass "leave" directly because the
+    // event type string of "socket end" gets passed too.
+    ss_client.on('disconnect', function () {
+        console.log('ss-D/C')
+        removeFeed();
+    });
+    ss_client.on('leave', function () {
+        console.log('ss-leave')
+        removeFeed();
+    });
+
+    ss_client.on('create', function (name, cb) {
+        console.log('ss-create')
+        if (arguments.length == 2) {
+            cb = (typeof cb == 'function') ? cb : function () {};
+            name = name || uuid();
+        } else {
+            cb = name;
+            name = uuid();
+        }
+        // check if exists
+        if (io_sig.sockets.ss_clients(name).length) {
+            safeCb(cb)('taken');
+        } else {
+            join(name);
+            safeCb(cb)(null, name);
+        }
+    });
+
+    // ss_client.emit('stunservers', [])
+    // var credentials = [];
+    // ss_client.emit('turnservers', credentials);
+
+});
+
 
 // http://stackoverflow.com/questions/5223/length-of-javascript-object-ie-associative-array
 Object.size = function(obj) {

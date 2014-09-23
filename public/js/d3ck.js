@@ -908,9 +908,15 @@ function kill_RTC() {
 
     // kill rtc stuff
     try {
-        webrtc.hangUp()
-        webrtc.leaveRoom()      // die, die, die, really
+        console.log('hanging up...')
         webrtc.emit('leave')
+
+        console.log('leaving...')
+        webrtc.leaveRoom()
+
+        console.log('really leaving..?')
+        webrtc.hangUp()      // die, die, die, really
+
         console.log('et tu, zen?')
     }
     catch (e) {
