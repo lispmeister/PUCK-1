@@ -387,7 +387,12 @@ SimpleWebRTC.prototype.handlePeerStreamRemoved = function (peer) {
     var container = this.getRemoteVideoContainer();
     var videoEl = peer.videoEl;
     if (this.config.autoRemoveVideos && container && videoEl) {
-        container.removeChild(videoEl);
+        try {
+            container.removeChild(videoEl);
+        }
+        catch (e) {
+            console.log("error removing child... hopefully all good anyway: " + JSON.stringify(e))
+        }
     }
     if (videoEl) this.emit('videoRemoved', videoEl, peer);
 };
