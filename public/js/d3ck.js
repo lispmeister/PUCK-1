@@ -933,6 +933,8 @@ function kill_RTC() {
 
     $('#cat_chat').html('')
 
+    go_d3ck_or_go_home()
+
 }
 
 //
