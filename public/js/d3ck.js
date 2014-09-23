@@ -933,8 +933,6 @@ function kill_RTC() {
 
     $('#cat_chat').html('')
 
-    go_d3ck_or_go_home()
-
 }
 
 //
@@ -953,6 +951,8 @@ function remove_signs_of_call() {
         // fire_d3ck_status(d3ck_status)
 
         kill_RTC()
+
+        go_d3ck_or_go_home()
 
     }
 
