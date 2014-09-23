@@ -909,6 +909,8 @@ function kill_RTC() {
     // kill rtc stuff
     try {
         webrtc.hangUp()
+        webrtc.leaveRoom()      // die, die, die, really
+        webrtc.emit('leave')
         console.log('et tu, zen?')
     }
     catch (e) {
@@ -922,6 +924,8 @@ function kill_RTC() {
 
     // kill the silly thing
     $('#video_effect_div').attr("class",'hidden')
+
+    $('#cat_chat').html('')
 
 }
 
