@@ -622,7 +622,7 @@ function d3ck_ping(all_ips, d3ckid, url) {
     //
     jqXHR_get_ping.done(function (data, textStatus, jqXHR) {
         var ret = data
-        console.log("pingzor " + JSON.stringify(data))
+        // console.log("pingzor " + JSON.stringify(data))
 
         var safe_id = 'uppity_' + data.ip.replace(/\./g, '_')
         var safe_ip = data.ip.replace(/\./g, '_')
@@ -632,7 +632,7 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
             all_pings[ping_url] = true
 
-            console.log('success with ' + ping_url)
+            // console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
 
             var ele = $('#'+element_id).parent().closest('div').find('.remote_ip strong')
@@ -917,10 +917,11 @@ function kill_RTC() {
         webrtc.leaveRoom()
 
         console.log('disconnect?')
-        webrtc.connection.disconnect();
+        // this seems to be the thing that really works
+        webrtc.connection.disconnect();      // die, die, die, really
 
-        console.log('really leaving..?')
-        webrtc.hangUp()      // die, die, die, really
+        // console.log('really leaving..?')
+        // webrtc.hangUp()
 
         console.log('et tu, zen?')
 

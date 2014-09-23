@@ -3515,8 +3515,8 @@ console.log('\n\nfiring up sockets... trying... to set up... on port ' + d3ck_po
 
 io_sig = require('socket.io').listen(d3cky)
 
+// xxx?
 // io_sig.disable('browser client cache');
-
 
 function describeRoom(name) {
     var clients = io_sig.sockets.clients(name);
