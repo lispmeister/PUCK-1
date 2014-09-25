@@ -1,0 +1,5 @@
+
+Different sorts of encryption need to be used for UDP and TCP. The former
+is a datagram protocol; accordingly, use of a stream cipher is almost
+certain to be disastrous.
+
