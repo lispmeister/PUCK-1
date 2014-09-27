@@ -1980,8 +1980,6 @@ function knockKnock(req, res, next) {
 
     console.log('knock knock')
 
-    return
-
     //console.log(req.params)
     // console.log(req)
 

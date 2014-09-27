@@ -25,13 +25,15 @@ cd /etc/d3ck/f-u-openssl
 . d3ck-vars
 
 # client
+KEY_CN=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
+magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 
 echo COMMON NAME IS: "$KEY_CN"
 
 echo $vtarget
 
-openssl req -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout "$vtarget.key" -out "$vtarget.csr" -config stupid.cnf
-openssl ca -cert ca.crt $magic -batch -keyfile ca.key -days $d3ck_vpn_life_tmp -out "$vtarget.crt" -in "$vtarget.csr" -config stupid.cnf
+openssl req -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout "$vtarget.key" -out "$vtarget.csr" -config stupid.conf
+openssl ca -cert ca.crt $magic -batch -keyfile ca.key -days $d3ck_vpn_life_tmp -out "$vtarget.crt" -in "$vtarget.csr" -config stupid.conf
 
 cd $vpn_home
 
