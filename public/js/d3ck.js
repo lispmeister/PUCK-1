@@ -721,13 +721,13 @@ function get_status() {
 
     jqXHR_get_status.done(function (queue, textStatus, jqXHR) {
         // console.log('status wootz\n' + queue)
-        // console.log("got status?  " + JSON.stringify(d3ck_status))
+        console.log("got status?  " + JSON.stringify(queue))
 
         first_news = false
 
         var lenq = _.keys(queue).length
 
-        // console.log('status wootz: ' + lenq)
+        console.log('status wootz: ' + lenq)
 
         // if (lenq <= 0) { console.log('null queue, bummer') }
         for (var i=0; i < lenq; i++) {
@@ -797,6 +797,13 @@ function status_or_die() {
         console.log('stuffing browser events...')
         d3ck_status.browser_events = {}
         d3ck_status.browser_events[browser_ip] = { "notify_add":false, "notify_ring":false, "notify_file":false}
+    }
+
+
+    console.log('knocked up?')
+    if (d3ck_status.d3ck_request.knock) {
+        console.log('knock knock!')
+        alert(d3ck_status.d3ck_request.ip_addr, d3ck_status.d3ck_request.did)
     }
 
     // if someone has added you, create a modest sized bit of text that tells you

@@ -246,10 +246,10 @@ function empty_status () {
 
     // till figure out something better... xxx
     var d3ck_request    = { 
-                            incoming_call : false,
-                            reply         : false,
-                            answer        : ""
-                          }
+            knock   : false,
+            ip_addr : "",
+            did     : ""
+    }
 
     if (typeof bwana_d3ck.D3CK_ID != "undefined") {
         d3ck_status.d3ck_id = bwana_d3ck.D3CK_ID
@@ -1122,7 +1122,8 @@ function d3ckStatus(req, res, next) {
             res.send(200, [])
         }
 
-        // console.log('d3ck status check... ' + JSON.stringify(d3ck_status))
+        console.log('d3ck status check... ' + JSON.stringify(status_queue))
+
         //tmp_status = JSON.parse(JSON.stringify(status_queue))
 
         //console.log(status_queue)
@@ -1133,6 +1134,8 @@ function d3ckStatus(req, res, next) {
         }
 
         status_queue = [] // not to be confused with quo
+
+        console.log('sending quo... ' + JSON.stringify(quo))
 
         res.send(200, quo)
 
@@ -1994,11 +1997,11 @@ function knockKnock(req, res, next) {
         // mark it as an event, which will be picked up by the client, and then answered yes or no
 
         var d3ck_request    = { 
-            incoming_call : false,
-            reply         : false,
-            answer        : ""
+            knock   : true,
+            ip_addr : ip_addr,
+            did     : d3ckid
         }
-  
+
         var d3ck_status            = empty_status()
 
         d3ck_status.d3ck_requests  = d3ck_request
