@@ -2021,18 +2021,18 @@ function knockKnock(req, res, next) {
 
         // mark it as an event, which will be picked up by the client, and then answered yes or no
 
-//      var d3ck_request    = { 
-//          incoming_call : false,
-//          reply         : false,
-//          answer        : ""
-//      }
-//
-//
-//      var d3ck_request    = { "incoming_call": false}
-//      d3ck_status.d3ck_requests  = d3ck_request
-//      createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
+        var d3ck_request    = { 
+            incoming_call : false,
+            reply         : false,
+            answer        : ""
+        }
+  
+  
+        var d3ck_request    = { "incoming_call": false}
+        d3ck_status.d3ck_requests  = d3ck_request
+        createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
 
-/////   res.send(200, { emotion: "<3" })
+        res.send(200, { emotion: "<3" })
 /////   res.send(200, { emotion: "<3" })
 /////   res.send(200, { emotion: "<3" })
 
