@@ -1944,24 +1944,37 @@ function stopVPN(req, res, next) {
 }
 
 
+function load_up_cc_cert(did) {
+
+    console.log('loading up cert for cs-auth ' + did)
+
+    var certz = {
+        // ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ckroot.crt").toString(),
+        key     : fs.readFileSync(d3ck_keystore +'/'+ did + "/d3ck.key").toString(),
+        cert    : fs.readFileSync(d3ck_keystore +'/'+ did + "/d3ck.crt").toString(),
+    };
+    return(certz)
+
+}
+
 function load_up_cert_by_ip(ip) {
 
     console.log('loading up client cert for ' + ip)
 
     console.log(ip)
     var certz = {
-        ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ckroot.crt").toString(),
+        // ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ckroot.crt").toString(),
         key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/cli3nt.key").toString(),
         cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/cli3nt.crt").toString(),
     };
     return(certz)
-
 }
+
 function load_up_cert_by_did(d3ck) {
 
     console.log('loading up client cert for ' + d3ck)
     var certz = {
-        ca      : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/d3ckroot.crt").toString(),
+        // ca      : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/d3ckroot.crt").toString(),
         key     : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/cli3nt.key").toString(),
         cert    : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/cli3nt.crt").toString(),
     };
@@ -2032,7 +2045,7 @@ function knockKnock(req, res, next) {
 
         console.log(url)
 
-        var options = load_up_cert_by_did(d3ckid)
+        var options = load_up_cc_cert(d3ckid)
 
         options.url  = url
         options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
