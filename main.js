@@ -2003,7 +2003,7 @@ function knockKnock(req, res, next) {
 
         d3ck_status.d3ck_requests  = d3ck_request
 
-        createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
+        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "d3ck_id": d3ckid}, d3ck_status)
 
         res.send(200, { emotion: "<3" })
 
