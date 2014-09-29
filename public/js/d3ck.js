@@ -855,7 +855,7 @@ function status_or_die() {
             // does it show up in UI's filestore?
             //
             // don't show up in file store if you're sending it to someone else, only yourself
-            else if (d3ck_status.file_events.direction == "local") {
+            if (d3ck_status.file_events.direction == "local") {
                 $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
             }
             else {
