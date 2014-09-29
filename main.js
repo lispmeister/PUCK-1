@@ -1975,6 +1975,9 @@ function knockKnock(req, res, next) {
     var ip_addr = req.body.ip_addr
     var d3ckid  = req.body.d3ckid
 
+    // bwana_d3ck.owner.name  = name
+
+
     console.log(ip_addr, d3ckid)
 
     if (typeof d3ckid == "undefined") {
@@ -2287,7 +2290,7 @@ function uploadSchtuff(req, res, next) {
                         console.error('upload failed:', err);
                         }
                     else {
-                        console.log('Upload successful...!')
+                        console.log('Upload successful...!  ' + JSON.stringify(resp))
 
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic

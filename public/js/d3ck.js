@@ -721,13 +721,13 @@ function get_status() {
 
     jqXHR_get_status.done(function (queue, textStatus, jqXHR) {
         // console.log('status wootz\n' + queue)
-        console.log("got status?  " + JSON.stringify(queue))
+        // console.log("got status?  " + JSON.stringify(queue))
 
         first_news = false
 
         var lenq = _.keys(queue).length
 
-        console.log('status wootz: ' + lenq)
+        // console.log('status wootz: ' + lenq)
 
         // if (lenq <= 0) { console.log('null queue, bummer') }
         for (var i=0; i < lenq; i++) {
@@ -801,9 +801,11 @@ function status_or_die() {
 
 
     console.log('knocked up?')
-    if (d3ck_status.d3ck_request.knock) {
+    if (d3ck_status.d3ck_requests.knock) {
         console.log('knock knock!')
-        alert(d3ck_status.d3ck_request.ip_addr, d3ck_status.d3ck_request.did)
+        // alert(d3ck_status.d3ck_requests.ip_addr + '/' + d3ck_status.d3ck_requests.did)
+        var friend = all_d3ck_ids[d3ck_status.d3ck_requests.did].owner.name
+        ask_user_4_response({qtype: 'knock', 'owner': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.did})
     }
 
     // if someone has added you, create a modest sized bit of text that tells you
@@ -821,17 +823,18 @@ function status_or_die() {
 
         d3ck_status.browser_events[browser_ip].notify_add = true
     }
+
     // did santa come?
+    else if (d3ck_status.file_events.file_name.length && ! d3ck_status.browser_events[browser_ip].notify_file) {
 
     // XXX - odd corner case... if both systems have the same IP ... say... testing behind a nat...
     // this probably won't work as expected.....
-    else if (d3ck_status.file_events.file_name.length && ! d3ck_status.browser_events[browser_ip].notify_file) {
 
         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
 
         // try to figure out if we sent it or the remote did
 
-        // if (d3ck_status.file_events.file_from != browser_ip) {
+        // if (d3ck_status.file_events.file_from != browser_ip)
         if (d3ck_status.file_events.did == my_d3ck.D3CK_ID) {
             console.log('new local file(z)!')
 
@@ -847,11 +850,15 @@ function status_or_die() {
 
             // put in or lookup PiD, then owner/d3ck's name!
             $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+        }
 
-            // don't show up in file store if you're sending it to someone else, only yourself
-            if (d3ck_status.file_events.direction == "local")
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-            }
+        //
+        // does it show up in UI's filestore?
+        //
+        // don't show up in file store if you're sending it to someone else, only yourself
+        else if (d3ck_status.file_events.direction == "local") {
+            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+        }
         else {
             console.log('file(z) from remote')
 
@@ -861,7 +868,9 @@ function status_or_die() {
             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
 
         }
+
     }
+
     // server... incoming ring
     else if (d3ck_status.openvpn_server.vpn_status == "up") {
         console.log('incoming...!')
@@ -1546,6 +1555,24 @@ function crypto_411() {
     }).fail(function(err) {
         console.log('errz on getting crypto stuff ' + JSON.stringify(err))
     })
+
+}
+
+
+//
+// (it will eventually!) look up authorization for request, do various things based on this
+//
+
+function ask_user_4_response(data) {
+
+
+    if (data.qtype == 'knock') {
+        console.log('knock... time to pay the piper...')
+
+        $.bootstrapGrowl('<strong>' + data.owner + '</strong> wants to connect\n' + data.ip_addr + '\n' + data.did, { 
+            offset: { from: 'top', amount: 140}, delay: -1, type: 'error', align: 'center', width: 'auto', allow_dismiss: true 
+        })
+    }
 
 }
 
