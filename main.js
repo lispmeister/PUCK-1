@@ -1122,7 +1122,7 @@ function d3ckStatus(req, res, next) {
             res.send(200, [])
         }
 
-        console.log('d3ck status check... ' + JSON.stringify(status_queue))
+        // console.log('d3ck status check... ' + JSON.stringify(status_queue))
 
         //tmp_status = JSON.parse(JSON.stringify(status_queue))
 
@@ -1135,7 +1135,7 @@ function d3ckStatus(req, res, next) {
 
         status_queue = [] // not to be confused with quo
 
-        console.log('sending quo... ' + JSON.stringify(quo))
+        // console.log('sending quo... ' + JSON.stringify(quo))
 
         res.send(200, quo)
 
