@@ -277,13 +277,6 @@ function q_status(ds) {
 
     status_queue.push(ds)
 
-    // console.log('\n\n')
-    // console.log(ds)
-    // console.log('\n\n')
-    // console.log(status_queue)
-    // console.log('\n\n')
-    // console.log('clearing out old status')
-
 }
 
 //
@@ -1155,27 +1148,6 @@ function postStatus (req, res, next) {
     // deprecated
     return
 
-//    console.log ("got browser's status posted")
-//
-//    console.log (req.body)
-//
-//    client_ip = get_client_ip(req)
-//
-//    console.log('posting from : ' + client_ip)
-//
-//    d3ck_events   = req.body.events
-//    file_magic    = req.body.file_events
-//    browser_magic = req.body.browser_events
-//    server_magic  = req.body.openvpn_server
-//    client_magic  = req.body.openvpn_client
-//
-//    if (! __.isEqual(old_d3ck_status, d3ck_status)) {
-//        write_status()
-//        old_d3ck_status = d3ck_status
-//    }
-//
-//    res.send(200, {"status" : "OK"})
-
 }
 
 
@@ -2027,14 +1999,13 @@ function knockKnock(req, res, next) {
             answer        : ""
         }
   
-  
-        var d3ck_request    = { "incoming_call": false}
+        var d3ck_status            = empty_status()
+
         d3ck_status.d3ck_requests  = d3ck_request
+
         createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
 
         res.send(200, { emotion: "<3" })
-/////   res.send(200, { emotion: "<3" })
-/////   res.send(200, { emotion: "<3" })
 
 
     }
