@@ -2291,7 +2291,6 @@ function uploadSchtuff(req, res, next) {
                     key     : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                     cert    : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
                     my_file: fs.createReadStream(target_file)
-                    remote_file: request(remoteFile)
                 };
 
                 console.log('readin n postin now')
