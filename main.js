@@ -2289,8 +2289,8 @@ function uploadSchtuff(req, res, next) {
                 request.post( {
                     headers : {'content-type' : 'application/x-www-form-urlencoded'},
                     url     : url,
-                    key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/cli3nt.key").toString(),
-                    cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/cli3nt.crt").toString(),
+                    key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                    cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
                     body    : tmpfile
                     }, function cb (err, resp) {
                         if (err) {
