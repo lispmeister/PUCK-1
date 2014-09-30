@@ -2149,9 +2149,9 @@ function uploadSchtuff(req, res, next) {
         // req.setBodyEncoding("binary");
         console.log(req.headers)
 
-
         var file_name   = req.headers['x-filename']
         var file_size   = req.headers['x-filesize']
+
         // xxx
         // when self-testing through a NAT... ips started getting weird... really
         // should figure out from cert matching
