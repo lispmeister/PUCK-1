@@ -2291,7 +2291,7 @@ function uploadSchtuff(req, res, next) {
                     url     : url,
                     key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                     cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                    body    : tmpfile
+                    body    : fs.readFileSync(tmpfile).toString(),
                     }, function cb (err, resp) {
                         if (err) {
                             console.error('upload failed:', err);
