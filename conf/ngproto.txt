@@ -16,10 +16,10 @@ events {
 #
 http {
 
-    server {
+    # grrrr
+    underscores_in_headers on
 
-        # grrrr
-        underscores_in_headers on
+    server {
 
         #
         # basix
