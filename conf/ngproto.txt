@@ -92,9 +92,9 @@ http {
         proxy_set_header            X-Forwarded-Proto   $scheme;
 
         # for p2p/uploads
-        proxy_pass_header           X_FILENAME;
-        proxy_pass_header           X_FILESIZE;
-        proxy_pass_header           X_D3CKID;
+        proxy_pass_header           x-filename;
+        proxy_pass_header           x-filesize;
+        proxy_pass_header           x-d3ckid;
 
         #
         # websockets

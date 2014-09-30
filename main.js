@@ -2149,17 +2149,14 @@ function uploadSchtuff(req, res, next) {
         // req.setBodyEncoding("binary");
         console.log(req.headers)
 
-        // var file_name   = req.headers['x-filename']
-        // var file_size   = req.headers['x-filesize']
-        var file_name   = req.headers['x_filename']
-        var file_size   = req.headers['x_filesize']
 
+        var file_name   = req.headers['x-filename']
+        var file_size   = req.headers['x-filesize']
 
         // xxx
         // when self-testing through a NAT... ips started getting weird... really
         // should figure out from cert matching
-        // var file_d3ckid = req.headers['x-d3ckid']
-        var file_d3ckid = req.headers['x_d3ckid']
+        var file_d3ckid = req.headers['x-d3ckid']
 
         // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
         var ws = fs.createWriteStream(d3ck_public + '/uploads/' + file_name)
