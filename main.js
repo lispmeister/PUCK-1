@@ -3171,15 +3171,16 @@ server.enable('trust proxy');
 // various helpers
 server.use(response());
 
-server.use(express.limit('1gb'))
+server.use(express.limit({limit: MAX_UPLOAD_SIZE}))
+
 
 // server.use(express.logger());
 server.use(compress());
 
 server.use(express.methodOverride());
 
-server.use(express.json());
-server.use(express.urlencoded());
+server.use(express.json({limit: MAX_UPLOAD_SIZE}));
+server.use(express.urlencoded({limit: MAX_UPLOAD_SIZE}));
 server.use(express.multipart());
 
 server.use(express.methodOverride());
