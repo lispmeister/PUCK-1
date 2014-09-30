@@ -2295,12 +2295,13 @@ function uploadSchtuff(req, res, next) {
                     'x-filename' : target_file, 
                     'x-filesize' : target_size, 
                     'x-d3ckID'   : bwana_d3ck.D3CK_ID,
-                    my_file      : fs.createReadStream(target_file)
+                    my_file      : fs.createReadStream(target_path)
                 };
 
                 console.log('readin n postin now')
 
                 // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
+
                 request.post(url, formData, function cb (err, resp) {
 
                     if (err) {
