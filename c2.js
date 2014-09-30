@@ -41,30 +41,50 @@ var my_did = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
             // 'x-filename' : target_file,
             // 'x-filesize' : target_size,
             headers      : {
-                'x-filename' : 'i.jpg',
-                'x-filesize' : 11813,
-                'x-d3ckid'   : my_did
+                // 'x-filename'     : 'i.jpg',
+                'x-filename'     : 'c2.js',
+                // 'x-filesize'     : 11813,
+                'x-filesize'     : 3200,
+                'x-d3ckid'       : my_did,
+                // 'content-length' : 11813
+                'content-length' : 3200,
+                'content-type' : 'application/octet-stream'
             },
-            my_file      : fs.createReadStream('i.jpg')
+            // my_file      : fs.createReadStream('i.jpg')
+            my_file      : fs.createReadStream('c2.js')
         };
 
 
-                console.log('readin n postin to: ' + url)
+        console.log('readin n postin to: ' + url)
 
                 // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
 
-        request.post(url, formData, function cb (err, resp) {
+        request.post(url, formData, function cb (err, res) {
+            var str = ''
+            console.error('hmmm....')
 
-                    if (err) {
-                        console.error('upload failed:', err);
-                        }
-                    else {
-                        console.log('Upload successful...!  ' + JSON.stringify(resp))
+            if (err) {
+                console.error('upload failed:', err);
+            }
 
-                    }
+            res.on('data', function (chunk) {
+                str += chunk;
+            });
+
+            res.on('end', function () {
+                console.log('Da End!')
+                console.log(str);
+            });
+
         })
 
 
+//          if (err) {
+//              console.error('upload failed:', err);
+//          }
+//          else {
+//              console.log('Upload successful...!  ' + JSON.stringify(resp))
+//          }
 
 //          if (err) {
 //              console.error('post to remote failed:')
