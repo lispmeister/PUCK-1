@@ -2287,6 +2287,8 @@ function uploadSchtuff(req, res, next) {
 
                 console.log('FN: ' + target_file)
 
+                console.log(ip2d3ck)
+
                 var formData = {
                     key          : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
                     cert         : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
