@@ -40,9 +40,9 @@ var my_did = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
             cert         : fs.readFileSync(d3ck_keystore +'/'+ d3ckid + "/d3ck.crt").toString(),
             // 'x-filename' : target_file,
             // 'x-filesize' : target_size,
-            'x-filename' : 'i.jpg',
-            'x-filesize' : 11813,
-            'x-d3ckID'   : my_did,
+            'X-FILENAME' : 'i.jpg',
+            'X-FILESIZE' : 11813,
+            'X-D3CKID'   : my_did,
             my_file      : fs.createReadStream('i.jpg')
         };
 
