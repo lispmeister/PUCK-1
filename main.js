@@ -2295,7 +2295,7 @@ function uploadSchtuff(req, res, next) {
 
                 console.log('readin n postin now')
 
-                // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
                 request.post(url, formData, function cb (err, resp) {
 
                     if (err) {
@@ -2310,7 +2310,7 @@ function uploadSchtuff(req, res, next) {
                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
                         res.send(204, {"status" : file_name})
                     }
-                }))
+                })
             }
         }
     }
