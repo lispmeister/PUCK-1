@@ -2295,7 +2295,7 @@ function uploadSchtuff(req, res, next) {
                     'x-filename' : target_file, 
                     'x-filesize' : target_size, 
                     'x-d3ckID'   : bwana_d3ck.D3CK_ID,
-                    my_file      : fs.createReadStream(target_path)
+                    my_file      : fs.createReadStream(tmpfile)
                 };
 
                 console.log('readin n postin now')
