@@ -477,7 +477,7 @@ function findByUsername(name, fn) {
 
 function auth(req, res, next) {
 
-    // console.log('authentication check for... ' + req.path)
+    console.log('authentication check for... ' + req.path)
     // console.log(req)
 
     var ip = get_client_ip(req)
@@ -1256,37 +1256,6 @@ function create_cli3nt_rest (req, res, next) {
 
 }
 
-
-//
-// as above, internal to server
-//
-function create_cli3nt_int (argz) {
-
-    console.log ('creating client keys')
-
-    var target  = ''
-    // var command = d3ck_home + '/f-u-openssl/rot-client.sh'
-    var command = d3ck_bin + '/bundle_certs.js'
-
-    //
-    // server internal
-    //
-    console.log('args: ' + req)
- 
-    var keyout = d3ck_spawn_sync(command, argz)
-
-    console.log ('keyZ...' + JSON.stringify(keyout))
-
-    if (keyout.code) {
-        console.log("error!\n\n\n")
-        return('')
-    }
-    else {
-        console.log('looks good...')
-        return(keyout.code)
-    }
-
-}
 
 //
 // Redis D3CKs key are all upper case+digits
@@ -2320,6 +2289,8 @@ function uploadSchtuff(req, res, next) {
                         }
                     else {
                         console.log('Upload successful...!  ' + JSON.stringify(resp))
+
+                        //.end
 
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic

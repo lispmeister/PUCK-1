@@ -67,7 +67,7 @@ console.log('creating client keyz')
 
 var result = sh.exec(command)
 
-// console.log('stdout + stderr ' + result.stdout);
+console.log('stdout + stderr ' + result.stdout);
 console.log ('keyZ return code ' + result.code);
 
 if (result.code) {
@@ -144,8 +144,8 @@ function rip_d3ck (d3ck, remote_did) {
     // censored.vpn.ca           = d3ck.vpn.ca
     censored.vpn.ca           = fs.readFileSync(d3ck_keystore +'/D3CK/d3ckroot.crt').toString().split('\n')
 
-    censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.key").toString().split('\n')
-    censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/cli3nt.crt").toString().split('\n')
+    censored.vpn.key          = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/_cli3nt.key").toString().split('\n')
+    censored.vpn.cert         = fs.readFileSync(d3ck_keystore +'/'+ remote_did + "/_cli3nt.crt").toString().split('\n')
     censored.vpn.all          = censored.vpn.key.join('\n') + '\n\n' + censored.vpn.cert.join('\n')
 
     censored.vpn.tlsauth      = d3ck.vpn.tlsauth
@@ -154,11 +154,10 @@ function rip_d3ck (d3ck, remote_did) {
     censored.image_b64        = d3ck.image_b64
     censored.capabilities     = d3ck.capabilities
 
-    console.log('... final result:')
+    // console.log('... final result:')
+    // console.log(censored)
 
-    console.log(censored)
-
-    var save_file = d3ck_keystore +'/'+ remote_did + '/cli3nt.json'
+    var save_file = d3ck_keystore +'/'+ remote_did + '/_cli3nt.json'
 
     fs.writeFile(save_file, JSON.stringify(censored), function (err) {
         if (err) {
