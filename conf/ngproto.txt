@@ -17,7 +17,7 @@ events {
 http {
 
     # grrrr
-    underscores_in_headers on
+    underscores_in_headers on;
 
     server {
 
