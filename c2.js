@@ -41,9 +41,9 @@ var my_did = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
             // 'x-filename' : target_file,
             // 'x-filesize' : target_size,
             headers      : {
-                'x_filename' : 'i.jpg',
-                'x_filesize' : 11813,
-                'x_d3ckid'   : my_did
+                'x-filename' : 'i.jpg',
+                'x-filesize' : 11813,
+                'x-d3ckid'   : my_did
             },
             my_file      : fs.createReadStream('i.jpg')
         };

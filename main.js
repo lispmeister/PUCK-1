@@ -2160,6 +2160,7 @@ function uploadSchtuff(req, res, next) {
 
         // var ws = fs.createWriteStream(d3ck_public + '/uploads/lucky.png')
         var ws = fs.createWriteStream(d3ck_public + '/uploads/' + file_name)
+
         // fs.createWriteStream(d3ck_public + "/uploads/" + req.body.filename).pipe(req);
 
         req.pipe(ws)
@@ -2294,11 +2295,13 @@ function uploadSchtuff(req, res, next) {
                 console.log(ip2d3ck)
 
                 var formData = {
-                    key          : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                    cert         : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                    'x-filename' : target_file, 
-                    'x-filesize' : target_size, 
-                    'x-d3ckID'   : bwana_d3ck.D3CK_ID,
+                    key          : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
+                    cert         : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
+                    headers      : {
+                        'x-filename' : target_file, 
+                        'x-filesize' : target_size, 
+                        'x-d3ckID'   : bwana_d3ck.D3CK_ID
+                    },
                     my_file      : fs.createReadStream(tmpfile)
                 };
 
