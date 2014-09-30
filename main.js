@@ -2283,14 +2283,17 @@ function uploadSchtuff(req, res, next) {
                 //     cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
                 // }
 
-                options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
+                // options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
 
                 console.log('FN: ' + target_file)
 
                 var formData = {
-                    key     : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                    cert    : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                    my_file: fs.createReadStream(target_file)
+                    key          : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                    cert         : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                    'x-filename' : target_file, 
+                    'x-filesize' : target_size, 
+                    'x-d3ckID'   : bwana_d3ck.D3CK_ID,
+                    my_file      : fs.createReadStream(target_file)
                 };
 
                 console.log('readin n postin now')
