@@ -2165,6 +2165,10 @@ function uploadSchtuff(req, res, next) {
 
         req.pipe(ws)
 
+        ws.on('error', function (err) {
+            console.log('ws writing error: ' + JSON.stringify(err))
+        });
+
         req.on('end', function() {
 
             console.log('someday has come for upload....?')
