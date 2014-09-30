@@ -3166,8 +3166,6 @@ var server_options = {
 
 server = express()
 
-server.options({limit: MAX_UPLOAD_SIZE})
-
 server.enable('trust proxy');
 
 // various helpers
@@ -3180,7 +3178,7 @@ server.use(compress());
 
 server.use(express.methodOverride());
 
-server.use(express.json());
+server.use(express.json({limit: 1gb}));
 server.use(express.urlencoded());
 server.use(express.multipart());
 
