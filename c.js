@@ -7,7 +7,7 @@ var request = require('request')
 
 var ip_addr = '54.203.255.17'
 var d3ck_port_ext = 8080
-var d3ckid = 'D62D4391C096C7C3A7F95C58754C9A5AF7007A5C'
+var d3ckid = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
 var d3ck_keystore = "/etc/d3ck/d3cks"
 
         var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/knock'

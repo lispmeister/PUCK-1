@@ -2278,35 +2278,31 @@ function uploadSchtuff(req, res, next) {
 
                 console.log(url)
 
-                var options = load_up_cert_by_ip(upload_target)
+                var options = {
+                    key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                    cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                }
 
                 options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
-                // var file_data = fs.readFileSync(tmpfile) 
 
                 console.log('FN: ' + target_file)
 
-                // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
-                request.post( {
-                    headers : {'content-type' : 'application/x-www-form-urlencoded'},
-                    url     : url,
-                    key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                    cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                    body    : fs.readFileSync(tmpfile).toString(),
-                    }, function cb (err, resp) {
-                        if (err) {
-                            console.error('upload failed:', err);
-                            }
-                        else {
-                            console.log('Upload successful...!  ' + JSON.stringify(resp))
+                console.log('readin n postin now')
 
-                            var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
-                            d3ck_status.browser_events = browser_magic
-                            d3ck_status.file_events    = file_magic
-                            createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
-                            res.send(204, {"status" : file_name})
+                fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                    if (err) {
+                        console.error('upload failed:', err);
                         }
+                    else {
+                        console.log('Upload successful...!  ' + JSON.stringify(resp))
+
+                        var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                        d3ck_status.browser_events = browser_magic
+                        d3ck_status.file_events    = file_magic
+                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
+                        res.send(204, {"status" : file_name})
                     }
-                )
+                }))
             }
         }
     }
