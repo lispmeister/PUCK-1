@@ -1271,6 +1271,11 @@ function create_cli3nt_rest (req, res, next) {
 function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
+
+    if (typeof data != 'object') {
+        data = JSON.parse(data)
+    }
+
     // console.log(req.body)
     // console.log(req.body.value)
 
@@ -1279,10 +1284,6 @@ function create_d3ck(req, res, next) {
         next(new MissingValueError());
         return;
     }
-
-    // if (typeof data != 'object') {
-    //     data = JSON.parse(data)
-    // }
 
     var d3ck_status = empty_status()
 
