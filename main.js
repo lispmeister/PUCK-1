@@ -1443,13 +1443,15 @@ function create_d3ck_key_store(data) {
 
 
     try {
-        client_key  = data.vpn_client.key.join('\n')
         client_cert = data.vpn_client.cert.join('\n')
-        write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
         write_2_file(d3ck_dir + '/cli3nt.crt',  client_cert)
+
+        client_key  = data.vpn_client.key.join('\n')
+        write_2_file(d3ck_dir + '/cli3nt.key',  client_key)
+
     }
     catch (e) {
-        console.log('no client keys in data...')
+        console.log('missing data...' + JSON.stringify(e))
         write_2_file(d3ck_dir + '/d3ckroot.crt', ca)
     }
 
@@ -2970,7 +2972,8 @@ function formCreate(req, res, next) {
 
                         console.log('adding from: ' + c_data.name)
 
-                        create_d3ck_key_store(c_data)
+                        // create_d3ck_key_store(c_data)
+
 
                         //
                         // execute a shell script with appropriate args to create a d3ck.
