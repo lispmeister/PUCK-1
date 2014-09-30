@@ -3171,7 +3171,7 @@ server.enable('trust proxy');
 // various helpers
 server.use(response());
 
-server.use(express.limit({limit: MAX_UPLOAD_SIZE}))
+server.use(express.limit(MAX_UPLOAD_SIZE))
 
 
 // server.use(express.logger());
