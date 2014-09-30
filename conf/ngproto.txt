@@ -11,12 +11,13 @@ events {
     worker_connections  1024; 
 }
 
-proxy_buffering         off;
-
 #
 # where the rubber meets the road
 #
 http {
+
+    # xxxx?
+    proxy_buffering         off;
 
     server {
 
@@ -81,7 +82,7 @@ http {
 
         add_header                  Front-End-Https     on;
         # xxxx?
-        # add_header                  X-Accel-Buffering   no;
+        add_header                  X-Accel-Buffering   no;
 
         ### Set headers to help out nodey
         proxy_set_header            Accept-Encoding     "";
