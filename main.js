@@ -3173,7 +3173,6 @@ server.use(response());
 
 server.use(express.limit('1gb'))
 
-
 // server.use(express.logger());
 server.use(compress());
 
@@ -3225,7 +3224,7 @@ server.use(express.session({
 server.use(flash());
 server.use(passport.initialize());
 server.use(passport.session());
-server.use(express.bodyParser({ limit: MAX_UPLOAD_SIZE }))
+// server.use(express.bodyParser());
 server.use(server.router);
 
 // passport auth
