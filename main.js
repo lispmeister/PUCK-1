@@ -2109,6 +2109,7 @@ function downloadStuff (req, res, next) {
 //  path        local on server
 //  name        filename
 //  type        mimetype, aka image/png and such
+//
 
 function uploadSchtuff(req, res, next) {
 
@@ -2146,6 +2147,8 @@ function uploadSchtuff(req, res, next) {
         console.log('another d3ck sending something...?')
 
         // req.setBodyEncoding("binary");
+        console.log(req.headers)
+
 
         var file_name   = req.headers['x-filename']
         var file_size   = req.headers['x-filesize']
