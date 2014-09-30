@@ -600,11 +600,15 @@
                 console.log('nock')
                 console.log(my_d3ck.D3CK_ID, my_d3ck.ip_addr)
 
+                // xxx - just for knock trials
+                var hack_key = _.keys(all_d3ck_ids)[1]
+                var hack_ip  = all_d3ck_ids[_.keys(all_d3ck_ids)[1]].ip_addr
+
                 var knock_knock = $.ajax({
                     type: "POST",
                     url: "/knock",
                     // data: {d3ckid: my_d3ck.D3CK_ID, ipaddr: my_d3ck.ip_addr}
-                    data: {d3ckid: 'D62D4391C096C7C3A7F95C58754C9A5AF7007A5C', ip_addr: '54.203.255.17', owner: my_d3ck.owner.name }
+                    data: {d3ckid: hack_key, ip_addr: hack_ip, owner: my_d3ck.owner.name }
                 })
 
                 knock_knock.done(function(msg) {
