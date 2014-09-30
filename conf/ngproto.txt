@@ -16,8 +16,8 @@ events {
 #
 http {
 
-    # xxxx?
-    proxy_buffering         off;
+    proxy_buffering                 off;
+    chunked_transfer_encoding       off;
 
     server {
 
