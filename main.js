@@ -1239,18 +1239,18 @@ function create_cli3nt_rest (req, res, next) {
 
         var cli3nt_bundle = JSON.parse(fs.readFileSync(d3ck_keystore +'/'+ did + "/_cli3nt.json").toString())
 
-        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.key", JSON.parse(cli3nt_bundle).vpn.key, function(err) {
+        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.key", cli3nt_bundle.vpn.key, function(err) {
             if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
             else { console.log('wrote remote vpn server IP') }
         });
-        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.cert", JSON.parse(cli3nt_bundle).vpn.cert, function(err) {
+        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert, function(err) {
             if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
             else { console.log('wrote remote vpn server IP') }
         });
 
         //console.log(certz)
 
-        res.send(200, cli3nt_bundle)
+        res.send(200, JSON.stringify(cli3nt_bundle))
 
     }
 
