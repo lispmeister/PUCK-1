@@ -91,7 +91,7 @@ fi
 
 # create the bundle to send
 $D3CK_BIN/bundle_certs.js $r_d3ck_id
-bundle=$(cat $keystore/$r_d3ck_id/cli3nt.json)
+bundle=$(cat $keystore/$r_d3ck_id/_cli3nt.json)
 
 # echo $image_base64
 

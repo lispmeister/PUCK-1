@@ -52,7 +52,7 @@ cp  $storage/$1.key $keystore/$1/_cli3nt.key
 
 cat $storage/$1.{crt,key} > $keystore/$1/_cli3nt.all
 
-rm $hell/*.pem
+rm -f $hell/*.pem
 
 chmod -R 755 $hell $d3ck_home
 
