@@ -840,29 +840,29 @@ function status_or_die() {
         // try to figure out if we sent it or the remote did
 
         // if (d3ck_status.file_events.file_from != browser_ip)
+
+        //
+        // it shows up in UI's filestore if we *didn't* try to give it to someone else
+        //
         if (d3ck_status.file_events.did == my_d3ck.D3CK_ID) {
             console.log('new local file(z)!')
 
+            // does it go into our vault?
             if (d3ck_status.file_events.direction != "local") {
                 dir = ' to ' + friend + "/" + d3ck_status.file_events.direction
+            }
+            else {
+                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
             }
 
             // put in or lookup PiD, then owner/d3ck's name!
             $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+
         }
         else {
-            //
-            // does it show up in UI's filestore?
-            //
-            // don't show up in file store if you're sending it to someone else, only yourself
-            if (d3ck_status.file_events.direction == "local") {
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-            }
-            else {
-                console.log('file(z) from remote')
-                $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-            }
+            console.log('file(z) from remote')
+            $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
         }
 
     }

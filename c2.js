@@ -13,7 +13,7 @@ var d3ck_keystore = "/etc/d3ck/d3cks"
 
 var my_did = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
 
-        var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/up/fish2.com'
+        var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/up/local'
 
         console.log(url)
 

@@ -2315,7 +2315,7 @@ function uploadSchtuff(req, res, next) {
                         console.error('upload failed:', err);
                         }
                     else {
-                        console.log('Upload successful...!  ' + resp)
+                        console.log('Upload successful...!  ' + JSON.stringify(resp))
 
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic
