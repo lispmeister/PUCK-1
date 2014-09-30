@@ -1335,8 +1335,7 @@ function create_d3ck(req, res, next) {
 
             d3ck_status.events = d3ck_events
 
-            create_d3ck_key_store(d3ck.value)
-
+            // create_d3ck_key_store(d3ck.value)
             create_d3ck_image(d3ck.value)
 
             // can they do this, that, or the other
@@ -2972,8 +2971,7 @@ function formCreate(req, res, next) {
 
                         console.log('adding from: ' + c_data.name)
 
-                        // create_d3ck_key_store(c_data)
-
+                        create_d3ck_key_store(c_data)
 
                         //
                         // execute a shell script with appropriate args to create a d3ck.
