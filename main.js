@@ -2278,23 +2278,32 @@ function uploadSchtuff(req, res, next) {
 
                 console.log(url)
 
-                var options = {
-                    key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                    cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                }
+                // var options = {
+                //     key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                //     cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                // }
 
                 options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
 
                 console.log('FN: ' + target_file)
 
+                var formData = {
+                    key     : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+                    cert    : fs.readFile(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+                    my_file: fs.createReadStream(target_file)
+                    remote_file: request(remoteFile)
+                };
+
                 console.log('readin n postin now')
 
-                fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                request.post(url, formData, function cb (err, resp) {
+
                     if (err) {
                         console.error('upload failed:', err);
                         }
                     else {
-                        console.log('Upload successful...!  ' + JSON.stringify(resp))
+                        console.log('Upload successful...!  ' + resp)
 
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic
