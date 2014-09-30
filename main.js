@@ -1235,15 +1235,15 @@ function create_cli3nt_rest (req, res, next) {
     }
     else {
         console.log('looks good...')
-        console.log(d3ck_keystore +'/'+ did + "/cli3nt.all")
+        console.log(d3ck_keystore +'/'+ did + "/_cli3nt.all")
 
-        var cli3nt_bundle = fs.readFileSync(d3ck_keystore +'/'+ did + "/cli3nt.json").toString()
+        var cli3nt_bundle = fs.readFileSync(d3ck_keystore +'/'+ did + "/_cli3nt.json").toString()
 
-        fs.writeFile(d3ck_keystore +'/'+ did + "/_sent_cli3nt.key", JSON.parse(cli3nt_bundle).vpn.key, function(err) {
+        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.key", JSON.parse(cli3nt_bundle).vpn.key, function(err) {
             if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
             else { console.log('wrote remote vpn server IP') }
         });
-        fs.writeFile(d3ck_keystore +'/'+ did + "/_sent_cli3nt.cert", JSON.parse(cli3nt_bundle).vpn.cert, function(err) {
+        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.cert", JSON.parse(cli3nt_bundle).vpn.cert, function(err) {
             if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
             else { console.log('wrote remote vpn server IP') }
         });
