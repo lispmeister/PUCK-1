@@ -36,13 +36,11 @@ var my_did = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
 
         var formData = {
             ca           : fs.readFileSync(d3ck_keystore +'/'+ d3ckid + "/d3ckroot.crt").toString(),
-            // key          : fs.readFileSync(d3ck_keystore +'/'+ d3ckid + "/cli3nt.key").toString(),
-            // cert         : fs.readFileSync(d3ck_keystore +'/'+ d3ckid + "/cli3nt.crt").toString(),
             key          : fs.readFileSync(d3ck_keystore +'/'+ d3ckid + "/d3ck.key").toString(),
             cert         : fs.readFileSync(d3ck_keystore +'/'+ d3ckid + "/d3ck.crt").toString(),
             // 'x-filename' : target_file,
             // 'x-filesize' : target_size,
-            'x-filename' : 'i.jpg',
+            'x-fname'    : 'i.jpg',
             'x-filesize' : 11813,
             'x-d3ckID'   : my_did,
             my_file      : fs.createReadStream('i.jpg')

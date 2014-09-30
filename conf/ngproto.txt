@@ -86,7 +86,7 @@ http {
         proxy_set_header            X-Forwarded-For     $proxy_add_x_forwarded_for;
         proxy_set_header            X-Forwarded-Proto   $scheme;
         # for p2p transfers/uploads
-        proxy_set_header            X-Filename          $x_filename;
+        proxy_set_header            X-Fname             $x_fname;
         proxy_set_header            X-Filesize          $x_filesize;
         proxy_set_header            X-d3ckid            $x_d3ckid;
 
