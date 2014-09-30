@@ -1272,10 +1272,6 @@ function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
 
-    if (typeof data != 'object') {
-        data = JSON.parse(data)
-    }
-
     // console.log(req.body)
     // console.log(req.body.value)
 
@@ -1285,12 +1281,17 @@ function create_d3ck(req, res, next) {
         return;
     }
 
+    var data = req.body.value
+    if (typeof data != 'object') {
+        data = JSON.parse(data)
+    }
+
     var d3ck_status = empty_status()
 
-    var ip_addr = req.body.value.ip_addr
+    var ip_addr = data.ip_addr
 
     client_ip  = get_client_ip(req)
-    all_client_ips = req.body.value.all_ips
+    all_client_ips = data.all_ips
 
     // if the IP we get the add from isn't in the ips the other d3ck
     // says it has... add it in; they may be coming from a NAT or
@@ -1307,13 +1308,13 @@ function create_d3ck(req, res, next) {
         }
         if (! found) {
             console.log("[create_d3ck] You're coming from an IP that isn't in your stated IPs... adding [" + client_ip + "] to your IP pool just in case")
-            req.body.value.all_ips[all_client_ips.length] = client_ip
+            data.all_ips[all_client_ips.length] = client_ip
         }
     }
 
     var d3ck = {
-        key    : req.body.key || req.body.value.replace(/\W+/g, '_'),
-        value  : JSON.stringify(req.body.value)
+        key    : req.body.key || data.replace(/\W+/g, '_'),
+        value  : JSON.stringify(data)
     }
 
     // TODO: Check if d3ck exists using EXISTS and fail if it does
@@ -1330,9 +1331,9 @@ function create_d3ck(req, res, next) {
             //
             // if it's from a remote system, wake up local UI and tell user
             //
-            console.log('redis saved data from: ' + req.body.value.name)
+            console.log('redis saved data from: ' + data.name)
 
-            d3ck_events = { new_d3ck_ip : client_ip, new_d3ck_name: req.body.value.name }
+            d3ck_events = { new_d3ck_ip : client_ip, new_d3ck_name: data.name }
 
             d3ck_status.events = d3ck_events
 
@@ -1342,7 +1343,7 @@ function create_d3ck(req, res, next) {
             // can they do this, that, or the other
             assign_capabilities(d3ck.value)
 
-            createEvent(get_client_ip(req), {event_type: "create", d3ck_id: req.body.value.D3CK_ID}, d3ck_status)
+            createEvent(get_client_ip(req), {event_type: "create", d3ck_id: data.D3CK_ID}, d3ck_status)
 
         }
     })
