@@ -3036,7 +3036,7 @@ function formCreate(req, res, next) {
 
                         d3ck_spawn(cmd, argz)
 
-                        createEvent(ip_addr, {event_type: "create", d3ck_id: data.D3CK_ID})
+                        createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
 
                     })
                     // xxx
@@ -3165,6 +3165,8 @@ var server_options = {
 }
 
 server = express()
+
+server.options({limit: MAX_UPLOAD_SIZE})
 
 server.enable('trust proxy');
 
