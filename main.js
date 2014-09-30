@@ -1241,16 +1241,24 @@ function create_cli3nt_rest (req, res, next) {
 
         fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.key", cli3nt_bundle.vpn.key, function(err) {
             if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
-            else { console.log('wrote remote vpn server IP') }
+            else { console.log('wrote remote vpn server key') }
         });
         fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert, function(err) {
             if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
-            else { console.log('wrote remote vpn server IP') }
+            else { console.log('wrote remote vpn server cert') }
         });
 
         //console.log(certz)
 
-        res.send(200, JSON.stringify(cli3nt_bundle))
+        console.log('sending bundle back')
+
+        try {
+            res.send(200, JSON.stringify(cli3nt_bundle))
+        }
+        catch (e) {
+            console.log('failzor?  ' + JSON.stringify(e))
+            res.send(200, cli3nt_bundle)
+        }
 
     }
 
@@ -2932,7 +2940,7 @@ function formCreate(req, res, next) {
 
                         console.log('remote d3ck info in...!')
 
-                        console.log("CDATA: " + c_data)
+                        // console.log("CDATA: " + c_data)
 
                         c_data = JSON.parse(c_data)
 
@@ -3001,7 +3009,7 @@ function formCreate(req, res, next) {
 
                         // write image
                         console.log('image...')
-                        console.log(c_data.image_b64)
+                        // console.log(c_data.image_b64)
                         write_2_file(d3ck_public + c_data.image, b64_decode(c_data.image_b64))
 
                         // self added
