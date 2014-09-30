@@ -47,7 +47,7 @@ var my_did = 'C73D67BF1BBED09067882B37CD5D6CC424A9F396'
                 'x-filesize'     : 3200,
                 'x-d3ckid'       : my_did,
                 // 'content-length' : 11813
-                'content-length' : 3200,
+                'Content-Length' : 3200,
                 // 'content-type' : 'application/octet-stream',
                 // 'Transfer-Encoding': 'chunked'
             },
