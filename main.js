@@ -1272,7 +1272,7 @@ function create_d3ck(req, res, next) {
 
     console.log ('creating d3ck')
     // console.log(req.body)
-    console.log(req.body.value)
+    // console.log(req.body.value)
 
     if (!req.body.value) {
         console.log('create_d3ck: missing value');
@@ -1358,7 +1358,7 @@ function create_d3ck_image(data) {
     }
 
     console.log('create d3ck img')
-    console.log(data)
+    // console.log(data)
 
     console.log(typeof data.image_b64)
 
@@ -2884,7 +2884,7 @@ function quikStart(req, res, next) {
 function formCreate(req, res, next) {
 
     console.log("form creating d3ck...")
-    console.log(req.body)
+    // console.log(req.body)
 
     var ip_addr = req.body.ip_addr
 
