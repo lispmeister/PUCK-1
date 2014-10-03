@@ -3003,8 +3003,6 @@ function formCreate(req, res, next) {
 
                         assign_capabilities(c_data)
 
-
-
                         // now write the image data for the d3ck in question
                         console.log('just about to keel over')
 
@@ -3017,8 +3015,6 @@ function formCreate(req, res, next) {
 
                         // self added
                         d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: c_data.name }
-
-
 
 
                         //

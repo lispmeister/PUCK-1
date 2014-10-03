@@ -38,6 +38,10 @@ var SHORT_WAIT = 1000  // 1 sec
 var D3CK_SOCK_RETRY   = 3000
 var LOCAL_VIDEO_WIDTH = 480
 
+// seems to go from (N-1) to 0h
+var DEFAULT_RING_TIME = 30
+var DEFAULT_RING_TIME = 10
+
 var ONE_HOUR = 60*60    // seconds
 
 
@@ -1558,16 +1562,68 @@ function crypto_411() {
 //
 // (it will eventually!) look up authorization for request, do various things based on this
 //
-
 function ask_user_4_response(data) {
-
 
     if (data.qtype == 'knock') {
         console.log('knock... time to pay the piper...')
 
-        $.bootstrapGrowl('<strong>' + data.owner + '</strong> wants to connect\n' + data.ip_addr + '\n' + data.did, { 
-            offset: { from: 'top', amount: 140}, delay: -1, type: 'error', align: 'center', width: 'auto', allow_dismiss: true 
-        })
+        var message = '<h2>' + data.owner + '</h2> wants to connect from ' + data.ip_addr + '<br />' + data.did + '<br />'
+
+        $("#labels", function () {
+            alertify.set({ 
+                // delay           : DEFAULT_RING_TIME,
+                buttonReverse   : true, 
+                labels          : { ok: "Allow", cancel: "Deny" }
+            });
+
+            alertify.confirm(message, function (e) {
+                console.log('confirm...?')
+                console.log(e)
+                if (e) {
+                    console.log('go for it')
+                    alertify.success("VPN connection will commence...");
+                } else {
+                    console.log('shuttin it down')
+                    alertify.error('Declined connection from: <br />' + data.owner + ' / ' + data.ip_addr)
+                }
+                $('#timer_countdown').TimeCircles().destroy();
+            });
+
+            return false;
+        });
+
+        $('#alertify').append('<div style="height:150px;width:150px;" id="timer_countdown" data-timer="' + DEFAULT_RING_TIME + '"></div>')
+        // $('body').append('<div style="height:150px;width:150px;" id="timer_countdown" data-timer="' + DEFAULT_RING_TIME + '"></div>')
+
+    //  timer circle
+          $('#timer_countdown').TimeCircles({
+              total_duration  : DEFAULT_RING_TIME + 1,
+              direction: "Counter-clockwise",
+              count_past_zero : false,
+              time            : {
+                  Days            : { show: false },
+                  Hours           : { show: false },
+                  Minutes         : { show: false },
+                  Seconds         : { show: true, color: "#2b94ea"}
+              }
+          }).addListener(function(unit, value, total) {
+              // console.log(DEFAULT_RING_TIME, unit,value,total)
+              if (value <= 0) {
+                  // alert('wakka!')
+                  console.log('clicking... cancel!')
+                  $('#alertify-cancel').click()
+              }
+          });
+
+
+
+        // $.bootstrapGrowl('<strong>' + data.owner + '</strong> wants to connect\n' + data.ip_addr + '\n' + data.did, { 
+        //     offset: { from: 'top', amount: 140}, delay: -1, align: 'center', allow_dismiss: true 
+        // })
+
+        // $('.thumbnail').css({"text-overflow": "ellipsis"})
+        // $.bootstrapGrowl("My message");
+
     }
 
 }

@@ -261,3 +261,13 @@ div.growlUI h1, div.growlUI h2 {
     */
 }
 
+
+/* from http://stackoverflow.com/questions/15308061/how-to-avoid-text-overflow-in-twitter-bootstrap */
+.dotdotdot {
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    display: block;
+}
+

@@ -227,9 +227,9 @@ $(document).ready(function () {
                     // on the screen... lots of ways to do this....
                     if (my_d3ck.did != val) {
 
-                        var name        = truncate(d3ckinfo.name)
-                        var owner       = truncate(d3ckinfo.owner.name)
-                        var email       = truncate(d3ckinfo.owner.email)
+                        var name        = d3ckinfo.name
+                        var owner       = d3ckinfo.owner.name
+                        var email       = d3ckinfo.owner.email
                         var d3ckid      = d3ckinfo.D3CK_ID
                         var ipaddr      = d3ckinfo.ip_addr
                         var all_ips     = d3ckinfo.all_ips
@@ -267,12 +267,9 @@ $(document).ready(function () {
                         // have to kill spaces... die, die, die!
                         d3ckid = d3ckid.replace(/\s+/g, '');
 
-                        var trunc_d3ckid     = truncate(d3ckid)
-
                         var d3ck = {
                            d3ckid         : d3ckid,
                            name           : name,
-                           trunc_d3ckid   : trunc_d3ckid,
                            owner          : owner,
                            email          : email,
                            image          : image,
@@ -293,7 +290,7 @@ $(document).ready(function () {
                               '<div class="thumbnail" style="background-color: #eaf1f1" id="{{d3ckid}}">'              +
                                  '<a href="/d3ck_details.html?d3ckid={{d3ckid}}">'                                     +
                                  // '<img id="{{d3ckid}}" width=128 style="padding: 4;" src="public/img/' + d3ckid + '.png"></a> <br />' +
-                                 '<img id="{{d3ckid}}" class="d3ck_img" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
+                                 '<img id="img_{{d3ckid}}" class="d3ck_img" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
                                  '<div class="caption">'                                                               +
                                     '<span>D3CK: </span><span class="d3ckname"><b>{{name}}</b></span> <br />'          +
                                     '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +
@@ -332,11 +329,13 @@ $(document).ready(function () {
                          setInterval(d3ck_ping, ping_poll, all_ips, d3ckid, d3ck_url)
 
                          // start images in gray, color (if avail) on mouseover
-                         console.log('adipoli: ' + d3ckid)
-                         $('#' + d3ckid).adipoli({
-                           'startEffect' : 'grayscale',
-                           'hoverEffect' : 'normal'
-                         })
+                         // console.log('adipoli: ' + d3ckid)
+                         // $('#img_' + d3ckid).adipoli({
+                         //   'startEffect' : 'grayscale',
+                         //   'hoverEffect' : 'normal'
+                         // })
+
+                         $('.thumbnail').addClass('dotdotdot')
 
                     } // else ... d3cks other than this one
                     else {
@@ -379,25 +378,6 @@ $(document).ready(function () {
 
     // paint in the data about our certs
     crypto_411()
-
-    //  timer circle
-//    $('#timer_countdown').TimeCircles({
-//        total_duration  : 30, 
-//        // total_duration  : 0, 
-//        direction: "Counter-clockwise",
-//        count_past_zero : false,
-//        time            : {
-//            Days            : { show: false },
-//            Hours           : { show: false },
-//            Minutes         : { show: false },
-//            Seconds         : { show: true, color: "#2b94ea"}
-//        }
-//    }).addListener(function(unit, value, total) {
-//        // if(total <= 0) {
-//        //     alert('wakka!')
-//        // }
-//    });
-    
 
 })
 

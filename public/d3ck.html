@@ -51,6 +51,11 @@
 <!-- circles in the stream -->
 <link href="/css/TimeCircles.css" rel="stylesheet">
 
+<!-- user dialogue/questions -->
+<link href="/css/alertify_core.css" rel="stylesheet">
+<link href="/css/alertify_def.css" rel="stylesheet">
+
+
 <!-- <link href="/css/bootstrap-responsive.css" rel="stylesheet"> -->
 
 <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -60,7 +65,7 @@
 
 <!-- for d3cks -->
 <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
-<!-- <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/> -->
+<link href="/css/adipoli.css" rel="stylesheet" type="text/css"/>
 
 <script src="/js/R.js"></script> 
 
@@ -98,8 +103,6 @@
 
                 <li> <a href="#messages" data-toggle="tab"><span id="d3ck_top_messages" title="Messages" data-content="Message center: notes, files, and events" class="glyphicon glyphicon-envelope"></span></a></li>
     
-                <!-- <li> <a id="rtc_hack" href="" data-toggle="tab"><span id="d3ck_video" title="VPN" data-content="Video - new page!" class="glyphicon glyphicon-facetime-video"></span></a></li> -->
-
                 <li> <a href="#rtc_hack" data-toggle="tab"><span id="d3ck_video" title="VPN" data-content="Voice-n-Vid" class="glyphicon glyphicon-facetime-video"></span></a></li>
 
                 </ul>
@@ -589,43 +592,6 @@
 
         <div class="btn-toolbar"> <span class="spacer50"></span> </div>
 
-        <div class="row">
-
-        <button id="knock_knock" type="button" class="btn btn-primary">Knock</button>
-
-        <script>
-        $(document).ready(function () {
-
-            $('#knock_knock').click(function (e) { 
-                console.log('nock')
-                console.log(my_d3ck.D3CK_ID, my_d3ck.ip_addr)
-
-                // xxx - just for knock trials
-                var hack_key = _.keys(all_d3ck_ids)[1]
-                var hack_ip  = all_d3ck_ids[_.keys(all_d3ck_ids)[1]].ip_addr
-
-                var knock_knock = $.ajax({
-                    type: "POST",
-                    url: "/knock",
-                    // data: {d3ckid: my_d3ck.D3CK_ID, ipaddr: my_d3ck.ip_addr}
-                    data: {d3ckid: hack_key, ip_addr: hack_ip, owner: my_d3ck.owner.name }
-                })
-
-                knock_knock.done(function(msg) {
-                    console.log("posto facto")
-                    console.log(msg)
-                })
-
-                knock_knock.fail(function(xhr, textStatus, errorThrown) {
-                    console.log('failzor -> ' + JSON.stringify(xhr))
-                })
-
-            })
-        })
-        </script>
-        </div>
-
-
         <div class="btn-toolbar"> <span class="spacer100"></span></div>
 
 
@@ -672,6 +638,8 @@
 
 <script type="text/javascript" src='/js/spin.js'></script>
 <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
+
+<script type="text/javascript" src="/js/alertify.js"></script>
 
 <!-- my stuff -->
 <script type="text/javascript" src="/js/d3ck.js"></script>
