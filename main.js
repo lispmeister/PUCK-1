@@ -2973,11 +2973,22 @@ function formCreate(req, res, next) {
 //
 // write cert/d3ck stuff into keystore
 //
+
+var local_d3cks = []
+
 function create_local_d3ck(ip_addr) {
 
     console.log('create_local_d3ck ' + ip_addr)
 
+
     var deferred = Q.defer();
+
+    // xxxxxx
+    if (typeof local_d3cks[ip_addr] != 'undefined') {
+        console.log('already one from this IP...?')
+        deferred.reject({error: 'already did this IP addr'})
+    }
+
 
     var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/ping'
 
@@ -3021,7 +3032,7 @@ function create_local_d3ck(ip_addr) {
         var c_data = ""
 
         // grab a d3ck's data via URL
-        https_get(c_url).then(function (err, c_data) {
+        https_get(c_url).then(function (c_data) {
 
             var c_deferred = Q.defer();
 
