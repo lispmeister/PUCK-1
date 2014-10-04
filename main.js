@@ -2926,7 +2926,6 @@ function https_get(url) {
 
         res.on('end', function () {
             console.log('HTTPs-get!')
-            console.log(req.data);
             console.log(str);
             console.log('deferred response: ' + str)
             deferred.resolve(str)
