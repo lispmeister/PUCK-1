@@ -3083,7 +3083,7 @@ function create_local_d3ck(ip_addr) {
                 // ... back to the program, dog!
                 //
                 // this simply takes the pwd and finds the exe area...
-                create_remote_d3ck(rdata)
+                create_remote_d3ck(c_data)
 
                 // write image
                 console.log('image...')
