@@ -2988,9 +2988,12 @@ function create_local_d3ck(ip_addr) {
             console.log('no woman no ping: ' + ping_data)
             return({'error': "other side didn't answer our ping"})
         }
-        data = ping_data
+        else {
+            console.log('ping returned: ' + ping_data)
+            data = ping_data
+        }
 
-    })
+    }).then(
 
     console.log('ping sez yes')
 
@@ -3026,6 +3029,7 @@ function create_local_d3ck(ip_addr) {
         c_data = c_data
 
     })
+    ).then(
 
     console.log('remote d3ck info in...!')
 
@@ -3096,6 +3100,9 @@ function create_local_d3ck(ip_addr) {
 
     // self added
     d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: c_data.name }
+    ).fail(function (error) {
+        console.log("error occured: " + error);
+    });
 
 }
 
