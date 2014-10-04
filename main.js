@@ -1245,7 +1245,7 @@ function create_cli3nt_rest(req, res, next) {
         //
         // create their d3ck locally as well
         //
-        create_local_d3ck(ip_addr)
+        // create_local_d3ck(ip_addr)
 
         console.log('sending bundle back')
 
@@ -1265,23 +1265,23 @@ function create_cli3nt_rest(req, res, next) {
 //
 // grab remote d3ck and stuff it locally
 //
-function create_remote_d3ck () {
+function create_remote_d3ck (data) {
 
     //console.log(certz)
     var cmd  = d3ck_bin + '/create_server_d3ck.sh'
 
     console.log('executing ' + cmd + ' to add locally')
 
-    var argz = [c_data.D3CK_ID, 
-                c_data.image, 
-                c_data.ip_addr, 
-                "\"all_ips\": [\"" + c_data.all_ips + "\"]", 
-                c_data.owner.name, 
-                c_data.owner.email]
+    var argz = [data.D3CK_ID, 
+                data.image, 
+                data.ip_addr, 
+                "\"all_ips\": [\"" + data.all_ips + "\"]", 
+                data.owner.name, 
+                data.owner.email]
 
     d3ck_spawn(cmd, argz)
 
-    assign_capabilities(c_data)
+    assign_capabilities(data)
 
 }
 
@@ -2961,7 +2961,7 @@ function formCreate(req, res, next) {
                 bwana_d3ck.owner.name, 
                 bwana_d3ck.owner.email, 
                 ip_addr, 
-                bwana_d3ck.D3CK_ID]
+                bwana_d3ck.D3CK_ID]     // xxxx?
 
         d3ck_spawn(cmd, argz)
 
@@ -3098,25 +3098,21 @@ function create_local_d3ck(ip_addr) {
             // ... back to the program, dog!
             //
             // this simply takes the pwd and finds the exe area...
-            var cmd  = d3ck_bin + '/create_server_d3ck.sh'
+            create_remote_d3ck(rdata)
 
-            console.log('executing ' + cmd + ' to add locally')
+            // var cmd  = d3ck_bin + '/create_server_d3ck.sh'
 
-            var argz = [r_data.D3CK_ID, 
-                        r_data.image, 
-                        r_data.ip_addr, 
-                        "\"all_ips\": [\"" + r_data.all_ips + "\"]", 
-                        r_data.owner.name, 
-                        r_data.owner.email]
+            // console.log('executing ' + cmd + ' to add locally')
 
-            d3ck_spawn(cmd, argz)
+            // var argz = [r_data.D3CK_ID, 
+            //             r_data.image, 
+            //             r_data.ip_addr, 
+            //             "\"all_ips\": [\"" + r_data.all_ips + "\"]", 
+            //             r_data.owner.name, 
+            //             r_data.owner.email]
+            // d3ck_spawn(cmd, argz)
 
-            assign_capabilities(r_data)
-
-            // now write the image data for the d3ck in question
-            console.log('just about to keel over')
-
-            // console.log(r_data)
+            // assign_capabilities(r_data)
 
             // write image
             console.log('image...')
