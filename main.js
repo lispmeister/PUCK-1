@@ -2983,7 +2983,8 @@ function create_local_d3ck(ip_addr) {
 
         var p_deferred = Q.defer();
 
-        console.log(url + ' nabbed => ' + JSON.stringify(ping_data))
+        console.log(url + ' nabbed => ')
+        console.log(ping_data)
 
         if (JSON.stringify(ping_data).indexOf("was not found") != -1) {
             console.log('no woman no ping: ' + ping_data)
@@ -3116,7 +3117,7 @@ function create_local_d3ck(ip_addr) {
        })
 
     }).fail(function (error) {
-        console.log("error occured: " + error);
+        console.log("in c-form error occured: " + error);
     });
 
     return deferred.promise;
