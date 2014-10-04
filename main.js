@@ -1210,15 +1210,12 @@ function create_cli3nt_rest(req, res, next) {
     var target  = ''
     var command = d3ck_bin + '/bundle_certs.js'
     var argz    = []
-    var ip_addr = req.body.ip_addr
+    var ip_addr = get_client_ip(req)
 
     //
     // url
     //
-    console.log('doing it the hard way....')
-
-    console.log('IP: ' + ip_addr)
-    console.log(req.body)
+    console.log('doing it the hard way, from IP: ' + ip_addr)
 
 
     if (typeof req.query.did == "undefined") {
@@ -2943,7 +2940,7 @@ function formCreate(req, res, next) {
     console.log("form creating d3ck...")
     // console.log(req.body)
 
-    var ip_addr = req.body.ip_addr
+    var ip_addr = get_client_ip(req)
 
     // do all the create stuff
     create_local_d3ck(ip_addr).then(function(data) {
