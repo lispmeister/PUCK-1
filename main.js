@@ -3028,7 +3028,7 @@ function create_local_d3ck(ip_addr) {
 
             var c_deferred = Q.defer();
 
-            console.log('\ncheckin client data from c_url + ' nabz => ' + c_data.substring(0,1024))
+            console.log('\ncheckin client data from ' + c_url + ' nabz => ' + c_data.substring(0,1024))
 
             if (err) {
                 console.log('errz3 snatchin ' + url + ' ... ' + e.message)
