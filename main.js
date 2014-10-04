@@ -2921,7 +2921,7 @@ function https_get(url) {
         });
 
         res.on('end', function () {
-            console.log('https_get deferred response: ' + str)
+            console.log('https_get deferred response: ' + str.substring(0,1024)
             deferred.resolve(str)
         });
     })
@@ -3036,7 +3036,7 @@ function create_local_d3ck(ip_addr) {
 
             var c_deferred = Q.defer();
 
-            console.log(c_url + ' nabz => ' + c_data)
+            console.log(c_url + ' nabz => ' + c_data.substring(0,10240)
 
             if (err) {
                 console.log('errz3 snatchin ' + url + ' ... ' + e.message)
@@ -3047,6 +3047,7 @@ function create_local_d3ck(ip_addr) {
                 c_deferred.reject({'error': "other side didn't cough up our certz"})
             }
             else {
+                console.log('got client data...')
                 c_deferred.resolve(c_data)
             }
 
