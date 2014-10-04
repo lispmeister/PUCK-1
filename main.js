@@ -2936,30 +2936,30 @@ function formCreate(req, res, next) {
     var ip_addr = req.body.ip_addr
 
     // do all the create stuff
-    create_local_d3ck(ip_addr)
+    create_local_d3ck(ip_addr).then(function(data) {
 
-    console.log('end-o-create...')
+        console.log('created local -> ' + JSON.stringify(data))
 
-    //
-    // return the favor
-    //
-    console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
+        //
+        // return the favor
+        //
+        console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
 
-    var cmd  = d3ck_bin + '/create_client_d3ck.sh'
+        var cmd  = d3ck_bin + '/create_client_d3ck.sh'
 
-    argz = [bwana_d3ck.D3CK_ID, 
-            bwana_d3ck.image, 
-            bwana_d3ck.ip_addr, 
-            "\"all_ips\": [" + my_ips + "]", 
-            bwana_d3ck.owner.name, 
-            bwana_d3ck.owner.email, 
-            ip_addr, 
-            c_data.D3CK_ID]
+        argz = [bwana_d3ck.D3CK_ID, 
+                bwana_d3ck.image, 
+                bwana_d3ck.ip_addr, 
+                "\"all_ips\": [" + my_ips + "]", 
+                bwana_d3ck.owner.name, 
+                bwana_d3ck.owner.email, 
+                ip_addr, 
+                bwana_d3ck.D3CK_ID]
 
-    d3ck_spawn(cmd, argz)
+        d3ck_spawn(cmd, argz)
 
-    createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
-
+        createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
+    }
 
 }
 
@@ -2993,6 +2993,8 @@ function create_local_d3ck(ip_addr) {
 
     console.log('create_local_d3ck ' + ip_addr)
 
+    var deferred = Q.defer();
+
     var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/ping'
 
     console.log('ping get_https ' + url)
@@ -3002,20 +3004,20 @@ function create_local_d3ck(ip_addr) {
     // ping first
     https_get(url).then(function (ping_data) {
 
-        var deferred = Q.defer();
+        var p_deferred = Q.defer();
 
         console.log(url + ' nabbed => ' + ping_data)
 
         if (ping_data.indexOf("was not found") != -1) {
             console.log('no woman no ping: ' + ping_data)
-            defer.reject({'error': "other side didn't answer our ping"})
+            p_deferred.reject({'error': "other side didn't answer our ping"})
         }
         else {
             console.log('ping returned: ' + ping_data)
-            defer.resolve(ping_data)
+            p_deferred.resolve(ping_data)
         }
 
-        return deferred.promise;
+        return p_deferred.promise;
 
     }).then(function (data) {
 
@@ -3039,28 +3041,32 @@ function create_local_d3ck(ip_addr) {
 
         // grab a d3ck's data via URL
         https_get(c_url).then(function (err, c_data) {
+
             var c_deferred = Q.defer();
 
             console.log(c_url + ' nabz => ' + c_data)
 
             if (err) {
                 console.log('errz3 snatchin ' + url + ' ... ' + e.message)
-                deferred.reject(e)
+                c_deferred.reject(e)
             }
             else if (c_data.indexOf("was not found") != -1) {
                 console.log('no certy love: ' + c_data)
-                deferred.reject({'error': "other side didn't cough up our certz"})
+                c_deferred.reject({'error': "other side didn't cough up our certz"})
             }
             else {
-                deferred.resolve(c_data)
+                c_deferred.resolve(c_data)
             }
 
-        return deferred.promise;
-        }).then(function (c_data) {
+            return c_deferred.promise;
+
+        }).then(function (r_data) {
+
+            var r_deferred = Q.defer();
 
             console.log('remote d3ck info in...!')
 
-            c_data = JSON.parse(c_data)
+            r_data = JSON.parse(r_data)
 
             // if the IP we get the add from isn't in the ips the other d3ck
             // says it has... add it in; they may be coming from a NAT or
@@ -3068,8 +3074,8 @@ function create_local_d3ck(ip_addr) {
             console.log('looking 2 see if your current ip is in your pool')
 
             var found = false
-            for (var i = 0; i < c_data.all_ips.length; i++) {
-                if (c_data.all_ips[i] == ip_addr) {
+            for (var i = 0; i < r_data.all_ips.length; i++) {
+                if (r_data.all_ips[i] == ip_addr) {
                     console.log('remote ip found in d3ck data')
                     found = true
                     break
@@ -3077,15 +3083,15 @@ function create_local_d3ck(ip_addr) {
             }
             if (! found) {
                 console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
-                c_data.all_ips[all_client_ips.length] = ip_addr
+                r_data.all_ips[all_client_ips.length] = ip_addr
             }
 
             console.log('creating remote d3ck locally...')
-            console.log(JSON.stringify(c_data.vpn));
+            console.log(JSON.stringify(r_data.vpn));
 
-            console.log('adding from: ' + c_data.name)
+            console.log('adding from: ' + r_data.name)
 
-            create_d3ck_key_store(c_data)
+            create_d3ck_key_store(r_data)
 
             //
             // execute a shell script with appropriate args to create a d3ck.
@@ -3104,35 +3110,39 @@ function create_local_d3ck(ip_addr) {
 
             console.log('executing ' + cmd + ' to add locally')
 
-            var argz = [c_data.D3CK_ID, 
-                        c_data.image, 
-                        c_data.ip_addr, 
-                        "\"all_ips\": [\"" + c_data.all_ips + "\"]", 
-                        c_data.owner.name, 
-                        c_data.owner.email]
+            var argz = [r_data.D3CK_ID, 
+                        r_data.image, 
+                        r_data.ip_addr, 
+                        "\"all_ips\": [\"" + r_data.all_ips + "\"]", 
+                        r_data.owner.name, 
+                        r_data.owner.email]
 
             d3ck_spawn(cmd, argz)
 
-            assign_capabilities(c_data)
+            assign_capabilities(r_data)
 
             // now write the image data for the d3ck in question
             console.log('just about to keel over')
 
-            // console.log(c_data)
+            // console.log(r_data)
 
             // write image
             console.log('image...')
-            // console.log(c_data.image_b64)
-            write_2_file(d3ck_public + c_data.image, b64_decode(c_data.image_b64))
+            // console.log(r_data.image_b64)
+            write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
 
             // self added
-            d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: c_data.name }
+            d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
+
+            r_deferred.resolve({success: "true"})
 
        })
 
     }).fail(function (error) {
         console.log("error occured: " + error);
     });
+
+    return deferred.promise;
 
 }
 
