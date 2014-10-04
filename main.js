@@ -2965,23 +2965,28 @@ function formCreate(req, res, next) {
 
 function https_ping(url) {
 
+    var deferred = Q.defer();
+
     https_get(url).then(function (err, ping_data) {
 
-        console.log(url + ' nabbed => ' + ping_data)
+        console.log(url + ' nabbed => ' + JSON.stringify(ping_data))
+
         if (err) {
             console.log('errz snatchin ' + url + ' ... ' + e.message)
-            return(e)
+            deferred.reject(e)
         }
-        else if (ping_data.indexOf("was not found") != -1) {
+        else if (JSON.stringify(ping_data).indexOf("was not found") != -1) {
             console.log('no woman no ping: ' + ping_data)
-            return({'error': "other side didn't answer our ping"})
+            deferred.reject({'error': "other side didn't answer our ping"})
         }
         else {
             console.log('ping returned: ' + ping_data)
-            data = ping_data
+            deferred.resolve(ping_data)
         }
 
     })
+
+    return deferred.promise;
 
 }
 
