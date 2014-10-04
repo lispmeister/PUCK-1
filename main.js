@@ -1249,6 +1249,8 @@ function create_cli3nt_rest(req, res, next) {
             create_local_d3ck(ip_addr)
         }
 
+        d3ck2ip[did] = ip_addr
+
         console.log('sending bundle back')
 
         try {
