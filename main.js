@@ -3035,13 +3035,12 @@ function create_local_d3ck(ip_addr) {
                 c_deferred.reject({'error': "other side didn't cough up our certz"})
             }
             else {
-                console.log('got client data...')
 
                 var r_deferred = Q.defer();
 
-                console.log('remote d3ck info in...!')
+                console.log('remote client d3ck info in...!')
 
-                r_data = c_data
+                console.log(c_data.all_ips)
 
                 // if the IP we get the add from isn't in the ips the other d3ck
                 // says it has... add it in; they may be coming from a NAT or
@@ -3049,8 +3048,9 @@ function create_local_d3ck(ip_addr) {
                 console.log('looking 2 see if your current ip is in your pool')
 
                 var found = false
-                for (var i = 0; i < r_data.all_ips.length; i++) {
-                    if (r_data.all_ips[i] == ip_addr) {
+
+                for (var i = 0; i < c_data.all_ips.length; i++) {
+                    if (c_data.all_ips[i] == ip_addr) {
                         console.log('remote ip found in d3ck data')
                         found = true
                         break
@@ -3058,15 +3058,15 @@ function create_local_d3ck(ip_addr) {
                 }
                 if (! found) {
                     console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
-                    r_data.all_ips[all_client_ips.length] = ip_addr
+                    c_data.all_ips[all_client_ips.length] = ip_addr
                 }
 
                 console.log('creating remote d3ck locally...')
-                console.log(JSON.stringify(r_data.vpn));
+                console.log(JSON.stringify(c_data.vpn));
 
-                console.log('adding from: ' + r_data.name)
+                console.log('adding from: ' + c_data.name)
 
-                create_d3ck_key_store(r_data)
+                create_d3ck_key_store(c_data)
 
                 //
                 // execute a shell script with appropriate args to create a d3ck.
@@ -3086,11 +3086,11 @@ function create_local_d3ck(ip_addr) {
                 // write image
                 console.log('image...')
 
-                // console.log(r_data.image_b64)
-                write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
+                // console.log(c_data.image_b64)
+                write_2_file(d3ck_public + c_data.image, b64_decode(c_data.image_b64))
 
                 // self added
-                d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
+                d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: c_data.name }
 
                 r_deferred.resolve({success: "true"})
 
