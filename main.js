@@ -1245,7 +1245,7 @@ function create_cli3nt_rest(req, res, next) {
         //
         // create their d3ck locally as well
         //
-        // create_local_d3ck(ip_addr)
+        create_local_d3ck(ip_addr)
 
         console.log('sending bundle back')
 
@@ -2975,7 +2975,7 @@ function formCreate(req, res, next) {
 }
 
 //
-// write cert/d3ck stuff into keystore
+// grab d3ck info from an ip address, write cert/d3ck stuff into keystore, etc
 //
 function create_local_d3ck(ip_addr) {
 
