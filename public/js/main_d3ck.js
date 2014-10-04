@@ -121,8 +121,35 @@ $(document).ready(function () {
     $('body').on('click', '.d3ck_vpn', function(e) {
         e.preventDefault()
 
+        // gather up the current target details
+        var vd3ckid = $(this).parent().find('#d3ckid').val()
+        var ipaddr  = $(this).parent().find('#ipaddr').val()
+        var target  = $(this).parent().find('#name').val()
+
+        console.log('nock')
+        console.log(vd3ckid, ipaddr)
+
+        var knock_knock = $.ajax({
+            type: "POST",
+            url: "/knock",
+            // data: {d3ckid: my_d3ck.D3CK_ID, ipaddr: my_d3ck.ip_addr}
+            data: {d3ckid: vd3ckid, ip_addr: ipaddr, owner: my_d3ck.owner.name }
+        })
+
+        knock_knock.done(function(msg) {
+            console.log("posto facto")
+            console.log(msg)
+        })
+
+        knock_knock.fail(function(xhr, textStatus, errorThrown) {
+            console.log('failzor -> ' + JSON.stringify(xhr))
+        })
+
+
+
         // one call at a time, for now
-        if (!d3ck_current.incoming && !d3ck_current.outgoing && !d3ck_current.busy) {
+        if (1 == 2) {
+        // if (!d3ck_current.incoming && !d3ck_current.outgoing && !d3ck_current.busy) {
             // possibly a better way to get name
             event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
 
@@ -351,6 +378,7 @@ $(document).ready(function () {
                 })
             })
         })
+
     })
 
     // message data
