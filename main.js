@@ -1835,7 +1835,10 @@ function get_d3ck(req, res, next) {
             else {
                 // console.log("Value retrieved: " + reply.toString());
                 console.log("data retrieved...")
-                var obj_reply = JSON.parse(reply)
+
+                res.send(200, reply)
+
+                // var obj_reply = JSON.parse(reply)
 
                 // console.log('\n\n\nbefore...')
                 // console.log(obj_reply.vpn.key)
@@ -1848,7 +1851,6 @@ function get_d3ck(req, res, next) {
                 // console.log('\n\nafter...')
                 // console.log(obj_reply.vpn.key)
                 // console.log('\n\n\n')
-                res.send(200, JSON.stringify(obj_reply))
             }
         }
         else {
@@ -2991,7 +2993,6 @@ function create_local_d3ck(ip_addr) {
     })
 
     console.log('ping sez yes')
-    // console.log(data)
 
     console.log('starting... writing...')
     console.log(typeof data)
