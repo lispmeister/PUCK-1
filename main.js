@@ -1210,6 +1210,7 @@ function create_cli3nt_rest(req, res, next) {
     var target  = ''
     var command = d3ck_bin + '/bundle_certs.js'
     var argz    = []
+    var ip_addr = req.body.ip_addr
 
     //
     // url
@@ -1237,14 +1238,8 @@ function create_cli3nt_rest(req, res, next) {
 
         var cli3nt_bundle = JSON.parse(fs.readFileSync(d3ck_keystore +'/'+ did + "/_cli3nt.json").toString())
 
-        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.key", cli3nt_bundle.vpn.key, function(err) {
-            if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
-            else { console.log('wrote remote vpn server key') }
-        });
-        fs.writeFile(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert, function(err) {
-            if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
-            else { console.log('wrote remote vpn server cert') }
-        });
+        write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.key", cli3nt_bundle.vpn.key)
+        write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert)
 
         //
         // create their d3ck locally as well
@@ -2925,9 +2920,7 @@ function https_get(url) {
         });
 
         res.on('end', function () {
-            console.log('HTTPs-get!')
-            console.log(str);
-            console.log('deferred response: ' + str)
+            console.log('https_get deferred response: ' + str)
             deferred.resolve(str)
         });
     })
@@ -3014,17 +3007,13 @@ function create_local_d3ck(ip_addr) {
 
         console.log('ping sez yes')
 
-        console.log('starting... writing...')
-        console.log(typeof data)
-        console.log(data)
-
         data = JSON.parse(data)
 
         //
         // now get client certs
         //
         // c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
-        c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + data.D3CK_ID
+        c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + data.did
 
         console.log('getting cli3nt data from: ' + c_url)
 
