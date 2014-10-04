@@ -2916,6 +2916,7 @@ function https_get(url) {
     console.log('getting... ' + url)
 
     var deferred = Q.defer();
+    var str      = ""
 
     https.get(url, function (res) {
 
