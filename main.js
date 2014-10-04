@@ -2963,34 +2963,6 @@ function formCreate(req, res, next) {
 
 }
 
-function https_ping(url) {
-
-    var deferred = Q.defer();
-
-    https_get(url).then(function (err, ping_data) {
-
-        console.log(url + ' nabbed => ' + JSON.stringify(ping_data))
-
-        if (err) {
-            console.log('errz snatchin ' + url + ' ... ' + e.message)
-            deferred.reject(e)
-        }
-        else if (JSON.stringify(ping_data).indexOf("was not found") != -1) {
-            console.log('no woman no ping: ' + ping_data)
-            deferred.reject({'error': "other side didn't answer our ping"})
-        }
-        else {
-            console.log('ping returned: ' + ping_data)
-            deferred.resolve(ping_data)
-        }
-
-    })
-
-    return deferred.promise;
-
-}
-
-
 //
 // write cert/d3ck stuff into keystore
 //
@@ -3011,9 +2983,9 @@ function create_local_d3ck(ip_addr) {
 
         var p_deferred = Q.defer();
 
-        console.log(url + ' nabbed => ' + ping_data)
+        console.log(url + ' nabbed => ' + JSON.stringify(ping_data))
 
-        if (ping_data.indexOf("was not found") != -1) {
+        if (JSON.stringify(ping_data).indexOf("was not found") != -1) {
             console.log('no woman no ping: ' + ping_data)
             p_deferred.reject({'error': "other side didn't answer our ping"})
         }
