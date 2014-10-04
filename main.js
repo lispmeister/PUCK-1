@@ -3040,88 +3040,71 @@ function create_local_d3ck(ip_addr) {
             }
             else {
                 console.log('got client data...')
-                c_deferred.resolve(c_data)
-            }
 
-            return c_deferred.promise;
+                var r_deferred = Q.defer();
 
-        }).then(function (r_data) {
+                console.log('remote d3ck info in...!')
 
-            var r_deferred = Q.defer();
+                r_data = c_data
 
-            console.log('remote d3ck info in...!')
+                // if the IP we get the add from isn't in the ips the other d3ck
+                // says it has... add it in; they may be coming from a NAT or
+                // something weird
+                console.log('looking 2 see if your current ip is in your pool')
 
-            r_data = JSON.parse(r_data)
-
-            // if the IP we get the add from isn't in the ips the other d3ck
-            // says it has... add it in; they may be coming from a NAT or
-            // something weird
-            console.log('looking 2 see if your current ip is in your pool')
-
-            var found = false
-            for (var i = 0; i < r_data.all_ips.length; i++) {
-                if (r_data.all_ips[i] == ip_addr) {
-                    console.log('remote ip found in d3ck data')
-                    found = true
-                    break
+                var found = false
+                for (var i = 0; i < r_data.all_ips.length; i++) {
+                    if (r_data.all_ips[i] == ip_addr) {
+                        console.log('remote ip found in d3ck data')
+                        found = true
+                        break
+                    }
                 }
+                if (! found) {
+                    console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
+                    r_data.all_ips[all_client_ips.length] = ip_addr
+                }
+
+                console.log('creating remote d3ck locally...')
+                console.log(JSON.stringify(r_data.vpn));
+
+                console.log('adding from: ' + r_data.name)
+
+                create_d3ck_key_store(r_data)
+
+                //
+                // execute a shell script with appropriate args to create a d3ck.
+                // ... of course... maybe should be done in node/js anyway...
+                // have to ponder the ponderables....
+                //
+                // Apparently the word ponder comes from the 14th century, coming from the
+                // word heavy or weighty in the physical sense... which makes a certain
+                // amount of sense... funny how we continually grasp for physical analogues (!)
+                // to our philosophical or digital concepts.
+                //
+                // ... back to the program, dog!
+                //
+                // this simply takes the pwd and finds the exe area...
+                create_remote_d3ck(rdata)
+
+                // write image
+                console.log('image...')
+
+                // console.log(r_data.image_b64)
+                write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
+
+                // self added
+                d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
+
+                r_deferred.resolve({success: "true"})
+
             }
-            if (! found) {
-                console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
-                r_data.all_ips[all_client_ips.length] = ip_addr
-            }
 
-            console.log('creating remote d3ck locally...')
-            console.log(JSON.stringify(r_data.vpn));
+        }).fail(function (error) {
+            console.log("in c-form error occured: " + error);
+        });
 
-            console.log('adding from: ' + r_data.name)
-
-            create_d3ck_key_store(r_data)
-
-            //
-            // execute a shell script with appropriate args to create a d3ck.
-            // ... of course... maybe should be done in node/js anyway...
-            // have to ponder the ponderables....
-            //
-            // Apparently the word ponder comes from the 14th century, coming from the
-            // word heavy or weighty in the physical sense... which makes a certain
-            // amount of sense... funny how we continually grasp for physical analogues (!)
-            // to our philosophical or digital concepts.
-            //
-            // ... back to the program, dog!
-            //
-            // this simply takes the pwd and finds the exe area...
-            create_remote_d3ck(rdata)
-
-            // var cmd  = d3ck_bin + '/create_server_d3ck.sh'
-
-            // console.log('executing ' + cmd + ' to add locally')
-
-            // var argz = [r_data.D3CK_ID, 
-            //             r_data.image, 
-            //             r_data.ip_addr, 
-            //             "\"all_ips\": [\"" + r_data.all_ips + "\"]", 
-            //             r_data.owner.name, 
-            //             r_data.owner.email]
-            // d3ck_spawn(cmd, argz)
-
-            // assign_capabilities(r_data)
-
-            // write image
-            console.log('image...')
-            // console.log(r_data.image_b64)
-            write_2_file(d3ck_public + r_data.image, b64_decode(r_data.image_b64))
-
-            // self added
-            d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: r_data.name }
-
-            r_deferred.resolve({success: "true"})
-
-       })
-
-    }).fail(function (error) {
-        console.log("in c-form error occured: " + error);
-    });
+    })
 
     return deferred.promise;
 
