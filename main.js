@@ -2917,13 +2917,13 @@ function https_get(url) {
 
     var deferred = Q.defer();
 
-    https.get(url, function (err, res) {
+    https.get(url, function (res) {
 
         res.on('data', function (chunk) {
             str += chunk;
         });
 
-        response.on('end', function () {
+        res.on('end', function () {
             console.log('HTTPs-get!')
             console.log(req.data);
             console.log(str);
