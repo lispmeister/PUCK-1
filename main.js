@@ -1202,7 +1202,7 @@ function update_d3ck(_d3ck) {
 // via REST... executes a program, creates client certs, stashes them
 // in the querying d3ck's dir, then returns the certs back
 //
-function create_cli3nt_rest (req, res, next) {
+function create_cli3nt_rest(req, res, next) {
 
     // XXXX - have to verify that they're requesting for themselves,
     // not for others!
@@ -1246,13 +1246,12 @@ function create_cli3nt_rest (req, res, next) {
             else { console.log('wrote remote vpn server cert') }
         });
 
-
-//      create_remote_d3ck ()
-
+        //
+        // create their d3ck locally as well
+        //
+        create_local_d3ck(ip_addr)
 
         console.log('sending bundle back')
-
-
 
         try {
             res.send(200, JSON.stringify(cli3nt_bundle))
@@ -1287,6 +1286,7 @@ function create_remote_d3ck () {
     d3ck_spawn(cmd, argz)
 
     assign_capabilities(c_data)
+
 }
 
 
@@ -2932,13 +2932,48 @@ function formCreate(req, res, next) {
 
     var ip_addr = req.body.ip_addr
 
+    // do all the create stuff
+    create_local_d3ck(ip_addr)
+
+    console.log('end-o-create...')
+
+    //
+    // return the favor
+    //
+    console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
+
+    var cmd  = d3ck_bin + '/create_client_d3ck.sh'
+
+    argz = [bwana_d3ck.D3CK_ID, 
+            bwana_d3ck.image, 
+            bwana_d3ck.ip_addr, 
+            "\"all_ips\": [" + my_ips + "]", 
+            bwana_d3ck.owner.name, 
+            bwana_d3ck.owner.email, 
+            ip_addr, 
+            c_data.D3CK_ID]
+
+    d3ck_spawn(cmd, argz)
+
+    createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
+
+
+}
+
+//
+// write cert/d3ck stuff into keystore
+//
+function create_local_d3ck(ip_addr) {
+
+    console.log('create_local_d3ck ' + ip_addr)
+
     var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/ping'
 
     console.log('ping get_https ' + url)
 
     var data = ""
 
-    // grab a remote d3ck's data
+    // ping first
     https_get(url).then(function (err, ping_data) {
 
         console.log(url + ' nabbed => ' + ping_data)
@@ -2961,17 +2996,6 @@ function formCreate(req, res, next) {
 
     data = JSON.parse(data)
 
-    // make the d3ck's dir... should not exist!
-    var d3ck_dir = config.D3CK.keystore + '/' + data.did
-
-    mkdirp.sync(d3ck_dir, function (err) {
-        if(err) {
-            // xxx - user error, bail
-            console.log('e: ' + err);
-        }
-    })
-
-
     //
     // now get client certs
     //
@@ -2979,6 +3003,7 @@ function formCreate(req, res, next) {
 
     var c_data = ""
 
+    // grab a d3ck's data via URL
     https_get(c_url).then(function (err, c_data) {
 
         console.log(url + ' nabbed => ' + c_data)
@@ -2994,7 +3019,6 @@ function formCreate(req, res, next) {
 
     })
 
-
     console.log('remote d3ck info in...!')
 
     c_data = JSON.parse(c_data)
@@ -3004,23 +3028,20 @@ function formCreate(req, res, next) {
     // something weird
     console.log('looking 2 see if your current ip is in your pool')
 
-    if (ip_addr != d3ck_server_ip) {
-        // if you're coming from a NAT or someplace weird...
-        var found = false
-        for (var i = 0; i < c_data.all_ips.length; i++) {
-            if (c_data.all_ips[i] == ip_addr) {
-                console.log('remote ip found in d3ck data')
-                found = true
-                break
-            }
-        }
-        if (! found) {
-            console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
-            c_data.all_ips[all_client_ips.length] = ip_addr
+    var found = false
+    for (var i = 0; i < c_data.all_ips.length; i++) {
+        if (c_data.all_ips[i] == ip_addr) {
+            console.log('remote ip found in d3ck data')
+            found = true
+            break
         }
     }
+    if (! found) {
+        console.log("You're coming from an IP that isn't in your stated IPs... adding [" + ip_addr + "] to your IP pool just in case")
+        c_data.all_ips[all_client_ips.length] = ip_addr
+    }
 
-    console.log('vpn-ify...!')
+    console.log('creating remote d3ck locally...')
     console.log(JSON.stringify(c_data.vpn));
 
     console.log('adding from: ' + c_data.name)
@@ -3068,30 +3089,8 @@ function formCreate(req, res, next) {
     // self added
     d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: c_data.name }
 
-
-    //
-    // return the favor
-    //
-    console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
-
-    var cmd  = d3ck_bin + '/create_client_d3ck.sh'
-
-    argz = [bwana_d3ck.D3CK_ID, 
-            bwana_d3ck.image, 
-            bwana_d3ck.ip_addr, 
-            "\"all_ips\": [" + my_ips + "]", 
-            bwana_d3ck.owner.name, 
-            bwana_d3ck.owner.email, 
-            ip_addr, 
-            c_data.D3CK_ID]
-
-    d3ck_spawn(cmd, argz)
-
-    createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
-
-    console.log('end-o-create...')
-
 }
+
 
 //
 // server stuff... perhaps a bit odd... but so am I
