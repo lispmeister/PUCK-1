@@ -2917,8 +2917,19 @@ function https_get(url) {
 
     var deferred = Q.defer();
 
-    https.get(url, deferred.resolve)
+    https.get(url, function (err, res) {
 
+        res.on('data', function (chunk) {
+            str += chunk;
+        });
+
+        response.on('end', function () {
+            console.log(req.data);
+            console.log(str);
+            deferred.resolve(str)
+        });
+    })
+    
     return deferred.promise;
 
 }
