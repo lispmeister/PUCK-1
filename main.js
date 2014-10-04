@@ -1217,6 +1217,10 @@ function create_cli3nt_rest(req, res, next) {
     //
     console.log('doing it the hard way....')
 
+    console.log('IP: ' + ip_addr)
+    console.log(req.body)
+
+
     if (typeof req.query.did == "undefined") {
         console.log('bad dog, no DiD!')
         res.send(400, { error: 'bad dog, no DiD, no tasty bites!' })
