@@ -1217,7 +1217,6 @@ function create_cli3nt_rest(req, res, next) {
     //
     console.log('doing it the hard way, from IP: ' + ip_addr)
 
-
     if (typeof req.query.did == "undefined") {
         console.log('bad dog, no DiD!')
         res.send(400, { error: 'bad dog, no DiD, no tasty bites!' })
@@ -1245,7 +1244,10 @@ function create_cli3nt_rest(req, res, next) {
         //
         // create their d3ck locally as well
         //
-        create_local_d3ck(ip_addr)
+
+        if (typeof d3ck2ip[did] == "undefined") {
+            create_local_d3ck(ip_addr)
+        }
 
         console.log('sending bundle back')
 
