@@ -2940,7 +2940,7 @@ function formCreate(req, res, next) {
     console.log("form creating d3ck...")
     // console.log(req.body)
 
-    var ip_addr = req.body.ip
+    var ip_addr = req.body.ip_addr
 
     // do all the create stuff
     create_local_d3ck(ip_addr).then(function(data) {
