@@ -1820,7 +1820,7 @@ function getEvent(req, res, next) {
  */
 function get_d3ck(req, res, next) {
 
-    console.log('get_d3ck')
+    console.log('get_d3ck: ' + res.params.key)
 
     // console.log(req.params)
 
@@ -1834,6 +1834,7 @@ function get_d3ck(req, res, next) {
             }
             else {
                 // console.log("Value retrieved: " + reply.toString());
+                console.log("data retrieved...")
                 var obj_reply = JSON.parse(reply)
 
                 // console.log('\n\n\nbefore...')
@@ -2993,20 +2994,26 @@ function create_local_d3ck(ip_addr) {
     // console.log(data)
 
     console.log('starting... writing...')
+    console.log(typeof data)
+    console.log(data)
 
     data = JSON.parse(data)
 
     //
     // now get client certs
     //
-    c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
+    // c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
+    c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + data.D3CK_ID
+
+    console.log('getting cli3nt data from: ' + c_url)
 
     var c_data = ""
 
     // grab a d3ck's data via URL
     https_get(c_url).then(function (err, c_data) {
 
-        console.log(url + ' nabbed => ' + c_data)
+        console.log(c_url + ' nabz => ' + c_data)
+
         if (err) {
             console.log('errz3 snatchin ' + url + ' ... ' + e.message)
             return(e)
