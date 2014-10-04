@@ -1787,7 +1787,7 @@ function getEvent(req, res, next) {
                             res.send(418, data)  // 418 I'm a teapot (RFC 2324)
                         }
                         else {
-                            // console.log("event data retrieved: " + data.toString());
+                            // console.log("event data fetched: " + data.toString());
                             jdata = data.toString()
                             // hack it into a json string
                             jdata = JSON.parse('[{' + jdata.substr(1,jdata.length-1) + ']')
@@ -2569,28 +2569,26 @@ function handleForm(req, res, next) {
 
     if (typeof req.body.d3ck_action === 'undefined' || req.body.d3ck_action == "") {
         console.log("error... unrecognized action: " + req.body.d3ck_action);
-        back_to_home(res)
     }
 
     var action = req.body.d3ck_action
 
     if (action == 'CREATE') {
-        formCreate(req, res, next)
-        console.log('... suck... sess...?')
-        back_to_home(res)
+        formCreate(req, res, next).then( function () {
+            console.log('... suck... sess...?')
+        })
     }
 
     else if (action == 'DELETE') {
         formDelete(req, res, next)
-        back_to_home(res)
     }
 
     // errror
     else {
         console.log("error... unrecognized action: " + action);
-        back_to_home(res)
     }
 
+    back_to_home(res)
 
 }
 
@@ -2940,7 +2938,9 @@ function formCreate(req, res, next) {
     console.log("form creating d3ck...")
     // console.log(req.body)
 
-    var ip_addr = req.body.ip_addr
+    var deferred = Q.defer();
+
+    var ip_addr  = req.body.ip_addr
 
     // do all the create stuff
     create_local_d3ck(ip_addr).then(function(data) {
@@ -2966,29 +2966,22 @@ function formCreate(req, res, next) {
         d3ck_spawn(cmd, argz)
 
         createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
+
+        return deferred.resolve();
     })
+
+    return deferred.promise;
 
 }
 
 //
 // write cert/d3ck stuff into keystore
 //
-
-var local_d3cks = []
-
 function create_local_d3ck(ip_addr) {
 
     console.log('create_local_d3ck ' + ip_addr)
 
-
     var deferred = Q.defer();
-
-    // xxxxxx
-    if (typeof local_d3cks[ip_addr] != 'undefined') {
-        console.log('already one from this IP...?')
-        deferred.reject({error: 'already did this IP addr'})
-    }
-
 
     var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/ping'
 
@@ -3001,8 +2994,7 @@ function create_local_d3ck(ip_addr) {
 
         var p_deferred = Q.defer();
 
-        console.log(url + ' nabbed => ')
-        console.log(ping_data)
+        console.log(url + ' nabbed')
 
         if (JSON.stringify(ping_data).indexOf("was not found") != -1) {
             console.log('no woman no ping: ' + ping_data)
@@ -3036,7 +3028,7 @@ function create_local_d3ck(ip_addr) {
 
             var c_deferred = Q.defer();
 
-            console.log(c_url + ' nabz => ' + c_data.substring(0,10240))
+            console.log('\ncheckin client data from c_url + ' nabz => ' + c_data.substring(0,1024))
 
             if (err) {
                 console.log('errz3 snatchin ' + url + ' ... ' + e.message)
