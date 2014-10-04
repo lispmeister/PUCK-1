@@ -1820,7 +1820,7 @@ function getEvent(req, res, next) {
  */
 function get_d3ck(req, res, next) {
 
-    console.log('get_d3ck: ' + res.params.key)
+    console.log('get_d3ck: ' + req.params.key)
 
     // console.log(req.params)
 
