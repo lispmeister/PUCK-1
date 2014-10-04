@@ -3030,11 +3030,7 @@ function create_local_d3ck(ip_addr) {
 
             console.log('\ncheckin client data from ' + c_url + ' nabz => ' + c_data.substring(0,1024))
 
-            if (err) {
-                console.log('errz3 snatchin ' + url + ' ... ' + e.message)
-                c_deferred.reject(e)
-            }
-            else if (c_data.indexOf("was not found") != -1) {
+            if (c_data.indexOf("was not found") != -1) {
                 console.log('no certy love: ' + c_data)
                 c_deferred.reject({'error': "other side didn't cough up our certz"})
             }
