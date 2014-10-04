@@ -3038,6 +3038,8 @@ function create_local_d3ck(ip_addr) {
 
                 var r_deferred = Q.defer();
 
+                c_data = JSON.parse(c_data)
+
                 console.log('remote client d3ck info in...!')
 
                 console.log(c_data.all_ips)
