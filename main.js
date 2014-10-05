@@ -1972,9 +1972,11 @@ function knockKnock(req, res, next) {
     // console.log(req)
 
     // bail if we don't get ID
-    var ip_addr  = req.body.ip_addr
-    var d3ckid   = req.body.d3ckid
-    var from     = req.body.from
+    // var ip_addr  = req.body.ip_addr
+    var ip_addr = get_client_ip(req)
+    var d3ckid  = req.body.d3ckid
+    var from    = req.body.from
+    var owner   = req.body.owner
 
     // bwana_d3ck.owner.name  = name
 

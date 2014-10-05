@@ -639,7 +639,9 @@ function d3ck_ping(all_ips, d3ckid, url) {
             // console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
 
+            // change the ip addr in two places
             var ele = $('#'+element_id).parent().closest('div').find('.remote_ip strong')
+            $('#'+element_id).prev().prev().attr('value', data.ip)
 
             // change IP address to the one who answered
             // $('#'+element_id).parent().closest('div').find('.remote_ip strong').html('<strong>' + data.ip + '</strong>')
