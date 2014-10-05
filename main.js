@@ -2018,7 +2018,14 @@ function knockKnock(req, res, next) {
     else {
         console.log('... you want the next door down....')
 
-        var url = 'https://' + ip_addr + ':' + d3ck_port_ext + '/knock'
+        if (typeof ip2d3ck[d3ckid] == "undefined") {
+            console.log("Can't find IP addr for " + d3ckid)
+            res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
+        }
+
+        var ip = ip2d3ck[d3ckid]
+
+        var url = 'https://' + ip + ':' + d3ck_port_ext + '/knock'
 
         console.log(url)
 
