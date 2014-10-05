@@ -1247,17 +1247,17 @@ function create_cli3nt_rest(req, res, next) {
         //
         // create their d3ck locally as well
         //
-        if (typeof all_d3cks[did] == "undefined") {
-            create_d3ck_by_ip(ip_addr).then( function () {
-                console.log('sending bundle back')
-                try { res.send(200, JSON.stringify(cli3nt_bundle)) }
-                catch (e) { console.log('Failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
-            })
-        }
-        else {
+        // if (typeof all_d3cks[did] == "undefined") {
+        //     create_d3ck_by_ip(ip_addr).then( function () {
+        //         console.log('sending bundle back')
+        //         try { res.send(200, JSON.stringify(cli3nt_bundle)) }
+        //         catch (e) { console.log('Failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
+        //     })
+        // }
+        // else {
             try { res.send(200, JSON.stringify(cli3nt_bundle)) }
             catch (e) { console.log('failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
-        }
+        // }
     }
 
 }
@@ -2944,12 +2944,12 @@ function create_d3ck_by_ip(ip_addr) {
     var deferred = Q.defer();
 
     // do all the create stuff
-    create_local_d3ck(ip_addr).then(function(data) {
+    create_d3ck_locally(ip_addr).then(function(data) {
 
         console.log('created local -> ' + JSON.stringify(data))
 
         //
-        // return the favor
+        // get client keys
         //
         console.log("posting our d3ck data to the d3ck we just added with create_d3ck.sh....")
 
@@ -2964,7 +2964,7 @@ function create_d3ck_by_ip(ip_addr) {
                 ip_addr, 
                 bwana_d3ck.D3CK_ID]     // xxxx?
 
-        // d3ck_spawn(cmd, argz)
+        d3ck_spawn(cmd, argz)
 
         createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
 
@@ -2985,9 +2985,9 @@ function create_d3ck_by_ip(ip_addr) {
 //  - save all that stuff it seems valid
 //  
 //
-function create_local_d3ck(ip_addr) {
+function create_d3ck_locally(ip_addr) {
 
-    console.log('create_local_d3ck ' + ip_addr)
+    console.log('create_d3ck_locally ' + ip_addr)
 
     var deferred = Q.defer();
 
@@ -3017,7 +3017,7 @@ function create_local_d3ck(ip_addr) {
         }
 
         else {
-            console.log('ping returned: ' + ping_data)
+            console.log('ping seemz ok')
             p_deferred.resolve(ping_data)
         }
 
@@ -3025,7 +3025,7 @@ function create_local_d3ck(ip_addr) {
 
     }).then(function (data) {
 
-        console.log('ping sez yes')
+        console.log('post ping')
 
         //
         // now get client certs
