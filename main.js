@@ -3005,6 +3005,12 @@ function create_local_d3ck(ip_addr) {
             console.log('no woman no ping: ' + ping_data)
             p_deferred.reject({'error': "other side didn't answer our ping"})
         }
+
+        else if (all_d3cks[ping_data.did] != "undefined") {
+            console.log('duplicate... pass.')
+            p_deferred.reject({'error': "duplicate... alreadydone"})
+        }
+
         else {
             console.log('ping returned: ' + ping_data)
             p_deferred.resolve(ping_data)
@@ -3070,9 +3076,7 @@ function create_local_d3ck(ip_addr) {
 
                 console.log('creating remote d3ck locally...')
                 console.log(JSON.stringify(c_data.vpn));
-
                 console.log('adding from: ' + c_data.name)
-
                 create_d3ck_key_store(c_data)
 
                 //
