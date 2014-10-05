@@ -3002,6 +3002,8 @@ function create_local_d3ck(ip_addr) {
 
         var p_deferred = Q.defer();
 
+        ping_data = JSON.parse(ping_data)
+
         console.log(url + ' nabbed')
 
         if (typeof ping_data.did == "undefined") {
