@@ -2313,19 +2313,22 @@ function uploadSchtuff(req, res, next) {
                     key          : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
                     cert         : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
                     headers      : {
-                        'x-filename' : target_file, 
-                        'x-filesize' : target_size, 
-                        'x-d3ckID'   : bwana_d3ck.D3CK_ID
+                        'x-filename'     : target_file, 
+                        'x-filesize'     : target_size, 
+                        'Content-Length' ; target_size,
+                        'x-d3ckID'       : bwana_d3ck.D3CK_ID
                     },
                     my_file      : fs.createReadStream(tmpfile)
                 };
 
                 console.log('readin n postin now')
+                console.log(formData)
 
                 // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
 
                 request.post(url, formData, function cb (err, resp) {
 
+                    console.log('... trying... 2 uploadd')
                     if (err) {
                         console.error('upload failed:', err);
                         }
@@ -2337,10 +2340,15 @@ function uploadSchtuff(req, res, next) {
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic
                         d3ck_status.file_events    = file_magic
+
                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
+
                         res.send(204, {"status" : file_name})
+
                     }
+
                 })
+
             }
         }
     }

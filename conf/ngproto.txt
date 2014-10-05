@@ -17,6 +17,7 @@ events {
 http {
 
     proxy_buffering                 off;
+    proxy_cache_bypass              on;
     chunked_transfer_encoding       off;
 
     server {
