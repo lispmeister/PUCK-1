@@ -3005,7 +3005,7 @@ function create_local_d3ck(ip_addr) {
         console.log(url + ' nabbed')
 
         if (typeof ping_data.did == "undefined") {
-            console.log('not a d3ck...?'
+            console.log('not a d3ck...?')
             p_deferred.reject({'error': "not a d3ck...?"})
         }
 
