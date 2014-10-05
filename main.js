@@ -2018,12 +2018,12 @@ function knockKnock(req, res, next) {
     else {
         console.log('... you want the next door down....')
 
-        if (typeof ip2d3ck[d3ckid] == "undefined") {
+        if (typeof d3ck2ip[d3ckid] == "undefined") {
             console.log("Can't find IP addr for " + d3ckid)
             res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
         }
 
-        var ip = ip2d3ck[d3ckid]
+        var ip = d3ck2ip[d3ckid]
 
         var url = 'https://' + ip + ':' + d3ck_port_ext + '/knock'
 
@@ -2702,6 +2702,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     ip2d3ck[all_ips[i]] = ping_d3ckid
                     res.send(200, ping_data)
                     console.log('ping cool: ' + ping_d3ckid + ' -> ' + d3ck2ip[ping_d3ckid])
+
                     // console.log('d2i, ip2d, did', all_ips[i], ip2d3ck[all_ips[i]], ping_d3ckid)
                 }
 
