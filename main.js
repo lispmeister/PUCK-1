@@ -3006,7 +3006,7 @@ function create_local_d3ck(ip_addr) {
             p_deferred.reject({'error': "other side didn't answer our ping"})
         }
 
-        else if (all_d3cks[ping_data.did] != "undefined") {
+        else if (typeof all_d3cks[ping_data.did] != "undefined") {
             console.log('duplicate... pass.')
             p_deferred.reject({'error': "duplicate... alreadydone"})
         }
