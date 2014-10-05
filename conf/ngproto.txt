@@ -100,7 +100,8 @@ http {
         proxy_pass_header           x-filename;
         proxy_pass_header           x-filesize;
         proxy_pass_header           x-d3ckid;
-        proxy_pass_header           Content-Length;
+        proxy_pass_header           content-length;
+        proxy_pass_header           content-type;
 
 
         #
