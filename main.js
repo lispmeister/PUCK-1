@@ -3035,7 +3035,7 @@ function create_d3ck_locally(ip_addr) {
         // now get client certs
         //
         // c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
-        c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + data.did
+        c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
 
         console.log("getting cli3nt data we'll use from: " + c_url)
 
