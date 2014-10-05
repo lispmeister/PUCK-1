@@ -2948,6 +2948,10 @@ function create_d3ck_by_ip(ip_addr) {
 
         console.log('created local -> ' + JSON.stringify(data))
 
+        if (typeof data.did == "undefined") {
+            return deferred.reject({ error: "couldnt get remote d3ck ID"} )
+        }
+
         //
         // get client keys
         //
@@ -2962,11 +2966,11 @@ function create_d3ck_by_ip(ip_addr) {
                 bwana_d3ck.owner.name, 
                 bwana_d3ck.owner.email, 
                 ip_addr, 
-                bwana_d3ck.D3CK_ID]     // xxxx?
+                data.did]
 
         d3ck_spawn(cmd, argz)
 
-        createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
+        createEvent(ip_addr, {event_type: "create", d3ck_id: data.did})
 
         return deferred.resolve();
     })
@@ -3033,7 +3037,7 @@ function create_d3ck_locally(ip_addr) {
         // c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
         c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + data.did
 
-        console.log('getting cli3nt data from: ' + c_url)
+        console.log("getting cli3nt data we'll use from: " + c_url)
 
         var c_data = ""
 
@@ -3077,9 +3081,6 @@ function create_d3ck_locally(ip_addr) {
                     c_data.all_ips[all_client_ips.length] = ip_addr
                 }
 
-                console.log('creating remote d3ck locally...')
-                console.log(JSON.stringify(c_data.vpn));
-                console.log('adding from: ' + c_data.name)
                 create_d3ck_key_store(c_data)
 
                 //
@@ -3107,12 +3108,13 @@ function create_d3ck_locally(ip_addr) {
                 // self added
                 d3ck_events = { new_d3ck_ip : '127.0.0.1', new_d3ck_name: c_data.name }
 
-                r_deferred.resolve({success: "true"})
+                r_deferred.resolve({ "did": c_data.D3CK_ID })
 
             }
 
         }).fail(function (error) {
             console.log("in c-form error occured: " + error);
+            r_deferred.reject({ "error": JSON.stringify(error)})
         });
 
     })
