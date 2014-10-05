@@ -1972,8 +1972,9 @@ function knockKnock(req, res, next) {
     // console.log(req)
 
     // bail if we don't get ID
-    var ip_addr = req.body.ip_addr
-    var d3ckid  = req.body.d3ckid
+    var ip_addr  = req.body.ip_addr
+    var d3ckid   = req.body.d3ckid
+    var from     = req.body.from
 
     // bwana_d3ck.owner.name  = name
 
@@ -2002,6 +2003,7 @@ function knockKnock(req, res, next) {
         var d3ck_request    = { 
             knock   : true,
             ip_addr : ip_addr,
+            from    : from,
             did     : d3ckid
         }
 
@@ -2032,7 +2034,7 @@ function knockKnock(req, res, next) {
         var options = load_up_cc_cert(d3ckid)
 
         options.url  = url
-        options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid  }
+        options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid , from: bwana_d3ck.owner.name }
 
         console.log(options)
 

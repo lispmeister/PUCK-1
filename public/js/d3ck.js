@@ -808,8 +808,8 @@ function status_or_die() {
     if (d3ck_status.d3ck_requests.knock) {
         console.log('knock knock!')
         // alert(d3ck_status.d3ck_requests.ip_addr + '/' + d3ck_status.d3ck_requests.did)
-        var friend = all_d3ck_ids[d3ck_status.d3ck_requests.did].owner.name
-        ask_user_4_response({qtype: 'knock', 'owner': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.did})
+        var friend = d3ck_status.d3ck_requests.from
+        ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from})
     }
 
     // if someone has added you, create a modest sized bit of text that tells you
@@ -1567,7 +1567,7 @@ function ask_user_4_response(data) {
     if (data.qtype == 'knock') {
         console.log('knock... time to pay the piper...')
 
-        var message = '<h2>' + data.owner + '</h2> wants to connect from ' + data.ip_addr + '<br />' + data.did + '<br />'
+        var message = '<h2>' + data.from + '</h2> wants to connect from ' + data.ip_addr + '<br />' + data.did + '<br />'
 
         $("#labels", function () {
             alertify.set({ 
@@ -1584,7 +1584,7 @@ function ask_user_4_response(data) {
                     alertify.success("VPN connection will commence...");
                 } else {
                     console.log('shuttin it down')
-                    alertify.error('Declined connection from: <br />' + data.owner + ' / ' + data.ip_addr)
+                    alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
                 }
                 $('#timer_countdown').TimeCircles().destroy();
             });
@@ -1617,7 +1617,7 @@ function ask_user_4_response(data) {
 
 
 
-        // $.bootstrapGrowl('<strong>' + data.owner + '</strong> wants to connect\n' + data.ip_addr + '\n' + data.did, { 
+        // $.bootstrapGrowl('<strong>' + data.from + '</strong> wants to connect\n' + data.ip_addr + '\n' + data.did, { 
         //     offset: { from: 'top', amount: 140}, delay: -1, align: 'center', allow_dismiss: true 
         // })
 
