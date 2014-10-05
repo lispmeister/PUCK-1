@@ -19,6 +19,7 @@ http {
     proxy_buffering                 off;
     proxy_cache_bypass              on;
     chunked_transfer_encoding       off;
+    gzip                            off;
 
     server {
 
@@ -31,7 +32,7 @@ http {
         server_name                 d3ck;
 
         # xxx - todo - drag this in from other confs
-        client_max_body_size 1024M;
+        client_max_body_size        1024M;
 
         #
         # logs
@@ -40,8 +41,8 @@ http {
         # error_log                   /etc/d3ck/logs/proxy-error.log debug;
         error_log                   /etc/d3ck/logs/proxy-error.log;
         # turn off
-        # access_log                  /dev/null;
-        access_log                  /etc/d3ck/logs/proxy-access.log;
+        access_log                  /dev/null;
+        # access_log                  /etc/d3ck/logs/proxy-access.log;
 
         #
         # certs
@@ -125,8 +126,6 @@ http {
             root                    /etc/d3ck;
             proxy_pass              http://localhost:5555;
             proxy_redirect          off;
-
-            # proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
 
         }
 
