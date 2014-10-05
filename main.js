@@ -117,6 +117,9 @@ if (fs.existsSync(d3ck_secretz)) {
 // owner user array
 var d3ck_owners = []
 
+var all_d3cks   = []
+
+
 //
 // URLs that anyone can contact
 //
@@ -1245,11 +1248,9 @@ function create_cli3nt_rest(req, res, next) {
         // create their d3ck locally as well
         //
 
-        if (typeof d3ck2ip[did] == "undefined") {
+        if (typeof all_d3cks[did] == "undefined") {
             create_local_d3ck(ip_addr)
         }
-
-        d3ck2ip[did] = ip_addr
 
         console.log('sending bundle back')
 
@@ -3088,6 +3089,8 @@ function create_local_d3ck(ip_addr) {
                 //
                 // this simply takes the pwd and finds the exe area...
                 create_remote_d3ck(c_data)
+
+                all_d3cks[c_data.D3CK_ID] = did
 
                 // write image
                 console.log('image...')
