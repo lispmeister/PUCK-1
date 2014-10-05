@@ -3098,7 +3098,7 @@ function create_d3ck_locally(ip_addr) {
                 //
                 create_full_d3ck(c_data)
 
-                all_d3cks[c_data.D3CK_ID] = did
+                all_d3cks[c_data.D3CK_ID] = c_data.D3CK_ID
 
                 // write image
                 console.log('image...')
