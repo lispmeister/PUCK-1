@@ -1247,21 +1247,17 @@ function create_cli3nt_rest(req, res, next) {
         //
         // create their d3ck locally as well
         //
-
         if (typeof all_d3cks[did] == "undefined") {
-            create_local_d3ck(ip_addr)
+            create_d3ck_by_ip(ip_addr).then( function () {
+                console.log('sending bundle back')
+                try { res.send(200, JSON.stringify(cli3nt_bundle)) }
+                catch (e) { console.log('Failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
+            })
         }
-
-        console.log('sending bundle back')
-
-        try {
-            res.send(200, JSON.stringify(cli3nt_bundle))
+        else {
+            try { res.send(200, JSON.stringify(cli3nt_bundle)) }
+            catch (e) { console.log('failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
         }
-        catch (e) {
-            console.log('failzor?  ' + JSON.stringify(e))
-            res.send(200, cli3nt_bundle)
-        }
-
     }
 
 }
@@ -1270,7 +1266,7 @@ function create_cli3nt_rest(req, res, next) {
 //
 // grab remote d3ck and stuff it locally
 //
-function create_remote_d3ck (data) {
+function create_full_d3ck (data) {
 
     //console.log(certz)
     var cmd  = d3ck_bin + '/create_server_d3ck.sh'
@@ -2579,7 +2575,9 @@ function handleForm(req, res, next) {
     var action = req.body.d3ck_action
 
     if (action == 'CREATE') {
-        formCreate(req, res, next).then( function () {
+        var ip_addr  = req.body.ip_addr
+
+        create_d3ck_by_ip(ip_address).then( function () {
             console.log('... suck... sess...?')
         })
     }
@@ -2935,17 +2933,15 @@ function https_get(url) {
 
 
 //
-// take the data pushed to us from the command line and create something... beautiful!
+// take the ip/data pushed to us from the UI and create something... beautiful!
 // a virtual butterfly, no less
 //
-function formCreate(req, res, next) {
+function create_d3ck_by_ip(ip_addr) {
 
-    console.log("form creating d3ck...")
+    console.log("creating d3ck by " + ip_addr)
     // console.log(req.body)
 
     var deferred = Q.defer();
-
-    var ip_addr  = req.body.ip_addr
 
     // do all the create stuff
     create_local_d3ck(ip_addr).then(function(data) {
@@ -2968,7 +2964,7 @@ function formCreate(req, res, next) {
                 ip_addr, 
                 bwana_d3ck.D3CK_ID]     // xxxx?
 
-        d3ck_spawn(cmd, argz)
+        // d3ck_spawn(cmd, argz)
 
         createEvent(ip_addr, {event_type: "create", d3ck_id: bwana_d3ck.D3CK_ID})
 
@@ -2981,6 +2977,13 @@ function formCreate(req, res, next) {
 
 //
 // grab d3ck info from an ip address, write cert/d3ck stuff into keystore, etc
+//
+// basic sequence:
+//
+//  - d3ck ping to see if it's alive and to get its d3ck id
+//  - get the data from the remote system
+//  - save all that stuff it seems valid
+//  
 //
 function create_local_d3ck(ip_addr) {
 
@@ -3001,12 +3004,12 @@ function create_local_d3ck(ip_addr) {
 
         console.log(url + ' nabbed')
 
-        if (JSON.stringify(ping_data).indexOf("was not found") != -1) {
-            console.log('no woman no ping: ' + ping_data)
-            p_deferred.reject({'error': "other side didn't answer our ping"})
+        if (typeof ping_data.did == "undefined") {
+            console.log('not a d3ck...?'
+            p_deferred.reject({'error': "not a d3ck...?"})
         }
 
-        else if (typeof all_d3cks[ping_data.did] != "undefined") {
+        if (typeof all_d3cks[ping_data.did] != "undefined") {
             console.log('duplicate... pass.')
             p_deferred.reject({'error': "duplicate... alreadydone"})
         }
@@ -3091,8 +3094,7 @@ function create_local_d3ck(ip_addr) {
                 //
                 // ... back to the program, dog!
                 //
-                // this simply takes the pwd and finds the exe area...
-                create_remote_d3ck(c_data)
+                create_full_d3ck(c_data)
 
                 all_d3cks[c_data.D3CK_ID] = did
 
