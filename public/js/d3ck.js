@@ -39,8 +39,8 @@ var D3CK_SOCK_RETRY   = 3000
 var LOCAL_VIDEO_WIDTH = 480
 
 // seems to go from (N-1) to 0h
-var DEFAULT_RING_TIME = 30
 var DEFAULT_RING_TIME = 10
+var DEFAULT_RING_TIME = 30
 
 var ONE_HOUR = 60*60    // seconds
 
@@ -1569,7 +1569,7 @@ function ask_user_4_response(data) {
     if (data.qtype == 'knock') {
         console.log('knock... time to pay the piper...')
 
-        var message = '<h2>' + data.from + '</h2> wants to connect from ' + data.ip_addr + '<br />' + data.did + '<br />'
+        var message = '<h2>' + data.from + '</h2> wants to connect from <span style="font-weight: 600">' + data.ip_addr + '</span><br /><span style="font-weight:100">' + data.did + '</span><br />'
 
         $("#labels", function () {
             alertify.set({ 
@@ -1594,7 +1594,7 @@ function ask_user_4_response(data) {
             return false;
         });
 
-        $('#alertify').append('<div style="height:150px;width:150px;" id="timer_countdown" data-timer="' + DEFAULT_RING_TIME + '"></div>')
+        $('#alertify').append('<div style="height:150px;width:150px;float:left;" id="timer_countdown" data-timer="' + DEFAULT_RING_TIME + '"></div>')
         // $('body').append('<div style="height:150px;width:150px;" id="timer_countdown" data-timer="' + DEFAULT_RING_TIME + '"></div>')
 
     //  timer circle

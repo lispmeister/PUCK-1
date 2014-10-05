@@ -73,7 +73,10 @@
   opacity: 0; }
 
 .alertify-dialog {
-  padding: 25px; }
+  padding: 25px; 
+  /* zen */
+  float: left;
+}
 
 .alertify-resetFocus {
   border: 0;
