@@ -3027,8 +3027,6 @@ function create_local_d3ck(ip_addr) {
 
         console.log('ping sez yes')
 
-        data = JSON.parse(data)
-
         //
         // now get client certs
         //
