@@ -1245,19 +1245,14 @@ function create_cli3nt_rest(req, res, next) {
         write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert)
 
         //
-        // create their d3ck locally as well
+        // if !exist, create their d3ck locally as well
         //
-        // if (typeof all_d3cks[did] == "undefined") {
-        //     create_d3ck_by_ip(ip_addr).then( function () {
-        //         console.log('sending bundle back')
-        //         try { res.send(200, JSON.stringify(cli3nt_bundle)) }
-        //         catch (e) { console.log('Failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
-        //     })
-        // }
-        // else {
-            try { res.send(200, JSON.stringify(cli3nt_bundle)) }
-            catch (e) { console.log('failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
-        // }
+        if (!fs.existsSync(d3ck_keystore +'/'+ did + '/' + did + '.json') {
+            console.log("Hmm, we don't have their data... try to get it")
+            create_d3ck_locally(ip_addr)
+        }
+        try       { res.send(200, JSON.stringify(cli3nt_bundle)) }
+        catch (e) { console.log('failzor?  ' + JSON.stringify(e)); res.send(200, cli3nt_bundle) }
     }
 
 }
@@ -3034,7 +3029,6 @@ function create_d3ck_locally(ip_addr) {
         //
         // now get client certs
         //
-        // c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
         c_url      = 'https://' + ip_addr + ':' + d3ck_port_ext + '/cli3nt?did=' + bwana_d3ck.D3CK_ID
 
         console.log("getting cli3nt data we'll use from: " + c_url)
