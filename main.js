@@ -2319,7 +2319,8 @@ function uploadSchtuff(req, res, next) {
                         'Content-Type'   : 'application/x-www-form-urlencoded',
                         'x-d3ckID'       : bwana_d3ck.D3CK_ID
                     },
-                    my_file      : fs.createReadStream(tmpfile)
+                    // my_file      : fs.createReadStream(tmpfile)
+                    my_file      : fs.readFileSync(tmpfile)
                 };
 
                 console.log('readin n postin now')
