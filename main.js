@@ -2316,6 +2316,7 @@ function uploadSchtuff(req, res, next) {
                         'x-filename'     : target_file, 
                         'x-filesize'     : target_size, 
                         'Content-Length' : target_size,
+                        'Content-Type'   : 'application/x-www-form-urlencoded',
                         'x-d3ckID'       : bwana_d3ck.D3CK_ID
                     },
                     my_file      : fs.createReadStream(tmpfile)
