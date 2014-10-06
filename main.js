@@ -1241,8 +1241,8 @@ function create_cli3nt_rest(req, res, next) {
 
         var cli3nt_bundle = JSON.parse(fs.readFileSync(d3ck_keystore +'/'+ did + "/_cli3nt.json").toString())
 
-        write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.key", cli3nt_bundle.vpn.key)
-        write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert)
+        write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.key", cli3nt_bundle.vpn.key.join('\n'))
+        write_2_file(d3ck_keystore +'/'+ did + "/_cli3nt.cert", cli3nt_bundle.vpn.cert.join('\n'))
 
         //
         // if !exist, create their d3ck locally as well
