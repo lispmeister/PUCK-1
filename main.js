@@ -2320,7 +2320,7 @@ function uploadSchtuff(req, res, next) {
                         'x-d3ckID'       : bwana_d3ck.D3CK_ID
                     },
                     // my_file      : fs.createReadStream(tmpfile)
-                    my_file      : fs.readFileSync(tmpfile)
+                    my_file      : fs.readFileSync(tmpfile).toString()
                 };
 
                 console.log('readin n postin now')
