@@ -87,8 +87,8 @@ case $1 in
                 done
 
                 service nginx stop
-                # /etc/init.d/redis* stop
-                killall -9 redis-server
+                /etc/init.d/redis* stop
+                # killall -9 redis-server
                 service openvpn stop
 
                 log_end_msg $?
