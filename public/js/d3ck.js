@@ -1114,6 +1114,7 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
 
         safe_id = "uppity"
         ip      = "local"
+        d3ckid  = "local"
         safe_ip = "local"
     }
 
@@ -1126,7 +1127,7 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
         maxSize    : 1024 * 1024,
         uploadFile: {
-            url:         '/up/' + ip,
+            url:         '/up/' + d3ckid,
             data:        {},
             beforeSend:  function(parent){parent.append('<div class="progress-bar" />');},
             success:     function(data, parent, progress){ },
