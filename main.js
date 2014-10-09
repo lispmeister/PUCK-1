@@ -2357,15 +2357,6 @@ console.log("going to push it to the next in line: " + upload_target)
                     }
                 }))
             }
-        }
-
-
-
-
-
-
-
-            }
 
 
 
