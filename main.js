@@ -1939,8 +1939,8 @@ function load_up_cert_by_ip(ip) {
     console.log(ip)
     var certz = {
         // ca      : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ckroot.crt").toString(),
-        key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/_cli3nt.key").toString(),
-        cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/_cli3nt.crt").toString(),
+        key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ck.key").toString(),
+        cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[ip] + "/d3ck.crt").toString(),
     };
     return(certz)
 }
@@ -1950,8 +1950,8 @@ function load_up_cert_by_did(d3ck) {
     console.log('loading up client cert for ' + d3ck)
     var certz = {
         // ca      : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/d3ckroot.crt").toString(),
-        key     : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/_cli3nt.key").toString(),
-        cert    : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/_cli3nt.crt").toString(),
+        key     : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/d3ck.key").toString(),
+        cert    : fs.readFileSync(d3ck_keystore +'/'+ d3ck + "/d3ck.crt").toString(),
     };
     return(certz)
 
