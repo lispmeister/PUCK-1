@@ -2243,72 +2243,138 @@ function uploadSchtuff(req, res, next) {
             else {
                 console.log("going to push it to the next in line: " + upload_target)
 
-                var file_magic = {
-                    file_name  : target_file,
-                    file_size  : target_size,
-                    file_from  : client_ip,
-                    did        : bwana_d3ck.D3CK_ID,
-                    direction  : upload_target
-                }
+//                 var file_magic = {
+//                     file_name  : target_file,
+//                     file_size  : target_size,
+//                     file_from  : client_ip,
+//                     did        : bwana_d3ck.D3CK_ID,
+//                     direction  : upload_target
+//                 }
+// 
+//                 var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+// 
+//                 console.log(url)
+// 
+//                 // var options = {
+//                 //     key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
+//                 //     cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
+//                 // }
+// 
+//                 // options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
+// 
+//                 console.log('FN: ' + target_file)
+// 
+//                 console.log(ip2d3ck)
+// 
+//                 var formData = {
+//                     key          : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
+//                     cert         : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
+//                     headers      : {
+//                         'x-filename'     : target_file, 
+//                         'x-filesize'     : target_size, 
+//                         'name'           : uppity
+//                         'Content-Length' : target_size,
+//                         'Content-Type'   : 'multipart/form-data; boundary=----WebKitFormBoundaryVs8cOCtsBC3eBVWu'
+//                         'x-d3ckID'       : bwana_d3ck.D3CK_ID
+// 
+//  form-data; name="uppity[]"; filename="Screen Shot 2014-10-03 at 2.14.22 PM.png"
+// 
+// 
+// \r\nContent-Type: image/png\r\n\r\n\r\n------WebKitFormBoundaryVs8cOCtsBC3eBVWu--\r\n
+// 
+// 
+// 
+// 
+// 
+//                     },
+//                     // my_file      : fs.createReadStream(tmpfile)
+//                     my_file      : fs.readFileSync(tmpfile).toString()
+//                 };
+// 
+//                 console.log('readin n postin now')
+//                 console.log(formData)
+// 
+//                 // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
+// 
+//                 request.post(url, formData, function cb (err, resp) {
+// 
+//                     console.log('... trying... 2 uploadd')
+//                     if (err) {
+//                         console.error('upload failed:', err);
+//                         }
+//                     else {
+//                         console.log('Upload successful...!  ' + JSON.stringify(resp))
+// 
+//                         //.end
+// 
+//                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
+//                         d3ck_status.browser_events = browser_magic
+//                         d3ck_status.file_events    = file_magic
+// 
+//                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
+// 
+//                         res.send(204, {"status" : file_name})
+// 
+//                     }
+// 
+//                 })
 
-                var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+console.log("going to push it to the next in line: " + upload_target)
 
-                console.log(url)
+var file_magic = {
+    file_name : target_file,
+    file_size : target_size,
+    file_from : client_ip,
+    did : bwana_d3ck.D3CK_ID,
+    direction : upload_target
+}
 
-                // var options = {
-                //     key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-                //     cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-                // }
+var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
+console.log(url)
 
-                // options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
+console.log('FN: ' + target_file)
+console.log(ip2d3ck)
 
-                console.log('FN: ' + target_file)
+var formData = {
+    key : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
+    cert : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
 
-                console.log(ip2d3ck)
+    headers : {
+    'x-filename' : target_file,
+    'x-filesize' : target_size,
+    'x-d3ckID' : bwana_d3ck.D3CK_ID
+    },
+    my_file : fs.createReadStream(tmpfile)
+};
 
-                var formData = {
-                    key          : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
-                    cert         : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
-                    headers      : {
-                        'x-filename'     : target_file, 
-                        'x-filesize'     : target_size, 
-                        'Content-Length' : target_size,
-                        'Content-Type'   : 'application/x-www-form-urlencoded',
-                        'x-d3ckID'       : bwana_d3ck.D3CK_ID
-                    },
-                    // my_file      : fs.createReadStream(tmpfile)
-                    my_file      : fs.readFileSync(tmpfile).toString()
-                };
+console.log('readin n postin now')
 
-                console.log('readin n postin now')
-                console.log(formData)
+request.post(url, formData, function cb (err, resp) {
+    if (err) {
+        console.error('upload failed:', err);
+    }
+    else {
+        console.log('Upload successful...! ' + JSON.stringify(resp))
+    //.end
+        var browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
+        d3ck_status.browser_events = browser_magic
+        d3ck_status.file_events = file_magic
+        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
+        res.send(204, {"status" : file_name})
+    }
+})
 
-                // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
 
-                request.post(url, formData, function cb (err, resp) {
 
-                    console.log('... trying... 2 uploadd')
-                    if (err) {
-                        console.error('upload failed:', err);
-                        }
-                    else {
-                        console.log('Upload successful...!  ' + JSON.stringify(resp))
 
-                        //.end
 
-                        var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
-                        d3ck_status.browser_events = browser_magic
-                        d3ck_status.file_events    = file_magic
-
-                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
-
-                        res.send(204, {"status" : file_name})
-
-                    }
-
-                })
 
             }
+
+
+
+
+
         }
     }
 
