@@ -2347,12 +2347,13 @@ function uploadSchtuff(req, res, next) {
                         console.error('upload failed:', err);
                         }
                     else {
-                        console.log('Upload successful...!')
+                        console.log('Upload successful...?')
+                        console.log(resp)
 
                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
                         d3ck_status.browser_events = browser_magic
                         d3ck_status.file_events    = file_magic
-                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
+                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": upload_target, "target ip": d3ck2ip[upload_target] }, d3ck_status)
                         res.send(204, {"status" : file_name})
                     }
                 }))
