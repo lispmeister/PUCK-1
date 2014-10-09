@@ -599,7 +599,7 @@ passport.use(new l_Strategy(
         // var _hash = hashit(password, N_ROUNDS)
 
         // XXXXXX - uncomment this if you want to see what the user typed for a password!
-        console.log('checking password ' + password + ' for user ' + name)
+        // console.log('checking password ' + password + ' for user ' + name)
 
         process.nextTick(function () {
             findByUsername(name, function(err, user) {
