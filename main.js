@@ -2340,7 +2340,9 @@ console.log("going to push it to the next in line: " + upload_target)
                 options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
                 // var file_data = fs.readFileSync(tmpfile) 
 
-                console.log('FN: ' + target_file)
+                console.log('FN: ' + target_file + '  Opts:')
+
+                console.log(options)
 
                 fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
                     if (err) {
