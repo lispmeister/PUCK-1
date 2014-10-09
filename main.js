@@ -2321,48 +2321,44 @@ function uploadSchtuff(req, res, next) {
 
 console.log("going to push it to the next in line: " + upload_target)
 
-var file_magic = {
-    file_name : target_file,
-    file_size : target_size,
-    file_from : client_ip,
-    did : bwana_d3ck.D3CK_ID,
-    direction : upload_target
-}
+                console.log("going to push it to the next in line: " + upload_target)
 
-var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
-console.log(url)
+                var file_magic = {
+                    file_name  : target_file,
+                    file_size  : target_size,
+                    file_from  : client_ip,
+                    did        : bwana_d3ck.D3CK_ID,
+                    direction  : upload_target
+                }
 
-console.log('FN: ' + target_file)
-console.log(ip2d3ck)
+                var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
 
-var formData = {
-    key : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
-    cert : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
+                console.log(url)
 
-    headers : {
-    'x-filename' : target_file,
-    'x-filesize' : target_size,
-    'x-d3ckID' : bwana_d3ck.D3CK_ID
-    },
-    my_file : fs.createReadStream(tmpfile)
-};
+                var options = load_up_cert_by_ip(upload_target)
 
-console.log('readin n postin now')
+                options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
+                // var file_data = fs.readFileSync(tmpfile) 
 
-request.post(url, formData, function cb (err, resp) {
-    if (err) {
-        console.error('upload failed:', err);
-    }
-    else {
-        console.log('Upload successful...! ' + JSON.stringify(resp))
-    //.end
-        var browser_magic = { "notify_add":false, "notify_ring":false, "notify_file":true}
-        d3ck_status.browser_events = browser_magic
-        d3ck_status.file_events = file_magic
-        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
-        res.send(204, {"status" : file_name})
-    }
-})
+                console.log('FN: ' + target_file)
+
+                fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                    if (err) {
+                        console.error('upload failed:', err);
+                        }
+                    else {
+                        console.log('Upload successful...!')
+
+                        var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
+                        d3ck_status.browser_events = browser_magic
+                        d3ck_status.file_events    = file_magic
+                        createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
+                        res.send(204, {"status" : file_name})
+                    }
+                }))
+            }
+        }
+
 
 
 
