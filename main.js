@@ -2333,7 +2333,7 @@ function uploadSchtuff(req, res, next) {
 
                 console.log(url)
 
-                var options = load_up_cert(upload_target)
+                var options = load_up_cert_by_did(upload_target)
 
                 options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
                 // var file_data = fs.readFileSync(tmpfile) 
