@@ -2056,6 +2056,45 @@ function knockKnock(req, res, next) {
 
 }
 
+// server.post('/knock/:did/:answer', auth, knockReply);
+
+function knockReply(req, res, next) {
+
+    console.log("who is it going to...? " + req.params.d3ckid)
+    console.log("you say... " + req.params.answer)
+
+    answer = req.params.answer
+    d3ckid = req.params.d3ckid
+
+    if (typeof d3ck2ip[d3ckid] == "undefined") {
+        console.log("Can't find IP addr for " + d3ckid)
+        res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
+    }
+
+    var ip = d3ck2ip[d3ckid]
+
+    var url = 'https://' + ip + ':' + d3ck_port_ext + '/knock/' + d3ckid + '/' + answer
+
+    console.log('answer going to : ' + url)
+
+    var options = load_up_cc_cert(d3ckid)
+
+    request.get(url, options, function optionalCallback (err, resp) {
+        if (err) {
+            console.error('post to remote failed:', JSON.stringify(err))
+            res.send(200, {"err" : err});
+            }
+        else {
+            console.log('knock answer success...!')
+            console.log(resp.body)
+            res.send(200, resp.body)
+        }
+    })
+
+}
+
+
+
 // upload and download some content from the vaults
 function downloadStuff (req, res, next) {
 
@@ -2241,84 +2280,6 @@ function uploadSchtuff(req, res, next) {
             // client-side certs for auth
             //
             else {
-                console.log("going to push it to the next in line: " + upload_target)
-
-//                 var file_magic = {
-//                     file_name  : target_file,
-//                     file_size  : target_size,
-//                     file_from  : client_ip,
-//                     did        : bwana_d3ck.D3CK_ID,
-//                     direction  : upload_target
-//                 }
-// 
-//                 var url = 'https://' + upload_target + ':' + d3ck_port_ext + '/up/local'
-// 
-//                 console.log(url)
-// 
-//                 // var options = {
-//                 //     key     : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.key").toString(),
-//                 //     cert    : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/cli3nt.crt").toString(),
-//                 // }
-// 
-//                 // options.headers = { 'x-filename': target_file, 'x-filesize': target_size, 'x-d3ckID': bwana_d3ck.D3CK_ID }
-// 
-//                 console.log('FN: ' + target_file)
-// 
-//                 console.log(ip2d3ck)
-// 
-//                 var formData = {
-//                     key          : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.key").toString(),
-//                     cert         : fs.readFileSync(d3ck_keystore +'/'+ ip2d3ck[upload_target] + "/d3ck.crt").toString(),
-//                     headers      : {
-//                         'x-filename'     : target_file, 
-//                         'x-filesize'     : target_size, 
-//                         'name'           : uppity
-//                         'Content-Length' : target_size,
-//                         'Content-Type'   : 'multipart/form-data; boundary=----WebKitFormBoundaryVs8cOCtsBC3eBVWu'
-//                         'x-d3ckID'       : bwana_d3ck.D3CK_ID
-// 
-//  form-data; name="uppity[]"; filename="Screen Shot 2014-10-03 at 2.14.22 PM.png"
-// 
-// 
-// \r\nContent-Type: image/png\r\n\r\n\r\n------WebKitFormBoundaryVs8cOCtsBC3eBVWu--\r\n
-// 
-// 
-// 
-// 
-// 
-//                     },
-//                     // my_file      : fs.createReadStream(tmpfile)
-//                     my_file      : fs.readFileSync(tmpfile).toString()
-//                 };
-// 
-//                 console.log('readin n postin now')
-//                 console.log(formData)
-// 
-//                 // fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp)
-// 
-//                 request.post(url, formData, function cb (err, resp) {
-// 
-//                     console.log('... trying... 2 uploadd')
-//                     if (err) {
-//                         console.error('upload failed:', err);
-//                         }
-//                     else {
-//                         console.log('Upload successful...!  ' + JSON.stringify(resp))
-// 
-//                         //.end
-// 
-//                         var browser_magic          = { "notify_add":false, "notify_ring":false, "notify_file":true}
-//                         d3ck_status.browser_events = browser_magic
-//                         d3ck_status.file_events    = file_magic
-// 
-//                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": ip2d3ck[upload_target], "target ip": upload_target }, d3ck_status)
-// 
-//                         res.send(204, {"status" : file_name})
-// 
-//                     }
-// 
-//                 })
-
                 console.log("going to push it to the next in line: " + upload_target)
 
                 var file_magic = {
@@ -3448,6 +3409,7 @@ server.get('/ping/:key', auth, echoStatus)
 
 // knock knock proto to request access to a system that doesn't trust you
 server.post('/knock', auth, knockKnock);
+server.post('/knock/:did/:answer', auth, knockReply);
 
 server.post('/vpn/start', auth, startVPN);
 

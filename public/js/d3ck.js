@@ -1588,10 +1588,19 @@ function ask_user_4_response(data) {
                 console.log(e)
                 if (e) {
                     console.log('go for it')
-                    alertify.success("VPN connection will commence...");
+
+                    $.get('/knock/' + data.did + '/yes', function(d3ck) {
+                        console.log('hellz ya!')
+                        alertify.success("VPN connection will commence...");
+                    })
+
                 } else {
                     console.log('shuttin it down')
-                    alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
+
+                    $.get('/knock/' + data.did + '/no', function(d3ck) {
+                        console.log('hellz no!')
+                        alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
+                    })
                 }
                 $('#timer_countdown').TimeCircles().destroy();
             });
