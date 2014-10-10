@@ -3430,7 +3430,7 @@ server.get('/ping/:key', auth, echoStatus)
 
 // knock knock proto to request access to a system that doesn't trust you
 server.post('/knock', auth, knockKnock);
-server.post('/knock/:did/:answer', auth, knockReply);
+server.get('/knock/:did/:answer', auth, knockReply);
 
 server.post('/vpn/start', auth, startVPN);
 
