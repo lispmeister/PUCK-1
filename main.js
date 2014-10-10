@@ -2069,7 +2069,7 @@ function knockReply(req, res, next) {
 
     // is it for us, or are we passing it on?
     if (d3ckid == bwana_d3ck.D3CK_ID) {
-        console.log('about time you answered, I've been knocking!')
+        console.log("about time you answered, I've been knocking!")
 
         // mark it as an event, which will be picked up by the client
         var d3ck_response   = {
