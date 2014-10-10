@@ -2066,6 +2066,7 @@ function knockReply(req, res, next) {
     answer = req.params.answer
     d3ckid = req.params.d3ckid
 
+    client_ip = get_client_ip(req)
 
     // is it for us, or are we passing it on?
     if (d3ckid == bwana_d3ck.D3CK_ID) {
@@ -2080,9 +2081,9 @@ function knockReply(req, res, next) {
         var d3ck_status            = empty_status()
         d3ck_status.d3ck_requests  = d3ck_response
 
-        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "d3ck_id": d3ckid}, d3ck_status)
+        createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
 
-        res.send(200, { emotion: "<3" })
+        res.send(200, { emotion: "^..^" })
 
     }
     else {                                                                                                                             
