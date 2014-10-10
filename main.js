@@ -2066,30 +2066,51 @@ function knockReply(req, res, next) {
     answer = req.params.answer
     d3ckid = req.params.d3ckid
 
-    if (typeof d3ck2ip[d3ckid] == "undefined") {
-        console.log("Can't find IP addr for " + d3ckid)
-        res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
-    }
 
-    var ip = d3ck2ip[d3ckid]
+    // is it for us, or are we passing it on?
+    if (d3ckid == bwana_d3ck.D3CK_ID) {
+        console.log('about time you answered, I've been knocking!')
 
-    var url = 'https://' + ip + ':' + d3ck_port_ext + '/knock/' + d3ckid + '/' + answer
-
-    console.log('answer going to : ' + url)
-
-    var options = load_up_cc_cert(d3ckid)
-
-    request.get(url, options, function optionalCallback (err, resp) {
-        if (err) {
-            console.error('post to remote failed:', JSON.stringify(err))
-            res.send(200, {"err" : err});
-            }
-        else {
-            console.log('knock answer success...!')
-            console.log(resp.body)
-            res.send(200, resp.body)
+        // mark it as an event, which will be picked up by the client
+        var d3ck_response   = {
+            answer : answer,
+            did     : d3ckid
         }
-    })
+
+        var d3ck_status            = empty_status()
+        d3ck_status.d3ck_requests  = d3ck_response
+
+        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "d3ck_id": d3ckid}, d3ck_status)
+
+        res.send(200, { emotion: "<3" })
+
+    }
+    else {                                                                                                                             
+        if (typeof d3ck2ip[d3ckid] == "undefined") {
+            console.log("Can't find IP addr for " + d3ckid)
+            res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
+        }
+
+        var ip = d3ck2ip[d3ckid]
+
+        var url = 'https://' + ip + ':' + d3ck_port_ext + '/knock/' + d3ckid + '/' + answer
+
+        console.log('answer going to : ' + url)
+
+        var options = load_up_cc_cert(d3ckid)
+
+        request.get(url, options, function optionalCallback (err, resp) {
+            if (err) {
+                console.error('post to remote failed:', JSON.stringify(err))
+                res.send(200, {"err" : err});
+                }
+            else {
+                console.log('knock answer success...!')
+                console.log(resp.body)
+                res.send(200, resp.body)
+            }
+        })
+    }
 
 }
 
