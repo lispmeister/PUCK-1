@@ -2095,7 +2095,7 @@ function knockReply(req, res, next) {
 
         var ip = d3ck2ip[d3ckid]
 
-        var url = 'https://' + ip + ':' + d3ck_port_ext + '/knock/' + d3ckid + '/' + answer
+        var url = 'https://' + ip + ':' + d3ck_port_ext + '/knockKnock/' + d3ckid + '/' + answer
 
         console.log('answer going to : ' + url)
 
