@@ -1586,7 +1586,7 @@ function ask_user_4_response(data) {
         var message = '<h2>' + data.from + '</h2> wants to connect from <span style="font-weight: 600">' + data.ip_addr + '</span><br /><span style="font-weight:100">' + data.did + '</span><br />'
 
         $("#labels", function () {
-            alertify.set({ 
+            alertify.set({
                 // delay           : DEFAULT_RING_TIME,
                 buttonReverse   : true, 
                 labels          : { ok: "Allow", cancel: "Deny" }
@@ -1603,6 +1603,7 @@ function ask_user_4_response(data) {
                     console.log('go for it')
                     answer = 'yes'
                     alertify.success("VPN connection will commence...");
+                }
                 else {
                     answer = 'no'
                     alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
