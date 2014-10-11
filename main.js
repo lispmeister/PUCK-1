@@ -2109,7 +2109,7 @@ function knockReply(req, res, next) {
 
         var options = load_up_cc_cert(d3ckid)
 
-        options.form = { 'ip_addr' : d3ck_server_ip, 'did': d3ckid }
+        options.form = { 'ip_addr' : d3ck_server_ip, 'did': bwana_d3ck.D3CK_ID }
 
         request.post(url, options, function cb (err, resp) {
             if (err) {
