@@ -1597,8 +1597,8 @@ function ask_user_4_response(data) {
                 console.log(e)
 
                 var answer    = ''
-
                 var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'did': my_d3ck.D3CK_ID, }
+                post_data     = JSON.stringify(post_data)
 
                 if (e) {
                     console.log('go for it')
