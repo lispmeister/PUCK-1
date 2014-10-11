@@ -568,7 +568,7 @@ function d3ck_create(element, ip_addr) {
     $.ajax({
         type: "POST",
         url: "/form",
-        headers: { 'Content-Type': 'application/json', },
+        headers: { 'Content-Type': 'application/json' },
         data: post_data,
         success: function(data, status) {
             console.log('suck... sess.... ')
@@ -1611,15 +1611,14 @@ function ask_user_4_response(data) {
 
                 $.ajax({
                     type: "POST",
-                    url: '/knock/' + data.did + '/' + answer, function(d3ck) {
-                        headers: { 'Content-Type': 'application/json', },
-                        data: post_data,
-                        success: function(data, status) {
+                    url: '/knock/' + data.did + '/' + answer,
+                    headers: { 'Content-Type': 'application/json' },
+                    data: post_data,
+                    success: function(data, status) {
                         console.log('suck... sess.... ')
-                        },
-                        fail: function(data, err) {
-                            console.log('fuck... me')
-                        }
+                    },
+                    fail: function(data, err) {
+                        console.log('fuck... me')
                     }
                 })
 
