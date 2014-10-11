@@ -819,7 +819,7 @@ function status_or_die() {
             console.log('knock knock!')
             // alert(d3ck_status.d3ck_requests.ip_addr + '/' + d3ck_status.d3ck_requests.did)
             var friend = d3ck_status.d3ck_requests.from
-            ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.did})
+            ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from_d3ck})
         }
     }
 

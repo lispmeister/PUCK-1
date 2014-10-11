@@ -2003,20 +2003,20 @@ function knockKnock(req, res, next) {
         // mark it as an event, which will be picked up by the client, and then answered yes or no
 
         var d3ck_request    = { 
-            knock   : true,
-            ip_addr : ip_addr,
-            from    : from,
-            did     : d3ckid
+            knock     : true,
+            ip_addr   : ip_addr,
+            from      : from,
+            from_d3ck : from_d3ck,
+            did       : d3ckid
         }
 
         var d3ck_status            = empty_status()
 
         d3ck_status.d3ck_requests  = d3ck_request
 
-        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "d3ck_id": d3ckid}, d3ck_status)
+        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
 
         res.send(200, { emotion: "<3" })
-
 
     }
     else {
@@ -2036,7 +2036,7 @@ function knockKnock(req, res, next) {
         var options = load_up_cc_cert(d3ckid)
 
         options.url  = url
-        options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid , from: bwana_d3ck.owner.name }
+        options.form = { 'ip_addr' : ip_addr, 'd3ckid'  : d3ckid, from_d3ck: bwana_d3ck.D3CK_ID, from: bwana_d3ck.owner.name }
 
         console.log(options)
 
@@ -2087,6 +2087,20 @@ function knockReply(req, res, next) {
 
     }
     else {                                                                                                                             
+
+
+// cert problem...?
+// cert problem...?
+// cert problem...?
+
+// other side not seeing anything
+
+
+
+
+
+
+
         if (typeof d3ck2ip[d3ckid] == "undefined") {
             console.log("Can't find IP addr for " + d3ckid)
             res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
