@@ -2003,11 +2003,11 @@ function knockKnock(req, res, next) {
         // mark it as an event, which will be picked up by the client, and then answered yes or no
 
         var d3ck_request    = { 
-            knock     : true,
-            ip_addr   : ip_addr,
-            from      : from,
-            from_d3ck : from_d3ck,
-            did       : d3ckid
+            knock       : true,
+            ip_addr     : ip_addr,
+            from        : from,
+            'from_d3ck' : from_d3ck,
+            did         : d3ckid
         }
 
         var d3ck_status            = empty_status()
