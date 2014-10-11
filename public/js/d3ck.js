@@ -1595,22 +1595,45 @@ function ask_user_4_response(data) {
             alertify.confirm(message, function (e) {
                 console.log('confirm...?')
                 console.log(e)
+
+                var answer    = ''
+                var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'did': my_d3ck.D3CK_ID }
+
                 if (e) {
                     console.log('go for it')
-
-                    $.get('/knock/' + data.did + '/yes', function(d3ck) {
-                        console.log('hellz ya!')
-                        alertify.success("VPN connection will commence...");
-                    })
-
-                } else {
-                    console.log('shuttin it down')
-
-                    $.get('/knock/' + data.did + '/no', function(d3ck) {
-                        console.log('hellz no!')
-                        alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
-                    })
+                    answer = 'yes'
+                    alertify.success("VPN connection will commence...");
+                else {
+                    answer = 'no'
+                    alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
                 }
+
+                $.ajax({
+                    type: "POST",
+                    url: '/knock/' + data.did + '/' + answer, function(d3ck) {
+                        headers: { 'Content-Type': 'application/json', },
+                        data: post_data,
+                        success: function(data, status) {
+                        console.log('suck... sess.... ')
+                        },
+                        fail: function(data, err) {
+                            console.log('fuck... me')
+                        }
+                    }
+                })
+
+                    // $.get('/knock/' + data.did + '/yes', function(d3ck) {
+                    //     console.log('hellz ya!')
+                    //     alertify.success("VPN connection will commence...");
+                    // })
+
+                    // console.log('shuttin it down')
+
+                    // $.get('/knock/' + data.did + '/no', function(d3ck) {
+                    //     console.log('hellz no!')
+                    //     alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
+                    // })
+                    // }
                 $('#timer_countdown').TimeCircles().destroy();
             });
 
