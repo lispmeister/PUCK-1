@@ -2075,9 +2075,10 @@ function knockReply(req, res, next) {
 
         // mark it as an event, which will be picked up by the client
         var d3ck_response   = {
-            knock : true,
-            answer: answer,
-            did   : d3ckid
+            knock    : true,
+            answer   : answer,
+            did      : d3ckid,
+            did_from : req.body.did_from
         }
 
         var d3ck_status            = empty_status()
@@ -2109,7 +2110,7 @@ function knockReply(req, res, next) {
 
         var options = load_up_cc_cert(d3ckid)
 
-        options.form = { 'ip_addr' : d3ck_server_ip, 'did': bwana_d3ck.D3CK_ID }
+        options.form = { 'ip_addr' : d3ck_server_ip, 'did': bwana_d3ck.D3CK_ID, did_from: d3ckid }
 
         request.post(url, options, function cb (err, resp) {
             if (err) {
