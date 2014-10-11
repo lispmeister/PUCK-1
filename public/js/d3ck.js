@@ -1597,7 +1597,8 @@ function ask_user_4_response(data) {
                 console.log(e)
 
                 var answer    = ''
-                var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'did': my_d3ck.D3CK_ID }
+
+                var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'did': my_d3ck.D3CK_ID, }
 
                 if (e) {
                     console.log('go for it')
@@ -1611,7 +1612,7 @@ function ask_user_4_response(data) {
 
                 $.ajax({
                     type: "POST",
-                    url: '/knock/' + data.did + '/' + answer,
+                    url: '/knockKnock/' + data.did + '/' + answer,
                     headers: { 'Content-Type': 'application/json' },
                     data: post_data,
                     success: function(data, status) {
