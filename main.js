@@ -1964,7 +1964,7 @@ function load_up_cert_by_did(d3ck) {
  * Check welcome/black lists to see if your D3CK will talk
  *
 */
-function knockKnock(req, res, next) {
+function knock(req, res, next) {
 
     console.log('knock knock')
 
@@ -2057,7 +2057,7 @@ function knockKnock(req, res, next) {
 
 }
 
-// server.post('/knock/:did/:answer', auth, knockReply);
+// server.post('/knockReply/:did/:answer', auth, knockReply);
 
 function knockReply(req, res, next) {
 
@@ -2095,7 +2095,7 @@ function knockReply(req, res, next) {
         }
 
         var ip  = d3ck2ip[d3ckid]
-        var url = 'https://' + ip + ':' + d3ck_port_ext + '/knockKnock/' + d3ckid + '/' + answer
+        var url = 'https://' + ip + ':' + d3ck_port_ext + '/knockReply/' + d3ckid + '/' + answer
 
         console.log('answer going to : ' + url)
 
@@ -3442,9 +3442,9 @@ server.get('/getip', auth, getIP);
 server.get('/ping/:key', auth, echoStatus)
 
 // knock knock proto to request access to a system that doesn't trust you
-server.post('/knock', auth, knockKnock);
+server.post('/knock', auth, knock);
 // reply to the first
-server.post('/knockKnock/:d3ckid/:answer', auth, knockReply);
+server.post('/knockReply/:d3ckid/:answer', auth, knockReply);
 
 server.post('/vpn/start', auth, startVPN);
 

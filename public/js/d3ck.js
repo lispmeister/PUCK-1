@@ -1623,7 +1623,7 @@ function ask_user_4_response(data) {
 
                 $.ajax({
                     type: "POST",
-                    url: '/knockKnock/' + data.did + '/' + answer,
+                    url: '/knockReply/' + data.did + '/' + answer,
                     headers: { 'Content-Type': 'application/json' },
                     data: post_data,
                     success: function(data, status) {
