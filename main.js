@@ -2041,7 +2041,7 @@ function knockKnock(req, res, next) {
 
         console.log(options)
 
-        request.post(options, function optionalCallback (err, resp) {
+        request.post(options, function cb (err, resp) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
                 res.send(200, {"err" : err});
@@ -2083,7 +2083,6 @@ function knockReply(req, res, next) {
         d3ck_status.d3ck_requests  = d3ck_response
 
         createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
-
         res.send(200, { emotion: "^..^" })
 
     }
@@ -2093,23 +2092,25 @@ function knockReply(req, res, next) {
             res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
         }
 
-        var ip = d3ck2ip[d3ckid]
-
+        var ip  = d3ck2ip[d3ckid]
         var url = 'https://' + ip + ':' + d3ck_port_ext + '/knockKnock/' + d3ckid + '/' + answer
 
         console.log('answer going to : ' + url)
 
-        var d3ck_response   = { 
-            knock       : true,
-            answer      : answer,
-            did         : bwana_d3ck.D3CK_ID
-        }
+        // var d3ck_status     = empty_status()
+        // var d3ck_response   = { 
+        //     knock       : true,
+        //     answer      : answer,
+        //     did         : bwana_d3ck.D3CK_ID
+        // }
+        // d3ck_status.d3ck_requests = d3ck_response
+        // createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
 
         var options = load_up_cc_cert(d3ckid)
 
         options.form = { 'ip_addr' : d3ck_server_ip, 'did': bwana_d3ck.D3CK_ID }
 
-        request.post(url, options, function optionalCallback (err, resp) {
+        request.post(url, options, function cb (err, resp) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
                 res.send(200, {"err" : err});
@@ -2334,7 +2335,7 @@ function uploadSchtuff(req, res, next) {
 
                 console.log(options)
 
-                fs.createReadStream(tmpfile).pipe(request.post(url, options, function optionalCallback (err, resp) {
+                fs.createReadStream(tmpfile).pipe(request.post(url, options, function cb (err, resp) {
                     if (err) {
                         console.error('upload failed:', err);
                         }
