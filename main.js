@@ -2088,20 +2088,6 @@ function knockReply(req, res, next) {
 
     }
     else {                                                                                                                             
-
-
-// cert problem...?
-// cert problem...?
-// cert problem...?
-
-// other side not seeing anything
-
-
-
-
-
-
-
         if (typeof d3ck2ip[d3ckid] == "undefined") {
             console.log("Can't find IP addr for " + d3ckid)
             res.send(420, { error: "enhance your calm! Can't find IP addr for " + d3ckid })
@@ -2113,9 +2099,17 @@ function knockReply(req, res, next) {
 
         console.log('answer going to : ' + url)
 
+        var d3ck_response   = { 
+            knock       : true,
+            answer      : answer,
+            did         : bwana_d3ck.D3CK_ID
+        }
+
         var options = load_up_cc_cert(d3ckid)
 
-        request.get(url, options, function optionalCallback (err, resp) {
+        options.form = { 'ip_addr' : d3ck_server_ip, 'did': bwana_d3ck.D3CK_ID }
+
+        request.post(url, options, function optionalCallback (err, resp) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
                 res.send(200, {"err" : err});
@@ -3446,7 +3440,7 @@ server.get('/ping/:key', auth, echoStatus)
 
 // knock knock proto to request access to a system that doesn't trust you
 server.post('/knock', auth, knockKnock);
-server.get('/knock/:d3ckid/:answer', auth, knockReply);
+server.post('/knock/:d3ckid/:answer', auth, knockReply);
 
 server.post('/vpn/start', auth, startVPN);
 
