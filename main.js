@@ -2075,8 +2075,9 @@ function knockReply(req, res, next) {
 
         // mark it as an event, which will be picked up by the client
         var d3ck_response   = {
+            knock  : true,
             answer : answer,
-            did     : d3ckid
+            did    : d3ckid
         }
 
         var d3ck_status            = empty_status()
