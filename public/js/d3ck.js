@@ -812,7 +812,18 @@ function status_or_die() {
 
         // answer to our knock
         if (typeof d3ck_status.d3ck_requests.answer != "undefined") {
-            alert('KNOCK, KNOCK, MOFO!')
+            // alert('KNOCK, KNOCK, MOFO! ' + d3ck_status.d3ck_requests.answer)
+            if (d3ck_status.d3ck_requests.answer) {
+                alertify.success("starting the VPN connection...");
+
+                var ip = $('#' + d3ck_status.d3ck_requests.did + ' .remote_ip strong:eq(1)').text()
+                console.log('to... ' + ip)
+                d3ck_vpn('d3ck_vpn_' + d3ckid, d3ckid, ip)
+
+            }
+            else {
+                alertify.reject("remote d3ck refused your request...");
+            }
         }
         // knocking
         else {
