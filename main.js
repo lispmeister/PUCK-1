@@ -3622,7 +3622,7 @@ io_sig.set('log level', 1);
 io_sig.sockets.on('connection', function (ss_client) {
 
     console.log("CONNEEEEECTION.....!")
-    console.log(ss_client)
+    // console.log(ss_client)
 
     ss_client.resources = {
         screen: false,
