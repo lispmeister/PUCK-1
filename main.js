@@ -2078,7 +2078,7 @@ function knockReply(req, res, next) {
         var d3ck_response   = {
             knock    : true,
             answer   : answer,
-            did      : d3ckid,
+            did      : req.body.did,
             did_from : req.body.did_from
         }
 
