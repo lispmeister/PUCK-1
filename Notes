@@ -1,5 +1,9 @@
 
-Different sorts of encryption need to be used for UDP and TCP. The former
-is a datagram protocol; accordingly, use of a stream cipher is almost
-certain to be disastrous.
+# rasbperry pi
 
+wget http://node-arm.herokuapp.com/node_latest_armhf.deb
+
+#   [...]
+#   Saving to: `node_latest_armhf.deb'
+
+sudo dpkg -i node_latest_armhf.deb

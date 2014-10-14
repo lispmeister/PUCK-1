@@ -2041,13 +2041,26 @@ function knock(req, res, next) {
 
         console.log(options)
 
+        // var d3ck_request    = { 
+        //     knock       : true,
+        //     ip_addr     : ip_addr,
+        //     'from_d3ck' : bwana_d3ck.D3CK_ID,
+        //     did         : d3ckid
+        // }
+        // var d3ck_status            = empty_status()
+        // d3ck_status.d3ck_requests  = d3ck_request
+
+
         request.post(options, function cb (err, resp) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
+                // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
+
                 res.send(200, {"err" : err});
                 }
             else {
                 console.log('knock success...!')
+                // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
                 console.log(resp.body)
                 res.send(200, resp.body)
             }
@@ -2100,14 +2113,15 @@ function knockReply(req, res, next) {
 
         console.log('answer going to : ' + url)
 
-        // var d3ck_status     = empty_status()
-        // var d3ck_response   = { 
-        //     knock       : true,
-        //     answer      : answer,
-        //     did         : bwana_d3ck.D3CK_ID
-        // }
-        // d3ck_status.d3ck_requests = d3ck_response
-        // createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
+        var d3ck_status     = empty_status()
+        var d3ck_response   = { 
+            knock       : true,
+            answer      : answer,
+            did         : bwana_d3ck.D3CK_ID
+        }
+        d3ck_status.d3ck_requests = d3ck_response
+        createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
+
 
         var options = load_up_cc_cert(d3ckid)
 
