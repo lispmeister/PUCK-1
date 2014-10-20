@@ -765,21 +765,21 @@ function get_q() {
 
     d3ck_queue = []
 
-    console.log('get queue')
+    // console.log('get queue')
 
     var url = "/q"
 
     var jqXHR_get_queue = $.ajax({ url: url })
 
     jqXHR_get_queue.done(function (queue, textStatus, jqXHR) {
-        console.log('queue wootz\n' + queue)
-        console.log("got queue?  " + JSON.stringify(queue))
+        // console.log('queue wootz\n' + queue)
+        // console.log("got queue?  " + JSON.stringify(queue))
 
         var lenq = _.keys(queue).length
 
-        console.log('queue wootz: ' + lenq)
+        // console.log('queue wootz: ' + lenq)
 
-        if (lenq <= 0) { console.log('null queue, bummer') }
+        // if (lenq <= 0) { console.log('null queue, bummer') }
 
         for (var i=0; i < lenq; i++) {
 
