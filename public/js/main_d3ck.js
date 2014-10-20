@@ -31,6 +31,8 @@ var PREGNANT_PAUSE  = 5000
 var SOCK_CHECK      = 1000
 var STATUS_CHECK    = 3000
 
+var Q_CHECK         = 2000  // check queue every second or two or something
+
 var all_d3ck_ids = {}
 
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
@@ -148,6 +150,7 @@ $(document).ready(function () {
 
 
         // one call at a time, for now
+        // if (passthrough+trust+stuff) {
         if (1 == 2) {
         // if (!d3ck_current.incoming && !d3ck_current.outgoing && !d3ck_current.busy) {
             // possibly a better way to get name
@@ -387,11 +390,13 @@ $(document).ready(function () {
     socket_looping()
 
     // sow the seed o' doubt
-    
     setInterval(get_status,STATUS_CHECK)
 
+    // qq
+    setInterval(get_q, Q_CHECK)
+
     // setInterval(get_status,PREGNANT_PAUSE)
-    setTimeout(get_status,PREGNANT_PAUSE)
+    // setTimeout(get_status,PREGNANT_PAUSE)
 
     // http://stackoverflow.com/questions/16214326/bootstrap-dropdown-with-hover
     $(function(){               

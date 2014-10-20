@@ -714,7 +714,12 @@ function ajaxError( jqXHR, textStatus, errorThrown ) {
 //
 // ... snag /status
 //
+
+// the first time you arrive you might want to get some status-updates
+// that aren't in the queue, such as whether or not you're in a VPN 
+// connected state or something
 first_news = true
+
 function get_status() {
 
     // console.log('get STATUS')
@@ -753,11 +758,85 @@ function get_status() {
 
 }
 
+//
+// drain the queue if anything is there
+//
+function get_q() {
+
+    d3ck_queue = []
+
+    console.log('get queue')
+
+    var url = "/q"
+
+    var jqXHR_get_queue = $.ajax({ url: url })
+
+    jqXHR_get_queue.done(function (queue, textStatus, jqXHR) {
+        console.log('queue wootz\n' + queue)
+        console.log("got queue?  " + JSON.stringify(queue))
+
+        var lenq = _.keys(queue).length
+
+        console.log('queue wootz: ' + lenq)
+
+        if (lenq <= 0) { console.log('null queue, bummer') }
+
+        for (var i=0; i < lenq; i++) {
+
+            d3ck_queue = queue[i]
+            console.log('got queue? ...' + JSON.stringify(d3ck_queue.event) + '...')
+            queue_or_die(d3ck_queue)
+
+        }
+    }).fail(ajaxError);
+
+}
 
 function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
+
+//
+// rip apart queue, figure out what to do
+//
+function queue_or_die(queue) {
+
+    console.log('sailing on the sneeze of chedder... from... ' + browser_ip)
+
+    console.log(queue)
+
+    if (typeof queue.type == "undefined") {
+        console.log('no queue here, false alarm')
+        return
+    }
+
+    // results of actions (e.g. file transfers, vpn, etc.)
+    if (typeof queue.type == "info") {
+        console.log('infomercial: ' + JSON.stringify(queue))
+        return
+    }
+
+    // inbound calls, vpn connections, etc.
+    else if (typeof queue.type == "event") {
+        console.log('event: ' + JSON.stringify(queue))
+        return
+    }
+
+    else {
+        console.log(':???: ' + JSON.stringify(queue))
+        return
+    }
+
+
+}
+
+
+
+
+
+
+//
 
 /*
 
@@ -795,6 +874,8 @@ With both:
 //
 function status_or_die() {
 
+    return
+
     console.log('sailing on the sneeze of cheeze... when I hear something... from... ' + browser_ip)
 
     console.log(JSON.stringify(d3ck_status))
@@ -818,6 +899,9 @@ function status_or_die() {
 
                 var ip = $('#' + d3ck_status.d3ck_requests.did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
+
+                event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
+
                 d3ck_vpn($('#d3ck_vpn_' + d3ck_status.d3ck_requests.did), d3ck_status.d3ck_requests.did, ip)
 
             }

@@ -208,6 +208,9 @@ var all_client_ips = [],
 var vpn_server_status = {}
 var vpn_client_status = {}
 
+// events/info/etc. that have been queued up for the client
+var d3ck_queue        = []
+
 // need to reset status from time to time
 function empty_status () {
 
@@ -830,7 +833,10 @@ function watch_logs(logfile, log_type) {
                 d3ck_status.browser_events = browser_magic
                 d3ck_status.openvpn_server = server_magic
                 vpn_server_status          = server_magic
+
                 createEvent('internal server', {event_type: "vpn_server_connected", call_from: client_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
+
+                d3ck_queue.push({type: 'info', event: 'vpn_server_connected', 'd3ck_status': d3ck_status})
 
             }
             // down
@@ -863,6 +869,7 @@ function watch_logs(logfile, log_type) {
                 d3ck_status.openvpn_server = server_magic
                 vpn_server_status          = server_magic
                 createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
+                d3ck_queue.push({type: 'info', event: 'vpn_server_disconnected', 'd3ck_status': d3ck_status})
             }
         }
         else if (log_type.indexOf("Client") > -1) {
@@ -907,6 +914,7 @@ function watch_logs(logfile, log_type) {
                 d3ck_status.openvpn_client = client_magic
                 vpn_client_status          = client_magic
                 createEvent('internal server', {event_type: "vpn_client_connected", call_to: server_remote_ip, d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
+                d3ck_queue.push({type: 'info', event: 'vpn_client_connected', 'd3ck_status': d3ck_status})
 
             }
             // down
@@ -943,6 +951,7 @@ function watch_logs(logfile, log_type) {
                 write_2_file(d3ck_remote_vpn, cat_fact_server)
 
                 createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
+                d3ck_queue.push({type: 'info', event: 'vpn_client_diconnected', 'd3ck_status': d3ck_status})
 
             }
         }
@@ -1097,6 +1106,37 @@ function cat_stamp() {
 
 
 //
+// pour out the latest queue
+//
+function d3ckQueue(req, res, next) {
+
+    console.log('d3ck Q query')
+
+    // the usual usualness
+    if (d3ck_queue.length > 0) {
+        console.log('clearing out the queue (' + d3ck_queue.length + ')....')
+    }
+    else {
+        console.log('empty queue...')
+        res.send(200, [])
+    }
+
+    var quo = []
+
+    for (var i = 0; i < d3ck_queue.length; i++) {
+        quo[i] = d3ck_queue[i]
+    }
+
+    d3ck_queue = [] // not to be confused with quo
+
+    console.log('sending quo... ' + JSON.stringify(quo))
+
+    res.send(200, quo)
+
+}
+
+
+//
 // as marvin once said, what's going on?
 //
 function d3ckStatus(req, res, next) {
@@ -1144,15 +1184,6 @@ function d3ckStatus(req, res, next) {
 
 }
 
-//
-// as marvin said, what's going on?
-//
-function postStatus (req, res, next) {
-
-    // deprecated
-    return
-
-}
 
 
 /**
@@ -1361,6 +1392,7 @@ function create_d3ck(req, res, next) {
             assign_capabilities(d3ck.value)
 
             createEvent(get_client_ip(req), {event_type: "create", d3ck_id: data.D3CK_ID}, d3ck_status)
+            d3ck_queue.push({type: 'info', event: 'd3ck_create', 'd3ck_status': d3ck_status})
 
         }
     })
@@ -1546,6 +1578,7 @@ function delete_d3ck(req, res, next) {
             console.log('delete_d3ck: success deleting %s', req.params.key)
 
             createEvent(get_client_ip(req), {event_type: "delete", d3ck_id: req.params.key})
+            d3ck_queue.push({type: 'info', event: 'd3ck_delete', 'd3ck_status': d3ck_status})
             res.send(204);
         }
     });
@@ -2016,6 +2049,7 @@ function knock(req, res, next) {
         d3ck_status.d3ck_requests  = d3ck_request
 
         createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
+        d3ck_queue.push({type: 'request', event: 'knock', 'd3ck_status': d3ck_status})
 
         res.send(200, { emotion: "<3" })
 
@@ -2055,12 +2089,15 @@ function knock(req, res, next) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
                 // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
+                d3ck_queue.push({type: 'info', event: 'remote_knock_fail', 'd3ck_status': d3ck_status})
 
                 res.send(200, {"err" : err});
                 }
             else {
                 console.log('knock success...!')
                 // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
+                d3ck_queue.push({type: 'info', event: 'remote_knock_success', 'd3ck_status': d3ck_status})
+
                 console.log(resp.body)
                 res.send(200, resp.body)
             }
@@ -2099,6 +2136,8 @@ function knockReply(req, res, next) {
         d3ck_status.d3ck_requests  = d3ck_response
 
         createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
+        d3ck_queue.push({type: 'info', event: 'knock_response', 'd3ck_status': d3ck_status})
+
         res.send(200, { emotion: "^..^" })
 
     }
@@ -2121,7 +2160,7 @@ function knockReply(req, res, next) {
         }
         d3ck_status.d3ck_requests = d3ck_response
         createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
-
+        d3ck_queue.push({type: 'info', event: 'knock_response', 'd3ck_status': d3ck_status})
 
         var options = load_up_cc_cert(d3ckid)
 
@@ -2245,6 +2284,8 @@ function uploadSchtuff(req, res, next) {
 
             createEvent(client_ip, {event_type: "remote_upload", "file_name": file_name, "file_size": file_size, "d3ck_id": file_d3ckid}, d3ck_status)
 
+            d3ck_queue.push({type: 'info', event: 'remote_upload', 'd3ck_status': d3ck_status})
+
             res.send(204, {"status" : file_name})
 
         })
@@ -2317,6 +2358,7 @@ function uploadSchtuff(req, res, next) {
                 d3ck_status.file_events    = file_magic
 
                 createEvent(client_ip, {event_type: "file_upload", "file_name": target_file, "file_size": target_size, "d3ck_id": bwana_d3ck.D3CK_ID}, d3ck_status)
+                d3ck_queue.push({type: 'info', event: 'file_upload', 'd3ck_status': d3ck_status})
 
                 res.send(204, {"status" : target_file})
 
@@ -2364,6 +2406,9 @@ function uploadSchtuff(req, res, next) {
                         d3ck_status.browser_events = browser_magic
                         d3ck_status.file_events    = file_magic
                         createEvent(client_ip, {event_type: "remotely_uploaded", "file_name": target_file, "file_size": target_size, "d3ck_id": upload_target, "target ip": d3ck2ip[upload_target] }, d3ck_status)
+
+                        d3ck_queue.push({type: 'info', event: 'remotely_uploaded', 'd3ck_status': d3ck_status})
+
                         res.send(204, {"status" : file_name})
                     }
                 }))
@@ -2484,6 +2529,8 @@ function startVPN(req, res, next) {
 
     createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
 
+    d3ck_queue.push({type: 'info', event: 'vpn_start', 'd3ck_status': d3ck_status})
+
     // write the IP addr to a file
     fs.writeFile(d3ck_remote_vpn, d3ck2ip[d3ckid], function(err) {
         if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
@@ -2539,6 +2586,7 @@ function forward_port(req, res, next) {
     d3ck_spawn(cmd, args)
 
     createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
+    d3ck_queue.push({type: 'info', event: 'vpn_stop', 'd3ck_status': d3ck_status})
 
     res.send(204)
 
@@ -3007,6 +3055,8 @@ function create_d3ck_by_ip(ip_addr) {
         d3ck_spawn(cmd, argz)
 
         createEvent(ip_addr, {event_type: "create", d3ck_id: data.did})
+
+        d3ck_queue.push({type: 'info', event: 'd3ck_create', 'd3ck_status': d3ck_status})
 
         return deferred.resolve();
     })
@@ -3545,7 +3595,9 @@ server.get("/status", auth, d3ckStatus)
 // this is to help keep state in case of moving off web page, browser
 // crashes, etc.
 //
-server.post("/status", auth, postStatus)
+// what's in the q?
+server.get("/q", auth, d3ckQueue)
+
 
 // XXX - update!
 server.get('/rest', function root(req, res, next) {
@@ -3569,13 +3621,13 @@ server.get('/rest', function root(req, res, next) {
         'GET     /p33rs',
         'GET     /ping',
         'GET     /ping/:key',
+        'GET     /q',
         'GET     /server',
         'GET     /server/stop',
         'GET     /server/restart',
         'GET     /setproxy',
         'GET     /sping/:key1/:key2',
         'GET     /status',
-        'POST    /status',
         'POST    /up/:key',
         'GET     /url',
         'POST    /vpn/start',
