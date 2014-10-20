@@ -815,6 +815,69 @@ function queue_or_die(queue) {
     // results of actions (e.g. file transfers, vpn, etc.)
     if (queue.type == "info") {
         console.log('infomercial: ' + JSON.stringify(queue))
+
+        console.log('event...? ' + queue.event)
+
+        if      (queue.event == 'd3ck_create') {
+            inform_user('added a D3CK as friend (you may have to refresh page to see details)')
+        }
+
+        else if (queue.event == 'd3ck_delete') {
+            inform_user('d3ck deleted')
+        }
+
+        else if (queue.event == 'file_upload') {
+            inform_user('file uploaded')
+        }
+
+        else if (queue.event == 'knock_response') {
+            inform_user('knock response')
+        }
+
+        else if (queue.event == 'remote_knock_fail') {
+            inform_user('knock failure')
+        }
+
+        else if (queue.event == 'remote_knock_success') {
+            inform_user('remote knock success')
+        }
+
+        else if (queue.event == 'remotely_uploaded') {
+            inform_user('your file was uploaded to remote d3ck')
+        }
+
+        else if (queue.event == 'remote_upload') {
+            inform_user('a file has been uploaded to your d3ck')
+        }
+
+        else if (queue.event == 'vpn_client_connected') {
+            inform_user("your d3ck has established a VPN connection")
+        }
+
+        else if (queue.event == 'vpn_client_disconnected') {
+            inform_user('your d3ck disconnected the VPN connection')
+        }
+
+        else if (queue.event == 'vpn_server_connected') {
+            inform_user('remote d3ck established a VPN connection to your d3ck')
+        }
+
+        else if (queue.event == 'vpn_server_disconnected') {
+            inform_user('remote d3ck disconnected its VPN connection')
+        }
+
+        else if (queue.event == 'vpn_start') {
+            inform_user('v-start')
+        }
+
+        else if (queue.event == 'vpn_stop') {
+            inform_user('v-stop')
+        }
+
+        else {
+            console.log("don't know this type of info event? " + queue.event)
+        }
+
         return
     }
 
@@ -825,6 +888,7 @@ function queue_or_die(queue) {
 
         return
     }
+
 
     // inbound calls, vpn connections, etc.
     else if (queue.type == "event") {
@@ -1678,6 +1742,15 @@ function crypto_411() {
 
 }
 
+
+function inform_user(message) {
+
+    var offset_amount = 70
+    var offset_from   = 'top'
+
+    $.bootstrapGrowl(message, {offset: {from: offset_from, amount: offset_from }, delay: -1})
+
+}
 
 //
 // (it will eventually!) look up authorization for request, do various things based on this

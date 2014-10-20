@@ -951,7 +951,7 @@ function watch_logs(logfile, log_type) {
                 write_2_file(d3ck_remote_vpn, cat_fact_server)
 
                 createEvent('internal server', {event_type: "vpn_client_disconnected", d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
-                d3ck_queue.push({type: 'info', event: 'vpn_client_diconnected', 'd3ck_status': d3ck_status})
+                d3ck_queue.push({type: 'info', event: 'vpn_client_disconnected', 'd3ck_status': d3ck_status})
 
             }
         }
