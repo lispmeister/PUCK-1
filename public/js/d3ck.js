@@ -830,8 +830,12 @@ function queue_or_die(queue) {
             inform_user('file uploaded')
         }
 
+        else if (queue.event == 'knock_request') {
+            // inform_user('knock response sent')
+        }
+
         else if (queue.event == 'knock_response') {
-            inform_user('knock response sent')
+            inform_user('knock response received')
         }
 
         else if (queue.event == 'remote_knock_fail') {
@@ -1769,8 +1773,7 @@ function ask_user_4_response(data) {
 
     var req = data.d3ck_status.d3ck_requests
 
-        //  ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from_d3ck})
-
+// ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from_d3ck})
 
     if (data.event == 'knock') {
 
@@ -1778,7 +1781,7 @@ function ask_user_4_response(data) {
 
         var friend = req.from
 
-        var message = '<h2>' + req.from + '</h2> wants to connect from <span style="font-weight: 600">' + req.ip_addr + '</span><br /><span style="font-weight:100">' + req.did + '</span><br />'
+        var message = '<h2>' + req.from + '</h2> wants to connect from <span style="font-weight: 600">' + req.ip_addr + '</span><br /><span style="font-weight:100">' + req.from_d3ck + '</span><br />'
 
         $("#labels", function () {
             alertify.set({
@@ -1807,7 +1810,7 @@ function ask_user_4_response(data) {
 
                 $.ajax({
                     type: "POST",
-                    url: '/knockReply/' + req.did + '/' + answer,
+                    url: '/knockReply/' + req.from_d3ck + '/' + answer,
                     headers: { 'Content-Type': 'application/json' },
                     req: post_data,
 

@@ -2159,8 +2159,8 @@ function knockReply(req, res, next) {
             did         : bwana_d3ck.D3CK_ID
         }
         d3ck_status.d3ck_requests = d3ck_response
-        createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
-        d3ck_queue.push({type: 'info', event: 'knock_response', 'd3ck_status': d3ck_status})
+        createEvent(client_ip, {event_type: "knock_request", "d3ck_id": d3ckid}, d3ck_status)
+        d3ck_queue.push({type: 'info', event: 'knock_request', 'd3ck_status': d3ck_status})
 
         var options = load_up_cc_cert(d3ckid)
 
