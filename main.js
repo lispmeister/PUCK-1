@@ -1110,14 +1110,14 @@ function cat_stamp() {
 //
 function d3ckQueue(req, res, next) {
 
-    console.log('d3ck Q query')
+    // console.log('d3ck Q query')
 
     // the usual usualness
     if (d3ck_queue.length > 0) {
         console.log('clearing out the queue (' + d3ck_queue.length + ')....')
     }
     else {
-        console.log('empty queue...')
+        // console.log('empty queue...')
         res.send(200, [])
     }
 
