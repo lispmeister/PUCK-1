@@ -879,6 +879,7 @@ function queue_or_die(queue) {
         }
 
         return
+
     }
 
     // request user feedback
@@ -1745,10 +1746,12 @@ function crypto_411() {
 
 function inform_user(message) {
 
+    console.log('squawking to user: ' + message)
+
     var offset_amount = 70
     var offset_from   = 'top'
 
-    $.bootstrapGrowl(message, {offset: {from: offset_from, amount: offset_from }, delay: -1})
+    $.bootstrapGrowl(message, {offset: {from: offset_from, amount: offset_amount }, delay: -1})
 
 }
 
