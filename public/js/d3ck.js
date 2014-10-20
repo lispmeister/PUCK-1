@@ -811,20 +811,23 @@ function queue_or_die(queue) {
         return
     }
 
+
     // results of actions (e.g. file transfers, vpn, etc.)
-    if (typeof queue.type == "info") {
+    if (queue.type == "info") {
         console.log('infomercial: ' + JSON.stringify(queue))
         return
     }
 
     // request user feedback
-    else if (typeof queue.type == "request") {
+    else if (queue.type == "request") {
         console.log('event: ' + JSON.stringify(queue))
+        ask_user_4_response(queue)
+
         return
     }
 
     // inbound calls, vpn connections, etc.
-    else if (typeof queue.type == "event") {
+    else if (queue.type == "event") {
         console.log('event: ' + JSON.stringify(queue))
         return
     }
@@ -1681,10 +1684,25 @@ function crypto_411() {
 //
 function ask_user_4_response(data) {
 
-    if (data.qtype == 'knock') {
+    console.log('ask the user....')
+
+    if (typeof data.type == "undefined" || data.type != 'request') {
+        console.log("that ain't no question")
+        return
+    }
+
+    var req = data.d3ck_status.d3ck_requests
+
+        //  ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from_d3ck})
+
+
+    if (data.event == 'knock') {
+
         console.log('knock... time to pay the piper...')
 
-        var message = '<h2>' + data.from + '</h2> wants to connect from <span style="font-weight: 600">' + data.ip_addr + '</span><br /><span style="font-weight:100">' + data.did + '</span><br />'
+        var friend = req.from
+
+        var message = '<h2>' + req.from + '</h2> wants to connect from <span style="font-weight: 600">' + req.ip_addr + '</span><br /><span style="font-weight:100">' + req.did + '</span><br />'
 
         $("#labels", function () {
             alertify.set({
@@ -1708,14 +1726,15 @@ function ask_user_4_response(data) {
                 }
                 else {
                     answer = 'no'
-                    alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
+                    alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr)
                 }
 
                 $.ajax({
                     type: "POST",
-                    url: '/knockReply/' + data.did + '/' + answer,
+                    url: '/knockReply/' + req.did + '/' + answer,
                     headers: { 'Content-Type': 'application/json' },
-                    data: post_data,
+                    req: post_data,
+
                     success: function(data, status) {
                         console.log('suck... sess.... ')
                     },
