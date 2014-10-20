@@ -831,7 +831,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'knock_response') {
-            inform_user('knock response')
+            inform_user('knock response sent')
         }
 
         else if (queue.event == 'remote_knock_fail') {
@@ -839,7 +839,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'remote_knock_success') {
-            inform_user('remote knock success')
+            inform_user('remote knock delivered')
         }
 
         else if (queue.event == 'remotely_uploaded') {
