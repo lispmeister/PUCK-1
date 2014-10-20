@@ -817,6 +817,12 @@ function queue_or_die(queue) {
         return
     }
 
+    // request user feedback
+    else if (typeof queue.type == "request") {
+        console.log('event: ' + JSON.stringify(queue))
+        return
+    }
+
     // inbound calls, vpn connections, etc.
     else if (typeof queue.type == "event") {
         console.log('event: ' + JSON.stringify(queue))
