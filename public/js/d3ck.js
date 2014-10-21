@@ -801,34 +801,10 @@ function queue_or_die(queue) {
 
             var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
 
-
-
             // does it go into our vault?
-            if (d3ck_status.file_events.direction != "local") {
-                dir = ' to ' + friend + "/" + d3ck_status.file_events.direction
-            }
-            else {
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-            }
+            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
 
-            // put in or lookup PiD, then owner/d3ck's name!
-            // $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
-            inform_user("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded")
-
-        }
-        else {
-            console.log('file(z) from remote')
-
-            // $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
-            inform_user("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from)
-
-
-
-
-
-
-
-            inform_user('file uploaded')
+            inform_user('New file', '<strong>' + queue.d3ck_status.file_events.file_name + '</strong>  ('  + queue.d3ck_status.file_events.file_size + ' bytes); uploaded')
         }
 
         else if (queue.event == 'knock_request') {
