@@ -836,6 +836,7 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'knock_response') {
             inform_user('knock response received')
+
         }
 
         else if (queue.event == 'remote_knock_fail') {
@@ -1815,25 +1816,12 @@ function ask_user_4_response(data) {
                     req: post_data,
 
                     success: function(data, status) {
-                        console.log('suck... sess.... ')
+                        console.log('vampire suck... sess.... ')
                     },
                     fail: function(data, err) {
-                        console.log('fuck... me')
+                        console.log('vampire fuck... me')
                     }
                 })
-
-                    // $.get('/knock/' + data.did + '/yes', function(d3ck) {
-                    //     console.log('hellz ya!')
-                    //     alertify.success("VPN connection will commence...");
-                    // })
-
-                    // console.log('shuttin it down')
-
-                    // $.get('/knock/' + data.did + '/no', function(d3ck) {
-                    //     console.log('hellz no!')
-                    //     alertify.error('Declined connection from: <br />' + data.from + ' / ' + data.ip_addr)
-                    // })
-                    // }
                 $('#timer_countdown').TimeCircles().destroy();
             });
 
@@ -1862,16 +1850,12 @@ function ask_user_4_response(data) {
                   $('#alertify-cancel').click()
               }
           });
-
-
-
         // $.bootstrapGrowl('<strong>' + data.from + '</strong> wants to connect\n' + data.ip_addr + '\n' + data.did, { 
         //     offset: { from: 'top', amount: 140}, delay: -1, align: 'center', allow_dismiss: true 
         // })
 
         // $('.thumbnail').css({"text-overflow": "ellipsis"})
         // $.bootstrapGrowl("My message");
-
     }
 
 }

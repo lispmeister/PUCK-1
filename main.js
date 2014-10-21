@@ -2136,7 +2136,8 @@ function knockReply(req, res, next) {
         d3ck_status.d3ck_requests  = d3ck_response
 
         createEvent(client_ip, {event_type: "knock_response", "d3ck_id": d3ckid}, d3ck_status)
-        d3ck_queue.push({type: 'info', event: 'knock_response', 'd3ck_status': d3ck_status})
+
+        d3ck_queue.push({type: 'info', event: 'knock_response', 'from_d3ck': req.body.did_from, 'd3ck_status': d3ck_status})
 
         res.send(200, { emotion: "^..^" })
 
@@ -2158,13 +2159,16 @@ function knockReply(req, res, next) {
             answer      : answer,
             did         : bwana_d3ck.D3CK_ID
         }
+
         d3ck_status.d3ck_requests = d3ck_response
+
         createEvent(client_ip, {event_type: "knock_request", "d3ck_id": d3ckid}, d3ck_status)
+
         d3ck_queue.push({type: 'info', event: 'knock_request', 'd3ck_status': d3ck_status})
 
         var options = load_up_cc_cert(d3ckid)
 
-        options.form = { 'ip_addr' : d3ck_server_ip, 'did': bwana_d3ck.D3CK_ID, did_from: d3ckid }
+        options.form = { ip_addr : d3ck_server_ip, did: bwana_d3ck.D3CK_ID, did_from: d3ckid }
 
         request.post(url, options, function cb (err, resp) {
             if (err) {
