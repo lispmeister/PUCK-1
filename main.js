@@ -2759,11 +2759,13 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     ping_data = JSON.parse(ping_data)
                 }
                 catch (e) {
-                    console.log('errz socket parsing: ' + JSON.stringify(e))
-                    response = {status: "ping failure", "error": e}
-                    // synchronicity... II... shouting above the din of my rice crispies
-                    try { res.send(408, response) }
-                    catch (e) { console.log('sPing error ' + e) }
+                    if (JSON.stringify(e) != "") {
+                        console.log('errz socket parsing: ' + JSON.stringify(e))
+                        response = {status: "ping failure", "error": e}
+                        // synchronicity... II... shouting above the din of my rice crispies
+                        try { res.send(408, response) }
+                        catch (e) { console.log('sPing error ' + e) }
+                    }
                     return
                 }
 
