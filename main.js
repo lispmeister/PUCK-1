@@ -1575,7 +1575,7 @@ function delete_d3ck(req, res, next) {
             console.log('delete_d3ck: success deleting %s', req.params.key)
 
             createEvent(get_client_ip(req), {event_type: "delete", d3ck_id: req.params.key})
-            d3ck_queue.push({type: 'info', event: 'd3ck_delete', 'd3ck_status': d3ck_status})
+            d3ck_queue.push( {type: 'info', event: 'd3ck_delete', d3ck: req.params.key} )
             res.send(204);
         }
     });

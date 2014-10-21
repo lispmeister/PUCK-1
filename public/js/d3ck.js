@@ -344,7 +344,6 @@ function state_vpn(state, browser_ip) {
 
         //     d3ck_current.outgoing = true
 
-        //     $('body').removeClass('avgrund-active');
             state_ring(false)
 
         // }
@@ -384,38 +383,6 @@ function event_connect(direction, caller) {
 
     console.log('connexting')
 
-    //
-    // energize modals
-    //
-    // "Avgrund is Swedish for abyss"
-
-    // first destroy
-    $('.avgrund-popin').remove()
-
-    // then create
-
-// xxxxxxxxxxx
-// xxxxxxxxxxx
-// xxxxxxxxxxx
-if ('monkeys' == 'bunnies') {
-
-    $('#' + direction).avgrund({
-        height: 120,
-        openOnEvent: false,
-        width: 600,
-        holderClass: 'custom',
-        showClose: true,
-        showCloseText: 'Close',
-        enableStackAnimation: true,
-        onBlurContainer: '.container',
-        template: '<div class="row">' +
-                  '<div id="d3ck_ring_img" class="col-md-4"></div>' +
-                  '<a style="text-decoration: none" href="#"><div class="col-md-4 top-spacer50"><button class="btn btn-primary nounderline" id="d3ck_answer" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span id="vpn_target" style="color: #fff !important;">Calling</span></button></div></a>'  +
-                  '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="d3ck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
-                  '</div>'
-        })
-}
-
     state_ring(true)
 
     // xxx - conf file, obv....
@@ -423,16 +390,12 @@ if ('monkeys' == 'bunnies') {
 
     // after things popup, add caller/callee
     if (direction == "incoming") {
-
         // tell who is calling
         $('#vpn_target').on('change', '#vpn_target').html('Call from ' + caller)
-
-        // if answer, remove avg
+        // if answer
         $(document).on('click', '#d3ck_answer', function() {
-            $("body").removeClass("avgrund-active")
             state_ring(false)
         })
-
     }
     else {
         $('#vpn_target').on('change', '#vpn_target').append(' ' + caller)
@@ -447,15 +410,6 @@ function toggle_special_FX() {
 
     // turn on/off special video FX
     $('#video_effect_div').toggleClass('hidden')
-
-//  $('#remoteVideos').html('')
-//  $('#localVideo').html('')
-
-// <div class='title'>
-//     TitleText 1
-//     <a class='delete' href="#">delete...</a>
-// </div>
-
 
 }
 
@@ -716,7 +670,7 @@ function truncate(string){
 // may or may not be needed
 //
 function check_ring() {
-    console.log("have I rang?");
+    console.log("can has I rang?");
 }
 
 function ajaxError( jqXHR, textStatus, errorThrown ) {
@@ -831,14 +785,20 @@ function queue_or_die(queue) {
         console.log('event...? ' + queue.event)
 
         if      (queue.event == 'd3ck_create') {
-            inform_user('added a D3CK as friend (you may have to refresh page to see details)')
+            var remote_ip   = queue.d3ck_status.events.new_d3ck_ip
+            var remote_name = queue.d3ck_status.events.new_d3ck_name
+
+            inform_user('D3CK add', '"' + remote_name + '" added your D3CK as a friend')
         }
 
         else if (queue.event == 'd3ck_delete') {
-            inform_user('d3ck deleted')
+            inform_user('deletion', 'd3ck deleted')
         }
 
         else if (queue.event == 'file_upload') {
+
+            var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
+
             inform_user('file uploaded')
         }
 
@@ -957,7 +917,7 @@ function queue_or_die(queue) {
 
 
 
-//
+// this stuff deprecated
 
 /*
 
@@ -1001,15 +961,7 @@ function status_or_die() {
 
     console.log(JSON.stringify(d3ck_status))
 
-    if (typeof d3ck_status.browser_events == "undefined" || typeof d3ck_status.browser_events[browser_ip] == "undefined") {
-        console.log('stuffing browser events...')
-        d3ck_status.browser_events = {}
-        d3ck_status.browser_events[browser_ip] = { "notify_add":false, "notify_ring":false, "notify_file":false}
-    }
-
-
     console.log('knocked up?')
-
     if (d3ck_status.d3ck_requests.knock) {
 
         // answer to our knock
@@ -1050,7 +1002,8 @@ function status_or_die() {
         // a bit down from the top, and stay until wiped away or refreshed
 
         if (typeof remote_name == "undefined" || remote_name != "")
-            $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
+            // $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
+            inform_user('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)')
 
         d3ck_status.browser_events[browser_ip].notify_add = true
     }
@@ -1087,12 +1040,16 @@ function status_or_die() {
             }
 
             // put in or lookup PiD, then owner/d3ck's name!
-            $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+            // $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+            inform_user("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded")
 
         }
         else {
             console.log('file(z) from remote')
-            $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+
+            // $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+            inform_user("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from)
+
             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
         }
 
@@ -1196,7 +1153,6 @@ function remove_signs_of_call() {
         $('.d3ck_vpn').text("Call").removeClass("btn-danger").removeClass('btn-success')
         $('#d3ck_video').addClass('disabled')
         $('#d3ck_video').removeClass('green').removeClass('pulse')
-        $('body').removeClass('avgrund-active')
         state_ring(false)
         // fire_d3ck_status(d3ck_status)
 
@@ -1804,7 +1760,7 @@ function crypto_411() {
 // This will change the color of the text box that comes up according
 // to bootstrap rules.
 //
-function inform_user(message, level) {
+function inform_user(title, message, level) {
 
     console.log('squawking to user: ' + message + '@' + level)
 
@@ -1820,16 +1776,18 @@ function inform_user(message, level) {
 
     console.log(level)
 
-    var offset_amount = 70
-    var offset_from   = 'top'
+    // xxx - at start of refresh?
 
-    $.bootstrapGrowl(message, {
-        offset: {
-            from: offset_from, 
-            amount: offset_amount 
-        }, 
-        delay: -1,
-        type: level
+    PNotify.desktop.permission();   // wow!
+
+    new PNotify({
+        // title: title_text,
+        title:      title,
+        text:       message,
+        type:       level,
+        styling:    "bootstrap3",
+        animation:  "fade",
+        desktop:    { desktop: true }  // wow^2!
     })
 
 }
