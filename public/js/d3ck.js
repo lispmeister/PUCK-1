@@ -846,7 +846,8 @@ function queue_or_die(queue) {
 
                 var did = queue.d3ck_status.d3ck_requests.did
 
-                alertify.success("starting the VPN connection... to " + did);
+                // alertify.success("starting the VPN connection... to " + did);
+                inform_user("starting the VPN connection... to " + did);
 
                 var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -857,7 +858,8 @@ function queue_or_die(queue) {
 
             }
             else {
-                alertify.reject("remote d3ck refused your request...");
+                // alertify.reject("remote d3ck refused your request...");
+                inform_user("remote d3ck refused your request...");
             }
 
         }
