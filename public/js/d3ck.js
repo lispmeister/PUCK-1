@@ -538,11 +538,13 @@ function d3ck_create(element, ip_addr) {
         data: post_data,
         success: function(data, status) {
             console.log('suck... sess.... ')
+            inform_user('adding d3ck', 'trying to add ' + ip_addr)
             // yes... I suck
             setTimeout(go_d3ck_or_go_home, 2000)
         },
         fail: function(data, err) {
             console.log('fuck... me')
+            inform_user('failed to add', ip_addr + ' was not added')
             // yes... I suck
             setTimeout(go_d3ck_or_go_home, 2000)
         }
@@ -798,6 +800,33 @@ function queue_or_die(queue) {
         else if (queue.event == 'file_upload') {
 
             var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
+
+
+
+            // does it go into our vault?
+            if (d3ck_status.file_events.direction != "local") {
+                dir = ' to ' + friend + "/" + d3ck_status.file_events.direction
+            }
+            else {
+                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+            }
+
+            // put in or lookup PiD, then owner/d3ck's name!
+            // $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+            inform_user("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded")
+
+        }
+        else {
+            console.log('file(z) from remote')
+
+            // $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+            inform_user("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from)
+
+
+
+
+
+
 
             inform_user('file uploaded')
         }
