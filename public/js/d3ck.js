@@ -844,6 +844,7 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'knock_request') {
             // inform_user('knock response sent')
+            inform_user('knock knock')
         }
 
         else if (queue.event == 'knock_response') {
@@ -915,11 +916,11 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_start') {
-            inform_user('v-start')
+            inform_user('vpn start')
         }
 
         else if (queue.event == 'vpn_stop') {
-            inform_user('v-stop')
+            inform_user('vpn stop')
         }
 
         else {
@@ -1015,7 +1016,7 @@ function status_or_die() {
         if (typeof d3ck_status.d3ck_requests.answer != "undefined") {
             // alert('KNOCK, KNOCK, MOFO! ' + d3ck_status.d3ck_requests.answer)
             if (d3ck_status.d3ck_requests.answer) {
-                alertify.success("starting the VPN connection...");
+                alertify.success("starting the VPN connection...", { delay: 0 })
 
                 var ip = $('#' + d3ck_status.d3ck_requests.did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -1026,7 +1027,7 @@ function status_or_die() {
 
             }
             else {
-                alertify.reject("remote d3ck refused your request...");
+                alertify.reject("remote d3ck refused your request...", { delay: 0 })
             }
         }
         // knocking
@@ -1790,14 +1791,46 @@ function crypto_411() {
 }
 
 
-function inform_user(message) {
+//
+// a way of communicating to a user in a browser (currently, at least);
+// puts a string on the screen for now, with an optional level that should
+// correspond to a specific bootstrap alerts, which are currently:
+//
+//  success
+//  info
+//  warning
+//  danger
+//
+// This will change the color of the text box that comes up according
+// to bootstrap rules.
+//
+function inform_user(message, level) {
 
-    console.log('squawking to user: ' + message)
+    console.log('squawking to user: ' + message + '@' + level)
+
+    // type: 'info', // (null, 'info', 'danger', 'success')
+    if (typeof level == 'undefined' ||
+       (level != 'danger'     &&
+        level != 'success'    &&
+        level != 'info'       &&
+        level != 'warning')) {
+            console.log(level + " isn't a recognized level... setting to default/null")
+            level = 'info'     // default
+        }
+
+    console.log(level)
 
     var offset_amount = 70
     var offset_from   = 'top'
 
-    $.bootstrapGrowl(message, {offset: {from: offset_from, amount: offset_amount }, delay: -1})
+    $.bootstrapGrowl(message, {
+        offset: {
+            from: offset_from, 
+            amount: offset_amount 
+        }, 
+        delay: -1,
+        type: level
+    })
 
 }
 
@@ -1843,11 +1876,13 @@ function ask_user_4_response(data) {
                 if (e) {
                     console.log('go for it')
                     answer = 'yes'
-                    alertify.success("VPN connection will commence...");
+                    inform_user('lowering shields to ' + req.ip_addr)
+                    lower_shields(req.ip_addr)
+                    alertify.success("VPN connection will commence...", { delay: 0 })
                 }
                 else {
                     answer = 'no'
-                    alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr)
+                    alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr, { delay: 0 })
                 }
 
                 $.ajax({
@@ -1901,3 +1936,63 @@ function ask_user_4_response(data) {
 
 }
 
+//
+// two simple functions; either allow or deny access
+// from an IP addr to talk to our vpn
+//
+
+function lower_shields(ip) {
+
+    console.log('lowering shields to ' + ip)
+    var url = '/shields/up'
+
+    var jqXHR_shields = $.ajax({ url: url })
+
+    jqXHR_shields.done(function (shields, textStatus, jqXHR) {
+
+        console.log('result of shield lowering request: ' + JSON.stringify(shields))
+
+        if (shields.result) {
+            console.log('Shields down, VPN may commence...')
+            inform_user('Shields down, VPN may commence...')
+        }
+        else {
+            console.log('Shield down command failed')
+            inform_user('Shield down command failed', 'warning')
+        }
+
+    }).fail(function(err) {
+        console.log('events errz on event listing' + err)
+        inform_user('Shield down command failed: ' + JSON.stringify(err), 'warning')
+    })
+
+
+}
+
+function raise_shields(ip) {
+
+    console.log('raising shields against ' + ip)
+
+    var url = '/shields/down'
+
+    var jqXHR_shields = $.ajax({ url: url })
+
+    jqXHR_shields.done(function (shields, textStatus, jqXHR) {
+
+        console.log('result of shield lowering request: ' + JSON.stringify(shields))
+
+        if (shields.result) {
+            console.log('Shields up!')
+            inform_user('Shields up!')
+        }
+        else {
+            console.log('Shields up command failed, we may be vulnerable...')
+            inform_user('Shields up command failed, we may be vulnerable...', 'danger')
+        }
+
+    }).fail(function(err) {
+        console.log('events errz on event listing' + err)
+        inform_user('Shield down command failed: ' + JSON.stringify(err), 'danger')
+    })
+
+}
