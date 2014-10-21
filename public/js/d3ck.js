@@ -377,6 +377,8 @@ function state_ring(sound) {
 //
 function event_connect(direction, caller) {
 
+    return
+
     console.log('connexting')
 
     //
