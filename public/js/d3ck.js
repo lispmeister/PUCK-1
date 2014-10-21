@@ -545,7 +545,7 @@ function d3ck_vpn(element, d3ckid, ipaddr) {
         console.log("posto facto")
     })
     pvpn.fail(function(xhr, textStatus, errorThrown) {
-        console.log('failzor -> ' + xhr)
+        console.log('failzor -> ' + JSON.stringify(xhr))
     })
 
 }
