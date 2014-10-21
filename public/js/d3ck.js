@@ -540,13 +540,13 @@ function d3ck_create(element, ip_addr) {
             console.log('suck... sess.... ')
             inform_user('adding d3ck', 'trying to add ' + ip_addr)
             // yes... I suck
-            setTimeout(go_d3ck_or_go_home, 2000)
+            // setTimeout(go_d3ck_or_go_home, 2000)
         },
         fail: function(data, err) {
             console.log('fuck... me')
             inform_user('failed to add', ip_addr + ' was not added')
             // yes... I suck
-            setTimeout(go_d3ck_or_go_home, 2000)
+            // setTimeout(go_d3ck_or_go_home, 2000)
         }
     })
 
