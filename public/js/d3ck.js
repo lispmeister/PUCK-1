@@ -377,8 +377,6 @@ function state_ring(sound) {
 //
 function event_connect(direction, caller) {
 
-    return
-
     console.log('connexting')
 
     //
@@ -390,6 +388,9 @@ function event_connect(direction, caller) {
     $('.avgrund-popin').remove()
 
     // then create
+
+if ('monkeys' == 'bunnies') {
+
     $('#' + direction).avgrund({
         height: 120,
         openOnEvent: false,
@@ -405,6 +406,7 @@ function event_connect(direction, caller) {
                   '<div class="col-md-4 top-spacer50"><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="d3ck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>' +
                   '</div>'
         })
+}
 
     state_ring(true)
 
