@@ -837,6 +837,29 @@ function queue_or_die(queue) {
         else if (queue.event == 'knock_response') {
             inform_user('knock response received')
 
+            console.log(queue)
+            console.log(queue.d3ck_status)
+            console.log(queue.d3ck_status.d3ck_requests)
+
+
+            if (queue.d3ck_status.d3ck_requests.knock && queue.d3ck_status.d3ck_requests.answer == "yes") {
+
+                var did = queue.d3ck_status.d3ck_requests.did
+
+                alertify.success("starting the VPN connection... to " + did);
+
+                var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
+                console.log('to... ' + ip)
+
+                event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
+
+                d3ck_vpn($('#d3ck_vpn_' + did), did, ip)
+
+            }
+            else {
+                alertify.reject("remote d3ck refused your request...");
+            }
+
         }
 
         else if (queue.event == 'remote_knock_fail') {
@@ -891,10 +914,8 @@ function queue_or_die(queue) {
     else if (queue.type == "request") {
         console.log('event: ' + JSON.stringify(queue))
         ask_user_4_response(queue)
-
         return
     }
-
 
     // inbound calls, vpn connections, etc.
     else if (queue.type == "event") {
@@ -1796,7 +1817,7 @@ function ask_user_4_response(data) {
                 console.log(e)
 
                 var answer    = ''
-                var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'did': my_d3ck.D3CK_ID, }
+                var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'from_d3ck': req.from_d3ck, 'did': my_d3ck.D3CK_ID }
                 post_data     = JSON.stringify(post_data)
 
                 if (e) {
