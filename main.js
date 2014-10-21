@@ -1119,13 +1119,10 @@ function d3ckQueue(req, res, next) {
     else {
         // console.log('empty queue...')
         res.send(200, [])
+        return
     }
 
-    var quo = []
-
-    for (var i = 0; i < d3ck_queue.length; i++) {
-        quo[i] = d3ck_queue[i]
-    }
+    var quo = d3ck_queue
 
     d3ck_queue = [] // not to be confused with quo
 
