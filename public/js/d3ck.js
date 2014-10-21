@@ -1016,7 +1016,7 @@ function status_or_die() {
         if (typeof d3ck_status.d3ck_requests.answer != "undefined") {
             // alert('KNOCK, KNOCK, MOFO! ' + d3ck_status.d3ck_requests.answer)
             if (d3ck_status.d3ck_requests.answer) {
-                alertify.success("starting the VPN connection...", { delay: 0 })
+                alertify.success("starting the VPN connection...", "", 0)
 
                 var ip = $('#' + d3ck_status.d3ck_requests.did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -1027,7 +1027,7 @@ function status_or_die() {
 
             }
             else {
-                alertify.reject("remote d3ck refused your request...", { delay: 0 })
+                alertify.reject("remote d3ck refused your request...", "", 0)
             }
         }
         // knocking
@@ -1878,11 +1878,11 @@ function ask_user_4_response(data) {
                     answer = 'yes'
                     inform_user('lowering shields to ' + req.ip_addr)
                     lower_shields(req.ip_addr)
-                    alertify.success("VPN connection will commence...", { delay: 0 })
+                    alertify.success("VPN connection will commence...", "", 0)
                 }
                 else {
                     answer = 'no'
-                    alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr, { delay: 0 })
+                    alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr, "", 0)
                 }
 
                 $.ajax({
