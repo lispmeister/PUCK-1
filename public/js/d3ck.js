@@ -282,10 +282,13 @@ function state_vpn(state, browser_ip) {
 
         set_up_RTC() // fly free, web RTC!
 
-        console.log(d3ck_status.browser_events[browser_ip].notify_ring)
+        // xxxx
+        // console.log(d3ck_status.browser_events[browser_ip].notify_ring)
 
         // is anything else going on?  If so, for now dont do anything
-        if (! d3ck_current.busy) {
+
+        // xxxx
+        // if (! d3ck_current.busy) {
             d3ck_current.incoming = true
 
             console.log('\t[+] fire up the alarms')
@@ -306,10 +309,10 @@ function state_vpn(state, browser_ip) {
 
             // d3ck_status.browser_events[browser_ip].notify_file = true
 
-        }
-        else {
-            console.log('\t[-] not doing anything with incoming call, currently busy')
-        }
+        // }
+//      else {
+//          console.log('\t[-] not doing anything with incoming call, currently busy')
+//      }
 
     }
 
@@ -389,6 +392,9 @@ function event_connect(direction, caller) {
 
     // then create
 
+// xxxxxxxxxxx
+// xxxxxxxxxxx
+// xxxxxxxxxxx
 if ('monkeys' == 'bunnies') {
 
     $('#' + direction).avgrund({
@@ -860,6 +866,8 @@ function queue_or_die(queue) {
 
                 d3ck_vpn($('#d3ck_vpn_' + did), did, ip)
 
+                state_vpn('incoming', browser_ip)
+
             }
             else {
                 // alertify.reject("remote d3ck refused your request...");
@@ -886,6 +894,7 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'vpn_client_connected') {
             inform_user("your d3ck has established a VPN connection")
+            state_vpn('outgoing', browser_ip)
         }
 
         else if (queue.event == 'vpn_client_disconnected') {
@@ -894,6 +903,9 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'vpn_server_connected') {
             inform_user('remote d3ck established a VPN connection to your d3ck')
+
+            state_vpn('incoming', browser_ip)
+
         }
 
         else if (queue.event == 'vpn_server_disconnected') {
@@ -1557,8 +1569,8 @@ function set_up_RTC(remote) {
 
     // ... wtf, as they say...?
     else {
-        alert('hmmm... are you connected...?')
-        return
+//      alert('hmmm... are you connected...?')
+//      return
     }
 
     console.log('setting up RTC: ' + SIGNALING_SERVER)
