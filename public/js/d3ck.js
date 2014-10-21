@@ -301,11 +301,13 @@ function state_vpn(state, browser_ip) {
             console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
             incoming_ip = d3ck_status.openvpn_server.client
             // ring them gongs, etc.
+            event_connect("incoming", incoming_ip)
 
-            if (!d3ck_status.browser_events[browser_ip].notify_ring) {
-                event_connect("incoming", incoming_ip)
-                d3ck_status.browser_events[browser_ip].notify_ring = true
-            }
+
+//          if (!d3ck_status.browser_events[browser_ip].notify_ring) {
+//              event_connect("incoming", incoming_ip)
+//              d3ck_status.browser_events[browser_ip].notify_ring = true
+//          }
 
             // d3ck_status.browser_events[browser_ip].notify_file = true
 
@@ -326,7 +328,7 @@ function state_vpn(state, browser_ip) {
 
         set_up_RTC(remote_ip) // fly free, web RTC!
 
-        if (! d3ck_current.busy) {
+        // if (! d3ck_current.busy) {
             console.log('\t[+] fire up the outbound signs')
 
             $('#d3ck_video').addClass('green').addClass('pulse')
@@ -340,15 +342,15 @@ function state_vpn(state, browser_ip) {
                 event_hang_up()
             })
 
-            d3ck_current.outgoing = true
+        //     d3ck_current.outgoing = true
 
-            $('body').removeClass('avgrund-active');
+        //     $('body').removeClass('avgrund-active');
             state_ring(false)
 
-        }
-        else {
-            console.log('\t[-] not doing anything with outgoing call, currently busy')
-        }
+        // }
+        // else {
+        //     console.log('\t[-] not doing anything with outgoing call, currently busy')
+        // }
 
     }
 
