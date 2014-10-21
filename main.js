@@ -2530,7 +2530,7 @@ function startVPN(req, res, next) {
 
     createEvent(get_client_ip(req), {event_type: "vpn_start", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
 
-    d3ck_queue.push({type: 'info', event: 'vpn_start', 'd3ck_status': d3ck_status})
+    d3ck_queue.push({type: 'info', event: 'vpn_start', remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
 
     // write the IP addr to a file
     fs.writeFile(d3ck_remote_vpn, d3ck2ip[d3ckid], function(err) {
