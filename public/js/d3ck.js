@@ -1772,8 +1772,7 @@ function inform_user(title, message, level) {
 
     var desky     = false   // by default keep all messages in the browser window
     var hidey     = true    // by default messages go away after a bit
-    var nonblock  = true    // turn transparent/pass through when mouseover
-    var stack     = {}
+    // var nonblock  = true    // turn transparent/pass through when mouseover
 
     // type: 'info', // (null, 'info', 'danger', 'success')
     if (typeof level == 'undefined' ||
@@ -1796,29 +1795,27 @@ function inform_user(title, message, level) {
         PNotify.desktop.permission();   // wow!
         desky    = true
         hidey    = false
-        nonblock = false
+        // nonblock = false
     }
 
+    var opts = {
+            title:      title,
+            text:       message,
+            type:       level,
+            styling:    "bootstrap3",
+            hide:       hidey,
+            animation:  "fade",
+            desktop:    { desktop: desky }  // wow^2!
+        }
+
+    // messages at bottom left side?
     if (level == 'success') {
         console.log('... and now for something completely different...')
-        stack   = stack_bottomleft
+        opts.addclass = "stack-bottomleft"
+        opts.stack    =  stack_bottomleft
     }
 
-    new PNotify({
-        // title: title_text,
-        nonblock: {
-            nonblock:         nonblock,
-            nonblock_opacity: .6
-        },
-        title:      title,
-        text:       message,
-        type:       level,
-        styling:    "bootstrap3",
-        stack:      stack,
-        hide:       hidey,
-        animation:  "fade",
-        desktop:    { desktop: desky }  // wow^2!
-    })
+    new PNotify(opts);
 
 }
 

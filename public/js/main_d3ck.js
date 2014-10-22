@@ -7,7 +7,6 @@ D3CK_PORT        = 8080
 //D3CK_SIG_PORT    = 8081
 D3CK_SIG_PORT    = 8080
 
-//SIGNALING_SERVER = 'wss://' + window.location.hostname + ':' + D3CK_SIG_PORT
 SIGNALING_SERVER = 'https://' + window.location.hostname + ':' + D3CK_SIG_PORT
 
 // poll until we get something, then stop polling
@@ -40,7 +39,6 @@ ring = new Audio("media/ringring.mp3") // load it up
 
 // exist function from http://stackoverflow.com/questions/31044/is-there-an-exists-function-for-jquery
 jQuery.fn.exists = function(){return this.length>0;}
-
 
 $(document).ready(function () {
 
@@ -150,9 +148,9 @@ $(document).ready(function () {
 
 
         // one call at a time, for now
-        // if (passthrough+trust+stuff) {
+        // if (passthrough+trust+stuff) 
         if (1 == 2) {
-        // if (!d3ck_current.incoming && !d3ck_current.outgoing && !d3ck_current.busy) {
+        // if (!d3ck_current.incoming && !d3ck_current.outgoing && !d3ck_current.busy) 
             // possibly a better way to get name
             event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
 
@@ -413,94 +411,4 @@ $(document).ready(function () {
     crypto_411()
 
 })
-
-// function psuedo_r_string() {
-//     var val = (Math.random() * new Date().getTime()).toString(36).replace(/\./g, '')
-//     console.log("YOU R: " + val)
-//     return val
-// }
-
-peer    = {}
-onMessageCallbacks = {};
-connection = {}
-
-function _do_that_rtc_thang(host) {
-
-//  document.getElementById('rtc_nowz').onclick = function()
-
-        console.log('firing up rtc')
-
-        local_socket.push = local_socket.send;
-        local_socket.send = function(data) {
-            console.log('great send off... ')
-            console.log(data)
-
-            data.sender = currentUserUUID;
-            local_socket.push(JSON.stringify(data));
-        };
-
-
-        var connection = new RTCMultiConnection();
-
-        connection.channel = 'd3ck'
-
-        connection.session = {
-            audio: true,
-            video: true
-        };
-
-        // overriding "openSignalingChannel" method
-        connection.openSignalingChannel = function (config) {
-
-            console.log('cracking open the signalz!')
-            console.log(config)
-
-            var channel = config.channel || this.channel;
-
-            onMessageCallbacks[channel] = config.onmessage;
-
-            if (config.onopen) setTimeout(config.onopen, 3000);
-
-            // directly returning socket object using "return" statement
-            console.log('\treturning... stuff')
-            return {
-                send: function (message) {
-                    console.log('\tsender:\t' + currentUserUUID)
-                    console.log('\tchan:\t' + channel)
-                    console.log('\tmessage:\t' + JSON.stringify(message))
-
-                    local_socket.send(JSON.stringify({
-                        sender: currentUserUUID,
-                        channel: channel,
-                        message: message
-                    }));
-                },
-                channel: channel
-            };
-        };
-
-        console.log('... and... showtime...?')
-
-        // ... showtime...?
-        // connection.open();
-        connection.onstream = function(e) {
-            console.log('adding...')
-            $('#videos-container').append(e.mediaElement)
-            $('#videos-container').append('... !!')
-        };
-
-
-        // searching for existing sessions
-        console.log('... searching... for a browser... with a heart of gold....')
-
-        connection.onNewSession = function(session) {
-            console.log('found room...')
-            session.join({audio: true, video: true})
-        };
-
-        connection.connect('d3ck');
-
-        connection.open();
-
-}
 
