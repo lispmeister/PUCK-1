@@ -305,7 +305,7 @@ function state_vpn(state, browser_ip) {
     }
 
     // an outgoing connect was successful
-    if (state == "outgoing") {
+    else if (state == "outgoing") {
 
         console.log('outgoing call is up')
 
@@ -327,6 +327,10 @@ function state_vpn(state, browser_ip) {
         })
 
         state_ring(false)
+    }
+
+    else {
+        alert('wtf?')
     }
 
 }
@@ -816,7 +820,7 @@ function queue_or_die(queue) {
 
                 d3ck_vpn($('#d3ck_vpn_' + did), did, ip)
 
-                state_vpn('incoming', browser_ip)
+                state_vpn('outgoing', browser_ip)
 
             }
             else {
@@ -1775,7 +1779,7 @@ function inform_user(title, message, level, element) {
 
     if (level == 'success' || level == 'danger' || level == 'error') {
         console.log('this one is a VIP message... sticky & desktop if it can...')
-        PNotify.desktop.permission();   // wow!
+        // PNotify.desktop.permission();   // wow!
         desky    = true
         hidey    = false
         // nonblock = false
