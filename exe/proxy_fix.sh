@@ -8,6 +8,8 @@
 # this puts the ip of the vpn server into the nginx conf file and restarts it
 #
 
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+
 #
 # Big and flawed assumptions for now:
 #

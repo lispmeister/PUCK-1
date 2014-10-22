@@ -1798,6 +1798,11 @@ function inform_user(title, message, level) {
         nonblock = false
     }
 
+    if (level == 'success') {
+        console.log('... and now for something completely different...')
+        stack: stack_bottomleft
+    }
+
     new PNotify({
         // title: title_text,
         nonblock: {
