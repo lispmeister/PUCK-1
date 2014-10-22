@@ -1820,6 +1820,7 @@ function inform_user(title, message, level, element) {
         pn.desktop.onclick = function(e) {
             window.focus()
         }
+    }
     catch(e) {
         console.log('ah well, try, try again...')
     }
