@@ -92,17 +92,6 @@
                 </div>
             </div>
 
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" data-parent="#d3ck_accordion" href="#d3ck_vpn_client_details">D3CK VPN client details </a>
-                    </h4>
-                </div>
-                <div id="d3ck_vpn_client_details" class="panel-collapse collapse">
-                    <div id="d3ck_vpn_client_basics" class="panel-body"> </div>
-                </div>
-            </div>
-
         </div>
 
         <!-- make it so -->
@@ -214,7 +203,7 @@ $(document).ready(function () {
            $('#d3ck_vpn').append(item[1])
            // global
            d3ckid = item[1]
-           console.log("d3ckid: " + item[1])
+           // console.log("d3ckid: " + item[1])
         }
         else {
            error = 1
@@ -227,7 +216,7 @@ $(document).ready(function () {
      // get more detailed data...
      $.getJSON('/d3ck/' + d3ckid, function(d3ckinfo) {
 
-        console.log(d3ckinfo)
+        // console.log(d3ckinfo)
 
         print_d3ck(d3ckid, d3ckinfo, ['#d3ck_basics', '#d3ck_vpn_basics', '#d3ck_vpn_client_basics'])
 

@@ -276,46 +276,28 @@ function state_video(state) {
 //
 function state_vpn(state, browser_ip) {
 
+    var message_connect = '<h2> connected! </h2>'
+    alertify.set({ labels : { ok: "OK" } });
+
     // an incoming connect was successful
     if (state == "incoming") {
         console.log('incoming call')
 
         set_up_RTC() // fly free, web RTC!
 
-        // xxxx
-        // console.log(d3ck_status.browser_events[browser_ip].notify_ring)
+        d3ck_current.incoming = true
 
-        // is anything else going on?  If so, for now dont do anything
+        console.log('\t[+] fire up the alarms')
 
-        // xxxx
-        // if (! d3ck_current.busy) {
-            d3ck_current.incoming = true
+        // ensure video button is enabled if a call is in progress
+        $('#d3ck_video').addClass('green').addClass('pulse')
+        $('button:contains("connecting")').text('connected from')
+        $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('connected').removeClass('btn-primary').addClass('btn-success')
 
-            console.log('\t[+] fire up the alarms')
-
-            // ensure video button is enabled if a call is in progress
-            $('#d3ck_video').addClass('green').addClass('pulse')
-            $('button:contains("connecting")').text('connected from')
-            $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('connected').removeClass('btn-primary').addClass('btn-success')
-
-            console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
-            incoming_ip = d3ck_status.openvpn_server.client
-            // ring them gongs, etc.
-            event_connect("incoming", incoming_ip)
-
-
-//          if (!d3ck_status.browser_events[browser_ip].notify_ring) {
-//              event_connect("incoming", incoming_ip)
-//              d3ck_status.browser_events[browser_ip].notify_ring = true
-//          }
-
-            // d3ck_status.browser_events[browser_ip].notify_file = true
-
-        // }
-//      else {
-//          console.log('\t[-] not doing anything with incoming call, currently busy')
-//      }
-
+        console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
+        incoming_ip = d3ck_status.openvpn_server.client
+        // ring them gongs, etc.
+        event_connect("incoming", incoming_ip)
     }
 
     // an outgoing connect was successful
@@ -323,34 +305,24 @@ function state_vpn(state, browser_ip) {
 
         console.log('outgoing call is up')
 
-
         remote_ip = d3ck_status.openvpn_client.server
 
         set_up_RTC(remote_ip) // fly free, web RTC!
 
-        // if (! d3ck_current.busy) {
-            console.log('\t[+] fire up the outbound signs')
+        console.log('\t[+] fire up the outbound signs')
 
-            $('#d3ck_video').addClass('green').addClass('pulse')
-            $('button:contains("connecting"),button:contains("Call")').text('End').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
+        $('#d3ck_video').addClass('green').addClass('pulse')
+        $('button:contains("connecting"),button:contains("Call")').text('End').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
 
-            // ... setup bye bye
-            $('button:contains("connecting"),button:contains("Call")').click(false)
+        // ... setup bye bye
+        $('button:contains("connecting"),button:contains("Call")').click(false)
 
-            $('body').on('click', '.hang_up', function() {
-                $(this).text('hanging up...')
-                event_hang_up()
-            })
+        $('body').on('click', '.hang_up', function() {
+            $(this).text('hanging up...')
+            event_hang_up()
+        })
 
-        //     d3ck_current.outgoing = true
-
-            state_ring(false)
-
-        // }
-        // else {
-        //     console.log('\t[-] not doing anything with outgoing call, currently busy')
-        // }
-
+        state_ring(false)
     }
 
 }
@@ -486,6 +458,8 @@ function d3ck_vpn(element, d3ckid, ipaddr) {
 
     event_connect("outgoing", ipaddr)
 
+    inform_user('VPN', 'starting up VPN to ' + d3ckid + ' : ' + ipaddr, 'success')
+
     // don't change anything until the call efforts pass/fail
     d3ck_current.busy = true
 
@@ -496,10 +470,13 @@ function d3ck_vpn(element, d3ckid, ipaddr) {
     })
 
     pvpn.done(function(msg) {
-        console.log("posto facto")
+        console.log("posto facto: " + JSON.stringify(msg))
     })
     pvpn.fail(function(xhr, textStatus, errorThrown) {
         console.log('failzor -> ' + JSON.stringify(xhr))
+    })
+    pvpn.error(function(xhr, textStatus, errorThrown) {
+        console.log('errzor -> ' + JSON.stringify(xhr))
     })
 
 }
@@ -807,12 +784,12 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'knock_request') {
-            // inform_user('knock response sent')
-            inform_user('request', 'knock knock')
+            // knock response sent
+            // inform_user('request', 'knock knock')
         }
 
         else if (queue.event == 'knock_response') {
-            inform_user('response', 'knock response received')
+            /// inform_user('response', 'knock response received')
 
             console.log(queue)
             console.log(queue.d3ck_status)
@@ -826,7 +803,7 @@ function queue_or_die(queue) {
                 // alertify.success("starting the VPN connection... to " + did);
 
                 // not really... success... but important?
-                inform_user('VPN', "starting the VPN connection... to " + did, 'success');
+                inform_user('VPN', "Remote d3ck agreed to connect" + did, 'success');
 
                 var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -850,7 +827,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'remote_knock_success') {
-            inform_user('request', 'remote knock delivered')
+            inform_user('VPN', 'connection request sent', 'success')
         }
 
         else if (queue.event == 'remotely_uploaded') {
@@ -862,7 +839,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_client_connected') {
-            inform_user('VPN', "your d3ck has established a VPN connection", 'success')
+            // inform_user('VPN', "your d3ck has established a VPN connection", 'success')
             state_vpn('outgoing', browser_ip)
         }
 
@@ -1311,7 +1288,7 @@ function drag_and_d3ck(safe_id, d3ckid, ip) {
     $('#' + safe_id).filer({
         changeInput: '<div class="dragDropBox" id="dragDropBox_' + safe_ip + '"><span class="message">CLICK -or- DROP files to upload</span></div>',
         appendTo   : ele,
-        // appendTo   : '#dragDropBox_' + safe_id,
+        extensions : null,
         template   : '<img src="%image-url%" title="%original-name%" /><em>%title%</em>',
         maxSize    : 1024 * 1024,
         uploadFile: {
@@ -1425,11 +1402,6 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
 
     var vpn_client = { }
 
-//  var vpn_client = {
-//      key        : d3ckinfo.vpn_client.key.join('\n'),
-//      cert       : d3ckinfo.vpn_client.cert.join('\n')
-//  }
-
     var d3ck = {
         d3ckid     : id3ck,
         name       : name,
@@ -1441,30 +1413,30 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
         all_ips    : d3ckinfo.all_ips.join(', ')
        }
 
-    var vpn_template = '<div><h4>VPN</h4></div>' +
-                   '<strong>port</strong>: {{port}} <br />' +
-                   '<strong>protocol</strong>: {{protocol}} <br />' +
-                   '<strong>ca</strong>: {{ca}} <br />' +
-                   '<strong>key</strong>: {{key}} <br />' +
-                   '<strong>cert</strong>: {{cert}} <br />' +
-                   '<strong>tlsauth</strong>: {{tls_auth}} <br />' +
-                   '<strong>DH</strong>: {{dh}} <br />'
+    var vpn_template =        '<div><h4>VPN</h4></div>' +
+                              '<strong>port</strong>: {{port}} <br />' +
+                              '<strong>protocol</strong>: {{protocol}} <br />' +
+                              '<strong>ca</strong>: {{ca}} <br />' +
+                              '<strong>key</strong>: {{key}} <br />' +
+                              '<strong>cert</strong>: {{cert}} <br />' +
+                              '<strong>tlsauth</strong>: {{tls_auth}} <br />' +
+                              '<strong>DH</strong>: {{dh}} <br />'
 
     var vpn_client_template = '<div><h4>VPN Client</h4></div>' +
-                   '<strong>port</strong>: {{port}} <br />' +
-                   '<strong>protocol</strong>: {{protocol}} <br />' +
-                   '<strong>ca</strong>: {{ca}} <br />' +
-                   '<strong>key</strong>: {{key}} <br />' +
-                   '<strong>cert</strong>: {{cert}} <br />'
+                              '<strong>port</strong>: {{port}} <br />' +
+                              '<strong>protocol</strong>: {{protocol}} <br />' +
+                              '<strong>ca</strong>: {{ca}} <br />' +
+                              '<strong>key</strong>: {{key}} <br />' +
+                              '<strong>cert</strong>: {{cert}} <br />'
 
-    var template = '<div><h4>ID: <span id="d3ckid">{{d3ckid}}</span></h4> <br />' +
-                   '<strong>D3CK\'s name</strong>: {{user}} <br />' +
-                   '<strong>Owner</strong>: {{user}} <br />' +
-                   '<strong>Email</strong>: {{email}} <br />' +
-                   '<strong>ip address</strong>: {{ip}} <br />' +
-                   '<strong>vpn ip address</strong>: {{vpn_ip}} <br />' +
-                   '<strong>all ips known</strong>: {{all_ips}} <br />' +
-                   '<div style="width: 200px"><img style="max-width:100%" src="{{image}}"></div>'
+    var template =            '<div><h4>ID: <span id="d3ckid">{{d3ckid}}</span></h4> <br />' +
+                              '<strong>D3CK\'s name</strong>: {{user}} <br />' +
+                              '<strong>Owner</strong>: {{user}} <br />' +
+                              '<strong>Email</strong>: {{email}} <br />' +
+                              '<strong>ip address</strong>: {{ip}} <br />' +
+                              '<strong>vpn ip address</strong>: {{vpn_ip}} <br />' +
+                              '<strong>all ips known</strong>: {{all_ips}} <br />' +
+                              '<div style="width: 200px"><img style="max-width:100%" src="{{image}}"></div>'
 
     var v_html   = Mustache.to_html(vpn_template, vpn)
     var v_c_html = Mustache.to_html(vpn_client_template, vpn_client)
@@ -1769,9 +1741,11 @@ function crypto_411() {
 // to bootstrap rules.
 //
 
-var stack_bottomleft = {"dir1": "right", "dir2": "up", "push": "top"};
+var stack_bottomleft      = {"dir1": "right", "dir2": "up", "push": "top"};
+var stack_toppishRightish = {"dir1": "down",  "dir2": "right", "push": "top"};
 
-function inform_user(title, message, level) {
+
+function inform_user(title, message, level, element) {
 
     console.log('squawking to user: ' + message + '@' + level)
 
@@ -1813,6 +1787,14 @@ function inform_user(title, message, level) {
             desktop:    { desktop: desky }  // wow^2!
         }
 
+    // messages at RHS side element...?
+    if (level == 'info') {
+        console.log('... and .... info!')
+        opts.addclass = "stack-topright"
+        opts.stack    = stack_toppishRightish
+        opts.context  = $('.dotdotdot')
+    }
+
     // messages at bottom left side?
     if (level == 'success') {
         console.log('... and now for something completely different...')
@@ -1846,7 +1828,7 @@ function ask_user_4_response(data) {
 
         var friend = req.from
 
-        var message = '<h2>' + req.from + '</h2> wants to connect from <span style="font-weight: 600">' + req.ip_addr + '</span><br /><span style="font-weight:100">' + req.from_d3ck + '</span><br />'
+        var message_request = '<h2>' + req.from + '</h2> wants to connect from <span style="font-weight: 600">' + req.ip_addr + '</span><br /><span style="font-weight:100">' + req.from_d3ck + '</span><br />'
 
         $("#labels", function () {
             alertify.set({
@@ -1855,7 +1837,7 @@ function ask_user_4_response(data) {
                 labels          : { ok: "Allow", cancel: "Deny" }
             });
 
-            alertify.confirm(message, function (e) {
+            alertify.confirm(message_request, function (e) {
                 console.log('confirm...?')
                 console.log(e)
 
