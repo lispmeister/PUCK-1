@@ -824,7 +824,9 @@ function queue_or_die(queue) {
                 var did = queue.d3ck_status.d3ck_requests.did
 
                 // alertify.success("starting the VPN connection... to " + did);
-                inform_user('VPN', "starting the VPN connection... to " + did);
+
+                // not really... success... but important?
+                inform_user('VPN', "starting the VPN connection... to " + did, 'success');
 
                 var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -880,7 +882,8 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_start') {
-            inform_user('VPN', 'vpn start')
+            // xxx?
+            // inform_user('VPN', 'vpn start')
         }
 
         else if (queue.event == 'vpn_stop') {
@@ -1766,6 +1769,8 @@ function crypto_411() {
 // to bootstrap rules.
 //
 
+var stack_bottomleft = {"dir1": "right", "dir2": "up", "push": "top"};
+
 function inform_user(title, message, level) {
 
     console.log('squawking to user: ' + message + '@' + level)
@@ -1812,7 +1817,7 @@ function inform_user(title, message, level) {
     if (level == 'success') {
         console.log('... and now for something completely different...')
         opts.addclass = "stack-bottomleft"
-        opts.stack    =  stack_bottomleft
+        opts.stack    = stack_bottomleft
     }
 
     new PNotify(opts);
