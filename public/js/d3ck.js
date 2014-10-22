@@ -539,14 +539,10 @@ function d3ck_create(element, ip_addr) {
         success: function(data, status) {
             console.log('suck... sess.... ')
             inform_user('adding d3ck', 'trying to add ' + ip_addr)
-            // yes... I suck
-            // setTimeout(go_d3ck_or_go_home, 2000)
         },
         fail: function(data, err) {
             console.log('fuck... me')
-            inform_user('failed to add', ip_addr + ' was not added')
-            // yes... I suck
-            // setTimeout(go_d3ck_or_go_home, 2000)
+            inform_user('failed to add', ip_addr + ' was not added', 'error')
         }
     })
 
@@ -790,11 +786,14 @@ function queue_or_die(queue) {
             var remote_ip   = queue.d3ck_status.events.new_d3ck_ip
             var remote_name = queue.d3ck_status.events.new_d3ck_name
 
-            inform_user('D3CK add', '"' + remote_name + '" added your D3CK as a friend')
+            inform_user('D3CK add', '"' + remote_name + '" added your D3CK as a friend', 'success')
+            // should do this gracefully, not hit it with an ugly stick
+            setTimeout(go_d3ck_or_go_home, 3000)
+
         }
 
         else if (queue.event == 'd3ck_delete') {
-            inform_user('deletion', 'd3ck deleted')
+            inform_user('deletion', 'd3ck deleted', 'success')
         }
 
         else if (queue.event == 'file_upload') {
@@ -804,16 +803,16 @@ function queue_or_die(queue) {
             // does it go into our vault?
             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
 
-            inform_user('New file', '<strong>' + queue.d3ck_status.file_events.file_name + '</strong>  ('  + queue.d3ck_status.file_events.file_size + ' bytes); uploaded')
+            inform_user('New file', '<strong>' + queue.d3ck_status.file_events.file_name + '</strong>  ('  + queue.d3ck_status.file_events.file_size + ' bytes); uploaded', 'success')
         }
 
         else if (queue.event == 'knock_request') {
             // inform_user('knock response sent')
-            inform_user('knock knock')
+            inform_user('request', 'knock knock')
         }
 
         else if (queue.event == 'knock_response') {
-            inform_user('knock response received')
+            inform_user('response', 'knock response received')
 
             console.log(queue)
             console.log(queue.d3ck_status)
@@ -825,7 +824,7 @@ function queue_or_die(queue) {
                 var did = queue.d3ck_status.d3ck_requests.did
 
                 // alertify.success("starting the VPN connection... to " + did);
-                inform_user("starting the VPN connection... to " + did);
+                inform_user('VPN', "starting the VPN connection... to " + did);
 
                 var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -839,53 +838,53 @@ function queue_or_die(queue) {
             }
             else {
                 // alertify.reject("remote d3ck refused your request...");
-                inform_user("remote d3ck refused your request...");
+                inform_user('VPN', "remote d3ck refused your request...", 'warning');
             }
 
         }
 
         else if (queue.event == 'remote_knock_fail') {
-            inform_user('knock failure')
+            inform_user('request', 'knock failure', 'warning')
         }
 
         else if (queue.event == 'remote_knock_success') {
-            inform_user('remote knock delivered')
+            inform_user('request', 'remote knock delivered')
         }
 
         else if (queue.event == 'remotely_uploaded') {
-            inform_user('your file was uploaded to remote d3ck')
+            inform_user('file upload', 'your file was uploaded to remote d3ck', 'success')
         }
 
         else if (queue.event == 'remote_upload') {
-            inform_user('a file has been uploaded to your d3ck')
+            inform_user('remote file upload', 'a file has been uploaded to your d3ck', 'success')
         }
 
         else if (queue.event == 'vpn_client_connected') {
-            inform_user("your d3ck has established a VPN connection")
+            inform_user('VPN', "your d3ck has established a VPN connection", 'success')
             state_vpn('outgoing', browser_ip)
         }
 
         else if (queue.event == 'vpn_client_disconnected') {
-            inform_user('your d3ck disconnected the VPN connection')
+            inform_user('VPN', 'your d3ck disconnected the VPN connection')
         }
 
         else if (queue.event == 'vpn_server_connected') {
-            inform_user('remote d3ck established a VPN connection to your d3ck')
+            inform_user('VPN', 'remote d3ck established a VPN connection to your d3ck', 'success')
 
             state_vpn('incoming', browser_ip)
 
         }
 
         else if (queue.event == 'vpn_server_disconnected') {
-            inform_user('remote d3ck disconnected its VPN connection')
+            inform_user('VPN', 'remote d3ck disconnected its VPN connection')
         }
 
         else if (queue.event == 'vpn_start') {
-            inform_user('vpn start')
+            inform_user('VPN', 'vpn start')
         }
 
         else if (queue.event == 'vpn_stop') {
-            inform_user('vpn stop')
+            inform_user('VPN', 'vpn stop')
         }
 
         else {
@@ -1758,6 +1757,7 @@ function crypto_411() {
 // correspond to a specific bootstrap alerts, which are currently:
 //
 //  success
+//  error
 //  info
 //  warning
 //  danger
@@ -1765,15 +1765,21 @@ function crypto_411() {
 // This will change the color of the text box that comes up according
 // to bootstrap rules.
 //
+
 function inform_user(title, message, level) {
 
     console.log('squawking to user: ' + message + '@' + level)
+
+    var desky     = false   // by default keep all messages in the browser window
+    var hidey     = true    // by default messages go away after a bit
+    var nonblock  = true    // turn transparent/pass through when mouseover
 
     // type: 'info', // (null, 'info', 'danger', 'success')
     if (typeof level == 'undefined' ||
        (level != 'danger'     &&
         level != 'success'    &&
         level != 'info'       &&
+        level != 'error'      &&
         level != 'warning')) {
             console.log(level + " isn't a recognized level... setting to default/null")
             level = 'info'     // default
@@ -1781,18 +1787,30 @@ function inform_user(title, message, level) {
 
     console.log(level)
 
-    // xxx - at start of refresh?
+    // for now... the bigger/more important types of messages go onto the desktop if you let them
+    // they'll also be sticky - the note will stay on the screen until dismissed
 
-    PNotify.desktop.permission();   // wow!
+    if (level == 'success' || level == 'danger' || level == 'error') {
+        console.log('this one is a VIP message... sticky & desktop if it can...')
+        PNotify.desktop.permission();   // wow!
+        desky    = true
+        hidey    = false
+        nonblock = false
+    }
 
     new PNotify({
         // title: title_text,
+        nonblock: {
+            nonblock:         nonblock,
+            nonblock_opacity: .6
+        },
         title:      title,
         text:       message,
         type:       level,
         styling:    "bootstrap3",
+        hide:       hidey,
         animation:  "fade",
-        desktop:    { desktop: true }  // wow^2!
+        desktop:    { desktop: desky }  // wow^2!
     })
 
 }

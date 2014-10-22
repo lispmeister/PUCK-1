@@ -3100,6 +3100,8 @@ function create_d3ck_locally(ip_addr) {
 
         ping_data = JSON.parse(ping_data)
 
+        console.log(ping_data)
+
         console.log(url + ' nabbed')
 
         if (typeof ping_data.did == "undefined") {
