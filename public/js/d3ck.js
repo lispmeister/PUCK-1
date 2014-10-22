@@ -1816,7 +1816,7 @@ function inform_user(title, message, level, element) {
     var pn = new PNotify(opts);
 
     // chrome only, I believe
-    pn.onclick = function(e) {
+    pn.desktop.onclick = function(e) {
         window.focus()
     }
 
