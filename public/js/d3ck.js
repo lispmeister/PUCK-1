@@ -1857,13 +1857,14 @@ function ask_user_4_response(data) {
                 if (e) {
                     console.log('go for it')
                     answer = 'yes'
-                    inform_user('lowering shields to ' + req.ip_addr)
+                    inform_user('request', 'lowering shields to ' + req.ip_addr)
                     lower_shields(req.ip_addr)
-                    alertify.success("VPN connection will commence...", "", 0)
+                    // alertify.success("VPN connection will commence...", "", 0)
                 }
                 else {
                     answer = 'no'
-                    alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr, "", 0)
+                    inform_user('request', 'declined connection from ' + req.ip_addr)
+                    // alertify.error('Declined connection from: <br />' + req.from + ' / ' + req.ip_addr, "", 0)
                 }
 
                 $.ajax({
@@ -1935,16 +1936,16 @@ function lower_shields(ip) {
 
         if (shields.result) {
             console.log('Shields down, VPN may commence...')
-            inform_user('Shields down, VPN may commence...')
+            inform_user('VPN', 'Shields down, VPN may commence...')
         }
         else {
             console.log('Shield down command failed')
-            inform_user('Shield down command failed', 'warning')
+            inform_user('VPN', 'Shield down command failed', 'warning')
         }
 
     }).fail(function(err) {
         console.log('events errz on event listing' + err)
-        inform_user('Shield down command failed: ' + JSON.stringify(err), 'warning')
+        inform_user('VPN', 'Shield down command failed: ' + JSON.stringify(err), 'warning')
     })
 
 
@@ -1964,16 +1965,16 @@ function raise_shields(ip) {
 
         if (shields.result) {
             console.log('Shields up!')
-            inform_user('Shields up!')
+            inform_user('VPN', 'Shields up!')
         }
         else {
             console.log('Shields up command failed, we may be vulnerable...')
-            inform_user('Shields up command failed, we may be vulnerable...', 'danger')
+            inform_user('VPN', 'Shields up command failed, we may be vulnerable...', 'danger')
         }
 
     }).fail(function(err) {
         console.log('events errz on event listing' + err)
-        inform_user('Shield down command failed: ' + JSON.stringify(err), 'danger')
+        inform_user('VPN', 'Shield down command failed: ' + JSON.stringify(err), 'error')
     })
 
 }
