@@ -1766,8 +1766,10 @@ function inform_user(title, message, level, element) {
         console.log('this one is a VIP message... sticky & desktop if it can...')
         PNotify.desktop.permission();   // wow!
         desky = true
-        hidey = false
+        // hidey = false
         level = 'info'
+
+        message = message + '<strong>foobar</strong>'
     }
 
     // type: 'info', // (null, 'info', 'danger', 'success')
