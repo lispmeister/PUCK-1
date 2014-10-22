@@ -130,7 +130,8 @@ $(document).ready(function () {
         console.log(vd3ckid, ipaddr)
 
         // if we're connected, don't knock again
-        if (d3ck_status.openvpn_client.vpn_status == "up" || d3ck_status.openvpn_server.vpn_status == "up") {
+        if (typeof d3ck_status.openvpn_client != 'undefined' && typeof d3ck_status.openvpn_server != 'undefined' && 
+            (d3ck_status.openvpn_client.vpn_status == "up" || d3ck_status.openvpn_server.vpn_status == "up") {
             return
         }
 
