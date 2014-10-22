@@ -1800,11 +1800,11 @@ function inform_user(title, message, level, element) {
     }
 
     // messages at bottom left side?
-    if (level == 'success') {
-        console.log('... and now for something completely different...')
-        opts.addclass = "stack-bottomleft"
-        opts.stack    = stack_bottomleft
-    }
+    // if (level == 'success') {
+    //     console.log('... and now for something completely different...')
+    //     opts.addclass = "stack-bottomleft"
+    //     opts.stack    = stack_bottomleft
+    // }
 
     new PNotify(opts);
 
