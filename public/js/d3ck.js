@@ -1816,8 +1816,12 @@ function inform_user(title, message, level, element) {
     var pn = new PNotify(opts);
 
     // chrome only, I believe
-    pn.desktop.onclick = function(e) {
-        window.focus()
+    try {
+        pn.desktop.onclick = function(e) {
+            window.focus()
+        }
+    catch(e) {
+        console.log('ah well, try, try again...')
     }
 
 }
