@@ -807,7 +807,7 @@ function queue_or_die(queue) {
                 // alertify.success("starting the VPN connection... to " + did);
 
                 // not really... success... but important?
-                inform_user('VPN', "Remote d3ck agreed to connect" + did, 'success');
+                inform_user('VPN', "Remote d3ck agreed to connect" + did)
 
                 var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -831,7 +831,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'remote_knock_success') {
-            inform_user('VPN', 'connection request sent', 'success')
+            inform_user('VPN', 'connection request sent')
         }
 
         else if (queue.event == 'remotely_uploaded') {
@@ -1789,15 +1789,15 @@ function inform_user(title, message, level, element) {
             hide:       hidey,
             animation:  "fade",
             desktop:    { desktop: desky }  // wow^2!
-        }
+    }
 
     // messages at RHS side element...?
-    if (level == 'info') {
-        console.log('... and .... info!')
-        opts.addclass = "stack-topright"
-        opts.stack    = stack_toppishRightish
-        opts.context  = $('.dotdotdot')
-    }
+    // if (level == 'info') {
+    //     console.log('... and .... info!')
+    //     opts.addclass = "stack-topright"
+    //     opts.stack    = stack_toppishRightish
+    //     opts.context  = $('.dotdotdot')
+    // }
 
     // messages at bottom left side?
     // if (level == 'success') {
