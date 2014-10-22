@@ -280,7 +280,7 @@ function state_vpn(state, browser_ip) {
     alertify.set({ labels : { ok: "OK" } });
     alertify.alert(message_request, function (e) {
         console.log('?...?')
-    }
+    })
 
 
     // an incoming connect was successful
