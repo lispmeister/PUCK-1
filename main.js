@@ -1576,6 +1576,9 @@ function delete_d3ck(req, res, next) {
 
             createEvent(get_client_ip(req), {event_type: "delete", d3ck_id: req.params.key})
             d3ck_queue.push( {type: 'info', event: 'd3ck_delete', d3ck: req.params.key} )
+
+            delete all_d3cks[req.params.key]
+
             res.send(204);
         }
     });
