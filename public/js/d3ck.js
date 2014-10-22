@@ -297,12 +297,18 @@ function state_vpn(state, browser_ip) {
         $('#d3ck_video').addClass('green').addClass('pulse')
         // $('button:contains("connecting")').text('connected from')
 
-        $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('End').removeClass('btn-primary').addClass('btn-warning')
+        $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('End').addClass("hang_up").removeClass('btn-primary').addClass('btn-warning')
 
         console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
         incoming_ip = d3ck_status.openvpn_server.client
         // ring them gongs, etc.
         event_connect("incoming", incoming_ip)
+
+        $('body').on('click', '.hang_up', function() {
+            $(this).text('hanging up...')
+            event_hang_up()
+        })
+
     }
 
     // an outgoing connect was successful
