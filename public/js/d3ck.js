@@ -1773,6 +1773,7 @@ function inform_user(title, message, level) {
     var desky     = false   // by default keep all messages in the browser window
     var hidey     = true    // by default messages go away after a bit
     var nonblock  = true    // turn transparent/pass through when mouseover
+    var stack     = {}
 
     // type: 'info', // (null, 'info', 'danger', 'success')
     if (typeof level == 'undefined' ||
@@ -1800,7 +1801,7 @@ function inform_user(title, message, level) {
 
     if (level == 'success') {
         console.log('... and now for something completely different...')
-        stack: stack_bottomleft
+        stack   = stack_bottomleft
     }
 
     new PNotify({
@@ -1813,6 +1814,7 @@ function inform_user(title, message, level) {
         text:       message,
         type:       level,
         styling:    "bootstrap3",
+        stack:      stack,
         hide:       hidey,
         animation:  "fade",
         desktop:    { desktop: desky }  // wow^2!
