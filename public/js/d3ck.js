@@ -848,7 +848,6 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'vpn_client_connected') {
             // inform_user('VPN', "your d3ck has established a VPN connection", 'success')
-            state_vpn('outgoing', browser_ip)
         }
 
         else if (queue.event == 'vpn_client_disconnected') {
