@@ -129,6 +129,11 @@ $(document).ready(function () {
         console.log('nock')
         console.log(vd3ckid, ipaddr)
 
+        // if we're connected, don't knock again
+        if (d3ck_status.openvpn_client.vpn_status == "up" || d3ck_status.openvpn_server.vpn_status == "up") {
+            return
+        }
+
         var knock_knock = $.ajax({
             type: "POST",
             url: "/knock",
@@ -144,23 +149,6 @@ $(document).ready(function () {
         knock_knock.fail(function(xhr, textStatus, errorThrown) {
             console.log('failzor -> ' + JSON.stringify(xhr))
         })
-
-
-
-        // one call at a time, for now
-        // if (passthrough+trust+stuff) 
-        if (1 == 2) {
-        // if (!d3ck_current.incoming && !d3ck_current.outgoing && !d3ck_current.busy) 
-            // possibly a better way to get name
-            event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
-
-            // gather up the current target details
-            var vd3ckid = $(this).parent().find('#d3ckid').val()
-            var ipaddr  = $(this).parent().find('#ipaddr').val()
-            var target  = $(this).parent().find('#name').val()
-
-            d3ck_vpn(this, vd3ckid, ipaddr)
-        }
 
     })
 
