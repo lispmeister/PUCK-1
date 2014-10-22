@@ -2789,7 +2789,9 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     ping_done = true
                     d3ck2ip[ping_d3ckid] = all_ips[i]
                     ip2d3ck[all_ips[i]] = ping_d3ckid
-                    // console.log('ping cool: ' + ping_d3ckid + ' -> ' + d3ck2ip[ping_d3ckid])
+
+                    console.log('ping cool: ' + ping_d3ckid + ' -> ' + all_ips[i] + ' -> ' + ip2d3ck[all_ips[i]])
+
                     res.send(200, ping_data)
                 }
 
