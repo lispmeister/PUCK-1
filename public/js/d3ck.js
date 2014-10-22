@@ -1761,6 +1761,15 @@ function inform_user(title, message, level, element) {
     var hidey     = true    // by default messages go away after a bit
     // var nonblock  = true    // turn transparent/pass through when mouseover
 
+    // if (level == 'success' || level == 'danger' || level == 'error') {
+    if (level == 'wowzer') {
+        console.log('this one is a VIP message... sticky & desktop if it can...')
+        PNotify.desktop.permission();   // wow!
+        desky = true
+        hidey = false
+        level = 'info'
+    }
+
     // type: 'info', // (null, 'info', 'danger', 'success')
     if (typeof level == 'undefined' ||
        (level != 'danger'     &&
@@ -1776,14 +1785,6 @@ function inform_user(title, message, level, element) {
 
     // for now... the bigger/more important types of messages go onto the desktop if you let them
     // they'll also be sticky - the note will stay on the screen until dismissed
-
-    if (level == 'success' || level == 'danger' || level == 'error') {
-        console.log('this one is a VIP message... sticky & desktop if it can...')
-        // PNotify.desktop.permission();   // wow!
-        desky    = true
-        hidey    = false
-        // nonblock = false
-    }
 
     var opts = {
             title:      title,
@@ -1844,6 +1845,8 @@ function ask_user_4_response(data) {
                 buttonReverse   : true, 
                 labels          : { ok: "Allow", cancel: "Deny" }
             });
+
+            inform_user('Connect Request', req.from + ' wants to connect from ' + req.ip_addr + '/' + req.from_d3ck, 'wowzer')
 
             alertify.confirm(message_request, function (e) {
                 console.log('confirm...?')
