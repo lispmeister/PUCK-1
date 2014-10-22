@@ -864,6 +864,7 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'vpn_server_disconnected') {
             inform_user('VPN', 'remote d3ck disconnected its VPN connection')
+            event_hang_up()
         }
 
         else if (queue.event == 'vpn_start') {
@@ -1768,8 +1769,6 @@ function inform_user(title, message, level, element) {
         desky = true
         // hidey = false
         level = 'info'
-
-        message = message + '<strong>foobar</strong>'
     }
 
     // type: 'info', // (null, 'info', 'danger', 'success')
