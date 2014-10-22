@@ -297,6 +297,8 @@ function state_vpn(state, browser_ip) {
         $('#d3ck_video').addClass('green').addClass('pulse')
         // $('button:contains("connecting")').text('connected from')
 
+        console.log(d3ck_status.openvpn_server)
+
         $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('End').addClass("hang_up").removeClass('btn-primary').addClass('btn-warning')
 
         console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
