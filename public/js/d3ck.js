@@ -307,6 +307,7 @@ function state_vpn(state, browser_ip) {
         event_connect("incoming", incoming_ip)
 
         $('body').on('click', '.hang_up', function() {
+            console.log('really, really, really hanging up')
             $(this).text('hanging up...')
             event_hang_up(d3ck_status.openvpn_server.client_did) // argh openvpn
         })
@@ -422,6 +423,8 @@ function event_hang_up(did) {
     if (typeof did == "string") {
         url = url + '?remote=' + did
     }
+
+    console.log('hanging up to ' + url + ' ... pleeze?')
 
     var jqXHR_stopVPN = $.ajax({
         url: url,
