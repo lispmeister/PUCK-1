@@ -1964,7 +1964,7 @@ function stopVPN(req, res, next) {
             console.log(url)
 
             // use client-side certz
-            var options = load_up_cert_by_did(upload_target)
+            var options = load_up_cert_by_did(did)
 
             options.headers = { 'x-d3ckID': bwana_d3ck.D3CK_ID }
 
