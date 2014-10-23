@@ -1980,6 +1980,7 @@ function stopVPN(req, res, next) {
                     }
                 else {
                     console.log('vpn stop request successful...?')
+                    console.log(resp)
                     res.send(200, {"status": "vpn down"});
                 }
             })
