@@ -484,7 +484,6 @@ function findByUsername(name, fn) {
 
 function auth(req, res, next) {
 
-    //console.log('authentication check for... ' + req.path)
     // console.log(req)
 
     var ip = get_client_ip(req)
@@ -518,6 +517,7 @@ function auth(req, res, next) {
     //
     // console.log('cert...?')
     if (typeof req.headers['x-ssl-client-verify'] != "undefined" && req.headers['x-ssl-client-verify'] == "SUCCESS"){
+        console.log('authentication check for... ' + req.path)
         console.log(req.headers)
         console.log('my cert homie...?!!?!')
         //
@@ -1942,9 +1942,10 @@ function echoStatus(req, res, next) {
  * Stop the local OpenVPN client via an external bash script.
  */
 function stopVPN(req, res, next) {
-    var cmd     = d3ck_bin + '/stop_vpn.sh';
 
     console.log('stop VPN!')
+
+    var cmd = d3ck_bin + '/stop_vpn.sh';
 
     if (typeof req.query.did == "undefined") {
         console.log('local server dying...')
@@ -1958,6 +1959,8 @@ function stopVPN(req, res, next) {
 
         // pass it along to the other side!
         if (did != bwana_d3ck.D3CK_ID) {
+
+            console.log('pass the stop along...')
 
             var url = 'https://' + d3ck2ip[did] + ':' + d3ck_port_ext + '/stop/vpn?host=' + did
 
@@ -1973,15 +1976,19 @@ function stopVPN(req, res, next) {
             request.get(url, options, function cb (err, resp) {
                 if (err) {
                     console.error('vpn stop request failed:', JSON.stringify(err))
+                    res.send(200, {"errz": "vpn stop request failed"});
                     }
                 else {
                     console.log('vpn stop request successful...?')
+                    res.send(200, {"status": "vpn down"});
                 }
             })
         }
         else {
 
             // validate they're who they say they are
+
+            console.log('hmm... why should I believe you...?')
 
             // so headers will look like -
             //  req.headers['x-ssl-client-verify'] == "SUCCESS"
@@ -2052,7 +2059,7 @@ function mrSulu(req, res, next) {
 
     // d3ck_spawn(cmd, argz)
 
-    res.send(200, {"status": "mr. sulu sez - sheilds are " + direction });
+    res.send(200, {"status": "mr. sulu sez - shields are " + direction });
 
 }
 
