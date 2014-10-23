@@ -2059,7 +2059,7 @@ function mrSulu(req, res, next) {
 
     // d3ck_spawn(cmd, argz)
 
-    res.send(200, {"status": "mr. sulu sez - shields are " + direction });
+    res.send(200, {"result": "mr. sulu sez - shields are " + direction });
 
 }
 
