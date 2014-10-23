@@ -420,7 +420,7 @@ function event_hang_up(did) {
     var url = "/vpn/stop"
 
     if (typeof did == "string") {
-        url = url + '?remote=' + host
+        url = url + '?remote=' + did
     }
 
     var jqXHR_stopVPN = $.ajax({
