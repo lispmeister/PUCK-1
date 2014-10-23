@@ -1172,7 +1172,7 @@ function remove_signs_of_call() {
 
         kill_RTC()
 
-        // go_d3ck_or_go_home()
+        go_d3ck_or_go_home()
 
     }
 
