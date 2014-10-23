@@ -308,7 +308,7 @@ function state_vpn(state, browser_ip) {
 
         $('body').on('click', '.hang_up', function() {
             $(this).text('hanging up...')
-            event_hang_up()
+            event_hang_up(d3ck_status.openvpn_server.client_did) // argh openvpn
         })
 
     }
@@ -405,7 +405,7 @@ function toggle_special_FX() {
 //
 // hang up the phone, return to home
 //
-function event_hang_up() {
+function event_hang_up(did) {
 
     toggle_special_FX()
 
@@ -418,6 +418,10 @@ function event_hang_up() {
     d3ck_current.busy = true
 
     var url = "/vpn/stop"
+
+    if (typeof did == "string") {
+        url = url + '?remote=' + host
+    }
 
     var jqXHR_stopVPN = $.ajax({
         url: url,

@@ -196,6 +196,7 @@ var server           = "",
     // d3ck_status_file = d3ck_home   + '/status.d3ck',
     d3ck_status_file = d3ck_public + '/status.d3ck',
     d3ck_remote_vpn  = d3ck_public + '/openvpn_server.ip';
+    d3ck_vpn_did     = d3ck_public + '/openvpn_server.did';
 
 // proxy up?
 var d3ck_proxy_up  = false,
@@ -1945,9 +1946,97 @@ function stopVPN(req, res, next) {
 
     console.log('stop VPN!')
 
-    d3ck_spawn(cmd, [])
+    if (typeof req.query.did == "undefined") {
+        console.log('local server dying...')
+        d3ck_spawn(cmd, [])
+        res.send(200, {"status": "vpn down"});
+        return
+    }
+    else {
 
-    res.send(200, {"status": "vpn down"});
+        var did = req.query.did
+
+        // pass it along to the other side!
+        if (did != bwana_d3ck.D3CK_ID) {
+
+            var url = 'https://' + d3ck2ip[did] + ':' + d3ck_port_ext + '/stop/vpn?host=' + did
+
+            console.log(url)
+
+            // use client-side certz
+            var options = load_up_cert_by_did(upload_target)
+
+            options.headers = { 'x-d3ckID': bwana_d3ck.D3CK_ID }
+
+            console.log(options)
+
+            request.get(url, options, function cb (err, resp) {
+                if (err) {
+                    console.error('vpn stop request failed:', JSON.stringify(err))
+                    }
+                else {
+                    console.log('vpn stop request successful...?')
+                }
+            })
+        }
+        else {
+
+            // validate they're who they say they are
+
+            // so headers will look like -
+            //  req.headers['x-ssl-client-verify'] == "SUCCESS"
+            //          console.log(req.headers)
+
+            // and this one has the CN:
+            // 'x-ssl-client-s-dn': '/C=AQ/ST=White/L=D3cktown/O=D3ckasaurusRex/CN=43a1299fa24e22afb28bb624f3308332',
+
+            // kill local vpn!
+            if (check_CN(req.headers['x-ssl-client-s-dn'], did)) {
+                console.log('local server dying via remote control')
+                d3ck_spawn(cmd, [])
+                res.send(200, {"status": "vpn down"});
+                return
+            }
+        }
+
+    }
+
+
+}
+
+//
+// This is a check to see if the client-side cert matches up;
+// 
+// when a d3ck is created a set of keys is generated and passed
+// to the remote d3ck; anyone claiming the same d3ckid must have
+// the cert we earlier gave to them. This may be verified by the
+// openssl command, which will look like:
+//
+//   $ openssl x509 -noout -subject -in keyfile.crt
+//   subject= /C=AQ/ST=White/L=D3cktown/O=D3ckasaurusRex/CN=8fd983b93ee52e80ddbf457b5ba8f0ec
+//
+// the keys were previously stored in their key subdir (tbd - add to redis)
+//
+function check_CN(cn, did) {
+
+    console.log('verifying CN matches the d3ck ID')
+
+    var cmd  = 'openssl'
+
+    var argz = ['x509', '-noout', '-subject', '-in', d3ck_keystore +'/'+ did + "/d3ck.crt"]
+    
+    var cn   = d3ck_spawn_sync(cmd, argz)
+
+    // subject= /C=AQ/ST=White/L=D3cktown/O=D3ckasaurusRex/CN=8fd983b93ee52e80ddbf457b5ba8f0ec
+
+    var disk_cn = substring(cn.indexOf('/CN=')+4)
+
+    console.log('cn vs. cn on disk: ' + cn + ' <=> ' + disk_cn)
+
+    if (cn == disk_cn)
+        return true
+    else
+        return false
 
 }
 
@@ -2500,8 +2589,6 @@ function startVPN(req, res, next) {
 
     var home  = "/"
 
-    var ip_addr = req.body.ip_addr
-
     // bail if we don't get ID
     if (typeof req.body.d3ckid === 'undefined' || req.body.d3ckid == "") {
         console.log("error... requires a D3CK ID!");
@@ -2536,10 +2623,8 @@ function startVPN(req, res, next) {
     d3ck_queue.push({type: 'info', event: 'vpn_start', remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
 
     // write the IP addr to a file
-    fs.writeFile(d3ck_remote_vpn, d3ck2ip[d3ckid], function(err) {
-        if (err) { console.log('err... no status... looks bad.... gasp... choke...' + err) }
-        else { console.log('wrote remote vpn server IP') }
-    });
+    write_2_file(d3ck_remote_vpn, d3ck2ip[d3ckid])
+    write_2_file(d3ck_remote_did, d3ckid)
 
     // finis
     res.send(204)
