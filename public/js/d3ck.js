@@ -421,7 +421,7 @@ function event_hang_up(did) {
     var url = "/vpn/stop"
 
     if (typeof did == "string") {
-        url = url + '?remote=' + did
+        url = url + '?did=' + did
     }
 
     console.log('hanging up to ' + url + ' ... pleeze?')
