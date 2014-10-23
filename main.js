@@ -196,7 +196,7 @@ var server           = "",
     // d3ck_status_file = d3ck_home   + '/status.d3ck',
     d3ck_status_file = d3ck_public + '/status.d3ck',
     d3ck_remote_vpn  = d3ck_public + '/openvpn_server.ip';
-    d3ck_vpn_did     = d3ck_public + '/openvpn_server.did';
+    d3ck_remote_did  = d3ck_public + '/openvpn_server.did';
 
 // proxy up?
 var d3ck_proxy_up  = false,
