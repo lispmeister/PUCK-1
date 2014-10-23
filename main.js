@@ -2040,6 +2040,22 @@ function check_CN(cn, did) {
 
 }
 
+function mrSulu(req, res, next) {
+
+    console.log("For god's sake, Mr. Sulu!")
+
+    var direction = req.params.key
+
+    var cmd       = d3ck_bin + '/shields.sh';
+
+    var argz      = direction
+
+    // d3ck_spawn(cmd, argz)
+
+    res.send(200, {"status": "mr. sulu sez - sheilds are " + direction });
+
+}
+
 
 function load_up_cc_cert(did) {
 
@@ -3685,6 +3701,9 @@ server.get('/sping/:key1/:key2', auth, function (req, res, next) {
 // send me anything... I'll give you a chicken.  Or... status.
 server.get("/status", auth, d3ckStatus)
 
+// packet filter up or down...?
+server.get("/shields/:key", auth, mrSulu)
+
 //
 // send any actions done on client... like ringing a phone or whatever
 // this is to help keep state in case of moving off web page, browser
@@ -3721,6 +3740,7 @@ server.get('/rest', function root(req, res, next) {
         'GET     /server/stop',
         'GET     /server/restart',
         'GET     /setproxy',
+        'GET     /shields/:key',
         'GET     /sping/:key1/:key2',
         'GET     /status',
         'POST    /up/:key',
