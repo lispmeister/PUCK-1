@@ -71,7 +71,7 @@ function formatErrorMessage(jqXHR, exception) {
 function who_am_i() {
     $.get('/ping', function(d3ck) {
         console.log('my name/id/status are: ', d3ck.name, d3ck.did, d3ck.status)
-        d3ck_status = 'Name: ' + d3ck.name + '<br />Status: ' + d3ck.status + '<br />ID: ' + d3ck.did
+        // d3ck_status = 'Name: ' + d3ck.name + '<br />Status: ' + d3ck.status + '<br />ID: ' + d3ck.did
         // get my own data
         $.getJSON('/d3ck/' + d3ck.did, function(d3ckinfo) {
             console.log('my D3CK:')
@@ -297,11 +297,15 @@ function state_vpn(state, browser_ip) {
         $('#d3ck_video').addClass('green').addClass('pulse')
         // $('button:contains("connecting")').text('connected from')
 
+// xxxxxxxxx d3
         console.log(d3ck_status.openvpn_server)
 
+// xxxxxxxxx d3
         $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('End').addClass("hang_up").removeClass('btn-primary').addClass('btn-warning')
 
+// xxxxxxxxx d3
         console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
+// xxxxxxxxx d3
         incoming_ip = d3ck_status.openvpn_server.client
         // ring them gongs, etc.
         event_connect("incoming", incoming_ip)
@@ -309,6 +313,7 @@ function state_vpn(state, browser_ip) {
         $('body').on('click', '.hang_up', function() {
             console.log('really, really, really hanging up')
             $(this).text('hanging up...')
+// xxxxxxxxx d3
             event_hang_up(d3ck_status.openvpn_server.client_did) // argh openvpn
         })
 
@@ -319,6 +324,7 @@ function state_vpn(state, browser_ip) {
 
         console.log('outgoing call is up')
 
+// xxxxxxxxx d3
         remote_ip = d3ck_status.openvpn_client.server
 
         set_up_RTC(remote_ip) // fly free, web RTC!
@@ -966,147 +972,146 @@ function status_or_die() {
 
     return
 
-    console.log('sailing on the sneeze of cheeze... when I hear something... from... ' + browser_ip)
+//     console.log('sailing on the sneeze of cheeze... when I hear something... from... ' + browser_ip)
+// 
+//     console.log(JSON.stringify(d3ck_status))
+// 
+//     console.log('knocked up?')
+//     if (d3ck_status.d3ck_requests.knock) {
+// 
+//         // answer to our knock
+//         if (typeof d3ck_status.d3ck_requests.answer != "undefined") {
+//             // alert('KNOCK, KNOCK, MOFO! ' + d3ck_status.d3ck_requests.answer)
+//             if (d3ck_status.d3ck_requests.answer) {
+//                 alertify.success("starting the VPN connection...", "", 0)
+// 
+//                 var ip = $('#' + d3ck_status.d3ck_requests.did + ' .remote_ip strong:eq(1)').text()
+//                 console.log('to... ' + ip)
+// 
+//                 event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
+// 
+//                 d3ck_vpn($('#d3ck_vpn_' + d3ck_status.d3ck_requests.did), d3ck_status.d3ck_requests.did, ip)
+// 
+//             }
+//             else {
+//                 alertify.reject("remote d3ck refused your request...", "", 0)
+//             }
+//         }
+//         // knocking
+//         else {
+//             console.log('knock knock!')
+//             // alert(d3ck_status.d3ck_requests.ip_addr + '/' + d3ck_status.d3ck_requests.did)
+//             var friend = d3ck_status.d3ck_requests.from
+//             ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from_d3ck})
+//         }
+//     }
+// 
+//     // if someone has added you, create a modest sized bit of text that tells you
+//     // and hopefully won't fuck up anything you're doing
+// 
+//     if (d3ck_status.events.new_d3ck_ip.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
+//         remote_ip   = d3ck_status.events.new_d3ck_ip
+//         remote_name = d3ck_status.events.new_d3ck_name
+//         console.log(remote_ip + ' added as friend')
+// 
+//         // a bit down from the top, and stay until wiped away or refreshed
+// 
+//         if (typeof remote_name == "undefined" || remote_name != "")
+//             // $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
+//             inform_user('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)')
+// 
+//         d3ck_status.browser_events[browser_ip].notify_add = true
+//     }
+// 
+//     //
+//     // did santa, er, filez come?
+//     //
+//     else if (d3ck_status.file_events.file_name.length && ! d3ck_status.browser_events[browser_ip].notify_file) {
+// 
+//     // XXX - odd corner case... if both systems have the same IP ... say... testing behind a nat...
+//     // this probably won't work as expected.....
+// 
+//         console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
+// 
+//         var friend = all_d3ck_ids[d3ck_status.file_events.did].owner.name
+//         var dir    = ""
+// 
+//         // try to figure out if we sent it or the remote did
+// 
+//         // if (d3ck_status.file_events.file_from != browser_ip)
+// 
+//         //
+//         // it shows up in UI's filestore if we *didn't* try to give it to someone else
+//         //
+//         if (d3ck_status.file_events.did == my_d3ck.D3CK_ID) {
+//             console.log('new local file(z)!')
+// 
+//             // does it go into our vault?
+//             if (d3ck_status.file_events.direction != "local") {
+//                 dir = ' to ' + friend + "/" + d3ck_status.file_events.direction
+//             }
+//             else {
+//                 $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+//             }
+// 
+//             // put in or lookup PiD, then owner/d3ck's name!
+//             // $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
+//             inform_user("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded")
+// 
+//         }
+//         else {
+//             console.log('file(z) from remote')
+// 
+//             // $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
+//             inform_user("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from)
+// 
+//             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
+//         }
+// 
+//     }
+// 
+//     // server... incoming ring
+//     else if (d3ck_status.openvpn_server.vpn_status == "up") {
+//         console.log('incoming...!')
+//         d3ck_current.busy     = false
+//         d3ck_current.incoming = true
+//         state_vpn('incoming', browser_ip)
+//     }
+// 
+//     // client... outgoing ring
+//     else if (d3ck_status.openvpn_client.vpn_status == "up") {
+//         console.log('outgoing...!')
+//         d3ck_current.busy     = false
+//         d3ck_current.outgoing = true
+//         state_vpn('outgoing', browser_ip)
+//         // cat facts!
+//         state_cam(true, 'local')
+//     }
+// 
+//     else {
+//         console.log("\n\nI'm not sure why you called me here...?\n")
+//     }
+// 
+//     // if nothing up now, kill any signs of a call, just to be sure
+//     if (d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") {
+// 
+//         kill_RTC()
+// 
+//         console.log("it's dead, jim")
+//         d3ck_current.incoming = false
+//         d3ck_current.outgoing = false
+//         d3ck_current.busy     = false
+// 
+//         if ($('button:contains("connected"),button:contains("hanging up")').length) {
+//             $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnecting!</h1></span>")
+//             // xxx - one for out, one for in?
+//             d3ck_status.browser_events[browser_ip].notify_ring = false
+//             remove_signs_of_call()
+//             console.log('clearing all flags of any calls to false')
+//         }
+// 
+//     }
 
-    console.log(JSON.stringify(d3ck_status))
-
-    console.log('knocked up?')
-    if (d3ck_status.d3ck_requests.knock) {
-
-        // answer to our knock
-        if (typeof d3ck_status.d3ck_requests.answer != "undefined") {
-            // alert('KNOCK, KNOCK, MOFO! ' + d3ck_status.d3ck_requests.answer)
-            if (d3ck_status.d3ck_requests.answer) {
-                alertify.success("starting the VPN connection...", "", 0)
-
-                var ip = $('#' + d3ck_status.d3ck_requests.did + ' .remote_ip strong:eq(1)').text()
-                console.log('to... ' + ip)
-
-                event_connect('outgoing', $(this).parent().parent().find('.d3ckname').text())
-
-                d3ck_vpn($('#d3ck_vpn_' + d3ck_status.d3ck_requests.did), d3ck_status.d3ck_requests.did, ip)
-
-            }
-            else {
-                alertify.reject("remote d3ck refused your request...", "", 0)
-            }
-        }
-        // knocking
-        else {
-            console.log('knock knock!')
-            // alert(d3ck_status.d3ck_requests.ip_addr + '/' + d3ck_status.d3ck_requests.did)
-            var friend = d3ck_status.d3ck_requests.from
-            ask_user_4_response({qtype: 'knock', 'from': friend, 'ip_addr': d3ck_status.d3ck_requests.ip_addr, 'did': d3ck_status.d3ck_requests.from_d3ck})
-        }
-    }
-
-    // if someone has added you, create a modest sized bit of text that tells you
-    // and hopefully won't fuck up anything you're doing
-
-    if (d3ck_status.events.new_d3ck_ip.length && ! d3ck_status.browser_events[browser_ip].notify_add) {
-        remote_ip   = d3ck_status.events.new_d3ck_ip
-        remote_name = d3ck_status.events.new_d3ck_name
-        console.log(remote_ip + ' added as friend')
-
-        // a bit down from the top, and stay until wiped away or refreshed
-
-        if (typeof remote_name == "undefined" || remote_name != "")
-            // $.bootstrapGrowl('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)', {offset: {from: 'top', amount: 70}, delay: -1})
-            inform_user('"' + remote_name + '" added your D3CK as a friend (you may have to refresh page to see details)')
-
-        d3ck_status.browser_events[browser_ip].notify_add = true
-    }
-
-    //
-    // did santa, er, filez come?
-    //
-    else if (d3ck_status.file_events.file_name.length && ! d3ck_status.browser_events[browser_ip].notify_file) {
-
-    // XXX - odd corner case... if both systems have the same IP ... say... testing behind a nat...
-    // this probably won't work as expected.....
-
-        console.log('ho ho ho, santa is here with new filez 4 the kidd3z!')
-
-        var friend = all_d3ck_ids[d3ck_status.file_events.did].owner.name
-        var dir    = ""
-
-        // try to figure out if we sent it or the remote did
-
-        // if (d3ck_status.file_events.file_from != browser_ip)
-
-        //
-        // it shows up in UI's filestore if we *didn't* try to give it to someone else
-        //
-        if (d3ck_status.file_events.did == my_d3ck.D3CK_ID) {
-            console.log('new local file(z)!')
-
-            // does it go into our vault?
-            if (d3ck_status.file_events.direction != "local") {
-                dir = ' to ' + friend + "/" + d3ck_status.file_events.direction
-            }
-            else {
-                $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-            }
-
-            // put in or lookup PiD, then owner/d3ck's name!
-            // $.bootstrapGrowl("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded", {offset: {from: 'top', amount: 70}, delay: -1})
-            inform_user("New file: <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes); uploaded")
-
-        }
-        else {
-            console.log('file(z) from remote')
-
-            // $.bootstrapGrowl("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from, {offset: {from: 'top', amount: 70}, delay: -1})
-            inform_user("File <strong>" + d3ck_status.file_events.file_name + "</strong>  ("  + d3ck_status.file_events.file_size + " bytes) from " + friend + '/' + d3ck_status.file_events.file_from)
-
-            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + d3ck_status.file_events.file_name + '">' + d3ck_status.file_events.file_name + '</a></td></tr>')
-        }
-
-    }
-
-    // server... incoming ring
-    else if (d3ck_status.openvpn_server.vpn_status == "up") {
-        console.log('incoming...!')
-        d3ck_current.busy     = false
-        d3ck_current.incoming = true
-        state_vpn('incoming', browser_ip)
-    }
-
-    // client... outgoing ring
-    else if (d3ck_status.openvpn_client.vpn_status == "up") {
-        console.log('outgoing...!')
-        d3ck_current.busy     = false
-        d3ck_current.outgoing = true
-        state_vpn('outgoing', browser_ip)
-        // cat facts!
-        state_cam(true, 'local')
-    }
-
-    else {
-        console.log("\n\nI'm not sure why you called me here...?\n")
-    }
-
-    // if nothing up now, kill any signs of a call, just to be sure
-    if (d3ck_status.openvpn_client.vpn_status != "up" && d3ck_status.openvpn_server.vpn_status != "up") {
-
-        kill_RTC()
-
-        console.log("it's dead, jim")
-        d3ck_current.incoming = false
-        d3ck_current.outgoing = false
-        d3ck_current.busy     = false
-
-        if ($('button:contains("connected"),button:contains("hanging up")').length) {
-            $('body').append("<span class='dead_center animated fadeOut'><h1>Disconnecting!</h1></span>")
-            // xxx - one for out, one for in?
-            d3ck_status.browser_events[browser_ip].notify_ring = false
-            remove_signs_of_call()
-            console.log('clearing all flags of any calls to false')
-        }
-
-    }
-
-    // fire_d3ck_status(d3ck_status)
 
 }
 
@@ -1167,7 +1172,7 @@ function remove_signs_of_call() {
 
         kill_RTC()
 
-        go_d3ck_or_go_home()
+        // go_d3ck_or_go_home()
 
     }
 
@@ -1519,11 +1524,14 @@ function set_up_RTC(remote) {
     var ip          = window.location.hostname
 
     // someone connected to us
+
+// xxxxxxxxx d3
     if (d3ck_status.openvpn_server.vpn_status == "up") {
         console.log("PEEEEER js: server up")
         remote_d3ck = d3ck_status.openvpn_server.client_did
     }
 
+// xxxxxxxxx d3
     // we're connected to them
     else if (d3ck_status.openvpn_client.vpn_status == "up") {
         console.log("PEEEEER js: client up")

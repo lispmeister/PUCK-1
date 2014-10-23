@@ -30,7 +30,7 @@ var PREGNANT_PAUSE  = 5000
 var SOCK_CHECK      = 1000
 var STATUS_CHECK    = 3000
 
-var Q_CHECK         = 2000  // check queue every second or two or something
+var Q_CHECK         = 3000  // check queue every second or two or something
 
 var all_d3ck_ids = {}
 
