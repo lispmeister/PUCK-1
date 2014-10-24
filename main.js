@@ -516,6 +516,7 @@ function auth(req, res, next) {
     // hmm... is this safe?
     //
     // console.log('cert...?')
+    // console.log(req.headers)
     if (typeof req.headers['x-ssl-client-verify'] != "undefined" && req.headers['x-ssl-client-verify'] == "SUCCESS"){
         console.log('authentication check for... ' + req.path)
         console.log(req.headers)
@@ -3439,7 +3440,7 @@ server.use(response());
 
 server.use(express.limit('1gb'))
 
-// server.use(express.logger());
+server.use(express.logger());
 server.use(compress());
 
 server.use(express.methodOverride());
