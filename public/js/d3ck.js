@@ -34,6 +34,8 @@ var poll = 5000  // every 5 secs
 
 var SHORT_WAIT = 1000  // 1 sec
 
+var PNOTIFY      = 15000 // 15 secs
+var PNOTIFY_HIGH = 30000 // 30 secs
 
 var D3CK_SOCK_RETRY   = 3000
 var LOCAL_VIDEO_WIDTH = 480
@@ -276,12 +278,11 @@ function state_video(state) {
 //
 function state_vpn(state, browser_ip, queue) {
 
-    var message_connect = '<h2> connected! </h2>'
-    alertify.set({ labels : { ok: "OK" } });
-    alertify.alert(message_connect, function (e) {
-        console.log('?...?')
-    })
-
+    // var message_connect = '<h2> connected! </h2>'
+    // alertify.set({ labels : { ok: "OK" } });
+    // alertify.alert(message_connect, function (e) {
+    //     console.log('?...?')
+    // })
 
     // an incoming connect was successful
     if (state == "incoming") {
@@ -485,7 +486,7 @@ function d3ck_vpn(element, d3ckid, ipaddr) {
 
     event_connect("outgoing", ipaddr)
 
-    inform_user('VPN', 'starting up VPN to ' + d3ckid + ' : ' + ipaddr, 'success')
+    inform_user('VPN', 'starting up VPN to ' + d3ckid + ' : ' + ipaddr, 'vpn')
 
     // don't change anything until the call efforts pass/fail
     d3ck_current.busy = true
@@ -807,7 +808,7 @@ function queue_or_die(queue) {
             // does it go into our vault?
             $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
 
-            inform_user('New file', '<strong>' + queue.d3ck_status.file_events.file_name + '</strong>  ('  + queue.d3ck_status.file_events.file_size + ' bytes); uploaded', 'success')
+            inform_user('File Upload', '<strong>' + queue.d3ck_status.file_events.file_name + '</strong>  ('  + queue.d3ck_status.file_events.file_size + ' bytes); uploaded', 'success')
         }
 
         else if (queue.event == 'knock_request') {
@@ -858,11 +859,21 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'remotely_uploaded') {
-            inform_user('file upload', 'your file was uploaded to remote d3ck', 'success')
+
+            var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
+            inform_user('File Upload', 'your file (' + queue.d3ck_status.file_events.file_name + ') was uploaded to remote d3ck', 'success')
+
         }
 
         else if (queue.event == 'remote_upload') {
-            inform_user('remote file upload', 'a file has been uploaded to your d3ck', 'success')
+
+            var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
+
+            // does it go into our vault?
+            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
+
+            inform_user('File Upload', '<a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a> ('  + queue.d3ck_status.file_events.file_size + ' bytes); was sent to you by ' + friend, 'success')
+
         }
 
         else if (queue.event == 'vpn_client_connected') {
@@ -875,7 +886,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_server_connected') {
-            inform_user('VPN', 'remote d3ck established a VPN connection to your d3ck', 'success')
+            inform_user('VPN', 'remote d3ck established a VPN connection to your d3ck', 'vpn')
 
             state_vpn('incoming', browser_ip, queue)
 
@@ -1778,50 +1789,73 @@ function crypto_411() {
 
 var stack_bottomleft      = {"dir1": "right", "dir2": "up", "push": "top"};
 var stack_toppishRightish = {"dir1": "down",  "dir2": "right", "push": "top"};
-
+var stack_bar_top         = {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0};
 
 function inform_user(title, message, level, element) {
 
     console.log('squawking to user: ' + message + '@' + level)
 
-    var desky     = false   // by default keep all messages in the browser window
-    var hidey     = true    // by default messages go away after a bit
+    PNotify.prototype.options.delay = PNOTIFY;
+
+    // var desky     = false   // by default keep all messages in the browser window
+    // var hidey     = true    // by default messages go away after a bit
     // var nonblock  = true    // turn transparent/pass through when mouseover
+
+    var opts = {
+        title:      title,
+        text:       message + '\n' + Date(),
+        styling:    "bootstrap3",
+        animation:  "fade",
+    }
+
+    // for now... the bigger/more important types of messages go onto the desktop if you let them
 
     // if (level == 'success' || level == 'danger' || level == 'error') {
     if (level == 'wowzer') {
         console.log('this one is a VIP message... sticky & desktop if it can...')
+
+        PNotify.desktop.permission();     // wow!
+
+        opts.desktop = { desktop: true }  // wow^2!
+        opts.type    = 'info'
+
+        PNotify.prototype.options.delay = PNOTIFY_HIGH;
+
+    }
+
+    // big bold baddass label
+    else if (level == 'vpn') {
+
+        console.log('VPN starting... sticky & desktop if it can...')
+
         PNotify.desktop.permission();   // wow!
-        desky = true
-        // hidey = false
-        level = 'info'
+
+        // opts.desktop     = { desktop: true }  // wow^2!
+        opts.type        = 'success'
+        opts.addclass    = "stack-bar-top"
+        opts.cornerclass = ""
+        opts.width       = "100%"
+        opts.stack       = stack_bar_top
+
+        PNotify.prototype.options.delay = PNOTIFY_HIGH;
     }
 
     // type: 'info', // (null, 'info', 'danger', 'success')
-    if (typeof level == 'undefined' ||
+    else if (typeof level == 'undefined' ||
        (level != 'danger'     &&
         level != 'success'    &&
         level != 'info'       &&
         level != 'error'      &&
         level != 'warning')) {
             console.log(level + " isn't a recognized level... setting to default/null")
-            level = 'info'     // default
+            opts.type = 'info'     // default
         }
 
-    console.log(level)
-
-    // for now... the bigger/more important types of messages go onto the desktop if you let them
-    // they'll also be sticky - the note will stay on the screen until dismissed
-
-    var opts = {
-            title:      title,
-            text:       message + '\n' + Date(),
-            type:       level,
-            styling:    "bootstrap3",
-            hide:       hidey,
-            animation:  "fade",
-            desktop:    { desktop: desky }  // wow^2!
+    if (opts.type == 'success') {
+        PNotify.prototype.options.delay = PNOTIFY_HIGH;
     }
+
+    console.log(opts)
 
     // messages at RHS side element...?
     // if (level == 'info') {
