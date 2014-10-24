@@ -274,7 +274,7 @@ function state_video(state) {
 //
 // when vpn status/state changes... set lights flashing, whatever
 //
-function state_vpn(state, browser_ip) {
+function state_vpn(state, browser_ip, queue) {
 
     var message_connect = '<h2> connected! </h2>'
     alertify.set({ labels : { ok: "OK" } });
@@ -297,16 +297,12 @@ function state_vpn(state, browser_ip) {
         $('#d3ck_video').addClass('green').addClass('pulse')
         // $('button:contains("connecting")').text('connected from')
 
-// xxxxxxxxx d3
-        console.log(d3ck_status.openvpn_server)
+        console.log(queue.d3ck_status.openvpn_server)
 
-// xxxxxxxxx d3
-        $('#d3ck_vpn_' + d3ck_status.openvpn_server.client_did).text('End').addClass("hang_up").removeClass('btn-primary').addClass('btn-warning')
+        $('#d3ck_vpn_' + queue.d3ck_status.openvpn_server.client_did).text('End').addClass("hang_up").removeClass('btn-primary').addClass('btn-warning')
 
-// xxxxxxxxx d3
-        console.log('incoming ring from ' + d3ck_status.openvpn_server.client)
-// xxxxxxxxx d3
-        incoming_ip = d3ck_status.openvpn_server.client
+        console.log('incoming ring from ' + queue.d3ck_status.openvpn_server.client)
+        incoming_ip = queue.d3ck_status.openvpn_server.client
         // ring them gongs, etc.
         event_connect("incoming", incoming_ip)
 
@@ -314,8 +310,7 @@ function state_vpn(state, browser_ip) {
             event.preventDefault()
             console.log('really, really, really hanging up')
             $(this).text('hanging up...')
-// xxxxxxxxx d3
-            event_hang_up(d3ck_status.openvpn_server.client_did) // argh openvpn
+            event_hang_up(queue.d3ck_status.openvpn_server.client_did) // argh openvpn
         })
 
     }
@@ -325,8 +320,7 @@ function state_vpn(state, browser_ip) {
 
         console.log('outgoing call is up')
 
-// xxxxxxxxx d3
-        remote_ip = d3ck_status.openvpn_client.server
+        remote_ip = queue.d3ck_status.openvpn_client.server
 
         set_up_RTC(remote_ip) // fly free, web RTC!
 
@@ -845,7 +839,7 @@ function queue_or_die(queue) {
 
                 d3ck_vpn($('#d3ck_vpn_' + did), did, ip)
 
-                state_vpn('outgoing', browser_ip)
+                state_vpn('outgoing', browser_ip, queue)
 
             }
             else {
@@ -883,7 +877,7 @@ function queue_or_die(queue) {
         else if (queue.event == 'vpn_server_connected') {
             inform_user('VPN', 'remote d3ck established a VPN connection to your d3ck', 'success')
 
-            state_vpn('incoming', browser_ip)
+            state_vpn('incoming', browser_ip, queue)
 
         }
 
