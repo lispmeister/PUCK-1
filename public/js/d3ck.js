@@ -1821,7 +1821,7 @@ function inform_user(title, message, level, element) {
 
     var opts = {
             title:      title,
-            text:       message + '\n' + Date()
+            text:       message + '\n' + Date(),
             type:       level,
             styling:    "bootstrap3",
             hide:       hidey,
