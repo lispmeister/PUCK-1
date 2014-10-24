@@ -1963,7 +1963,7 @@ function stopVPN(req, res, next) {
 
             console.log('pass the stop along...')
 
-            var url = 'https://' + d3ck2ip[did] + ':' + d3ck_port_ext + '/stop/vpn?host=' + did
+            var url = 'https://' + d3ck2ip[did] + ':' + d3ck_port_ext + '/vpn/stop?host=' + did
 
             console.log(url)
 
@@ -3440,7 +3440,7 @@ server.use(response());
 
 server.use(express.limit('1gb'))
 
-server.use(express.logger());
+// server.use(express.logger());
 server.use(compress());
 
 server.use(express.methodOverride());
