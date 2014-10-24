@@ -1951,6 +1951,10 @@ function stopVPN(req, res, next) {
     if (typeof req.query.did == "undefined") {
         console.log('local server dying...')
         d3ck_spawn(cmd, [])
+
+        createEvent(client_ip, {event_type: "vpn_stop" })
+        d3ck_queue.push({type: 'info', event: 'vpn_stop' })
+
         res.send(200, {"status": "vpn down"});
         return
     }
@@ -1981,7 +1985,10 @@ function stopVPN(req, res, next) {
                     }
                 else {
                     console.log('vpn stop request successful...?')
-                    console.log(resp)
+
+                    createEvent(client_ip, {event_type: "vpn_client_disconnected" })
+                    d3ck_queue.push({type: 'info', event: 'vpn_client_disconnected' })
+
                     res.send(200, {"status": "vpn down"});
                 }
             })
@@ -2003,6 +2010,10 @@ function stopVPN(req, res, next) {
             if (check_CN(req.headers['x-ssl-client-s-dn'], did)) {
                 console.log('local server dying via remote control')
                 d3ck_spawn(cmd, [])
+
+                createEvent(client_ip, {event_type: "vpn_server_disconnected" })
+                d3ck_queue.push({type: 'info', event: 'vpn_server_disconnected' })
+
                 res.send(200, {"status": "vpn down"});
                 return
             }
