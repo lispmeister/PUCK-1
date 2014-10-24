@@ -1832,7 +1832,7 @@ function inform_user(title, message, level, element) {
 
         // opts.desktop     = { desktop: true }  // wow^2!
         opts.type        = 'success'
-        opts.addclass    = "stack-bar-top"
+        opts.addclass    = "tippy-top"
         opts.cornerclass = ""
         opts.width       = "100%"
         opts.stack       = stack_bar_top
