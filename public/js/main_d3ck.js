@@ -28,9 +28,9 @@ var ovpn_clogs = 'openvpn_client_logs'
 var D3CK_TIMEOUT    = 5000  // 5 seconds should be enough for anyone!
 var PREGNANT_PAUSE  = 5000
 var SOCK_CHECK      = 1000
-var STATUS_CHECK    = 3000
+var STATUS_CHECK    = 5000
 
-var Q_CHECK         = 3000  // check queue every second or two or something
+var Q_CHECK         = 3000  // check queue every few seconds or something
 
 var all_d3ck_ids = {}
 
@@ -377,7 +377,7 @@ $(document).ready(function () {
     socket_looping()
 
     // sow the seed o' doubt
-    setInterval(get_status,STATUS_CHECK)
+    setInterval(get_status, STATUS_CHECK)
 
     // qq
     setInterval(get_q, Q_CHECK)

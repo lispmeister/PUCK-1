@@ -1124,7 +1124,7 @@ function d3ckQueue(req, res, next) {
         return
     }
 
-    var quo = d3ck_queue
+    var quo    = d3ck_queue
 
     d3ck_queue = [] // not to be confused with quo
 
@@ -1155,7 +1155,7 @@ function d3ckStatus(req, res, next) {
     else {
 
         if (status_queue.length > 0) {
-            console.log('clearing out the queue (' + status_queue.length + ')....')
+            console.log('clearing out the status (' + status_queue.length + ')....')
         }
         else {
             //console.log('empty queue...')
