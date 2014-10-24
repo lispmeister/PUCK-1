@@ -1791,9 +1791,10 @@ function crypto_411() {
 // to bootstrap rules.
 //
 
-var stack_bottomleft      = {"dir1": "right", "dir2": "up", "push": "top"};
+var stack_bottomleft      = {"dir1": "right", "dir2": "up",    "push": "top"};
 var stack_toppishRightish = {"dir1": "down",  "dir2": "right", "push": "top"};
-var stack_bar_top         = {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0};
+var stack_bar_bottom      = {"dir1": "up",    "dir2": "right", "push": "bottom", "spacing1": 0, "spacing2": 0};
+
 
 function inform_user(title, message, level, element) {
 
@@ -1839,11 +1840,7 @@ function inform_user(title, message, level, element) {
         opts.addclass    = "tippy-top"
         opts.cornerclass = ""
         opts.width       = "100%"
-        opts.stack       = stack_bar_top
-        opts.nonblock    = {
-            nonblock: true,
-            nonblock_opacity: .2
-        }
+        opts.stack       = stack_bar_bottom
 
         PNotify.prototype.options.delay = PNOTIFY_HIGH;
     }
