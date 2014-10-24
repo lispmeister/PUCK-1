@@ -1840,6 +1840,10 @@ function inform_user(title, message, level, element) {
         opts.cornerclass = ""
         opts.width       = "100%"
         opts.stack       = stack_bar_top
+        opts.nonblock    = {
+            nonblock: true,
+            nonblock_opacity: .6
+        }
 
         PNotify.prototype.options.delay = PNOTIFY_HIGH;
     }
