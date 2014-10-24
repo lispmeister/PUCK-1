@@ -1842,7 +1842,7 @@ function inform_user(title, message, level, element) {
         opts.stack       = stack_bar_top
         opts.nonblock    = {
             nonblock: true,
-            nonblock_opacity: .6
+            nonblock_opacity: .2
         }
 
         PNotify.prototype.options.delay = PNOTIFY_HIGH;
