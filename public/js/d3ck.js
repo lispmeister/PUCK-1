@@ -886,7 +886,11 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_server_connected') {
-            inform_user('VPN', 'remote d3ck established a VPN connection to your d3ck', 'vpn')
+            var did    = queue.d3ck_status.openvpn_server.client_did
+            var friend = all_d3ck_ids[did].owner.name
+            var ip     = queue.d3ck_status.openvpn_server.client
+
+            inform_user('VPN', 'remote d3ck (' + friend + ' / ' + ip + ' / ' + var did + ') established a VPN connection to your d3ck', 'vpn')
 
             state_vpn('incoming', browser_ip, queue)
 
