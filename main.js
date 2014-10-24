@@ -1986,8 +1986,9 @@ function stopVPN(req, res, next) {
                 else {
                     console.log('vpn stop request successful...?')
 
-                    createEvent(client_ip, {event_type: "vpn_client_disconnected" })
-                    d3ck_queue.push({type: 'info', event: 'vpn_client_disconnected' })
+                    // this is done by watching logs
+                    // createEvent(client_ip, {event_type: "vpn_client_disconnected" })
+                    // d3ck_queue.push({type: 'info', event: 'vpn_client_disconnected' })
 
                     res.send(200, {"status": "vpn down"});
                 }
@@ -2011,8 +2012,9 @@ function stopVPN(req, res, next) {
                 console.log('local server dying via remote control')
                 d3ck_spawn(cmd, [])
 
-                createEvent(client_ip, {event_type: "vpn_server_disconnected" })
-                d3ck_queue.push({type: 'info', event: 'vpn_server_disconnected' })
+                // this is done by watching logs
+                // createEvent(client_ip, {event_type: "vpn_server_disconnected" })
+                // d3ck_queue.push({type: 'info', event: 'vpn_server_disconnected' })
 
                 res.send(200, {"status": "vpn down"});
                 return
