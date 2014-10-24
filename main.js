@@ -2712,8 +2712,8 @@ function forward_port(req, res, next) {
 
     d3ck_spawn(cmd, args)
 
-    createEvent(get_client_ip(req), {event_type: "vpn_stop", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
-    d3ck_queue.push({type: 'info', event: 'vpn_stop', 'd3ck_status': d3ck_status})
+    createEvent(get_client_ip(req), {event_type: "port_forwarding", remote_ip: d3ck2ip[d3ckid], remote_d3ck_id: d3ckid})
+    d3ck_queue.push({type: 'info', event: 'port_forwarding', 'd3ck_status': d3ck_status})
 
     res.send(204)
 

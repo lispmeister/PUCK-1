@@ -876,7 +876,8 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_client_disconnected') {
-            inform_user('VPN', 'your d3ck disconnected the VPN connection')
+            inform_user('VPN', 'remote d3ck disconnected from your d3ck', 'success')
+            event_hang_up()
         }
 
         else if (queue.event == 'vpn_server_connected') {
@@ -899,6 +900,11 @@ function queue_or_die(queue) {
         else if (queue.event == 'vpn_stop') {
             inform_user('VPN', 'vpn stop')
         }
+
+        else if (queue.event == 'port_forwarding') {
+            inform_user('Port Forwarding', 'successfully forwarded')
+        }
+
 
         else {
             console.log("don't know this type of info event? " + queue.event)
@@ -1815,7 +1821,7 @@ function inform_user(title, message, level, element) {
 
     var opts = {
             title:      title,
-            text:       message,
+            text:       message + '\n' + Date()
             type:       level,
             styling:    "bootstrap3",
             hide:       hidey,
