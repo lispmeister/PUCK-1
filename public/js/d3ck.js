@@ -310,7 +310,8 @@ function state_vpn(state, browser_ip) {
         // ring them gongs, etc.
         event_connect("incoming", incoming_ip)
 
-        $('body').on('click', '.hang_up', function() {
+        $('body').on('click', '.hang_up', function(event) {
+            event.preventDefault()
             console.log('really, really, really hanging up')
             $(this).text('hanging up...')
 // xxxxxxxxx d3
@@ -337,7 +338,8 @@ function state_vpn(state, browser_ip) {
         // ... setup bye bye
         $('button:contains("connecting"),button:contains("Call")').click(false)
 
-        $('body').on('click', '.hang_up', function() {
+        $('body').on('click', '.hang_up', function(event) {
+            event.preventDefault()
             $(this).text('hanging up...')
             event_hang_up()
         })
