@@ -1,7 +1,7 @@
 
 /* some simple additions */
 
-.tippy-top { top: 0px !important; }
+.tippy-top      { top: 0px    !important; }
 
 .nav .active a { background:#blue!important }
 

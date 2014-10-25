@@ -4,6 +4,16 @@ Version : 2.0.1
 Link    : http://sciactive.com/pnotify/
 */
 /* -- Notice */
+
+.ui-pnotify.stack-bar-bottom {
+    margin : 0;
+    bottom : 0;
+    right  : auto;
+    top    : auto;
+    left   : auto;
+}
+
+
 .ui-pnotify {
 top: 25px;
 right: 25px;

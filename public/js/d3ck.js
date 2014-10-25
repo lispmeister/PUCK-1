@@ -1796,7 +1796,6 @@ var stack_toppishRightish = {"dir1": "down",  "dir2": "right", "push": "top"};
 // var stack_bar_top      = {"dir1": "down", "dir2": "right", "push": "top", "spacing1": 0, "spacing2": 0};
 var stack_bar_bottom      = {"dir1": "up",    "dir2": "right", "push": "bottom", "spacing1": 0, "spacing2": 0};
 
-
 function inform_user(title, message, level, element) {
 
     console.log('squawking to user: ' + message + '@' + level)
