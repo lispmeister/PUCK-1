@@ -14,7 +14,6 @@ var Tail       = require('./tail').Tail,
     sh         = require('execSync'),
     fs         = require('fs'),
     formidable = require('formidable'),
-    geoip      = require('geoip-lite');
     http       = require('http'),
     https      = require('https'),
     mkdirp     = require('mkdirp'),
@@ -1091,12 +1090,10 @@ function getGeo(req, res, next) {
 
 }
 
-function resolveGeo(ip) {
-
-    var deferred = Q.defer();
+function resolveGeo(ip_addr) {
 
     // free geo service
-    var url = 'http://freegeoip.net/json/' + ip_addr
+    var url = 'https://freegeoip.net/json/' + ip_addr
 
     console.log(url)
 
@@ -1110,17 +1107,16 @@ function resolveGeo(ip) {
         return old_geo[ip_addr]
     }
 
-    https_get(url).then(function (geo_data) {
+    return Q.fcall(https_get(url))
 
-        var str = ''
-        console.error('hmmm....')
-        console.log( { geo: geo_data } )
-        // return( { geo: geo_data } )
-        deferred.resolve(geo_data)
+//      var str = ''
+//      console.error('hmmm....')
+//      console.log( { geo: geo_data } )
+//      old_geo[ip_addr] = JSON.stringify(geo_data)
+//      return( { geo: geo_data } )
+//      return(geo_data)
+//  })
 
-    })
-
-    return deferred.promise;
 
 }
 
@@ -2233,23 +2229,31 @@ function knock(req, res, next) {
 
         console.log("for me? You shouldn't have!")
 
-        var d3ck_request    = { 
-            knock       : true,
-            ip_addr     : ip_addr,
-            from        : from,
-            'from_d3ck' : from_d3ck,
-            did         : d3ckid,
-            geo         : geoip.lookup(ip_addr)
-        }
+        resolveGeo(ip_addr).then(function (geo) {
 
-        var d3ck_status            = empty_status()
+            var d3ck_request    = { 
+                knock       : true,
+                ip_addr     : ip_addr,
+                from        : from,
+                'from_d3ck' : from_d3ck,
+                did         : d3ckid,
+                geo         : geo
+            }
 
-        d3ck_status.d3ck_requests  = d3ck_request
+            var d3ck_status            = empty_status()
 
-        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
-        d3ck_queue.push({type: 'request', event: 'knock', 'd3ck_status': d3ck_status})
+            d3ck_status.d3ck_requests  = d3ck_request
+    
+            createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
+            d3ck_queue.push({type: 'request', event: 'knock', 'd3ck_status': d3ck_status})
 
-        res.send(200, { emotion: "<3" })
+            res.send(200, { emotion: "<3" })
+
+        }).fail(function (error) {
+            console.log("in resolveGeo errz...")
+            res.send(400, { emotion: ":(" })
+        });
+
 
     }
     else {
