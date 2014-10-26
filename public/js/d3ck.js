@@ -883,7 +883,7 @@ function queue_or_die(queue) {
 
         else if (queue.event == 'vpn_client_disconnected') {
             inform_user('VPN', 'remote d3ck disconnected from your d3ck', 'success')
-            event_hang_up()
+            // event_hang_up()
         }
 
         else if (queue.event == 'vpn_server_connected') {

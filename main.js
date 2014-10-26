@@ -871,7 +871,7 @@ function watch_logs(logfile, log_type) {
                 d3ck_status.openvpn_server = server_magic
                 vpn_server_status          = server_magic
                 createEvent('internal server', {event_type: "vpn_server_disconnected", d3ck_id: bwana_d3ck.D3CK_ID}, d3ck_status)
-                d3ck_queue.push({type: 'info', event: 'vpn_server_disconnected', 'd3ck_status': d3ck_status})
+                // d3ck_queue.push({type: 'info', event: 'vpn_server_disconnected', 'd3ck_status': d3ck_status})
             }
         }
         else if (log_type.indexOf("Client") > -1) {
