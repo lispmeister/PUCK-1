@@ -376,7 +376,7 @@ function event_connect(direction, caller) {
 
     console.log('connexting')
 
-    state_ring(true)
+    // state_ring(true)
 
     // xxx - conf file, obv....
     var ring_img = '<img src="/img/ringring.gif">'
@@ -832,6 +832,7 @@ function queue_or_die(queue) {
 
                 // not really... success... but important?
                 inform_user('VPN', "Remote d3ck agreed to connect" + did)
+                state_ring(true)    // bang a gong
 
                 var ip = $('#' + did + ' .remote_ip strong:eq(1)').text()
                 console.log('to... ' + ip)
@@ -891,6 +892,7 @@ function queue_or_die(queue) {
             var ip     = queue.d3ck_status.openvpn_server.client
 
             inform_user('VPN', 'remote d3ck (' + friend + ' / ' + ip + ' / ' + did + ') established a VPN connection to your d3ck', 'vpn')
+            state_ring(false)    // bang a gong
 
             state_vpn('incoming', browser_ip, queue)
 
@@ -1924,6 +1926,7 @@ function ask_user_4_response(data) {
 
             inform_user('Connect Request', req.from + ' wants to connect from ' + req.ip_addr + '/' + req.from_d3ck, 'wowzer')
 
+            // user hit allow or deny?
             alertify.confirm(message_request, function (e) {
                 console.log('confirm...?')
                 console.log(e)
@@ -2011,6 +2014,8 @@ function lower_shields(ip) {
     jqXHR_shields.done(function (shields, textStatus, jqXHR) {
 
         console.log('result of shield lowering request: ' + JSON.stringify(shields))
+
+        state_ring(true)    // bang a gong
 
         if (shields.result) {
             console.log('Shields down, VPN may commence...')

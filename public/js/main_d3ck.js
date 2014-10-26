@@ -35,7 +35,8 @@ var Q_CHECK         = 3000  // check queue every few seconds or something
 var all_d3ck_ids = {}
 
 // xxx - from http://soundbible.com/1411-Telephone-Ring.html
-ring = new Audio("media/ringring.mp3") // load it up
+// ring = new Audio("media/ringring.mp3") // load it up
+ring = new Audio("media/modem.mp3") // load it up... from wiki
 
 // exist function from http://stackoverflow.com/questions/31044/is-there-an-exists-function-for-jquery
 jQuery.fn.exists = function(){return this.length>0;}
