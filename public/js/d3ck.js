@@ -907,7 +907,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_stop') {
-            inform_user('VPN', 'vpn stop')
+            inform_user('VPN', 'vpn stop', 'vpn')
         }
 
         else if (queue.event == 'port_forwarding') {
