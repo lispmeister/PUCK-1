@@ -1073,7 +1073,7 @@ function getGeo(req, res, next) {
 
     var ip = req.query.ip
 
-    var geo = resolve_geo([ip])
+    var geo = resolve_geo(ip)
 
     res.send(200, '{"geo" : ' + geo + '}');
 
