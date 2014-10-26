@@ -1077,6 +1077,8 @@ function getGeo(req, res, next) {
 
     var geo = geoip.lookup(ip)
 
+    console.log('geo: ' + JSON.stringify(geo))
+
     res.send(200, '{"geo" : ' + geo + '}');
 
 }
