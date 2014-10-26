@@ -14,6 +14,7 @@ var Tail       = require('./tail').Tail,
     sh         = require('execSync'),
     fs         = require('fs'),
     formidable = require('formidable'),
+    geoip      = require('geoip-lite');
     http       = require('http'),
     https      = require('https'),
     mkdirp     = require('mkdirp'),
@@ -1063,7 +1064,6 @@ function getIP(req, res, next) {
 // }
 //
 function getGeo(req, res, next) {
-    console.log('get geo for ' + ip)
 
     if (typeof req.query.ip == "undefined") {
         console.log('bad dog, no IP')
@@ -1073,7 +1073,9 @@ function getGeo(req, res, next) {
 
     var ip = req.query.ip
 
-    var geo = resolve_geo(ip)
+    console.log('get geo for ' + ip)
+
+    var geo = geoip.lookup(ip)
 
     res.send(200, '{"geo" : ' + geo + '}');
 
@@ -3415,36 +3417,6 @@ function serverRestart(req, res, next) {
 
 }
 
-
-// geo lookup
-
-    // geo return looks like...
-    // { range: [ 3479299040, 3479299071 ],
-    //   country: 'US',
-    //   region: 'CA',
-    //   city: 'San Francisco',
-    //   ll: [37.7484, -122.4156] 
-    // }
-
-function resolve_geo(ip) {
-
-    console.log('... resolving geo for... ' + ip)
-
-    if (ip == undefined || ip == '') {
-        console.log('no ip to resolve')
-        return({})
-    }
-
-    var geoip = require('geoip-lite');
-
-    geo = geoip.lookup(ip)
-
-    console.log('parting is such sweeeet... sorrow.  Goodbye.')
-    console.log(geo)
-
-    return(geo)
-
-}
 
 ///
 ///
