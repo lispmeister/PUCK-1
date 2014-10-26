@@ -1063,7 +1063,13 @@ function getIP(req, res, next) {
 //   ll: [37.7484, -122.4156] 
 // }
 //
+var geo_cache_threshold = 60 * 60 * 24
+var old_secz = new Date() / 1000;
+var old_geo  = []
+
 function getGeo(req, res, next) {
+
+    var deferred = Q.defer();
 
     if (typeof req.query.ip == "undefined") {
         console.log('bad dog, no IP')
@@ -1071,15 +1077,50 @@ function getGeo(req, res, next) {
         return
     }
 
-    var ip = req.query.ip
+    var ip_addr = req.query.ip
 
-    console.log('get geo for ' + ip)
+    resolveGeo(ip).then(function(geo) {
 
-    var geo = geoip.lookup(ip)
+        console.log('resolved: ' + geo)
+        deferred.resolve(geo)
+        res.send(200, geo )
 
-    console.log('geo: ' + JSON.stringify(geo))
+    })
 
-    res.send(200, '{"geo" : ' + geo + '}');
+    return deferred.promise;
+
+}
+
+function resolveGeo(ip) {
+
+    var deferred = Q.defer();
+
+    // free geo service
+    var url = 'http://freegeoip.net/json/' + ip_addr
+
+    console.log(url)
+
+    var secz = new Date() / 1000;
+
+    // cache for 24 hours
+    var diff = secz - old_secz
+
+    if (typeof old_geo[ip_addr] != "undefined" && diff <= geo_cache_threshold) {
+        console.log('using cached value: ' + old_geo[ip_addr])
+        return old_geo[ip_addr]
+    }
+
+    https_get(url).then(function (geo_data) {
+
+        var str = ''
+        console.error('hmmm....')
+        console.log( { geo: geo_data } )
+        // return( { geo: geo_data } )
+        deferred.resolve(geo_data)
+
+    })
+
+    return deferred.promise;
 
 }
 
