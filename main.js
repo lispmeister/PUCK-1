@@ -481,7 +481,6 @@ function findByUsername(name, fn) {
 //
 //
 //
-
 function auth(req, res, next) {
 
     // console.log(req)
@@ -1051,6 +1050,33 @@ function getIP(req, res, next) {
     var ip = get_client_ip(req)
 
     res.send(200, '{"ip" : "' + ip + '"}');
+}
+
+//
+// given an IP addr, return looks like...
+//
+// { range: [ 3479299040, 3479299071 ],
+//   country: 'US',
+//   region: 'CA',
+//   city: 'San Francisco',
+//   ll: [37.7484, -122.4156] 
+// }
+//
+function getGeo(req, res, next) {
+    console.log('get geo for ' + ip)
+
+    if (typeof req.query.ip == "undefined") {
+        console.log('bad dog, no IP')
+        res.send(400, { error: 'bad dog, no IP, no dog treat!' })
+        return
+    }
+
+    var ip = req.query.ip
+
+    var geo = resolve_geo([ip])
+
+    res.send(200, '{"geo" : ' + geo + '}');
+
 }
 
 
@@ -2161,14 +2187,13 @@ function knock(req, res, next) {
     if (d3ckid == bwana_d3ck.D3CK_ID) {
         console.log("for me? You shouldn't have!")
 
-        // mark it as an event, which will be picked up by the client, and then answered yes or no
-
         var d3ck_request    = { 
             knock       : true,
             ip_addr     : ip_addr,
             from        : from,
             'from_d3ck' : from_d3ck,
-            did         : d3ckid
+            did         : d3ckid,
+            geo         : geo
         }
 
         var d3ck_status            = empty_status()
@@ -3390,7 +3415,44 @@ function serverRestart(req, res, next) {
 
 }
 
+
+// geo lookup
+
+    // geo return looks like...
+    // { range: [ 3479299040, 3479299071 ],
+    //   country: 'US',
+    //   region: 'CA',
+    //   city: 'San Francisco',
+    //   ll: [37.7484, -122.4156] 
+    // }
+
+function resolve_geo(ip) {
+
+    console.log('... resolving geo for... ' + ip)
+
+    if (ip == undefined || ip == '') {
+        console.log('no ip to resolve')
+        return({})
+    }
+
+    var geoip = require('geoip-lite');
+
+    geo = geoip.lookup(ip)
+
+    console.log('parting is such sweeeet... sorrow.  Goodbye.')
+    console.log(geo)
+
+    return(geo)
+
+}
+
+///
+///
+///
 ///--- Server
+///
+///
+///
 
 // Cert stuff
 var key  = fs.readFileSync("/etc/d3ck/d3cks/D3CK/d3ck.key")
@@ -3635,6 +3697,8 @@ server.post('/form', auth, handleForm);
 // get your ip addr(s)
 server.get('/getip', auth, getIP);
 
+// get your geo on
+server.get('/geo', auth, getGeo);
 
 // Ping another
 server.get('/ping/:key', auth, echoStatus)
@@ -3748,6 +3812,7 @@ server.get('/rest', function root(req, res, next) {
         'GET     /logout',
         'GET     /rest',
         'GET     /getip',
+        'GET     /geo',
         'POST    /d3ck',
         'GET     /d3ck',
         'DELETE  /d3ck',
