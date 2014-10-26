@@ -2189,6 +2189,7 @@ function knock(req, res, next) {
 
     // is it for us, or are we passing it on?
     if (d3ckid == bwana_d3ck.D3CK_ID) {
+
         console.log("for me? You shouldn't have!")
 
         var d3ck_request    = { 
@@ -2197,7 +2198,7 @@ function knock(req, res, next) {
             from        : from,
             'from_d3ck' : from_d3ck,
             did         : d3ckid,
-            geo         : geo
+            geo         : geoip.lookup(ip)
         }
 
         var d3ck_status            = empty_status()
