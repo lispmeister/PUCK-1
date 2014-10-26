@@ -2294,14 +2294,16 @@ function knock(req, res, next) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
                 // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
-                d3ck_queue.push({type: 'info', event: 'remote_knock_fail', 'd3ck_status': d3ck_status})
+                // d3ck_queue.push({type: 'info', event: 'remote_knock_fail', 'd3ck_status': d3ck_status})
+                d3ck_queue.push({type: 'info', event: 'remote_knock_fail' })
 
                 res.send(200, {"err" : err});
                 }
             else {
                 console.log('knock success...!')
                 // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
-                d3ck_queue.push({type: 'info', event: 'remote_knock_success', 'd3ck_status': d3ck_status})
+                // d3ck_queue.push({type: 'info', event: 'remote_knock_success', 'd3ck_status': d3ck_status})
+                d3ck_queue.push({type: 'info', event: 'remote_knock_success' })
 
                 console.log(resp.body)
                 res.send(200, resp.body)
