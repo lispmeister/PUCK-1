@@ -2198,7 +2198,7 @@ function knock(req, res, next) {
             from        : from,
             'from_d3ck' : from_d3ck,
             did         : d3ckid,
-            geo         : geoip.lookup(ip)
+            geo         : geoip.lookup(ip_addr)
         }
 
         var d3ck_status            = empty_status()
