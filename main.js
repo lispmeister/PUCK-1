@@ -2229,7 +2229,9 @@ function knock(req, res, next) {
 
         console.log("for me? You shouldn't have!")
 
-        resolveGeo(ip_addr).then(function (geo) {
+        return Q.fcall(function () {
+
+            resolveGeo(ip_addr).then(function (geo) {
 
             var d3ck_request    = { 
                 knock       : true,
@@ -2254,6 +2256,7 @@ function knock(req, res, next) {
             res.send(400, { emotion: ":(" })
         });
 
+        })
 
     }
     else {
