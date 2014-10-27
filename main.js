@@ -2251,6 +2251,8 @@ function knock(req, res, next) {
 
             res.send(200, { emotion: "<3" })
 
+            return
+
         }).fail(function (error) {
             console.log("in resolveGeo errz...")
             res.send(400, { emotion: ":(" })
