@@ -2279,24 +2279,23 @@ function knock(req, res, next) {
 
         console.log(options)
 
-        // var d3ck_request    = { 
-        //     knock       : true,
-        //     ip_addr     : ip_addr,
-        //     'from_d3ck' : bwana_d3ck.D3CK_ID,
-        //     did         : d3ckid
-        // }
-        // var d3ck_status            = empty_status()
-        // d3ck_status.d3ck_requests  = d3ck_request
+        var d3ck_request    = { 
+            knock       : true,
+            ip_addr     : ip_addr,
+            'from_d3ck' : bwana_d3ck.D3CK_ID,
+            did         : d3ckid
+        }
+        var d3ck_status            = empty_status()
+        d3ck_status.d3ck_requests  = d3ck_request
 
-
-        d3ck_queue.push({type: 'info', event: 'remote_knock_sent' })
+        d3ck_queue.push({type: 'info', event: 'remote_knock_sent' }, 'd3ck_status': d3ck_status)
 
         request.post(options, function cb (err, res) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
                 // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
                 // d3ck_queue.push({type: 'info', event: 'remote_knock_fail', 'd3ck_status': d3ck_status})
-                d3ck_queue.push({type: 'info', event: 'remote_knock_fail' })
+                d3ck_queue.push({type: 'info', event: 'remote_knock_fail' }, 'd3ck_status': d3ck_status)
 
                 res.send(200, {"err" : err});
                 }
@@ -2306,7 +2305,7 @@ function knock(req, res, next) {
                 // console.log(res)
 
                 if (res.statusCode != 200) {
-                    d3ck_queue.push({type: 'info', event: 'remote_knock_return', statusCode: res.statusCode })
+                    d3ck_queue.push({type: 'info', event: 'remote_knock_return', statusCode: res.statusCode }, 'd3ck_status': d3ck_status)
                     console.log(res.body)
                     res.send(res.statusCode, res.body)
                 }
