@@ -1114,7 +1114,7 @@ function resolveGeo(ip_addr) {
 
         old_geo[ip_addr] = JSON.stringify(geo_data)
 
-        d3ck_queue.push({type: 'info', event: 'geo', ip, geodata: geodata })
+        d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip, geodata: geodata })
 
         return(geo_data)
 
@@ -2240,7 +2240,7 @@ function knock(req, res, next) {
             ip_addr     : ip_addr,
             from        : from,
             'from_d3ck' : from_d3ck,
-            did         : d3ckid,
+            did         : d3ckid
         }
 
         var d3ck_status            = empty_status()
