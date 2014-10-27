@@ -2301,14 +2301,14 @@ function knock(req, res, next) {
                 res.send(200, {"err" : err});
                 }
             else {
-                console.log('knock returned... something - RC: ' + res.returnCode)
+                console.log('knock returned... something - RC: ' + res.statusCode)
 
-                console.log(res)
+                // console.log(res)
 
-                if (res.returnCode != 200) {
-                    d3ck_queue.push({type: 'info', event: 'remote_knock_return', returnCode: res.returnCode })
+                if (res.statusCode != 200) {
+                    d3ck_queue.push({type: 'info', event: 'remote_knock_return', statusCode: res.statusCode })
                     console.log(res.body)
-                    res.send(res.returnCode, res.body)
+                    res.send(res.statusCode, res.body)
                 }
                 else {
                     d3ck_queue.push({type: 'info', event: 'remote_knock_success' })
