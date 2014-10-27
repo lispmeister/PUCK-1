@@ -1107,16 +1107,18 @@ function resolveGeo(ip_addr) {
         return old_geo[ip_addr]
     }
 
-    return Q.fcall(https_get(url))
+    geo = https_get(url).then(function (geodata) {
 
-//      var str = ''
-//      console.error('hmmm....')
-//      console.log( { geo: geo_data } )
-//      old_geo[ip_addr] = JSON.stringify(geo_data)
-//      return( { geo: geo_data } )
-//      return(geo_data)
-//  })
+        console.log('geo hmmm....')
+        console.log( { geo: geo_data } )
 
+        old_geo[ip_addr] = JSON.stringify(geo_data)
+
+        d3ck_queue.push({type: 'info', event: 'geo', ip, geodata: geodata })
+
+        return(geo_data)
+
+    })
 
 }
 
@@ -2229,42 +2231,33 @@ function knock(req, res, next) {
 
         console.log("for me? You shouldn't have!")
 
-        return Q.fcall(function () {
+        resolveGeo(ip_addr)
 
-            resolveGeo(ip_addr).then(function (geo) {
+        console.log('resolve geo:' + geo)
 
-            console.log('resolve geo:' + geo)
+        var d3ck_request    = { 
+            knock       : true,
+            ip_addr     : ip_addr,
+            from        : from,
+            'from_d3ck' : from_d3ck,
+            did         : d3ckid,
+        }
 
-            var d3ck_request    = { 
-                knock       : true,
-                ip_addr     : ip_addr,
-                from        : from,
-                'from_d3ck' : from_d3ck,
-                did         : d3ckid,
-                geo         : geo
-            }
+        var d3ck_status            = empty_status()
 
-            var d3ck_status            = empty_status()
+        d3ck_status.d3ck_requests  = d3ck_request
 
-            d3ck_status.d3ck_requests  = d3ck_request
-    
-            createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
-            d3ck_queue.push({type: 'request', event: 'knock', 'd3ck_status': d3ck_status})
+        createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
+        d3ck_queue.push({type: 'request', event: 'knock' })
 
-            console.log('sending back... <3!!!')
+        console.log('sending back... <3!!!')
 
-            res.send(200, { emotion: "<3" })
+        res.send(200, { emotion: "<3" })
 
-            return
-        });
-
-        }).fail(function (error) {
-            console.log("in resolveGeo errz...")
-            res.send(400, { emotion: ":(" })
-            return
-        })
+        return
 
     }
+
     else {
         console.log('... you want the next door down....')
 
