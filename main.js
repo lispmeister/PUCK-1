@@ -2248,7 +2248,7 @@ function knock(req, res, next) {
         d3ck_status.d3ck_requests  = d3ck_request
 
         createEvent(client_ip, {event_type: "knock", "ip_addr": ip_addr, "from_d3ck": from_d3ck, "d3ck_id": d3ckid}, d3ck_status)
-        d3ck_queue.push({type: 'request', event: 'knock' })
+        d3ck_queue.push({type: 'request', event: 'knock' }, 'd3ck_status': d3ck_status )
 
         console.log('sending back... <3!!!')
 
