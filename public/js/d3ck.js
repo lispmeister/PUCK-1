@@ -851,12 +851,20 @@ function queue_or_die(queue) {
 
         }
 
+        else if (queue.event == 'remote_knock_sent') {
+            inform_user('VPN', 'connection request sent')
+        }
+
         else if (queue.event == 'remote_knock_fail') {
             inform_user('request', 'knock failure', 'warning')
         }
 
         else if (queue.event == 'remote_knock_success') {
-            inform_user('VPN', 'connection request sent')
+            inform_user('VPN', 'connection request replied to')
+        }
+
+        else if (queue.event == 'remote_knock_return') {
+            inform_user('VPN', 'connection reply : ' + queue.returnCode)
         }
 
         else if (queue.event == 'remotely_uploaded') {

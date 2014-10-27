@@ -2296,6 +2296,8 @@ function knock(req, res, next) {
         // d3ck_status.d3ck_requests  = d3ck_request
 
 
+        d3ck_queue.push({type: 'info', event: 'remote_knock_sent' })
+
         request.post(options, function cb (err, resp) {
             if (err) {
                 console.error('post to remote failed:', JSON.stringify(err))
@@ -2306,13 +2308,18 @@ function knock(req, res, next) {
                 res.send(200, {"err" : err});
                 }
             else {
-                console.log('knock success...!')
-                // createEvent(client_ip, {event_type: "remote-knock", "ip_addr": ip_addr, "from_d3ck": bwana_d3ck.D3CK_ID, }, d3ck_status)
-                // d3ck_queue.push({type: 'info', event: 'remote_knock_success', 'd3ck_status': d3ck_status})
-                d3ck_queue.push({type: 'info', event: 'remote_knock_success' })
+                console.log('knock returned... something - RC: ' + resp.returnCode)
 
-                console.log(resp.body)
-                res.send(200, resp.body)
+                if (resp.returnCode != 200) {
+                    d3ck_queue.push({type: 'info', event: 'remote_knock_return', returnCode: resp.returnCode })
+                    console.log(resp.body)
+                    res.send(resp.returnCode, resp.body)
+                }
+                else {
+                    d3ck_queue.push({type: 'info', event: 'remote_knock_success' })
+                    console.log(resp.body)
+                    res.send(200, resp.body)
+                }
             }
         })
 
