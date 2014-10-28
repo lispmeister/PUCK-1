@@ -9,6 +9,7 @@ var Tail       = require('./tail').Tail,
     compress   = require('compression'),
     cors       = require('cors'),
     crypto     = require('crypto'),
+    dns        = require('native-dns'),
     express    = require('express'),
     flash      = require('connect-flash'),
     sh         = require('execSync'),
@@ -1119,6 +1120,65 @@ function resolveGeo(ip_addr) {
         return(geo_data)
 
     })
+
+}
+    
+//
+// do a IP-> hostname lookup, cache until restart
+//
+
+// should only do when record timesout, but for now... it's just retreiving a cached value
+
+var ip2fqdns = [];
+
+function getDNS (req, res, next) {
+
+    console.log('dns lookup...?')
+
+    var deferred = Q.defer();
+
+    if (typeof req.query.ip === 'undefined') {
+        console.log('need an IP to resolve it')
+        deferred.reject({fqdn : '?' } )
+        res.json(400, { "error" : "?"})
+    }
+
+    var ip = req.query.ip
+
+    var fqdn = []
+
+    console.log(ip)
+
+    var question = dns.Question({
+        address: ip,
+        type: 'A',
+    });
+
+    // cache until can't cache no more (restart)
+    if (typeof ip2fqdns[ip] !== "undefined") {
+        console.log('returning cached result')
+        console.log(ip2fqdns[ip])
+        deferred.resolve({ip: ip, fqdn : ip2fqdns[ip] } )
+        res.send(200,    {ip: ip, fqdn : ip2fqdns[ip] } )
+    }
+
+    var r = dns.reverse(ip, function (err, fqdn) {
+
+        if (err) {
+            ip2fqdns[ip] = err
+            console.log(err) 
+            deferred.reject({ip: ip, fqdn : err } )
+            res.send(420,   {ip: ip, fqdn : err } )
+        }
+        else {
+            ip2fqdns[ip] = fqdn
+            console.log('reverse for ' + ip + ': ' + JSON.stringify(fqdn));
+            deferred.resolve({ip: ip, fqdn : fqdn } )
+            res.send(200,    {ip: ip, fqdn : fqdn } )
+        }
+    });
+
+    return deferred.promise;
 
 }
 
@@ -3731,6 +3791,9 @@ server.get('/getip', auth, getIP);
 
 // get your geo on
 server.get('/geo', auth, getGeo);
+
+// get your geo on
+server.get('/dns', auth, getDNS);
 
 // Ping another
 server.get('/ping/:key', auth, echoStatus)

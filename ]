@@ -619,27 +619,25 @@ function d3ck_ping(all_ips, d3ckid, url) {
             $(ele).html('<strong>' + data.ip + '</strong>')
 
             // fill in DNS if can
-            // should only do when record timesout, but for now... it's only checks if doesn't have anything
-            if (typeof ip2fqdn[data.ip] == "undefined") {
-                var ele2    = $('#'+element_id).parent().closest('div').find('.remote_fqdn strong')
-                var dns_url = '/dns?ip=' + data.ip
+            var ele2    = $('#'+element_id).parent().closest('div').find('.remote_fqdn strong')
+            var dns_url = '/dns?ip=' + data.ip
 
-                console.log('dns request for ' + dns_url)
+            console.log('dns request for ' + dns_url)
 
-                var jqXHR_get_dns = $.ajax({ url: dns_url })
+            var jqXHR_get_dns = $.ajax({ url: dns_url })
 
-                jqXHR_get_dns.done(function (data, textStatus, jqXHR) {
-                    console.log('dns returned: ' + data.fqdn)
-                    $(ele2).text(data.fqdn.join())
-                    ip2fqdn[data.ip] = data.fqdn
-                }).fail(function(err) {
-                    console.log( "dns fail for " + dns_url)
-                    console.log(err)
-                }).error(function(err) {
-                    console.log( "dns error for " + dns_url)
-                    console.log(err)
-                })
-            }
+            // should only do when record timesout, but for now... it's just retreiving a cached value
+            jqXHR_get_dns.done(function (data, textStatus, jqXHR) {
+               //  console.log('dns returned: ' + data.fqdn)
+                $(ele2).text(data.fqdn.join())
+                ip2fqdn[data.ip] = data.fqdn
+            }).fail(function(err) {
+                console.log( "dns fail for " + dns_url)
+                console.log(err)
+            }).error(function(err) {
+                console.log( "dns error for " + dns_url)
+                console.log(err)
+            })
 
             var current_time_in_seconds = new Date().getTime() / 1000;
 
