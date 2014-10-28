@@ -3250,8 +3250,8 @@ function create_d3ck_by_ip(ip_addr) {
 
         console.log('created local -> ' + JSON.stringify(data))
 
-        if (typeof data.did == "undefined") {
-            return deferred.reject({ error: "couldnt get remote d3ck ID"} )
+        if (typeof data.did == "undefined" || typeof data.owner.name == "undefined") {
+            return deferred.reject({ error: "couldnt get remote d3ck ID or owner name"} )
         }
 
         //
