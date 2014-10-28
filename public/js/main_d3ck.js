@@ -309,12 +309,13 @@ $(document).ready(function () {
                                  '<div class="polaroid" >'                                                             +
                                     '<p>{{owner}}</p>'                                                                 +
                                     '<a href="/d3ck_details.html?d3ckid={{d3ckid}}">'                                  +
-                                    '<img id="img_{{d3ckid}}" class="d3ck_img" width=200 style="padding: 4;" src="{{image}}">'+
+                                    '<img id="img_{{d3ckid}}" class="d3ck_img" width=200 style="padding: 4;" src="{{image}}">' +
                                     '</a>'                                                                             +
-                                    '</div>'                                                                           +
+                                 '</div>'                                                                              +
                                  '<div class="caption">'                                                               +
                                     '<span>D3CK: </span><span class="d3ckname"><b>{{name}}</b></span> <br />'          +
-                                    '<span class="remote_ip">Server: <strong>{{ipaddr}}</strong> </span> <br />'       +
+                                    '<span class="remote_ip">IP Address: <strong>{{ipaddr}}</strong> </span> <br />'       +
+                                    '<span class="remote_fqdn">Hostname: <strong>{{ipaddr}}</strong> </span> <br />'       +
                                     '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                                     '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
                                     '<br />' +
