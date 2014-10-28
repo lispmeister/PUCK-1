@@ -5,6 +5,29 @@
 
 .nav .active a { background:#blue!important }
 
+.polaroid {
+  position: relative;
+  width: 220px;
+}
+ 
+.polaroid img {
+  border: 10px solid #fff;
+  border-bottom: 45px solid #fff;
+  -webkit-box-shadow: 3px 3px 3px #777;
+     -moz-box-shadow: 3px 3px 3px #777;
+          box-shadow: 3px 3px 3px #777;
+}
+
+.polaroid p {
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  bottom: 0px;
+  font: 400 18px/1 'Kaushan Script', cursive;
+  color: #888;
+}
+ 
+
 .navbar-brand {
     margin-left: 80px;
 }
@@ -26,8 +49,8 @@ video {
 img d3ck_img {
     display: block;
     /* cards are about 3.5 x 2.25 (2.5 for poker) */
-    max-width:230px;
-    max-height:95px;
+    max-width:200px;
+    max-height:124px;
     width: auto;
     height: auto;
 }

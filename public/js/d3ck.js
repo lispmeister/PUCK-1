@@ -328,10 +328,10 @@ function state_vpn(state, browser_ip, queue) {
         console.log('\t[+] fire up the outbound signs')
 
         $('#d3ck_video').addClass('green').addClass('pulse')
-        $('button:contains("connecting"),button:contains("Call")').text('End').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
-
+        // $('button:contains("connecting"),button:contains("Call")').text('End').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
+        $('button:contains("connecting")').text('End').addClass("hang_up").removeClass('btn-danger').addClass('btn-warning')
         // ... setup bye bye
-        $('button:contains("connecting"),button:contains("Call")').click(false)
+        // $('button:contains("connecting"),button:contains("Call")').click(false)
 
         $('body').on('click', '.hang_up', function(event) {
             event.preventDefault()

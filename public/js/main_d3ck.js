@@ -306,15 +306,18 @@ $(document).ready(function () {
                         var template = 
                              '<div class="col-md-3">'                                                                  + 
                               '<div class="thumbnail" style="background-color: #eaf1f1" id="{{d3ckid}}">'              +
-                                 '<a href="/d3ck_details.html?d3ckid={{d3ckid}}">'                                     +
-                                 // '<img id="{{d3ckid}}" width=128 style="padding: 4;" src="public/img/' + d3ckid + '.png"></a> <br />' +
-                                 '<img id="img_{{d3ckid}}" class="d3ck_img" width=128 style="padding: 4;" src="{{image}}"></a> <br />'      +
+                                 '<div class="polaroid" >'                                                             +
+                                    '<p>{{owner}}</p>'                                                                 +
+                                    '<a href="/d3ck_details.html?d3ckid={{d3ckid}}">'                                  +
+                                    '<img id="img_{{d3ckid}}" class="d3ck_img" width=200 style="padding: 4;" src="{{image}}">'+
+                                    '</a>'                                                                             +
+                                    '</div>'                                                                           +
                                  '<div class="caption">'                                                               +
                                     '<span>D3CK: </span><span class="d3ckname"><b>{{name}}</b></span> <br />'          +
-                                    '<span id="{{owner}}"> Owner: <strong>{{owner}}</strong>   </span> <br />'         +
-                                    '<span class="remote_ip">Server: <strong>{{ipaddr}}</strong> </span> <br />'         +
+                                    '<span class="remote_ip">Server: <strong>{{ipaddr}}</strong> </span> <br />'       +
                                     '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                                     '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
+                                    '<br />' +
                                     '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                       +
                                     '<input style="display:none" id="d3ckid" name="d3ckid"  value={{d3ckid}}>'         +
                                     '<input style="display:none" id="ipaddr" name="ipaddr"  value={{ipaddr}}>'         +
