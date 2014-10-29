@@ -316,6 +316,7 @@ $(document).ready(function () {
                                     '<span>D3CK: </span><span class="d3ckname"><b>{{name}}</b></span> <br />'          +
                                     '<span class="remote_ip">IP Address: <strong>{{ipaddr}}</strong> </span> <br />'       +
                                     '<span class="remote_fqdn">Hostname: <strong></strong> </span> <br />'       +
+                                    '<span class="remote_geo">Where: <strong></strong> </span> <br />'       +
                                     '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                                     '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
                                     '<br />' +

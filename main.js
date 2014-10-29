@@ -1065,9 +1065,11 @@ function getIP(req, res, next) {
 //
 var geo_cache_threshold = 60 * 60 * 24
 var old_secz = new Date() / 1000;
-var old_geo  = []
+var ip2geo   = []
 
 function getGeo(req, res, next) {
+
+    console.log('get geo')
 
     var deferred = Q.defer();
 
@@ -1079,11 +1081,33 @@ function getGeo(req, res, next) {
 
     var ip_addr = req.query.ip
 
-    resolveGeo(ip).then(function(geo) {
+    var url     = 'https://freegeoip.net/json/' + ip_addr
 
-        console.log('resolved: ' + geo)
-        deferred.resolve(geo)
-        res.send(200, geo )
+    console.log('resolving geo stuff from: ' + url)
+
+    // cache until can't cache no more (restart)
+    if (typeof ip2geo[ip_addr] !== "undefined") {
+        console.log('returning cached geo result')
+        console.log(ip2geo[ip_addr])
+        res.send(200, {ip_addr: ip_addr, geo : ip2geo[ip_addr] } )
+        return
+    }
+
+    https_get(url).then(function (geo_data) {
+
+        console.log('geo hmmm....')
+
+        console.log( { geo: geo_data } )
+
+        // ip2geo[ip_addr] = JSON.stringify(geo_data)
+        ip2geo[ip_addr] = geo_data
+
+        d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
+
+        // return geo_data
+        res.send(200, geo_data )
+
+        return deferred.resolve(geo_data)
 
     })
 
@@ -1096,30 +1120,44 @@ function resolveGeo(ip_addr) {
     // free geo service
     var url = 'https://freegeoip.net/json/' + ip_addr
 
-    console.log(url)
+    console.log('resolving geo stuff from: ' + url)
 
-    var secz = new Date() / 1000;
+    var deferred = Q.defer();
 
-    // cache for 24 hours
-    var diff = secz - old_secz
+//  var secz = new Date() / 1000;
+//  // cache for 24 hours
+//  var diff = secz - old_secz
+//  if (typeof old_geo[ip_addr] != "undefined" && diff <= geo_cache_threshold) {
+//      console.log('using cached value: ' + old_geo[ip_addr])
+//      return old_geo[ip_addr]
+//  }
 
-    if (typeof old_geo[ip_addr] != "undefined" && diff <= geo_cache_threshold) {
-        console.log('using cached value: ' + old_geo[ip_addr])
-        return old_geo[ip_addr]
-    }
+    // cache until can't cache no more (restart)
+//  if (typeof ip2geo[ip_addr] !== "undefined") {
+//      console.log('returning cached geo result')
+//      console.log(ip2geo[ip_addr])
+//      return({ip_addr: ip_addr, geo : ip2geo[ip_addr] })
+//  }
 
-    geo = https_get(url).then(function (geodata) {
+    https_get(url).then(function (geo_data) {
 
         console.log('geo hmmm....')
         console.log( { geo: geo_data } )
 
-        old_geo[ip_addr] = JSON.stringify(geo_data)
+        geo_data = JSON.parse(geo_data)
 
-        d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip, geodata: geodata })
+        // ip2geo[ip_addr] = JSON.stringify(geo_data)
+        ip2geo[ip_addr] = geo_data
 
-        return(geo_data)
+        d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
+
+        // return geo_data
+        // res.send(200, geo_data )
+        return deferred.resolve(geo_data)
 
     })
+
+    return deferred.promise;
 
 }
     
@@ -1139,7 +1177,6 @@ function getDNS (req, res, next) {
 
     if (typeof req.query.ip === 'undefined') {
         console.log('need an IP to resolve it')
-        deferred.reject({fqdn : '?' } )
         res.json(400, { "error" : "?"})
     }
 
@@ -1156,9 +1193,8 @@ function getDNS (req, res, next) {
 
     // cache until can't cache no more (restart)
     if (typeof ip2fqdns[ip] !== "undefined") {
-        console.log('returning cached result')
+        console.log('returning cached ip2fqdns result')
         console.log(ip2fqdns[ip])
-        deferred.resolve({ip: ip, fqdn : ip2fqdns[ip] } )
         res.send(200,    {ip: ip, fqdn : ip2fqdns[ip] } )
     }
 

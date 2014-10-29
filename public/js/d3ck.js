@@ -562,6 +562,7 @@ function d3ck_create(element, ip_addr) {
 var draggers = {} // track drag-n-drop areas
 
 var ip2fqdn  = {}
+var ip2geo   = {}
 
 function d3ck_ping(all_ips, d3ckid, url) {
 
@@ -618,6 +619,7 @@ function d3ck_ping(all_ips, d3ckid, url) {
             // $('#'+element_id).parent().closest('div').find('.remote_ip strong').html('<strong>' + data.ip + '</strong>')
             $(ele).html('<strong>' + data.ip + '</strong>')
 
+
             // fill in DNS if can
             // should only do when record timesout, but for now... it's only checks if doesn't have anything
             if (typeof ip2fqdn[data.ip] == "undefined") {
@@ -639,6 +641,36 @@ function d3ck_ping(all_ips, d3ckid, url) {
                     console.log( "dns error for " + dns_url)
                     console.log(err)
                 })
+
+                // 
+                // look up geo along with DNS lookups
+                //
+                if (typeof ip2geo[data.ip] == "undefined") {
+                    var ele3    = $('#'+element_id).parent().closest('div').find('.remote_geo strong')
+                    var geo_url = '/geo?ip=' + data.ip
+
+                    console.log('geo request for ' + geo_url)
+
+                    var jqXHR_get_geo = $.ajax({ url: geo_url })
+
+                    jqXHR_get_geo.done(function (data, textStatus, jqXHR) {
+                        console.log('geo returned: ' + data)
+
+                        ip2geo[data.ip] = JSON.parse(data.geo)
+
+                        // do something with the data
+                        rip_geo(ele3, JSON.parse(data.geo))
+
+                    }).fail(function(err) {
+                        console.log( "geo fail for " + geo_url)
+                        console.log(err)
+                    }).error(function(err) {
+                        console.log( "geo error for " + geo_url)
+                        console.log(err)
+                    })
+
+                }
+
             }
 
             var current_time_in_seconds = new Date().getTime() / 1000;
@@ -680,6 +712,38 @@ function d3ck_ping(all_ips, d3ckid, url) {
 // console.log('post-pingy ' + d3ckid + '... putting into ' + element_id)
 
 }
+
+function rip_geo(element, geo) {
+
+    console.log('tearing up geo data')
+
+//
+// something like... for one of my EC2 instances....
+//  { ip: '54.203.255.17',
+//    country_code: 'US',
+//    country_name: 'United States',
+//    region_code: 'OR',
+//    region_name: 'Oregon',
+//    city: 'Boardman',
+//    zipcode: '97818',
+//    latitude: 45.7788,
+//    longitude: -119.529,
+//    metro_code: '810',
+//    area_code: '541' }
+//
+
+    // xxx - do different stuff for foreign, have no data yet!
+    var phone = '(' + geo.area_code + ')-' + geo.metro_code + '-xxxx'
+
+    // nifty flags courtesy of http://flag-sprites.com/ -->
+    var flag  = '<img style="margin-left:4px;" src="img/blank.gif" class="flag flag-' + geo.country_code.toLowerCase() + '">'
+
+    $(element).append(geo.city + ', ' +  geo.region_code + ', ' + geo.country_code + '; ' + flag + ' ' + geo.zipcode + ' ' +  '; ' + phone)
+
+    // latitude, longitude
+
+}
+
 
 //
 // until I find a good one
