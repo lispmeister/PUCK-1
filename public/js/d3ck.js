@@ -654,7 +654,7 @@ function d3ck_ping(all_ips, d3ckid, url) {
                     var jqXHR_get_geo = $.ajax({ url: geo_url })
 
                     jqXHR_get_geo.done(function (data, textStatus, jqXHR) {
-                        console.log('geo returned: ' + data)
+                        console.log('geo returned: ' + JSON.stringify(data))
 
                         ip2geo[data.ip] = JSON.parse(data.geo)
 

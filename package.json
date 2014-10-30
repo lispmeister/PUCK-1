@@ -52,6 +52,7 @@
     "ws": "0.4.31"
   },
   "author": "dan f with some very early help from the mighty Markus Fix",
+  "email": zen@trouble.org",
   "license": "???",
   "repository": {
     "type": "git",

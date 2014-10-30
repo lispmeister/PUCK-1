@@ -31,6 +31,7 @@ aptitude update
 apt-get install -y openssh-server
 apt-get install -y openvpn
 apt-get install -y yate
+apt-get install -y nginx
 apt-get install -y openssl
 apt-get install -y git
 apt-get install -y npm
