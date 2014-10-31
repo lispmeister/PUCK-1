@@ -1093,23 +1093,22 @@ function getGeo(req, res, next) {
         return
     }
 
-    https_get(url).then(function (geo_data) {
-
-        console.log('geo hmmm....')
-
-        console.log( { geo: geo_data } )
-
-        // ip2geo[ip_addr] = JSON.stringify(geo_data)
-        ip2geo[ip_addr] = geo_data
-
-        d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
-
-        // return geo_data
+    Q.fcall(function() {
+        var geo_data = resolveGeo(ip_addr)
         res.send(200, geo_data )
-
-        return deferred.resolve(geo_data)
-
+        return (geo_data)
     })
+
+//  https_get(url).then(function (geo_data) {
+//      console.log('geo hmmm....')
+//      console.log( { geo: geo_data } )
+//      // ip2geo[ip_addr] = JSON.stringify(geo_data)
+//      ip2geo[ip_addr] = geo_data
+//      d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
+//      // return geo_data
+//      res.send(200, geo_data )
+//      return deferred.resolve(geo_data)
+//  })
 
     return deferred.promise;
 
@@ -1149,7 +1148,7 @@ function resolveGeo(ip_addr) {
         // ip2geo[ip_addr] = JSON.stringify(geo_data)
         ip2geo[ip_addr] = geo_data
 
-        d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
+        // d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
 
         // return geo_data
         // res.send(200, geo_data )
@@ -1198,20 +1197,32 @@ function getDNS (req, res, next) {
         res.send(200,    {ip: ip, fqdn : ip2fqdns[ip] } )
     }
 
-    var r = dns.reverse(ip, function (err, fqdn) {
+    // xxx - yeah, bad... will figure out a better dns call later
+    var d = require('domain').create();
+    d.on('error', function(err) {
+        if (err.message != 'connect ECONNREFUSED') {
+            console.log('shuxx0r, dns blew a gastket, could be an issue: ' + err.message);
+        }
+        deferred.reject({ip: ip, fqdn : err } )
+        res.send(420,   {ip: ip, fqdn : err } )
 
-        if (err) {
-            ip2fqdns[ip] = err
-            console.log(err) 
-            deferred.reject({ip: ip, fqdn : err } )
-            res.send(420,   {ip: ip, fqdn : err } )
-        }
-        else {
-            ip2fqdns[ip] = fqdn
-            console.log('reverse for ' + ip + ': ' + JSON.stringify(fqdn));
-            deferred.resolve({ip: ip, fqdn : fqdn } )
-            res.send(200,    {ip: ip, fqdn : fqdn } )
-        }
+    });
+    d.run(function() {
+        console.log("lookin' up " + ip)
+        dns.reverse(ip, function (err, fqdn) {
+            if (err) {
+                ip2fqdns[ip] = err
+                console.log(err) 
+                deferred.reject({ip: ip, fqdn : err } )
+                res.send(420,   {ip: ip, fqdn : err } )
+            }
+            else {
+                ip2fqdns[ip] = fqdn
+                console.log('reverse for ' + ip + ': ' + JSON.stringify(fqdn));
+                deferred.resolve({ip: ip, fqdn : fqdn } )
+                res.send(200,    {ip: ip, fqdn : fqdn } )
+            }
+        });
     });
 
     return deferred.promise;
@@ -3068,7 +3079,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     ping_data = JSON.parse(ping_data)
                 }
                 catch (e) {
-                    if (JSON.stringify(e) != "") {
+                    if (JSON.stringify(e) != "{}") {
                         console.log('errz socket parsing: ' + JSON.stringify(e))
                         response = {status: "ping failure", "error": e}
                         // synchronicity... II... shouting above the din of my rice crispies

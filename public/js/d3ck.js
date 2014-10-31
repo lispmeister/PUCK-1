@@ -630,10 +630,20 @@ function d3ck_ping(all_ips, d3ckid, url) {
 
                 var jqXHR_get_dns = $.ajax({ url: dns_url })
 
-                jqXHR_get_dns.done(function (data, textStatus, jqXHR) {
-                    console.log('dns returned: ' + data.fqdn)
-                    $(ele2).text(data.fqdn.join())
-                    ip2fqdn[data.ip] = data.fqdn
+                jqXHR_get_dns.done(function (dns_data, textStatus, jqXHR) {
+                    console.log('dns returned: ' + dns_data.fqdn)
+
+                    if (dns_data.fqdn.code = 'ENOTFOUND') { dns_data.fqdn = data.ip }
+
+                    try {
+                        $(ele2).text(dns_data.fqdn.join())
+                    }
+                    catch (e) {
+                        $(ele2).text(dns_data.fqdn)
+                    }
+
+                    ip2fqdn[data.ip] = dns_data.fqdn
+
                 }).fail(function(err) {
                     console.log( "dns fail for " + dns_url)
                     console.log(err)
@@ -656,10 +666,14 @@ function d3ck_ping(all_ips, d3ckid, url) {
                     jqXHR_get_geo.done(function (data, textStatus, jqXHR) {
                         console.log('geo returned: ' + JSON.stringify(data))
 
-                        ip2geo[data.ip] = JSON.parse(data.geo)
-
-                        // do something with the data
-                        rip_geo(ele3, JSON.parse(data.geo))
+                        if (JSON.stringify(data) == "{}") {
+                            ip2geo[data.ip] = ""
+                        }
+                        else {
+                            ip2geo[data.ip] = data.geo
+                            // do something with the data
+                            rip_geo(ele3, data.geo)
+                        }
 
                     }).fail(function(err) {
                         console.log( "geo fail for " + geo_url)
@@ -733,12 +747,25 @@ function rip_geo(element, geo) {
 //
 
     // xxx - do different stuff for foreign, have no data yet!
-    var phone = '(' + geo.area_code + ')-' + geo.metro_code + '-xxxx'
+
+    // think this is true for private ip space (10/8, etc.)
+    if (geo.country_name == 'Reserved') {
+        return
+    }
+
+    phone = ''
+    if (geo.area_code != '') {
+        var phone = '(' + geo.area_code + ')-' + geo.metro_code + '-xxxx'
+    }
 
     // nifty flags courtesy of http://flag-sprites.com/ -->
-    var flag  = '<img style="margin-left:4px;" src="img/blank.gif" class="flag flag-' + geo.country_code.toLowerCase() + '">'
+    flag = ''
+    if (geo.country_code != '') {
+        var flag  = '<img style="margin-left:4px;" src="img/blank.gif" class="flag flag-' + geo.country_code.toLowerCase() + '">'
+    }
 
-    $(element).append(geo.city + ', ' +  geo.region_code + ', ' + geo.country_code + '; ' + flag + ' ' + geo.zipcode + ' ' +  '; ' + phone)
+    if (phone != '' || flag != '')
+        $(element).append(geo.city + ', ' +  geo.region_code + ', ' + geo.country_code + '; ' + flag + ' ' + geo.zipcode + ' ' +  '; ' + phone)
 
     // latitude, longitude
 
