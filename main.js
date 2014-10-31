@@ -2340,8 +2340,6 @@ function knock(req, res, next) {
 
         resolveGeo(ip_addr)
 
-        console.log('resolve geo:' + geo)
-
         var d3ck_request    = { 
             knock       : true,
             ip_addr     : ip_addr,
