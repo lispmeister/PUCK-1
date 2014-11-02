@@ -1050,7 +1050,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_stop') {
-            $('#alertify').html('')
+            $('#alertify').addClass('alertify-hide alertify-hidden')
             inform_user('VPN', 'vpn stop', 'vpn')
         }
 
