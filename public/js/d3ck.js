@@ -1980,7 +1980,12 @@ function inform_user(title, message, level, element) {
         PNotify.desktop.permission();   // wow!
 
         // opts.desktop     = { desktop: true }  // wow^2!
+
         opts.type        = 'success'
+        if (title == 'vpn_stop')
+            opts.type    = 'warning'
+
+
         opts.addclass    = 'stack-bar-bottom'
         opts.cornerclass = ''
         opts.width       = '100%'
