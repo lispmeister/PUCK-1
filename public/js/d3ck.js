@@ -564,11 +564,17 @@ var draggers = {} // track drag-n-drop areas
 var ip2fqdn  = {}
 var ip2geo   = {}
 
+function aj_errz(jqXHR, textStatus, errorThrown) {
+    // console.log('ajE: ' + errorThrown)
+}
+
 function d3ck_ping(all_ips, d3ckid, url) {
 
     // console.log('in d3ck_ping')
     // console.log(d3ckid, url)
     // console.log(all_ips)
+
+    $.ajaxSetup({ error: aj_errz })
 
     // var ping_url = '/sping/' + d3ckid + "/" + all_ip_string
     var ping_url = '/sping/' + d3ckid + "/" + all_ips
@@ -722,6 +728,8 @@ function d3ck_ping(all_ips, d3ckid, url) {
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
             $('#'+element_id).closest('form').find('div').remove()
     })
+
+
 
 // console.log('post-pingy ' + d3ckid + '... putting into ' + element_id)
 
@@ -2055,7 +2063,7 @@ function ask_user_4_response(data) {
             alertify.set({
                 // delay           : DEFAULT_RING_TIME,
                 buttonReverse   : true, 
-                labels          : { ok: "Allow", cancel: "Deny" }
+                labels          : { ok: 'Answer', cancel: 'Decline' }
             });
 
             inform_user('Connect Request', req.from + ' wants to connect from ' + req.ip_addr + '/' + req.from_d3ck, 'wowzer')
