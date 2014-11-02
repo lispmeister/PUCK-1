@@ -476,23 +476,6 @@ function get_ip(element) {
 }
 
 //
-// one, two, three sequence of UI to user things
-//
-function n_incoming(d3ckid) {
-
-    console.log('sequence started with ' + d3ckid)
-
-    var sequence = '<span><a href="#" class="button button-circle button-primary"         >One</a>  </span>'            +
-                   '<span><a href="#" class="button button-circle button-primary disabled">Two</a>  </span>'   +
-                   '<span><a href="#" class="button button-circle button-primary disabled">Three</a></span>'
-
-    show_user_sequence(d3ckid)
-    // $('#timer_countdown').append(sequence)
-    // $('#alertify').append(sequence)
-
-}
-
-//
 // start the sequence to fire up the VPN
 //
 function d3ck_vpn(element, d3ckid, ipaddr) {
@@ -2172,7 +2155,6 @@ function show_user_sequence(d3ckid) {
 
             var answer    = ''
 
-            // xxx - todo - actually cancel! :)
             if (e) {
                 inform_user('info', 'you cancelled the call', 'warning')
                 console.log('give it the ol college try')

@@ -130,7 +130,7 @@ $(document).ready(function () {
         console.log('nock')
         console.log(vd3ckid, ipaddr)
 
-        n_incoming(vd3ckid)
+        show_user_sequence(vd3ckid)
 
         // if we're connected, don't knock again
         if (typeof d3ck_status.openvpn_client != 'undefined' && typeof d3ck_status.openvpn_server != 'undefined' && 
