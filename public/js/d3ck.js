@@ -476,7 +476,24 @@ function get_ip(element) {
 }
 
 //
-// fire up the VPN
+// one, two, three sequence of UI to user things
+//
+function n_incoming(d3ckid) {
+
+    console.log('sequence started with ' + d3ckid)
+
+    var sequence = '<span><a href="#" class="button button-circle button-primary"         >One</a>  </span>'            +
+                   '<span><a href="#" class="button button-circle button-primary disabled">Two</a>  </span>'   +
+                   '<span><a href="#" class="button button-circle button-primary disabled">Three</a></span>'
+
+    show_user_sequence(d3ckid)
+    // $('#timer_countdown').append(sequence)
+    // $('#alertify').append(sequence)
+
+}
+
+//
+// start the sequence to fire up the VPN
 //
 function d3ck_vpn(element, d3ckid, ipaddr) {
 
@@ -1033,6 +1050,7 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_stop') {
+            $('#alertify').html('')
             inform_user('VPN', 'vpn stop', 'vpn')
         }
 
@@ -2122,6 +2140,85 @@ function ask_user_4_response(data) {
     }
 
 }
+
+function show_user_sequence(d3ckid) {
+
+    console.log('show the did... ' + d3ckid)
+
+    // if (typeof data.type == "undefined" || data.type != 'request')
+    //  console.log('need something to show....')
+    //  return
+    //
+
+    var message_request = '<h2>Connecting...</h2><br />'
+
+    $("#labels", function () {
+        alertify.set({
+            // delay           : DEFAULT_RING_TIME,
+            buttonReverse   : true, 
+            labels          : { ok: "Cancel", cancel: "Cancel" }
+        });
+
+        // if user hits cancel... ignore for now ;)
+        alertify.alert(message_request, function (e) {
+            console.log('cancel...?')
+            console.log(e)
+
+            var answer    = ''
+
+            // xxx - todo - actually cancel! :)
+            if (e) {
+                inform_user('info', 'you cancelled the call', 'warning')
+                console.log('give it the ol college try')
+                event_hang_up(d3ckid)
+            }
+
+//          $.ajax({
+//              type: "POST",
+//              url: '/knockReply/' + req.from_d3ck + '/' + answer,
+//              headers: { 'Content-Type': 'application/json' },
+//              req: post_data,
+
+//              success: function(data, status) {
+//                  console.log('vampire suck... sess.... ')
+//              },
+//              fail: function(data, err) {
+//                  console.log('vampire fuck... me')
+//              }
+//          })
+            $('#timer_countdown').TimeCircles().destroy();
+        });
+
+        // make the button red
+        // <button class="alertify-button alertify-button-ok" id="alertify-ok">Cancel</button>
+        $('#alertify-ok').removeClass('alertify-button-ok').addClass('alertify-button-cancel')
+
+        return false;
+    });
+
+    $('#alertify').append('<div style="height:150px;width:150px;float:left;" id="timer_countdown" data-timer="' + DEFAULT_RING_TIME + '"></div>')
+    //  timer circle
+    $('#timer_countdown').TimeCircles({
+        total_duration  : DEFAULT_RING_TIME + 1,
+        direction: "Counter-clockwise",
+        count_past_zero : false,
+        time            : {
+            Days            : { show: false },
+            Hours           : { show: false },
+            Minutes         : { show: false },
+            Seconds         : { show: true, color: "#2b94ea"}
+        }
+    }).addListener(function(unit, value, total) {
+        // console.log(DEFAULT_RING_TIME, unit,value,total)
+        if (value <= 0) {
+            // alert('wakka!')
+            console.log('clicking... cancel!')
+            $('#alertify-cancel').click()
+        }
+    });
+
+}
+
 
 //
 // two simple functions; either allow or deny access

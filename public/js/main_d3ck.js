@@ -130,6 +130,8 @@ $(document).ready(function () {
         console.log('nock')
         console.log(vd3ckid, ipaddr)
 
+        n_incoming(vd3ckid)
+
         // if we're connected, don't knock again
         if (typeof d3ck_status.openvpn_client != 'undefined' && typeof d3ck_status.openvpn_server != 'undefined' && 
             (d3ck_status.openvpn_client.vpn_status == "up" || d3ck_status.openvpn_server.vpn_status == "up")) {
@@ -144,7 +146,7 @@ $(document).ready(function () {
         })
 
         knock_knock.done(function(msg) {
-            console.log("posto facto")
+            console.log("mposto facto")
             console.log(msg)
         })
 
