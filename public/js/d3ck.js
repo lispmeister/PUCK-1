@@ -881,7 +881,14 @@ function get_q() {
             queue_or_die(d3ck_queue)
 
         }
-    }).fail(ajaxError);
+    }).fail(function (e) {
+        console.log('fail!  You failed!  Loser!')
+        console.log(e)
+    })
+    }).error(function (e) {
+        console.log('querror on status')
+        console.log(e)
+    })
 
 }
 
