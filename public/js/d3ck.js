@@ -1961,13 +1961,16 @@ function inform_user(title, message, level, element) {
 
         console.log('VPN starting... sticky & desktop if it can...')
 
+        $('#alertify-ok').click()
+
         PNotify.desktop.permission();   // wow!
 
         // opts.desktop     = { desktop: true }  // wow^2!
 
         opts.type        = 'success'
-        if (title == 'VPN')
+        if (title == 'VPN') {
             opts.type    = 'warning'
+        }
 
 
         opts.addclass    = 'stack-bar-bottom'
@@ -2144,18 +2147,21 @@ function show_user_sequence(d3ckid) {
     $("#labels", function () {
         alertify.set({
             // delay           : DEFAULT_RING_TIME,
-            buttonReverse   : true, 
-            labels          : { ok: "Cancel", cancel: "Cancel" }
+            labels          : { ok: "ok", cancel: "Cancel" }
         });
 
         // if user hits cancel... ignore for now ;)
-        alertify.alert(message_request, function (e) {
+        alertify.confirm(message_request, function (e) {
             console.log('cancel...?')
             console.log(e)
 
             var answer    = ''
 
+            // this will be hidden... only programatically triggered, hopefully
             if (e) {
+                console.log('clicking... ok, ok')
+            }
+            else {
                 inform_user('info', 'you cancelled the call', 'warning')
                 console.log('give it the ol college try')
                 event_hang_up(d3ckid)
@@ -2177,9 +2183,9 @@ function show_user_sequence(d3ckid) {
             $('#timer_countdown').TimeCircles().destroy();
         });
 
-        // make the button red
+        // make the OK button go away
         // <button class="alertify-button alertify-button-ok" id="alertify-ok">Cancel</button>
-        $('#alertify-ok').removeClass('alertify-button-ok').addClass('alertify-button-cancel')
+        $('#alertify-ok').hide()
 
         return false;
     });
