@@ -564,9 +564,9 @@ var draggers = {} // track drag-n-drop areas
 var ip2fqdn  = {}
 var ip2geo   = {}
 
-function aj_errz(jqXHR, textStatus, errorThrown) {
+// function aj_errz(jqXHR, textStatus, errorThrown) {
     // console.log('ajE: ' + errorThrown)
-}
+// }
 
 function d3ck_ping(all_ips, d3ckid, url) {
 
@@ -574,7 +574,7 @@ function d3ck_ping(all_ips, d3ckid, url) {
     // console.log(d3ckid, url)
     // console.log(all_ips)
 
-    $.ajaxSetup({ error: aj_errz })
+    // $.ajaxSetup({ error: aj_errz })
 
     // var ping_url = '/sping/' + d3ckid + "/" + all_ip_string
     var ping_url = '/sping/' + d3ckid + "/" + all_ips
