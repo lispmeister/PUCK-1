@@ -26,8 +26,8 @@ video {
 img d3ck_img {
     display: block;
     /* cards are about 3.5 x 2.25 (2.5 for poker) */
-    max-width:200px;
-    max-height:124px;
+    max-width:  200px;
+    max-height: 124px;
     width: auto;
     height: auto;
 }
@@ -195,25 +195,26 @@ div.growlUI h1, div.growlUI h2 {
 /* slightly modded from http://www.paulund.co.uk/playground/demo/css_pulse_animation/core.css */
 @-webkit-keyframes pulse_animation {
     0% { -webkit-transform: scale(1); }
-    10% { -webkit-transform: scale(1.05); }
-    20% { -webkit-transform: scale(1.1); }
-    30% { -webkit-transform: scale(1.25); }
-    40% { -webkit-transform: scale(1.35); }
-    50% { -webkit-transform: scale(1.45); }
-    60% { -webkit-transform: scale(1.35); }
-    70% { -webkit-transform: scale(1.25); }
-    80% { -webkit-transform: scale(1.1); }
-    90% { -webkit-transform: scale(1.05); }
+    10% { -webkit-transform: scale(1.02); }
+    20% { -webkit-transform: scale(1.04); }
+    30% { -webkit-transform: scale(1.06); }
+    40% { -webkit-transform: scale(1.08); }
+    50% { -webkit-transform: scale(1.10); }
+    60% { -webkit-transform: scale(1.08); }
+    70% { -webkit-transform: scale(1.06); }
+    80% { -webkit-transform: scale(1.04); }
+    90% { -webkit-transform: scale(1.02); }
    100% { -webkit-transform: scale(1); }
 }
 
 .pulse {
-    -webkit-animation-name: 'pulse_animation';
-    -webkit-animation-duration: 3000ms;
-    -webkit-transform-origin:70% 70%;
+    -webkit-animation-name:            'pulse_animation';
+    -webkit-animation-duration:        10s;
+    -webkit-transform-origin:          70% 70%;
     -webkit-animation-iteration-count: infinite;
     -webkit-animation-timing-function: linear;
 }
+
 
 /* almost verbatim from jquery-filer */
 
