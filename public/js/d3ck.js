@@ -1050,7 +1050,8 @@ function queue_or_die(queue) {
         }
 
         else if (queue.event == 'vpn_stop') {
-            $('#alertify').addClass('alertify-hide alertify-hidden')
+            console.log('cancel dialogue')
+            $('#alertify-cancel').click()
             inform_user('VPN', 'vpn stop', 'vpn')
         }
 
@@ -1982,7 +1983,7 @@ function inform_user(title, message, level, element) {
         // opts.desktop     = { desktop: true }  // wow^2!
 
         opts.type        = 'success'
-        if (title == 'vpn_stop')
+        if (title == 'VPN')
             opts.type    = 'warning'
 
 
