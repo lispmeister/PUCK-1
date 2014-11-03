@@ -1149,10 +1149,11 @@ function resolveGeo(ip_addr) {
         ip2geo[ip_addr] = geo_data
 
         // d3ck_queue.push({type: 'info', event: 'geo', ip_addr: ip_addr, geodata: geo_data })
-
         // return geo_data
         // res.send(200, geo_data )
+
         return deferred.resolve(geo_data)
+
 
     }).catch(function (error) {
         console.log('geo err! What or where - is the world coming to?')
@@ -3350,19 +3351,41 @@ function https_get(url) {
     var deferred = Q.defer();
     var str      = ""
 
-    https.get(url, function (res) {
 
-        res.on('data', function (chunk) {
-            str += chunk;
+    // xxx - yeah, yeah....
+    var d = require('domain').create();
+
+    d.run(function() {
+        console.log("snaggin' " + url)
+
+        request(url, function (err, res, body) {
+            if (!err) {
+                // success
+                console.log("we're going home, ma!")
+                // console.log(body)
+                deferred.resolve(body)
+            }
+            if (err) {
+                console.log('errz on snags: ' + JSON.stringify(err) )
+                deferred.reject(err)
+            }
         });
 
-        res.on('end', function () {
-            console.log('https_get deferred response: ' + str.substring(0,1024))
-            deferred.resolve(str)
-        });
-    })
-    
+    });
+
+    d.on('error', function(err) {
+        if (err.message != 'connect ECONNREFUSED') {
+            console.log('https.get !lucky: ' + err.message);
+            deferred.reject(err)
+        }
+        else {
+            console.log('https.get cronked on some bad shit: ' + err.message);
+            deferred.reject(err)
+        }
+    });
+
     return deferred.promise;
+
 
 }
 
