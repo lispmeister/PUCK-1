@@ -2090,7 +2090,7 @@ function ask_user_4_response(data) {
                     console.log('go for it')
                     answer = 'yes'
 
-                    var message_request = '<span><img style="float: left; height:64px; border-radius:50%;" src="' + all_d3ck_ids[req.from_d3ck].image + '">' +
+                    var message_request = '<span><img style="float: left; height:64px;" src="' + all_d3ck_ids[req.from_d3ck].image + '">' +
                                           '<h2 style="position: relative;">Connecting...</h2></span><br />'
 
 
