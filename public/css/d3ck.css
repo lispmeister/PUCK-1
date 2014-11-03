@@ -23,11 +23,12 @@ video {
     height: 200px;
 }
 
-img d3ck_img {
+.d3ck_img {
     display: block;
     /* cards are about 3.5 x 2.25 (2.5 for poker) */
-    max-width:  200px;
-    max-height: 124px;
+    max-width:  250px;
+    max-height: 200px;
+    padding: 4;
     width: auto;
     height: auto;
 }

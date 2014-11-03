@@ -312,7 +312,7 @@ $(document).ready(function () {
                                  '<div class="polaroid" >'                                                             +
                                     '<p>{{owner}}</p>'                                                                 +
                                     '<a href="/d3ck_details.html?d3ckid={{d3ckid}}">'                                  +
-                                    '<img id="img_{{d3ckid}}" class="d3ck_img" width=200 style="padding: 4;" src="{{image}}">' +
+                                    '<img id="img_{{d3ckid}}" class="d3ck_img" src="{{image}}">' +
                                     '</a>'                                                                             +
                                  '</div>'                                                                              +
                                  '<div class="caption">'                                                               +
