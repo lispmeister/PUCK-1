@@ -3140,10 +3140,10 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 if (responses == all_ips.length && !ping_done) {
                     console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
                     ping_done = true
-                    response = {status: "ping failure", "error": e}
+                    response = {status: "ping failure", "error": error }
                     // synchronicity... II... shouting above the din of my rice crispies
-                    try { res.send(408, response) }
-                    catch (e) { console.log('sPing error ' + e) }
+                    try       { res.send(408, response) }
+                    catch (e) { console.log('sPing error ' + JSON.stringify(e)) }
                 }
 
             })
@@ -3578,7 +3578,10 @@ function create_d3ck_locally(ip_addr) {
             r_deferred.reject({ "error": JSON.stringify(error)})
         });
 
-    })
+    }).fail(function (error) {
+        console.log("in create d3ck errz: " + error);
+        r_deferred.reject({ "error": error })
+    });
 
     return deferred.promise;
 
