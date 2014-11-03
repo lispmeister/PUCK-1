@@ -1154,7 +1154,13 @@ function resolveGeo(ip_addr) {
         // res.send(200, geo_data )
         return deferred.resolve(geo_data)
 
+    }).catch(function (error) {
+        console.log('geo err! What or where - is the world coming to?')
+        console.log(error)
+        return deferred.reject(error)
     })
+    .done();
+
 
     return deferred.promise;
 
@@ -2154,7 +2160,10 @@ function stopVPN(req, res, next) {
 
             console.log(options)
 
-            request.get(url, options, function cb (err, resp) {
+
+            // request.get(url, options, function cb (err, resp) {
+            https_get(url).then(function (resp) {
+
                 if (err) {
                     console.error('vpn stop request failed:', JSON.stringify(err))
                     res.send(200, {"errz": "vpn stop request failed"});
@@ -2168,7 +2177,14 @@ function stopVPN(req, res, next) {
 
                     res.send(200, {"status": "vpn down"});
                 }
+            }).catch(function (error) {
+                console.log('vpn-stop err')
+                console.log(error)
+                res.send(420, {"error": "error brining down vpn"});
             })
+            .done();
+
+
         }
         else {
 
@@ -3064,28 +3080,23 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
 
         var url = 'https://' + ip + ':' + d3ck_port_ext + '/ping'
 
-        var req = https.get(url, function(response) {
-
-            var ping_data = ''
-            response.on('data', function(chunk) {
-                ping_data += chunk
-            })
-            response.on('end', function() {
-                // console.log('+++ someday has come for ' + ip + ' ... ping response back')
-                // console.log(ping_data)
-                try {
-                    ping_data = JSON.parse(ping_data)
+        // var req = https.get(url, function(response) {
+        https_get(url).then(function (ping_data) {
+            // console.log('+++ someday has come for ' + ip + ' ... ping response back')
+            // console.log(ping_data)
+            try {
+                ping_data = JSON.parse(ping_data)
+            }
+            catch (e) {
+                if (JSON.stringify(e) != "{}") {
+                    console.log('errz socket parsing: ' + JSON.stringify(e))
+                    response = {status: "ping failure", "error": e}
+                    // synchronicity... II... shouting above the din of my rice crispies
+                    try { res.send(408, response) }
+                    catch (e) { console.log('sPing error ' + e) }
                 }
-                catch (e) {
-                    if (JSON.stringify(e) != "{}") {
-                        console.log('errz socket parsing: ' + JSON.stringify(e))
-                        response = {status: "ping failure", "error": e}
-                        // synchronicity... II... shouting above the din of my rice crispies
-                        try { res.send(408, response) }
-                        catch (e) { console.log('sPing error ' + e) }
-                    }
-                    return
-                }
+                return
+            }
 
                 // data.ip = ip
                 // console.log('ip: ' + ip + ', data: ' + JSON.stringify(ping_data))
@@ -3118,22 +3129,39 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                     response = {status: "no answer"}
                     res.send(408, response)
                 }
-            })
-        })
-        .on('error', function(e) {
-            // console.log(e)
-            // console.log(responses + ' v.s. ' + all_ips.length)
-            responses++
+            }).catch(function (error) {
 
-            if (responses == all_ips.length && !ping_done) {
-                console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
-                ping_done = true
-                response = {status: "ping failure", "error": e}
-                // synchronicity... II... shouting above the din of my rice crispies
-                try { res.send(408, response) }
-                catch (e) { console.log('sPing error ' + e) }
-            }
-        })
+                // res.send(420, {"error": "error ring a ping ping"});
+                console.log("ping ping err err " + JSON.stringify(error))
+
+                responses++
+
+                if (responses == all_ips.length && !ping_done) {
+                    console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
+                    ping_done = true
+                    response = {status: "ping failure", "error": e}
+                    // synchronicity... II... shouting above the din of my rice crispies
+                    try { res.send(408, response) }
+                    catch (e) { console.log('sPing error ' + e) }
+                }
+
+            })
+            .done();
+
+//         .on('error', function(e) {
+//             // console.log(e)
+//             // console.log(responses + ' v.s. ' + all_ips.length)
+// 
+//             if (responses == all_ips.length && !ping_done) {
+//                 console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
+//                 ping_done = true
+//                 response = {status: "ping failure", "error": e}
+//                 // synchronicity... II... shouting above the din of my rice crispies
+//                 try { res.send(408, response) }
+//                 catch (e) { console.log('sPing error ' + e) }
+//             }
+//         })
+
 
     })
 
