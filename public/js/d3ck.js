@@ -2085,12 +2085,43 @@ function ask_user_4_response(data) {
                 var post_data = { 'ip_addr' : my_d3ck.ip_addr, 'from_d3ck': req.from_d3ck, 'did': my_d3ck.D3CK_ID }
                 post_data     = JSON.stringify(post_data)
 
+                // if they say yes....
                 if (e) {
                     console.log('go for it')
                     answer = 'yes'
+
+                    var message_request = '<span><img style="float: left; height:64px; border-radius:50%;" src="' + all_d3ck_ids[req.from_d3ck].image + '">' +
+                                          '<h2 style="position: relative;">Connecting...</h2></span><br />'
+
+
+                    alertify.set({
+                        buttonReverse   : true,
+                        labels          : { ok: 'Answer', cancel: 'Decline' }
+                    });
+
+                    // xxx - if user hits cancel... ignore for now... probably not optimal, lol
+                    alertify.confirm(message_request, function (e) {
+                        console.log('cancel...?')
+                        console.log(e)
+
+                        var answer    = ''
+
+                        // this will be hidden... only programatically triggered, hopefully
+                        if (e) {
+                            console.log('clicking... ok, ok')
+                        }
+                        else {
+                            inform_user('info', 'you cancelled the call', 'warning')
+                            console.log('give it the ol college try')
+                            event_hang_up(d3ckid)
+                        }
+                    })
+
+
+                    $('#alertify-ok').hide()
                     inform_user('request', 'lowering shields to ' + req.ip_addr)
                     lower_shields(req.ip_addr)
-                    // alertify.success("VPN connection will commence...", "", 0)
+
                 }
                 else {
                     answer = 'no'
@@ -2159,7 +2190,7 @@ function show_user_sequence(d3ckid) {
     //
 
     var message_request = '<h2 style="position: relative;">Calling</h2>' +
-                          '<img style="float: left; height:64px; border-radius:50%;" src="' + all_d3ck_ids[d3ckid].image + '"></span><br />'
+                          '<img style="display: block; margin-left: auto; margin-right: auto; height:64px;" src="' + all_d3ck_ids[d3ckid].image + '">'
 
     $("#labels", function () {
         alertify.set({
