@@ -3138,7 +3138,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
                 responses++
 
                 if (responses == all_ips.length && !ping_done) {
-                    console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
+                    // console.log('+++ someday has come... in a bad way for ' + ip + ' ... ping failure')
                     ping_done = true
                     response = {status: "ping failure", "error": error }
                     // synchronicity... II... shouting above the din of my rice crispies
