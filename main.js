@@ -3133,7 +3133,7 @@ function httpsPing(ping_d3ckid, ipaddr, res, next) {
             }).catch(function (error) {
 
                 // res.send(420, {"error": "error ring a ping ping"});
-                console.log("ping ping err err " + JSON.stringify(error))
+                // console.log("ping ping err err " + JSON.stringify(error))
 
                 responses++
 
@@ -3366,7 +3366,7 @@ function https_get(url) {
                 deferred.resolve(body)
             }
             if (err) {
-                console.log('errz on snags: ' + JSON.stringify(err) )
+                // console.log('errz on snags: ' + JSON.stringify(err) )
                 deferred.reject(err)
             }
         });
@@ -3374,12 +3374,12 @@ function https_get(url) {
     });
 
     d.on('error', function(err) {
-        if (err.message != 'connect ECONNREFUSED') {
-            console.log('https.get !lucky: ' + err.message);
+        if (err.code == 'ECONNREFUSED' || err.code == 'EHOSTUNREACH') {
+            console.log('https.get !lucky: ' + JSON.stringify(err));
             deferred.reject(err)
         }
         else {
-            console.log('https.get cronked on some bad shit: ' + err.message);
+            console.log('https.get cronked on some weird/bad shit: ' + JSON.stringify(err.message));
             deferred.reject(err)
         }
     });
