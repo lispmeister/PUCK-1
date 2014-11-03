@@ -127,16 +127,17 @@ $(document).ready(function () {
         var ipaddr  = $(this).parent().find('#ipaddr').val()
         var target  = $(this).parent().find('#name').val()
 
-        console.log('nock')
-        console.log(vd3ckid, ipaddr)
+        console.log('nock?')
 
-        show_user_sequence(vd3ckid)
+        console.log(vd3ckid, ipaddr)
 
         // if we're connected, don't knock again
         if (typeof d3ck_status.openvpn_client != 'undefined' && typeof d3ck_status.openvpn_server != 'undefined' && 
             (d3ck_status.openvpn_client.vpn_status == "up" || d3ck_status.openvpn_server.vpn_status == "up")) {
             return
         }
+
+        show_user_sequence(vd3ckid)
 
         var knock_knock = $.ajax({
             type: "POST",
