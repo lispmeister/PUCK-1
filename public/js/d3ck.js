@@ -2064,7 +2064,7 @@ function ask_user_4_response(data) {
         var friend = req.from
 
         // var message_request = '<h2>' + req.from + '</h2> wants to connect from <span style="font-weight: 600">' + req.ip_addr + '</span><br /><span style="font-weight:100">' + req.from_d3ck + '</span><br />'
-        var message_request = '<span><img style="float: left; height:64px; border-radius:50%;" src="' + all_d3ck_ids[req.from_d3ck].image + '">' +
+        var message_request = '<span><img style="float: left; height:64px;" src="' + all_d3ck_ids[req.from_d3ck].image + '">' +
                               '<h2 style="position: relative;">' + req.from + '</h2></span><br />'
 
         $("#labels", function () {
