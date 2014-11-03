@@ -1119,7 +1119,7 @@ function resolveGeo(ip_addr) {
     // free geo service
     var url = 'https://freegeoip.net/json/' + ip_addr
 
-    console.log('resolving geo stuff from: ' + url)
+    console.log('in resolve_geo: ' + url)
 
     var deferred = Q.defer();
 
@@ -3346,7 +3346,7 @@ function quikStart(req, res, next) {
 //
 function https_get(url) {
 
-    console.log('getting... ' + url)
+    // console.log('getting... ' + url)
 
     var deferred = Q.defer();
     var str      = ""
