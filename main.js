@@ -3356,12 +3356,12 @@ function https_get(url) {
     var d = require('domain').create();
 
     d.run(function() {
-        console.log("snaggin' " + url)
+        // console.log("snaggin' " + url)
 
         request(url, function (err, res, body) {
             if (!err) {
                 // success
-                console.log("we're going home, ma!")
+                // console.log("we're going home, ma!")
                 // console.log(body)
                 deferred.resolve(body)
             }
