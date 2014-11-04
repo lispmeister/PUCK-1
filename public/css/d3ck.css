@@ -1,6 +1,14 @@
 
 /* some simple additions */
 
+/* bootstrap colors - from http://getbootstrap.com/customize/#less-variables */
+.bs_danger  { color: #d9534f; }
+.bs_info    { color: #5bc0de; }
+.bs_primary { color: #428bca; }
+.bs_success { color: #5cb85c; }
+.bs_warning { color: #f0ad4e; }
+
+
 .tippy-top      { top: 0px    !important; }
 
 .nav .active a { background:#blue!important }
@@ -9,19 +17,20 @@
     margin-left: 80px;
 }
 
-/* boot blue => 2b94ea */
-
 #remote_videos video {
-    height: 300px;
-}
-#local_video {
-    height: 300px;
+    max-height: 500px;
 }
 
+#local_videos {
+    height: 360px;
+}
+
+/*
 video {
     width: 350px;
     height: 200px;
 }
+*/
 
 .d3ck_img {
     display: block;
@@ -31,6 +40,12 @@ video {
     padding: 4;
     width: auto;
     height: auto;
+}
+
+.glyph_badge {
+   background: #428bca;  /* bootstrap primary */
+   position:relative;
+   top: -20px;
 }
 
 
@@ -127,7 +142,6 @@ div.growlUI h1, div.growlUI h2 {
 
 /* bootstrap green */
 /* div .cat_chat:first { background-color: "#dff0d8" } */
-
 
 /* http://www.bootply.com/113647# */
 .btn-hover {

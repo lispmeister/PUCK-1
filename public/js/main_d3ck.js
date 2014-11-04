@@ -47,7 +47,7 @@ $(document).ready(function () {
     $('#video_effect').change(function() {
         var opt = $('option:selected', this).attr('value')
         console.log('ch-ch-ch-changing to ' + opt)
-        $('#localVideo').css('-webkit-filter', opt);
+        $('#remoteVideos video').css('-webkit-filter', opt);
     });
 
 

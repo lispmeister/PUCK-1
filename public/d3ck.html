@@ -202,7 +202,7 @@
     
                 <div class="row-fluid marketing" id="d3ck_friends">
                     <div class="muted">
-                        <h3>Friends <a href="#modalD3ck" role="button" class="btn btn-primary btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span></a></h3>
+                        <h3><a href="#modalD3ck" role="button" class="btn btn-primary btn-xs" data-toggle="modal"><span class="glyphicon glyphicon-plus"></span></a> Friends</h3>
                     </div>
         
                     <!-- spinner when loading d3cks -->
@@ -546,22 +546,17 @@
                         </div>  <!-- row -->
                     </div> <!-- container -->
 
-                <style>
-                    #remoteVideos video { height: 360px; }
-                    #localVideo   video { height: 240px; }
-                </style>
-
-                <div id="all_videos">
+                
+                <div id="all_videos" class="col-md-8">
 
                     <div id="remoteVideos">
                         <h4 id="h4_remote">Remote Video</h4>
                     </div>
 
-                    <h4 id="h4_local">Local Video</h4>
-                    <!-- little hack for fun -->
-                    <span id="video_effect_div" class="hidden">
-                        <span class="spacer10"></span>
-                        <select id="video_effect"  class="textbox">
+                        <!-- little hack for fun -->
+                        <span id="video_effect_div" class="hidden">
+                         <span class="spacer10"></span>
+                          <select id="video_effect"  class="textbox">
                             <option><b>Select an effect</b></option>
                             <option id="vid-sepia"      value="sepia(1)">          sepia</option>
                             <option id="vid-blur"       value="blur(3px)">         blur</option>
@@ -572,10 +567,17 @@
                             <option id="vid-saturate"   value="saturate(3)">       saturate</option>
                             <option id="vid-opacity"    value="opacity(0.3)">      opacity</option>
                             <option id="vid-clear"      value="clear">             <span id="cleary">clear effects</span></option>
-                        </select>
-                    </span>
+                         </select>
+                        </span>
 
-                    <video id="localVideo"></video>
+
+                    <div id="localVideos">>
+
+                        <h4 id="h4_local">Local Video</h4>
+
+                        <video id="localVideo"></video>
+
+                    </div>
 
                 </div>
             </div>

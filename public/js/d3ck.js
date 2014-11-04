@@ -936,7 +936,8 @@ function queue_or_die(queue) {
             var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
 
             // does it go into our vault?
-            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
+            // $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
+            load_vault()
 
             inform_user('File Upload', '<strong>' + queue.d3ck_status.file_events.file_name + '</strong>  ('  + queue.d3ck_status.file_events.file_size + ' bytes); uploaded', 'success')
         }
@@ -1009,7 +1010,8 @@ function queue_or_die(queue) {
             var friend = all_d3ck_ids[queue.d3ck_status.file_events.did].owner.name
 
             // does it go into our vault?
-            $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
+            // $('#d3ck_cloud_file_listing tr:last').after('<tr><td><a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a></td></tr>')
+            load_vault()
 
             inform_user('File Upload', '<a target="_blank" href="/uploads/' + queue.d3ck_status.file_events.file_name + '">' + queue.d3ck_status.file_events.file_name + '</a> ('  + queue.d3ck_status.file_events.file_size + ' bytes); was sent to you by ' + friend, 'success')
 
@@ -1356,7 +1358,16 @@ function load_vault() {
         console.log('jxq file vault listing')
         console.log(data.files)
 
+        // clear out whatever might be there if updating
+        $('#d3ck_cloud_file_listing').html("'<tr><td><strong> files </strong> </td></tr>'")
+
         var vault = []
+
+        var num_files = data.files.length
+        if (num_files > 0) {
+            $('#d3ck_top_cloud').html('').append('<span style="font-size: 10px" class="badge badge-info glyph_badge">' + num_files + '</span>')
+        }
+
 
         for (var i = 0; i < data.files.length; i++) {
             console.log(data.files[i])
@@ -1704,6 +1715,8 @@ function set_up_RTC(remote) {
     }
 
     console.log('setting up RTC: ' + SIGNALING_SERVER)
+
+    // media: {"audio": true, "video": {"optional": [{"minWidth": "1280"}, {"minHeight": "720"}], "mandatory": {}}}
 
     $('#remoteVideos video').remove()
 
@@ -2190,7 +2203,7 @@ function show_user_sequence(d3ckid) {
     //
 
     var message_request = '<h2 style="position: relative;">Calling</h2>' +
-                          '<img style="display: block; margin-left: auto; margin-right: auto; height:64px;" src="' + all_d3ck_ids[d3ckid].image + '">'
+                          '<img style="display: block; margin-left: auto; margin-right: auto; height:25%;" src="' + all_d3ck_ids[d3ckid].image + '">'
 
     $("#labels", function () {
         alertify.set({
