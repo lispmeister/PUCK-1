@@ -1224,8 +1224,11 @@ function getDNS (req, res, next) {
                 res.send(420,   {ip: ip, fqdn : err } )
             }
             else {
+                fqdn         = fqdn.join()
                 ip2fqdns[ip] = fqdn
-                console.log('reverse for ' + ip + ': ' + JSON.stringify(fqdn));
+
+                console.log('reverse for ' + ip + ': ' + fqdn);
+
                 deferred.resolve({ip: ip, fqdn : fqdn } )
                 res.send(200,    {ip: ip, fqdn : fqdn } )
             }

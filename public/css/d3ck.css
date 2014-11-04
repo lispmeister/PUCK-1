@@ -41,6 +41,12 @@ video { width: 350px; height: 200px; }
    top: -20px;
 }
 
+.d3ck_vpn {
+    display:      block;
+    margin-left:  auto !important;
+    margin-right: auto !important;
+}
+
 
 @font-face {
   font-family: 'Diplomata-Regular';

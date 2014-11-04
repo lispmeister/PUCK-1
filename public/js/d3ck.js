@@ -568,7 +568,7 @@ var ip2geo   = {}
     // console.log('ajE: ' + errorThrown)
 // }
 
-function d3ck_ping(all_ips, d3ckid, url) {
+function d3ck_ping(all_ips, d3ckid) {
 
     // console.log('in d3ck_ping')
     // console.log(d3ckid, url)
@@ -639,15 +639,9 @@ function d3ck_ping(all_ips, d3ckid, url) {
                 jqXHR_get_dns.done(function (dns_data, textStatus, jqXHR) {
                     console.log('dns returned: ' + dns_data.fqdn)
 
-                    if (dns_data.fqdn.code = 'ENOTFOUND') { dns_data.fqdn = data.ip }
+                    // if (dns_data.fqdn.code = 'ENOTFOUND') { dns_data.fqdn = data.ip }
 
-                    try {
-                        $(ele2).text(dns_data.fqdn.join())
-                    }
-                    catch (e) {
-                        $(ele2).text(dns_data.fqdn)
-                    }
-
+                    $(ele2).text(dns_data.fqdn)
                     ip2fqdn[data.ip] = dns_data.fqdn
 
                 }).fail(function(err) {
@@ -1636,7 +1630,7 @@ function print_d3ck(id3ck, d3ckinfo, elements) {
                               '<strong>ip address</strong>: {{ip}} <br />' +
                               '<strong>vpn ip address</strong>: {{vpn_ip}} <br />' +
                               '<strong>all ips known</strong>: {{all_ips}} <br />' +
-                              '<div style="width: 200px"><img style="max-width:100%" src="{{image}}"></div>'
+                              '<div style="width: 200px"><a href="{{image}}"><img style="max-width:100%" src="{{image}}"></a></div>'
 
     var v_html   = Mustache.to_html(vpn_template, vpn)
     var v_c_html = Mustache.to_html(vpn_client_template, vpn_client)

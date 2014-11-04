@@ -283,7 +283,7 @@ $(document).ready(function () {
                             proto = 'https'
                         }
 
-                        var d3ck_url         = proto + '://' + ipaddr_ext + ':' + port_ext
+                        // var d3ck_url         = proto + '://' + ipaddr_ext + ':' + port_ext
 
                         // have to kill spaces... die, die, die!
                         d3ckid = d3ckid.replace(/\s+/g, '');
@@ -296,7 +296,7 @@ $(document).ready(function () {
                            image          : image,
                            ipaddr         : ipaddr,
                            all_ips        : all_ips,
-                           url            : d3ck_url,
+                           // url            : d3ck_url,
                            vpn_form       : vpn_form,
                            span_owner     : 'span_' + owner,
                            span_email     : 'span_' + email
@@ -320,7 +320,7 @@ $(document).ready(function () {
                                     '<span class="remote_ip">IP Address: <strong>{{ipaddr}}</strong> </span> <br />'       +
                                     '<span class="remote_fqdn">Hostname: <strong></strong> </span> <br />'       +
                                     '<span class="remote_geo">Where: <strong></strong> </span> <br />'       +
-                                    '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
+                                    // '<span id="{{ipaddr}}">URL: <strong>{{url}}</strong> </span> <br />'               +
                                     '<span id="{{email}}"> Email: <strong>{{email}}</strong>   </span> <br />'         +
                                     '<br />' +
                                     '<form id="{{vpn_form}}" action="/vpn/start" method="POST">'                       +
@@ -350,9 +350,9 @@ $(document).ready(function () {
                          ping_poll = 10000
 
                          // pingy - check if system is up... do it once, then at regular intervals
-                         d3ck_ping(all_ips, d3ckid, d3ck_url)
+                         d3ck_ping(all_ips, d3ckid)
                          // args are function, timeout, function (ips, did, and url)
-                         setInterval(d3ck_ping, ping_poll, all_ips, d3ckid, d3ck_url)
+                         setInterval(d3ck_ping, ping_poll, all_ips, d3ckid)
 
                          // start images in gray, color (if avail) on mouseover
                          // console.log('adipoli: ' + d3ckid)
