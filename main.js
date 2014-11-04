@@ -366,7 +366,7 @@ var N_ROUNDS = parseInt(config.crypto.bcrypt_rounds)
 // it will pass/fail/need-confirm/etc.
 //
 
-// the capabilities structure is in puck.json; it looks something like this:
+// the capabilities structure is in D3CK.json; it looks something like this:
 //
 //  "capabilities" : {
 //      "friend request":       { "paranoid": "off", "moderate": "ask", "trusting": "on"  },
