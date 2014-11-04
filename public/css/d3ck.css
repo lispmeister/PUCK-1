@@ -17,19 +17,12 @@
     margin-left: 80px;
 }
 
-#remote_videos video {
-    max-height: 500px;
-}
+/* 
 
-#local_videos {
-    height: 360px;
-}
+#remote_videos video { max-height: 500px; }
+#local_videos { height: 360px; }
+video { width: 350px; height: 200px; }
 
-/*
-video {
-    width: 350px;
-    height: 200px;
-}
 */
 
 .d3ck_img {

@@ -2203,7 +2203,7 @@ function show_user_sequence(d3ckid) {
     //
 
     var message_request = '<h2 style="position: relative;">Calling</h2>' +
-                          '<img style="display: block; margin-left: auto; margin-right: auto; height:25%;" src="' + all_d3ck_ids[d3ckid].image + '">'
+                          '<img style="display: block; margin-left: auto; margin-right: auto; height:64px;" src="' + all_d3ck_ids[d3ckid].image + '">'
 
     $("#labels", function () {
         alertify.set({
