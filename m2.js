@@ -629,7 +629,6 @@ passport.use(new l_Strategy(
 
 ))
 
-
 //
 // watch vpn logs for incoming/outgoing connections
 //
@@ -1211,8 +1210,7 @@ function getDNS (req, res, next) {
             console.log('shuxx0r, dns blew a gastket, could be an issue: ' + err.message);
         }
         deferred.reject({ip: ip, fqdn : err } )
-        res.send(200, { ip: ip, fqdn : ip })
-        // res.send(420,   {ip: ip, fqdn : err } )
+        res.send(420,   {ip: ip, fqdn : err } )
 
     });
     d.run(function() {
@@ -3822,6 +3820,34 @@ server.use(server.router);
 
 // passport auth
 server.use(auth)
+
+
+
+var everyauth = require('everyauth')
+
+everyauth.everymodule
+  .findUserById( function (id, callback) {
+    callback(null, usersById[id]);
+  });
+
+everyauth
+  .twitter
+  .entryPath('/twitter')
+  .callbackPath('/twitter/callback')
+  .consumerKey(conf.twit.consumerKey)
+  .consumerSecret(conf.twit.consumerSecret)
+  .findOrCreateUser( function (sess, accessToken, accessSecret, twitUser) {
+      return usersByTwitId[twitUser.id] || (usersByTwitId[twitUser.id] = addUser('twitter', twitUser));
+  })
+  .redirectPath('/');
+
+server.get('/twitter/user', function (req, res) {
+  console.log(req.user);  // FTW!
+});
+
+
+
+
 
 //
 //

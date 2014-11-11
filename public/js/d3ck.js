@@ -70,18 +70,18 @@ function formatErrorMessage(jqXHR, exception) {
 }
 
 // ping myself
-function who_am_i() {
-    $.get('/ping', function(d3ck) {
-        console.log('my name/id/status are: ', d3ck.name, d3ck.did, d3ck.status)
-        // d3ck_status = 'Name: ' + d3ck.name + '<br />Status: ' + d3ck.status + '<br />ID: ' + d3ck.did
-        // get my own data
-        $.getJSON('/d3ck/' + d3ck.did, function(d3ckinfo) {
-            console.log('my D3CK:')
-            my_d3ck = d3ckinfo
-            console.log(my_d3ck)
-        })
-    })
-}
+// function who_am_i() {
+//     $.get('/ping', function(d3ck) {
+//         console.log('my name/id/status are: ', d3ck.name, d3ck.did, d3ck.status)
+//         // d3ck_status = 'Name: ' + d3ck.name + '<br />Status: ' + d3ck.status + '<br />ID: ' + d3ck.did
+//         // get my own data
+//         $.getJSON('/d3ck/' + d3ck.did, function(d3ckinfo) {
+//             console.log('my D3CK:')
+//             my_d3ck = d3ckinfo
+//             console.log(my_d3ck)
+//         })
+//     })
+// }
 
 //
 // some funs to grab the event data
@@ -574,12 +574,18 @@ function d3ck_ping(all_ips, d3ckid) {
     // console.log(d3ckid, url)
     // console.log(all_ips)
 
-    // $.ajaxSetup({ error: aj_errz })
+    // if previously answered on an IP, then try that... if that doesn't
+    // work, then fall back to all of them
+    if (typeof all_pings[d3ckid] != "undefined") {
+        console.log("trying last one... if it worked, don't break it")
+        all_ips = all_pings[d3ckid]
+    }
+    else {
+        console.log("that didn't work... try try again with everyone...")
+        // delete all_pings[ping_url]
+    }
 
-    // var ping_url = '/sping/' + d3ckid + "/" + all_ip_string
     var ping_url = '/sping/' + d3ckid + "/" + all_ips
-
-    // console.log('pinging ' + d3ckid + ' ... URL ... ' + ping_url)
 
     var ping_id  = ''
 
@@ -592,9 +598,6 @@ function d3ck_ping(all_ips, d3ckid) {
         cache: false
     })
 
-    // if (typeof all_pings[ping_url] == "undefined") {
-    all_pings[ping_url] = false
-    // }
 
     //
     // XXX -
@@ -612,7 +615,7 @@ function d3ck_ping(all_ips, d3ckid) {
         // make the button clickable and green
         if (data.status == "OK") {
 
-            all_pings[ping_url] = true
+            all_pings[d3ckid] = data.ip
 
             // console.log('success with ' + ping_url)
             $('#'+element_id).addClass('btn-primary').removeClass('disabled')
@@ -652,8 +655,10 @@ function d3ck_ping(all_ips, d3ckid) {
                     console.log(err)
                 })
 
+
                 // 
-                // look up geo along with DNS lookups
+                // look up geo along with DNS lookups... once success/fail, won't check again
+                // until you reload page/come back
                 //
                 if (typeof ip2geo[data.ip] == "undefined") {
                     var ele3    = $('#'+element_id).parent().closest('div').find('.remote_geo strong')
@@ -708,15 +713,28 @@ function d3ck_ping(all_ips, d3ckid) {
         }
         else {
             console.log('not ok...')
+            try {
+                delete all_pings[d3ckid]
+            }
+            catch (e) { }
+
             $('#' + safe_id).remove() // remove old, add new form
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
         }
     }).fail(function(err) {
+            try {
+                delete all_pings[d3ckid]
+            }
+            catch (e) { }
             // console.log( "ping fail for " + ping_url)
             // console.log(err)
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')
             $('#'+element_id).closest('form').find('div').remove()
     }).error(function(err) {
+            try {
+                delete all_pings[d3ckid]
+            }
+            catch (e) { }
             // console.log( "ping error for " + ping_url)
             // console.log(err)
             $('#'+element_id).removeClass('btn-primary').addClass('disabled')

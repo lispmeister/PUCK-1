@@ -225,20 +225,22 @@ $(document).ready(function () {
 
         $('#d3ck_status').attr("data-toggle", "popover").attr("data-placement", "bottom").attr("data-html", "true").attr("title", "D3CK Status").attr("data-content", my_d3ck_status).popover({delay: { hide: 200 }, trigger: "hover"})
 
+    })
+
         // get the other d3cks we know about from local REST
-        $.getJSON('/d3ck', function(d3cks) {
+    $.getJSON('/d3ck', function(d3cks) {
 
-            if (d3cks.length == 1) {
-                $('#d3ck_friends').append("<div class='row'><div class='col-md-4 top-spacer-50'>It appears you have no friends... but don't worry, we won't tell everyone you're a loser.  Click on the blue/white plus button above to add another D3CK, assuming their owner would be willing to talk to you (and you know their IP address or hostname).  Maybe I can link in some <a target='_blank' href='https://www.youtube.com/watch?v=oHg5SJYRHA0'>youtube videos</a> and break out <a target='_blank' href='http://www.amazon.com/Orville-Redenbacher-Butter-Popcorn-10-Count/dp/B0049M7LA2'>the popcorn</a> if that doesn't work for you.</div></div>")
-            }
+        if (d3cks.length == 1) {
+            $('#d3ck_friends').append("<div class='row'><div class='col-md-4 top-spacer-50'>It appears you have no friends... but don't worry, we won't tell everyone you're a loser.  Click on the blue/white plus button above to add another D3CK, assuming their owner would be willing to talk to you (and you know their IP address or hostname).  Maybe I can link in some <a target='_blank' href='https://www.youtube.com/watch?v=oHg5SJYRHA0'>youtube videos</a> and break out <a target='_blank' href='http://www.amazon.com/Orville-Redenbacher-Butter-Popcorn-10-Count/dp/B0049M7LA2'>the popcorn</a> if that doesn't work for you.</div></div>")
+        }
 
-            // loop over all valid d3cks
-            $.each(d3cks, function(key, val) {
+        // loop over all valid d3cks
+        $.each(d3cks, function(key, val) {
 
-                $('#d3ck_loading').hide()
+            $('#d3ck_loading').hide()
 
-                // for each d3ck get more detailed data
-                $.getJSON('/d3ck/' + val, function(d3ckinfo) {
+            // for each d3ck get more detailed data
+            $.getJSON('/d3ck/' + val, function(d3ckinfo) {
                     console.log('v/p')
                     console.log(val)
                     console.log(d3ckinfo)
@@ -376,8 +378,6 @@ $(document).ready(function () {
                     }
                 })
             })
-        })
-
     })
 
     // message data
