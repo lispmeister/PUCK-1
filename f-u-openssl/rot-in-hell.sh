@@ -14,31 +14,42 @@ echo "  a black crane over the lake"
 echo "  may you rot in hell"
 echo
 
-cd /etc/puck/f-u-openssl
+cd /etc/d3ck/f-u-openssl
 
-. /etc/puck/config.sh
+. /etc/d3ck/config.sh
 
-. puck-vars
+. d3ck-vars
 
 ./clean-all
 
-rm -f ca.* puck.* vpn_client.*
+rm -f ca.* d3ck.* vpn_client.*
 
 echo Key size will be $KEY_SIZE bits
 
 # randomish CN for CA
 # tmp=$KEY_CN
 # KEY_CN=$bits_o_128
+KEY_CN=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
+magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 
 # create CA
-openssl req -batch -days $KEY_LIFE -nodes -new -newkey rsa:$KEY_SIZE -x509 -keyout ca.key -out ca.crt -config stupid.cnf
+openssl req $magic -batch -nodes -new -newkey rsa:$KEY_SIZE -config stupid.conf -keyout ca.key -out ca.crt -x509 -days $KEY_LIFE
+
+# more pseudo randomnish stuff
+KEY_CN=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
+magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 
 # server
-openssl req $magic -batch -days $KEY_LIFE -nodes -new -newkey rsa:$KEY_SIZE -keyout puck.key -out puck.csr -extensions server -config stupid.cnf
-openssl ca $magic -keyfile ca.key -cert ca.crt -batch -days $KEY_LIFE -out puck.crt -in puck.csr -extensions server -config stupid.cnf
+openssl req $magic -extensions server -batch -nodes -new -newkey rsa:$KEY_SIZE -config stupid.conf -keyout d3ck.key -out d3ck.req -batch
+openssl  ca $magic -extensions server -batch -in d3ck.req -out d3ck.crt -config stupid.conf -days $KEY_LIFE -batch
+
+# even more pseudo random
+KEY_CN=$(dd if=/dev/urandom bs=16 count=1 2>/dev/null| hexdump |awk '{$1=""; printf("%s", $0)}' | sed 's/ //g')
+magic="-subj /C=$KEY_COUNTRY/ST=$KEY_PROVINCE/L=$KEY_CITY/O=$KEY_ORG/CN=$KEY_CN"
 
 # client
-openssl req $magic -nodes -batch -new -newkey rsa:$KEY_SIZE -keyout vpn_client.key -out vpn_client.csr -config stupid.cnf
-openssl ca $magic -cert ca.crt -batch -keyfile ca.key -days $KEY_LIFE -out vpn_client.crt -in vpn_client.csr -config stupid.cnf
+openssl req $magic -extensions client -new -newkey rsa:$KEY_SIZE -config stupid.conf -keyout vpn_client.key -out vpn_client.req -batch -nodes
+openssl  ca $magic -extensions client -batch -in vpn_client.req -out vpn_client.crt -config stupid.conf -days $KEY_LIFE -batch
 
-chmod -R 755 /etc/puck/f-u-openssl/keys
+chmod -R 755 /etc/d3ck/f-u-openssl
+

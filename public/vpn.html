@@ -2,12 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>PUCKasaurus Rex!</title>
+    <title>D3CKasaurus Rex!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="rawr!">
 
     <link href="/css/bootstrap.css" rel="stylesheet">
-    <link href="/css/puck.css" rel="stylesheet">
+    <link href="/css/d3ck.css" rel="stylesheet">
 
     <style type="text/css">
       body {
@@ -60,7 +60,7 @@
       <script src="/js/html5shiv.js"></script>
     <![endif]-->
 
-   <!-- for pucks -->
+   <!-- for d3cks -->
    <!-- http://cube3x.com/adipoli-jquery-image-hover-plugin/ -->
    <link href="/css/adipoli.css" rel="stylesheet" type="text/css"/>
 
@@ -73,12 +73,12 @@
 
       <div class="masthead">
         <ul class="nav nav-pills pull-right">
-          <li> <button class="btn btn-danger disabled nounderline" id="puck_video" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></a></button>
-          <li class="muted"><a href="https://github.com/the-puck">Github</a></li>
+          <li> <button class="btn btn-danger disabled nounderline" id="d3ck_video" type="button"><a style="text-decoration: none" href="/vpn.html"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Video</span></a></button>
+          <li class="muted"><a href="https://github.com/the-d3ck">Github</a></li>
           <li class="muted"><a href="/logs.html">Logs</a></li>
           <li class="muted"><a href="#">Help</a></li>
         </ul>
-          <h3 class="active"><a href="/puck.html">PUCK!</a></h3>
+          <h3 class="active"><a href="/d3ck.html">D3CK!</a></h3>
       </div>
 
 
@@ -116,7 +116,7 @@
 
         <video id="localVideo"></video>
 
-        <div><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="puck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>
+        <div><button data-loading-text="hanging up..." class="btn btn-warning nounderline" id="d3ck_disconnect" type="button"><span style="color: #fff !important;" class="glyphicon glyphicon-facetime-video"></span> <span style="color: #fff !important;">Disconnect</span></a></button></div>
 
         <div id="remoteVideos"></div>
 
@@ -195,7 +195,7 @@
         <div class="btn-toolbar"> <span></span></div>
         <div class="btn-toolbar"> <span class="spacer100"></span></div>
 
-        <div class="footer" id="puck_footy">
+        <div class="footer" id="d3ck_footy">
             <p id='ip_diddy' class="text-muted credit">no electrons were harmed in the making of this footer</p>
         </div>
     </div>
@@ -221,7 +221,7 @@
 <script type="text/javascript" src="/js/jquery.bootstrap-growl.min.js"></script>
 <script type="text/javascript" src="/js/bootstrap-paginator.js"></script>
 
-<script type="text/javascript" src='/js/puck.js'></script>
+<script type="text/javascript" src='/js/d3ck.js'></script>
 
 <script type='text/javascript'>
 
@@ -229,7 +229,7 @@
     var remote_sock = ""
     var local_sock  = ""
     var socky_love  = false
-    var my_puck     = {}
+    var my_d3ck     = {}
     
     //
     // having troubles with initial hit
@@ -287,7 +287,7 @@ function candid_camera(url) {
 //
 $(document).ready(function () {
 
-    // get my puck data
+    // get my d3ck data
     who_am_i()
 
     // put browser's ip in footer
@@ -297,7 +297,7 @@ $(document).ready(function () {
     $("#ovpn_server_infinity").mCustomScrollbar({ scrollButtons:{ enable:true } });
     $("#cat_chat").mCustomScrollbar({ set_height: 200, set_width: 600, scrollButtons:{ enable:true } });
 
-    // local = our PUCK
+    // local = our D3CK
     local_socket = io.connect()
 
     var ovpn_slogs = 'openvpn_server_logs'
@@ -325,11 +325,11 @@ $(document).ready(function () {
     
                     console.log('trying to connect to... ' + url)
             
-                    PUCK_SOCK_RETRY = 5000
+                    D3CK_SOCK_RETRY = 5000
     
                     put_a_sock_in_it(url)
     
-                    setTimeout('put_a_sock_in_it', PUCK_SOCK_RETRY, url)
+                    setTimeout('put_a_sock_in_it', D3CK_SOCK_RETRY, url)
     
                     remote_socket.on('connect', function(){
 
@@ -351,11 +351,11 @@ $(document).ready(function () {
                             }
                         })
     
-                        remote_socket.emit('puck', 'foo', function (data) {
-                            console.log('[@] + hey pucks... ')
+                        remote_socket.emit('d3ck', 'foo', function (data) {
+                            console.log('[@] + hey d3cks... ')
                             console.log(data)
                         })
-                        remote_socket.on('puck_status', function (data) {
+                        remote_socket.on('d3ck_status', function (data) {
                             console.log('[@] + cat facts... wait...no... status :(')
                             console.log(data)
                         })
@@ -364,8 +364,8 @@ $(document).ready(function () {
                             console.log('remote errz ' + JSON.stringify(err))
                         })
     
-                        //cat_chat(remote_socket, my_puck.PUCK_ID)
-                        cat_chat(remote_socket, my_puck.ip_addr)
+                        //cat_chat(remote_socket, my_d3ck.D3CK_ID)
+                        cat_chat(remote_socket, my_d3ck.ip_addr)
                     })
     
                     remote_socket.on('anything', function(data) {
@@ -387,24 +387,24 @@ $(document).ready(function () {
                 }
                 else {
                     candid_camera('/')
-                    cat_chat(local_socket, my_puck.ip_addr)
+                    cat_chat(local_socket, my_d3ck.ip_addr)
                 }
     
             } // undefined
 
         })
 
-        local_socket.emit('puck', 'foo', function (data) {
-            console.log('hey pucks... ')
+        local_socket.emit('d3ck', 'foo', function (data) {
+            console.log('hey d3cks... ')
             console.log(data)
         })
     
-        local_socket.on('puck_status', function (data) {
+        local_socket.on('d3ck_status', function (data) {
             console.log('cat facts... wait...no... status :(')
             console.log(data)
         })
     
-        local_socket.on('puck_status', function (data) {
+        local_socket.on('d3ck_status', function (data) {
             console.log('cat facts... wait...no... status :(')
             console.log(data)
         })
@@ -428,7 +428,7 @@ $(document).ready(function () {
 
 
     // ... bye bye
-    $('body').on('click', '#puck_disconnect', function() {
+    $('body').on('click', '#d3ck_disconnect', function() {
         $('body').removeClass('avgrund-active');
         event_hang_up()
     })
@@ -445,7 +445,7 @@ $(document).ready(function () {
         console.log('catting as : ' + user)
     
         // i is here
-        sock.emit('new_puck', user);
+        sock.emit('new_d3ck', user);
     
         // listener, whenever the server emits 'chat_receive', this updates the chat body
         sock.on('chat_receive', function (stamp, username, data) {
@@ -458,15 +458,15 @@ $(document).ready(function () {
 
             if (typeof username == "undefined") { username = '<unknown>'; }
             console.log('got data! ' + data)
-            if (username != "PUCK") {
+            if (username != "D3CK") {
                 $('#cat_chat').prepend('<div>' + stamp + '<b>'+username + ':</b> ' + data + '<br></div>')
                 // $('#cat_chat').mCustomScrollbar("update")
                 // $('#cat_chat').mCustomScrollbar("scrollTo",".cat_chat:last",{scrollInertia:2500,scrollEasing:"easeInOutQuad"})
             }
         });
     
-        // listener, whenever the server emits 'new_puck', this updates the username list
-        sock.on('new_puck', function(stamp, data) {
+        // listener, whenever the server emits 'new_d3ck', this updates the username list
+        sock.on('new_d3ck', function(stamp, data) {
             console.log('new user!')
             console.log(data)
             $('#users').empty();

@@ -54,7 +54,7 @@ remote_ip=$4
 remote_port=$5
 proto=$6
 
-# will not reverse this, as other PUCK stuff might break, but ensure it's on!
+# will not reverse this, as other D3CK stuff might break, but ensure it's on!
 echo "1" > /proc/sys/net/ipv4/ip_forward
 
 # get the ip addrs for a host, in its mind
@@ -62,16 +62,16 @@ all_ips=$(ifconfig | awk '{if (n) { all[dev] = substr($2, match($2, ":") + 1); n
 
 if [ $direction = "up" ] ; then
         echo "forwarding $proto traffic from $local_ip : $local_port => $remote_ip : $remote_port"
-        echo iptables -t nat -A PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        echo iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -A PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -A POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        echo iptables -t nat -A PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        echo iptables -t nat -A POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
+        iptables -t nat -A PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        iptables -t nat -A POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
 else
         echo "disabling forwarding of $proto traffic from $local_ip : $local_port => $remote_ip : $remote_port"
-        echo iptables -t nat -D PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        echo iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
-        iptables -t nat -D PREROUTING  -p tcp -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
-        iptables -t nat -D POSTROUTING -p tcp --dport $remote_port -j MASQUERADE
+        echo iptables -t nat -D PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        echo iptables -t nat -D POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
+        iptables -t nat -D PREROUTING  -p $proto -d $local_ip --dport $local_port   -j DNAT --to-destination $remote_ip:$remote_port
+        iptables -t nat -D POSTROUTING -p $proto --dport $remote_port -j MASQUERADE
 fi
 
 

@@ -1,16 +1,16 @@
 #!/bin/bash -x
 
 #
-# Generate DHM keys. Will create a symlink for the PUCK's
+# Generate DHM keys. Will create a symlink for the D3CK's
 # openvpn will use the generated one next time.
 #
 # This can take a very, very long time on the Pi
 #
 
-. /etc/puck/config.sh
+. /etc/d3ck/config.sh
 
-keyfile="$keystore/PUCK/dh$KEY_SIZE.params"
-vpn_keyfile="$keystore/PUCK/dh.params"
+keyfile="$d3ck_keystore/dh$KEY_SIZE.params"
+vpn_keyfile="$d3ck_keystore/dh.params"
 
 if [ -f $keyfile -o -f $vpn_keyfile ] ; then
     echo "Not going to overwrite existing DH key with same name ($keyfile or $vpn_keyfile)"
@@ -18,9 +18,7 @@ if [ -f $keyfile -o -f $vpn_keyfile ] ; then
 fi
 
 echo creating DH parameters... 
-echo ... unfasten your seatbelt and take a walk, maybe a vacation, this\'ll take awhile....
-
-mkdir /etc/puck/PUCK 2> /dev/null
+echo "... unfasten your seatbelt and take a walk, maybe a vacation, this might take awhile...."
 
 # start crankin' on DH...
 time openssl dhparam -out $keyfile $KEY_SIZE

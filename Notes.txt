@@ -1,46 +1,31 @@
 
-So currently ran this on llew's system
+ubuntu... make something in /etc/init.d runnable...
 
-    ./fw.sh up 10.0.0.71  5555 192.168.0.250 12034 tcp
-
-#####?    ip route add 192.168.0.250 dev tun1... no need if use 10.xx..xxxxx?
-
-
-Also - meld in signal server
+    update-rc.d foo-filename defaults
+    update-rc.d foo-filename enable
 
 
 
-
-CURRENT ASSUMPTION: if PUCK-1 can ip-connect to PUCK-2, user-1 can ip-connect to PUCK-2 as well
-
-# Installed node from:
-# 
-#    http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
-#
-
-cd /tmp
-wget http://nodejs.org/dist/v0.10.24/node-v0.10.24-linux-arm-pi.tar.gz
-
-mkdir /usr/local/puck_stuff
-cd /usr/local/puck_stuff
-
-tar xvf /tmp/node-v0.10.24-linux-arm-pi.tar.gz
-rm /tmp/node-v0.10.24-linux-arm-pi.tar.gz
-
-# add line to .bash_profile
-
-echo export PATH=$PATH:/usr/local/puck_stuff/node-v0.10.24-linux-arm-pi/bin >> ~/.bash_profile
+poker cards 3.5 x 2.5
 
 
-# used this branch of node-http-proxy
-
-https://github.com/nodejitsu/node-http-proxy/tree/caronte
-
-# someone said:
-#
-# npm -g install /path/to/node-http-proxy-caronte
-
-# In my case, the install linkage was broken, so I had to run sudo npm link http-proxy
 
 
-+ websocket npm
+When a d3ck is added:
+
+    create set of certs they may use to communicate to our d3ck
+
+    save these certs in the directory corresponding to the keys we got from them
+
+        xxx - save in redis
+
+
+
+# rasbperry pi
+
+wget http://node-arm.herokuapp.com/node_latest_armhf.deb
+
+#   [...]
+#   Saving to: `node_latest_armhf.deb'
+
+sudo dpkg -i node_latest_armhf.deb

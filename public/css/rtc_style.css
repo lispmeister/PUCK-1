@@ -1,34 +1,10 @@
-/* slightly modded version of:
+/* modded version of:
 
 // Muaz Khan         - www.MuazKhan.com
 // MIT License       - www.WebRTC-Experiment.com/licence
 // Experiments       - github.com/muaz-khan/WebRTC-Experiment
 
 */
-
-body, body * {
-    padding: 0;
-    margin: 0;
-    outline: none;
-    -webkit-user-drag: none;
-}
-
-body {
-    border-right: 2px solid gray;
-    border-left: 2px solid gray;
-    margin: 0 2%;
-    background: white;
-    line-height: 1.5em;
-}
-
-body {
-    padding: 30px 30px;
-}
-
-.main {
-    border: 1px solid black;
-    border-radius: 6px;
-}
 
 .new-message {
     border-top: 1px solid black;
@@ -59,12 +35,8 @@ body {
     padding: .4em .8em;
 }
 
-.header {
-}
-
 .message {
     padding: .6em .8em;
-/*    color: red; */
 }
 
 .message img, .message iframe {
@@ -153,19 +125,6 @@ button[disabled], input[type=button][disabled] {
 	padding-bottom: 4px;
 }
 
-a {
-    color: #2844FA;
-    text-decoration: none;
-}
-
-a:hover, a:focus {
-    color: #1B29A4;
-}
-
-a:active {
-    color: #000;
-}
-
 input {
     border-radius: 1px;
     border: 1px solid #d9d9d9;
@@ -185,12 +144,6 @@ input[type=checkbox] {
     height: 30px;
     margin: 0;
     vertical-align: middle;
-}
-
-h1 {
-    position: absolute;
-    color: rgb(10, 175, 253);
-    text-shadow: 1px 1px rgb(7, 129, 160);
 }
 
 .users-list.selected {
@@ -281,13 +234,6 @@ table {
     width: 100%;
 }
 
-h1, h2 {
-    border-bottom: 1px solid rgb(189, 189, 189);
-    display: inline;
-    font-weight: normal;
-    padding: 0 0 3px 0;
-}
-
 select {
     border: 1px solid #d9d9d9;
     border-radius: 1px;
@@ -311,6 +257,7 @@ small {
     border: 0!important;
     vertical-align: middle;
 }
+
 #who-is-typing
 {
 	text-align: left;

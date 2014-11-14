@@ -1,14 +1,14 @@
 #!/bin/bash -x
 
 #
-#  Try to start a VPN between the PUCK we're on and the remote one - the start of a bold new world...!
+#  Try to start a VPN between the D3CK we're on and the remote one - the start of a bold new world...!
 #
-#  Usage: $0 puck-id ip-address
+#  Usage: $0 d3ck-id ip-address
 #
 
-. /etc/puck/config.sh
+. /etc/d3ck/config.sh
 
-results="$PUCK_TMP/_puck_create_results.$$"
+results="$D3CK_TMP/_d3ck_create_results.$$"
 
 app_dir=`pwd`
 bin_dir="$app_dir/exe"
@@ -26,11 +26,13 @@ fi
 pid="$1"
 ip=$2
 
-ca="       --ca  $keystore/$pid/puckroot.crt"
-key="     --key  $keystore/$pid/puck.key"
-cert="   --cert  $keystore/$pid/puck.crt"
+ca="       --ca  $keystore/$pid/d3ckroot.crt"
+# key="     --key  $keystore/$pid/cli3nt.key"
+# cert="   --cert  $keystore/$pid/cli3nt.crt"
+key="     --key  $keystore/$pid/d3ck.key"
+cert="   --cert  $keystore/$pid/d3ck.crt"
 tls="--tls-auth  $keystore/$pid/ta.key"
-# dh="       --dh  $puck_home/pucks/$pid/dh_param"
+# dh="       --dh  $d3ck_home/d3cks/$pid/dh_param"
 
 # cd $HOME
 # $bin_dir/p0v.py -m client &

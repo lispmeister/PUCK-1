@@ -3,7 +3,7 @@
 #
 # allow a few ips through a given port, block the rest
 #
-me="192.168.0.0/24"
+me="192.168.0.0/24 63.225.191.45 127.0.0.1"
 
 llew="66.235.6.166"
 ec2="54.203.255.17"

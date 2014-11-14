@@ -11,7 +11,7 @@
 
 # ps output line will look something like:
 #
-# root     30424  0.0  0.0   5248  3092 ?        S    12:21   0:00 openvpn --ca /etc/puck/pucks/0A1867714E98FC89C4029AD63C5C8F2ACA01D8E6/puckroot.crt --key /etc/puck/pucks/0A1867714E98FC89C4029AD63C5C8F2ACA01D8E6/puck.key --cert /etc/puck/pucks/0A1867714E98FC89C4029AD63C5C8F2ACA01D8E6/puck.crt --remote 192.168.0.141 --config C.conf
+# root     30424  0.0  0.0   5248  3092 ?        S    12:21   0:00 openvpn --ca /etc/d3ck/d3cks/0A1867714E98FC89C4029AD63C5C8F2ACA01D8E6/d3ckroot.crt --key /etc/d3ck/d3cks/0A1867714E98FC89C4029AD63C5C8F2ACA01D8E6/d3ck.key --cert /etc/d3ck/d3cks/0A1867714E98FC89C4029AD63C5C8F2ACA01D8E6/d3ck.crt --remote 192.168.0.141 --config C.conf
 #
 
 pid=$(ps axuww | grep ' openvpn ' | grep C.conf | awk '{print $2}')

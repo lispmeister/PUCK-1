@@ -22,3 +22,6 @@ echo Device  :  $dev
 echo MTU     :  $mtu
 echo MTU2    :  $mtu2
 
+echo changing haproxy settings....
+/etc/d3ck/exe/proxy_fix.sh
+

@@ -1,5 +1,5 @@
 # 
-# stuff you need to run a PUCK... for ubuntu
+# stuff you need to run a D3CK... for ubuntu
 #
 # EC2 uses yum... big interesting one is:
 #
@@ -8,7 +8,14 @@
 #
 # - zen
 #
-# Fri May  2 14:58:27 PDT 2014
+# 
+# Sun Aug 17 11:03:46 PDT 2014
+
+# latest node for arm/raspberry pi:
+#
+# http://nodejs.org/dist/v0.10.27/node-v0.10.27-linux-arm-pi.tar.gz
+#
+
 #
 
 apt-get install -y aptitude
@@ -24,6 +31,7 @@ aptitude update
 apt-get install -y openssh-server
 apt-get install -y openvpn
 apt-get install -y yate
+apt-get install -y nginx
 apt-get install -y openssl
 apt-get install -y git
 apt-get install -y npm
@@ -31,9 +39,9 @@ apt-get install -y redis-server
 apt-get install -y curl
 apt-get install -y nodejs
 
-git clone https://github.com/zenfish/PUCK
+git clone https://github.com/zenfish/D3CK
 
-cd PUCK
+cd D3CK
 
 npm install
 
@@ -43,5 +51,5 @@ npm install
 # and finally....
 
 # start, stop, restart... sort of work ;)
-service puck start
+service d3ck start
 

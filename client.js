@@ -1,136 +1,49 @@
-
-var util = require('util');
-
-var assert = require('assert-plus');
-var bunyan = require('bunyan');
-var getopt = require('posix-getopt');
-var restify = require('restify');
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
 
 
-///--- Globals
+var constants = require('constants');
 
-var sprintf = util.format;
+var https = require('https');
+var fs = require("fs");
 
-
-
-///--- API
-
-function PuckClient(options) {
-        assert.object(options, 'options');
-        assert.object(options.log, 'options.log');
-        assert.optionalString(options.socketPath, 'options.socketPath');
-        assert.optionalString(options.url, 'options.url');
-        assert.optionalString(options.version, 'options.version');
-
-        var self = this;
-        var ver = options.version || '~1.0';
-
-        this.client = restify.createClient({
-                log: options.log,
-                name: 'PuckClient',
-                socketPath: options.socketPath,
-                type: 'json',
-                url: options.url,
-                version: ver
-        });
-        this.log = options.log.child({component: 'PuckClient'}, true);
-        this.url = options.url;
-        this.version = ver;
-
-        if (options.username && options.password) {
-                this.username = options.username;
-                this.client.basicAuth(options.username, options.password);
-        }
-}
+https.globalAgent.options.secureProtocol = 'SSLv3_method'
 
 
-PuckClient.prototype.create = function create(value, cb) {
-        assert.string(value, 'value');
-        assert.func(cb, 'callback');
+var options = {
+    host: 'localhost',
+    port: 4000,
+    // path: '/',
+    path: '/kkk',
+    method: 'GET',
+    key:        fs.readFileSync("client.key"),
+    cert:       fs.readFileSync("client.crt"),
+    ca:         fs.readFileSync("/etc/d3ck/d3cks/D3CK/ca.crt"),
+    // key:        fs.readFileSync("bad.key"),
+    // cert:       fs.readFileSync("bad.crt"),
+    // ca:         fs.readFileSync("bad.ca"),
+    strictSSL:  false
 
-        this.client.post('/puck', {value: value}, function (err, req, res, obj) {
-                if (err) {
-                        cb(err);
-                } else {
-                        cb(null, obj);
-                }
-        });
 };
 
+var req = https.request(options, function(res) {
 
-PuckClient.prototype.list = function list(cb) {
-        assert.func(cb, 'callback');
+    console.log("statusCode: ", res.statusCode);
+    console.log("headers: ", res.headers);
 
-        this.client.get('/puck', function (err, req, res, obj) {
-                if (err) {
-                        cb(err);
-                } else {
-                        cb(null, obj);
-                }
-        });
-};
+    res.on('data', function(d) {
+        console.log('on data, on blitzen...')
+        // process.stdout.write(d);
+        console.log(d)
+        console.log(typeof d)
+        console.log(JSON.stringify(d))
+    });
 
+});
 
-PuckClient.prototype.get = function get(key, cb) {
-        assert.string(key, 'key');
-        assert.func(cb, 'callback');
+req.end();
 
-        this.client.get('/puck/' + key, function (err, req, res, obj) {
-                if (err) {
-                        cb(err);
-                } else {
-                        cb(null, obj);
-                }
-        });
-};
-
-
-PuckClient.prototype.update = function update(puck, cb) {
-        assert.object(puck, 'puck');
-        assert.func(cb, 'callback');
-
-        this.client.put('/puck/' + puck.key, puck, function (err) {
-                if (err) {
-                        cb(err);
-                } else {
-                        cb(null);
-                }
-        });
-};
-
-
-PuckClient.prototype.del = function del(key, cb) {
-        if (typeof (key) === 'function') {
-                cb = key;
-                key = '';
-        }
-        assert.string(key, 'key');
-        assert.func(cb, 'callback');
-
-        var p = '/puck' + (key.length > 0 ? '/' + key : '');
-        this.client.del(p, function (err) {
-                if (err) {
-                        cb(err);
-                } else {
-                        cb(null);
-                }
-        });
-};
-
-
-PuckClient.prototype.toString = function toString() {
-        var str = sprintf('[object PuckClient<url=%s, username=%s, version=%s]',
-                          this.url, this.username || 'null', this.version);
-        return (str);
-};
-
-
-
-///--- API
-
-module.exports = {
-        createClient: function createClient(options) {
-                return (new PuckClient(options));
-        }
-};
+req.on('error', function(e) {
+    console.log('errz')
+    console.log(e);
+});
